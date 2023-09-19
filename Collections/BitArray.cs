@@ -500,10 +500,10 @@ public sealed class BitArray
     private void ThrowException(int index)
     {
         if (index < 0)
-            throw new ArgumentOutOfRangeException("index", "Must be greater than or equal to zero.");
+            throw new ArgumentOutOfRangeException(nameof(index), "Must be greater than or equal to zero.");
 
         if (index >= m_count)
-            throw new ArgumentOutOfRangeException("index", "Exceedes the length of the array.");
+            throw new ArgumentOutOfRangeException(nameof(index), "Exceedes the length of the array.");
     }
 
     // Validates that a range of bits (specified by index AND length) is within the valid range in the bit array. 
@@ -519,13 +519,13 @@ public sealed class BitArray
     private void ThrowException(int index, int length)
     {
         if (index < 0)
-            throw new ArgumentOutOfRangeException("index", "Must be greater than or equal to zero.");
+            throw new ArgumentOutOfRangeException(nameof(index), "Must be greater than or equal to zero.");
 
         if (length < 0)
-            throw new ArgumentOutOfRangeException("length", "Must be greater than or equal to zero.");
+            throw new ArgumentOutOfRangeException(nameof(length), "Must be greater than or equal to zero.");
 
         if (index + length > m_count)
-            throw new ArgumentOutOfRangeException("length", "index + length exceedes the length of the array.");
+            throw new ArgumentOutOfRangeException(nameof(length), "index + length exceedes the length of the array.");
     }
 
     #endregion
