@@ -107,7 +107,7 @@ public sealed class BitArray
     /// Gets or sets individual bits in this array.
     /// </summary>
     /// <param name="index">Bit position to access.</param>
-    /// <returns></returns>
+    /// <returns>Bit at specified <paramref name="index"/>.</returns>
     public bool this[int index]
     {
         get => GetBit(index);
