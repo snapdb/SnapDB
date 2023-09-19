@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  ImmutableList`1.cs - Gbtc
+//  ImmutableList.cs - Gbtc
 //
 //  Copyright © 2016, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -18,9 +18,10 @@
 //  ----------------------------------------------------------------------------------------------------
 //  10/24/2016 - Steven E. Chisholm
 //       Generated original version of source code. 
-//       
+//
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using System.Collections;
@@ -96,8 +97,10 @@ public class ImmutableList<T>
     /// <summary>
     /// Adds the elements of the specified collection to the end of the <see cref="T:System.Collections.Generic.List`1"/>.
     /// </summary>
-    /// <param name="collection">The collection whose elements should be added to the end of the <see cref="T:System.Collections.Generic.List`1"/>. 
-    /// The collection itself cannot be null, but it can contain elements that are null</param>
+    /// <param name="collection">
+    /// The collection whose elements should be added to the end of the <see cref="T:System.Collections.Generic.List`1"/>. 
+    /// The collection itself cannot be null, but it can contain elements that are null.
+    /// </param>
     public void AddRange(IEnumerable<T> collection)
     {
         TestForEditable();
@@ -124,7 +127,7 @@ public class ImmutableList<T>
     /// <summary>
     /// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1" /> contains a specific value.
     /// </summary>
-    /// <returns>true if <paramref name="item" /> is found in the <see cref="T:System.Collections.Generic.ICollection`1" />; otherwise, false.</returns>
+    /// <returns><c>true</c> if <paramref name="item" /> is found in the <see cref="T:System.Collections.Generic.ICollection`1" />; otherwise, <c>false</c>.</returns>
     /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
     public bool Contains(T item)
     {
@@ -134,7 +137,10 @@ public class ImmutableList<T>
     /// <summary>
     /// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
     /// </summary>
-    /// <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1" />. The <see cref="T:System.Array" /> must have zero-based indexing.</param>
+    /// <param name="array">
+    /// The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1" />. 
+    /// The <see cref="T:System.Array" /> must have zero-based indexing.
+    /// </param>
     /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
     public void CopyTo(T[] array, int arrayIndex)
     {
@@ -144,7 +150,9 @@ public class ImmutableList<T>
     /// <summary>
     /// Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.ICollection`1" />.
     /// </summary>
-    /// <returns>true if <paramref name="item" /> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1" />; otherwise, false. This method also returns false if <paramref name="item" /> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1" />.</returns>
+    /// <returns><c>true</c> if <paramref name="item" /> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1" />; 
+    /// otherwise, <c>false</c>. This method also returns false if <paramref name="item" /> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1" />.
+    /// </returns>
     /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
     public bool Remove(T item)
     {
@@ -165,7 +173,7 @@ public class ImmutableList<T>
     }
 
     /// <summary>
-    /// Requests that member fields be set to readonly. 
+    /// Requests that member fields be set to "read-only". 
     /// </summary>
     protected override void SetMembersAsReadOnly()
     {

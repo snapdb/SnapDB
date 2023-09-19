@@ -18,16 +18,17 @@
 //  ----------------------------------------------------------------------------------------------------
 //  10/24/2016 - Steven E. Chisholm
 //       Generated original version of source code. 
-//       
+//
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.Immutables;
 
 /// <summary>
 /// Represents an object that can be configured as read only and thus made immutable.  
-/// The origional contents of this class will not be editable once <see cref="IImmutableObject.IsReadOnly"/> is set to true.
+/// The original contents of this class will not be editable once <see cref="IImmutableObject.IsReadOnly"/> is set to <c>true</c>.
 /// In order to modify the contest of this object, a clone of the object must be created with <see cref="CloneEditable"/>.
 /// </summary>
 /// <typeparam name="T"></typeparam>
@@ -37,12 +38,10 @@ public interface IImmutableObject<out T>
     /// <summary>
     /// Makes a clone of this object and allows it to be edited.
     /// </summary>
-    /// <returns></returns>
     new T CloneEditable();
 
     /// <summary>
     /// Makes a readonly clone of this object. Returns the same object if it is already marked as readonly.
     /// </summary>
-    /// <returns></returns>
     new T CloneReadonly();
 }

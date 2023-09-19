@@ -18,9 +18,10 @@
 //  ----------------------------------------------------------------------------------------------------
 //  10/24/2016 - Steven E. Chisholm
 //       Generated original version of source code. 
-//       
+//
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using System.Data;
@@ -44,8 +45,8 @@ public abstract class ImmutableObjectBase<T>
     private bool m_isReadOnly;
 
     /// <summary>
-    /// Gets/Sets if this class is immutable and thus read only. Once
-    /// setting to readonly, the class becomes immutable.
+    /// Gets or sets if this class is immutable and thus "read-only". Once
+    /// setting to "read-only", the class becomes immutable.
     /// </summary>
     public bool IsReadOnly
     {
@@ -55,7 +56,7 @@ public abstract class ImmutableObjectBase<T>
         }
         set
         {
-            if (value ^ m_isReadOnly) //if values are different
+            if (value ^ m_isReadOnly) // If values are different.
             {
                 if (m_isReadOnly)
                     throw new ReadOnlyException("Object has been set as read only and cannot be reversed");
@@ -66,7 +67,7 @@ public abstract class ImmutableObjectBase<T>
     }
 
     /// <summary>
-    /// Test if the class has been marked as readonly. Throws an exception if editing cannot occur.
+    /// Test if the class has been marked as "read-only". Throws an exception if editing cannot occur.
     /// </summary>
     protected void TestForEditable()
     {
@@ -80,7 +81,7 @@ public abstract class ImmutableObjectBase<T>
     }
 
     /// <summary>
-    /// Requests that member fields be set to readonly. 
+    /// Requests that member fields be set to "read-only". 
     /// </summary>
     protected abstract void SetMembersAsReadOnly();
 
@@ -93,7 +94,7 @@ public abstract class ImmutableObjectBase<T>
     /// Creates a clone of this class that is editable.
     /// A clone is always created, even if this class is already editable.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The newly created instance of type 'T'.</returns>
     public virtual T CloneEditable()
     {
         T initializer = (T)MemberwiseClone();
@@ -103,9 +104,9 @@ public abstract class ImmutableObjectBase<T>
     }
 
     /// <summary>
-    /// Makes a readonly clone of this object. Returns the same object if it is already marked as readonly.
+    /// Makes a "read-only" clone of this object. Returns the same object if it is already marked as "read-only".
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The non-editable clone.</returns>
     object IImmutableObject.CloneReadonly()
     {
         return CloneReadonly();
@@ -114,17 +115,16 @@ public abstract class ImmutableObjectBase<T>
     /// <summary>
     /// Makes a clone of this object and allows it to be edited.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The editable clone.</returns>
     object IImmutableObject.CloneEditable()
     {
         return CloneEditable();
     }
 
     /// <summary>
-    /// Makes a readonly clone of the object.
-    /// If the class is currently marked as readonly, the current instance is returned.
+    /// Makes a "read-only" clone of the object.
+    /// If the class is currently marked as "read-only", the current instance is returned.
     /// </summary>
-    /// <returns></returns>
     public virtual T CloneReadonly()
     {
         if (IsReadOnly)
@@ -132,19 +132,19 @@ public abstract class ImmutableObjectBase<T>
 
         T copy = CloneEditable();
         copy.IsReadOnly = true;
+
         return copy;
     }
 
     /// <summary>
     /// Returns a clone of this class.
-    /// If the class is marked as readonly, it returns the current instance.
+    /// If the class is marked as "read-only", it returns the current instance.
     /// </summary>
-    /// <returns></returns>
     public object Clone()
     {
         if (IsReadOnly)
             return this;
-        else
-            return CloneEditable();
+
+        return CloneEditable();
     }
 }
