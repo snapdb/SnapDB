@@ -104,7 +104,7 @@ public sealed class BitArray
     #region [ Properties ]
 
     /// <summary>
-    /// Gets/Sets individual bits in this array.
+    /// Gets or sets individual bits in this array.
     /// </summary>
     /// <param name="index">Bit position to access.</param>
     /// <returns></returns>
