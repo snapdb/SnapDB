@@ -40,7 +40,7 @@ public class NullableLargeArray<T> : IEnumerable<T>
     private readonly BitArray m_isUsed;
 
     /// <summary>
-    /// Creates a <see cref="NullableLargeArray{T}"/>
+    /// Creates a <see cref="NullableLargeArray{T}"/>.
     /// </summary>
     public NullableLargeArray()
     {
