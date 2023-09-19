@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  9/1/2012 - Steven E. Chisholm
+//  09/01/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //
 //  09/14/2023 - Lillian Gensolin
-//       Converted code to .NET core.       
+//       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using Gemstone;
@@ -29,13 +30,15 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Collections;
 
 /// <summary>
-/// Since large arrays expand slowly, this class can quickly grow an array with millions of elements.
-/// It is highly advised that these objects are structs since keeping a list of millions of classes 
-/// will cause the garbage collection cycles to become very slow.
+/// Implementation that utilizes a jagged array structure and 
+/// array expansion optimization to improve performance.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class LargeArray<T>
 {
+    // Since large arrays expand slowly, this class can quickly grow an array with millions of elements.
+    // It is highly advised that these objects are structs since keeping a list of millions of classes
+    // would cause the garbage collection cycles to become very slow.
     private readonly int m_size;
     private readonly int m_bitShift;
     private readonly int m_mask;
@@ -51,7 +54,7 @@ public class LargeArray<T>
     /// <summary>
     /// Creates a <see cref="LargeArray{T}"/> with the specified jagged array depth.
     /// </summary>
-    /// <param name="jaggedArrayDepth">the number of elements per jagged array. Rounds up to the nearest power of 2.</param>
+    /// <param name="jaggedArrayDepth">The number of elements per jagged array (rounds up to the nearest power of 2).</param>
     public LargeArray(int jaggedArrayDepth)
     {
         m_size = (int)BitMath.RoundUpToNearestPowerOfTwo((uint)jaggedArrayDepth);
@@ -62,10 +65,10 @@ public class LargeArray<T>
     }
 
     /// <summary>
-    /// Gets/Sets the value in the specified index of the array.
+    /// Gets or sets the value in the specified index of the array.
     /// </summary>
-    /// <param name="index">The index to address</param>
-    /// <returns></returns>
+    /// <param name="index">The index to address.</param>
+    /// <returns>The value at the specified index.</returns>
     public T this[int index]
     {
         get
@@ -89,9 +92,7 @@ public class LargeArray<T>
     /// Sets the capacity of the array to at least the given length. Will not reduce the size.
     /// </summary>
     /// <param name="length">The new length (capacity) for the data structure.</param>
-    /// <returns>
-    /// The updated capacity of the data structure after setting it to the specified length.
-    /// </returns>
+    /// <returns>The updated capacity of the data structure after setting it to the specified length.</returns>
     public int SetCapacity(int length)
     {
         // Variable to store the number of arrays needed to accommodate the specified length.
@@ -134,12 +135,13 @@ public class LargeArray<T>
             ThrowException(index);
     }
 
-    // Thows an ArgumentOutOfRangeException if index is outside of valid range.
+    // Throws an ArgumentOutOfRangeException if index is outside of valid range.
     [MethodImpl(MethodImplOptions.NoInlining)]
     private void ThrowException(int index)
     {
         if (index < 0)
             throw new ArgumentOutOfRangeException("index", "Must be greater than or equal to zero.");
+            
         if (index >= m_capacity)
             throw new ArgumentOutOfRangeException("index", "Exceedes the length of the array.");
     }
