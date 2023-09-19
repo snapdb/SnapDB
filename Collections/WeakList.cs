@@ -21,6 +21,7 @@
 //       
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using System.Collections;
@@ -29,17 +30,9 @@ namespace SnapDB.Collections;
 
 /// <summary>
 /// Creates a list of items that will be weak referenced.
-/// This list is thread safe and allows enumeration while adding and removing from the list.
+/// This list is thread-safe and allows enumeration while adding and removing from the list.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-/// <remarks>
-/// This is a special case list where all items in the list are weak referenced. Only include 
-/// instances that are strong referenced somewhere. 
-/// For example, delegates will not work in this list unless it is strong referenced in the instance.
-/// This is because a delegate is a small wrapper of (Object,Method) and is usually recreated on the fly
-/// rather than stored. Therefore if the only reference to the delegate is passed to this list, it will be
-/// collected at the next GC cycle.
-/// </remarks>
 public class WeakList<T> : IEnumerable<T>
     where T : class
 {
@@ -48,6 +41,12 @@ public class WeakList<T> : IEnumerable<T>
     /// </summary>
     private class Snapshot
     {
+        // This is a special case list where all items in the list are weak referenced. Only include 
+        // instances that are strong referenced somewhere. 
+        // For example, delegates will not work in this list unless it is strong referenced in the instance.
+        // This is because a delegate is a small wrapper of (Object,Method) and is usually recreated on the fly
+        // rather than stored. Therefore if the only reference to the delegate is passed to this list, it will be
+        // collected at the next GC cycle.
         public WeakReference[] Items;
         public int Size;
            
@@ -74,6 +73,7 @@ public class WeakList<T> : IEnumerable<T>
 
                 if (reference.Target is T)
                     itemCount++;
+                
                 else
                     Items[x] = null;
             }
@@ -136,7 +136,7 @@ public class WeakList<T> : IEnumerable<T>
         /// Attempts to add <see cref="item"/> to the list. 
         /// </summary>
         /// <param name="item"></param>
-        /// <returns>returns true if added, false otherwise.</returns>
+        /// <returns<c>true</c> if added, <c>false</c> otherwise.</returns>
         public bool TryAdd(T item)
         {
             return TryAdd(new WeakReference(item));
@@ -167,10 +167,10 @@ public class WeakList<T> : IEnumerable<T>
         private T? m_current;
 
         /// <summary>
-        /// Creates a <see cref="Enumerator"/>
+        /// Creates a <see cref="Enumerator"/>.
         /// </summary>
-        /// <param name="items">the weak referenced items.</param>
-        /// <param name="count">the number of valid items in the list.</param>
+        /// <param name="items">The weak referenced items.</param>
+        /// <param name="count">The number of valid items in the list.</param>
         public Enumerator(WeakReference[] items, int count)
         {
             m_items = items;
@@ -202,7 +202,8 @@ public class WeakList<T> : IEnumerable<T>
         /// <c>true</c> if the enumerator was successfully advanced to the next item;
         /// <c>false</c> if the end of the collection has been reached.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created. </exception><filterpriority>2</filterpriority>
+        /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created. </exception>
+        /// <filterpriority>2</filterpriority>
         public bool MoveNext()
         {
             while (m_currentIndex < m_lastItem)
@@ -217,6 +218,7 @@ public class WeakList<T> : IEnumerable<T>
                 {
                     // If the weak reference can be resolved to an item of type T, set the current item and return true.
                     m_current = item;
+                    
                     return true;
                 }
 
