@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  WeakList`1.cs - Gbtc
+//  WeakList.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -16,7 +16,7 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  4/11/2014 - Steven E. Chisholm
+//  04/11/2014 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/15/2023 - Lillian Gensolin
