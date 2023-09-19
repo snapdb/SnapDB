@@ -55,6 +55,7 @@ public static class ListExtensions
             }
 
         list.Add(item);
+
         return list.Count - 1;
     }
 
@@ -81,6 +82,7 @@ public static class ListExtensions
         }
 
         list.Add(item);
+           
         return list.Count - 1;
     }
 }
