@@ -30,8 +30,8 @@ namespace SnapDB.Collections;
 
 /// <summary>
 /// Provides a high speed list that can have elements that can be null.
-/// It would be similiar to a List&lt;Nullable&lt;T&gt;&gt;() except provide high speed lookup for
-/// NextIndexOfNull-like functions.
+/// It is similiar to a <see cref="List{T}"/> except high speed lookup for
+/// NextIndexOfNull-like functions is provided as well.
 /// </summary>
 /// <typeparam name="T">The type.</typeparam>
 public class NullableLargeArray<T> : IEnumerable<T>
@@ -52,7 +52,6 @@ public class NullableLargeArray<T> : IEnumerable<T>
     /// Returns if the object is not null.
     /// </summary>
     /// <param name="index"></param>
-    /// <returns></returns>
     public bool HasValue(int index)
     {
         // Bounds checking is done in BitArray
@@ -64,17 +63,19 @@ public class NullableLargeArray<T> : IEnumerable<T>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
-    /// <returns>True if the item exists. False if null.</returns>
+    /// <returns><c>True</c> if the item exists; otherwise, <c>false</c> if null.</returns>
     public bool TryGetValue(int index, out T value)
     {
         if (HasValue(index))
         {
             value = m_list[index];
+
             return true;
         }
         else
         {
             value = default;
+
             return false;
         }
     }
@@ -85,7 +86,7 @@ public class NullableLargeArray<T> : IEnumerable<T>
     public int Capacity => m_list.Capacity;
 
     /// <summary>
-    /// Gets the number of items that are in the array that are not null
+    /// Gets the number of non-null items that are in the array.
     /// </summary>
     public int CountUsed => m_isUsed.SetCount;
 
@@ -97,8 +98,8 @@ public class NullableLargeArray<T> : IEnumerable<T>
     /// <summary>
     /// Gets the provided item from the array. 
     /// </summary>
-    /// <param name="index">the index of the item</param>
-    /// <returns>The item.</returns>
+    /// <param name="index">The index of the item.</param>
+    /// <returns>The item at the specified index.</returns>
     public T this[int index]
     {
         get => GetValue(index);
@@ -121,10 +122,10 @@ public class NullableLargeArray<T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Gets the specified item from the list.  Throws an exception if the item is null.
+    /// Gets the specified item from the list. Throws an exception if the item is null.
     /// </summary>
     /// <param name="index"></param>
-    /// <returns></returns>
+    /// <returns>The item from the specified index.</returns>
     public T GetValue(int index)
     {
         if (!HasValue(index))
@@ -155,24 +156,24 @@ public class NullableLargeArray<T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Replaces and existing value in the list. Throws an exception if the existing item is null.
+    /// Replaces an existing value in the list. Throws an exception if the existing item is null.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
     public void OverwriteValue(int index, T value)
     {
         if (!HasValue(index))
-            throw new IndexOutOfRangeException("index does not exist");
+            throw new IndexOutOfRangeException("Index does not exist.");
 
         m_list[index] = value;
     }
 
     /// <summary>
-    /// Adds a new value to the list and locates it at the nearest possible empty location.
+    /// Adds a new value to the list at the nearest possible empty location.
     /// If there is not enough room, the list is automatically expanded.
     /// </summary>
     /// <param name="value">The value to add.</param>
-    /// <returns>the index where the value was placed.</returns>
+    /// <returns>The index where the value was placed.</returns>
     public int AddValue(T value)
     {
         int index = FindFirstEmptyIndex();
@@ -181,7 +182,9 @@ public class NullableLargeArray<T> : IEnumerable<T>
             SetCapacity(Capacity + 1);
             index = FindFirstEmptyIndex();
         }
+
         SetValue(index, value);
+
         return index;
     }
 
