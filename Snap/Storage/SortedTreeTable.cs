@@ -24,7 +24,6 @@
 //******************************************************************************************************
 
 using SnapDB.IO.FileStructure;
-using SnapDB.Snap.Storage;
 
 namespace GSF.Snap.Storage
 {
@@ -171,16 +170,5 @@ namespace GSF.Snap.Storage
         ///// Closes and deletes the Archive File. Also calls dispose.
         ///// If this is a memory archive, it will release the memory space to the buffer pool.
         ///// </summary>
-        //public void Delete()
-        //{
-        //    Dispose();
-        //    if (m_fileName != string.Empty)
-        //    {
-        //        File.Delete(m_fileName);
-        //    }
-        //}
-
-
-        #endregion
-    }
+    #endregion
 }

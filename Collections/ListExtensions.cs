@@ -23,64 +23,63 @@
 //       Converted code to .NET core. 
 //******************************************************************************************************
 
-namespace SnapDB.Collections
+namespace SnapDB.Collections;
+
+/// <summary>
+/// Extensions for <see cref="IList{T}"/>
+/// </summary>
+public static class ListExtensions
 {
     /// <summary>
-    /// Extensions for <see cref="IList{T}"/>
+    /// Parses through the provided list and assigns <see cref="item"/> to the first null field. 
+    /// Otherwise, it will be added to the end of the list.
     /// </summary>
-    public static class ListExtensions
+    /// <param name="list">the list to iterate through</param>
+    /// <param name="item">the item to add</param>
+    /// <returns>the index of the added item</returns>
+    public static int ReplaceFirstNullOrAdd<T>(this IList<T> list, T item)
+        where T : class
     {
-        /// <summary>
-        /// Parses through the provided list and assigns <see cref="item"/> to the first null field. 
-        /// Otherwise, it will be added to the end of the list.
-        /// </summary>
-        /// <param name="list">the list to iterate through</param>
-        /// <param name="item">the item to add</param>
-        /// <returns>the index of the added item</returns>
-        public static int ReplaceFirstNullOrAdd<T>(this IList<T> list, T item)
-            where T : class
-        {
-            if (list is null)
-                throw new ArgumentException("list");
+        if (list is null)
+            throw new ArgumentException("list");
 
-            if (list is List<T> lst)
-                return lst.ReplaceFirstNullOrAdd(item);
+        if (list is List<T> lst)
+            return lst.ReplaceFirstNullOrAdd(item);
 
-            for (int x = 0; x < list.Count; x++)
-                if (list[x] is null)
-                {
-                    list[x] = item;
-                    return x;
-                }
-
-            list.Add(item);
-            return list.Count - 1;
-        }
-
-        /// <summary>
-        /// Parses through the provided list and assigns <see cref="item"/> to the first null field. 
-        /// Otherwise, it will be added to the end of the list.
-        /// </summary>
-        /// <param name="list">the list to iterate through</param>
-        /// <param name="item">the item to add</param>
-        /// <returns>the index of the added item</returns>
-        public static int ReplaceFirstNullOrAdd<T>(this List<T> list, T item)
-           where T : class
-        {
-            if (list is null)
-                throw new ArgumentException("list");
-
-            for (int x = 0; x < list.Count; x++)
+        for (int x = 0; x < list.Count; x++)
+            if (list[x] is null)
             {
-                if (list[x] is null)
-                {
-                    list[x] = item;
-                    return x;
-                }
+                list[x] = item;
+                return x;
             }
 
-            list.Add(item);
-            return list.Count - 1;
+        list.Add(item);
+        return list.Count - 1;
+    }
+
+    /// <summary>
+    /// Parses through the provided list and assigns <see cref="item"/> to the first null field. 
+    /// Otherwise, it will be added to the end of the list.
+    /// </summary>
+    /// <param name="list">the list to iterate through</param>
+    /// <param name="item">the item to add</param>
+    /// <returns>the index of the added item</returns>
+    public static int ReplaceFirstNullOrAdd<T>(this List<T> list, T item)
+       where T : class
+    {
+        if (list is null)
+            throw new ArgumentException("list");
+
+        for (int x = 0; x < list.Count; x++)
+        {
+            if (list[x] is null)
+            {
+                list[x] = item;
+                return x;
+            }
         }
+
+        list.Add(item);
+        return list.Count - 1;
     }
 }
