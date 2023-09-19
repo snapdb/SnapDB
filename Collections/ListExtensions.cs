@@ -16,7 +16,7 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  6/8/2012 - Steven E. Chisholm
+//  06/08/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/14/2023 - Lillian Gensolin
@@ -34,9 +34,9 @@ public static class ListExtensions
     /// Parses through the provided list and assigns <see cref="item"/> to the first null field. 
     /// Otherwise, it will be added to the end of the list.
     /// </summary>
-    /// <param name="list">the list to iterate through</param>
-    /// <param name="item">the item to add</param>
-    /// <returns>the index of the added item</returns>
+    /// <param name="list">The list to iterate through.</param>
+    /// <param name="item">The item to add.</param>
+    /// <returns>The index of the added item.</returns>
     public static int ReplaceFirstNullOrAdd<T>(this IList<T> list, T item)
         where T : class
     {
