@@ -143,7 +143,7 @@ public sealed class BitArray
     /// Gets the status of the corresponding bit.
     /// </summary>
     /// <param name="index"></param>
-    /// <returns>True if set.  False if cleared</returns>
+    /// <returns><c>true</c> if set; otherwise, <c>false</c> if cleared.</returns>
     public bool GetBit(int index)
     {
         Validate(index);
