@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  4/18/2012 - Steven E. Chisholm
+//  04/18/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using System.Collections.Concurrent;
@@ -49,8 +50,10 @@ public class ResourceQueue<T>
     {
         if (instance is null)
             throw new ArgumentNullException("instance");
+        
         if (initialCount < 0)
             throw new ArgumentOutOfRangeException("initialCount", "Must be positive");
+        
         if (maximumCount < initialCount)
             throw new ArgumentOutOfRangeException("maximumCount", "Must be greater than or equal to initialCount");
 
@@ -82,9 +85,9 @@ public class ResourceQueue<T>
     /// <param name="resource">The resource of type T to enqueue.</param>
     public void Enqueue(T resource)
     {
-        //If a race condition exists, too many items will be added to the queue. 
-        //Since it matters little that too many items are queued, that's not
-        //worth the extra complexity of synchronizing.
+        // If a race condition exists, too many items will be added to the queue. 
+        // Since it matters little that too many items are queued, that's not
+        // worth the extra complexity of synchronizing.
         if (m_queue.Count < m_maximumCount)
             m_queue.Enqueue(resource);
     }
