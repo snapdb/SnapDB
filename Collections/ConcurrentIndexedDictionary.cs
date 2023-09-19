@@ -18,9 +18,10 @@
 //  ----------------------------------------------------------------------------------------------------
 //  09/06/2014 - Steven E. Chisholm
 //       Generated original version of source code. 
-//       
+//
 //  09/14/2023 - Lillian Gensolin
-//       Converted code to .NET core.  
+//       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using System.Data;
@@ -32,8 +33,8 @@ namespace SnapDB.Collections;
 /// A thread-safe indexed dictionary that can only be added to.
 /// </summary>
 /// <remarks>
-/// This is a special purpose class that supports only the Add and Get operations.
-/// It is designed to have indexing capabilities or dictionary lookup.
+/// This is a special purpose class that supports only the 'Add' and 'Get' operations.
+/// It is designed to have indexing and dictionary lookup capabilities.
 /// </remarks>
 public class ConcurrentIndexedDictionary<TKey, TValue>
 {
@@ -50,16 +51,14 @@ public class ConcurrentIndexedDictionary<TKey, TValue>
     /// Gets the value at the specified index in the dictionary.
     /// </summary>
     /// <param name="index">The index of the value to get.</param>
-    /// <returns>
-    /// The value at the specified index.
-    /// </returns>
+    /// <returns>The value at the specified index.</returns>
     /// <exception cref="IndexOutOfRangeException">
-    /// Thrown if the specified index is less than 0 or greater than or equal to the Count of elements in the dictionary.
+    /// Thrown if the specified index is less than 0, or if it is
+    /// greater than or equal to the Count of elements in the dictionary.
     /// </exception>
     public TValue this[int index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-
         get
         {
             if (index < 0 || index >= Count)
@@ -92,9 +91,7 @@ public class ConcurrentIndexedDictionary<TKey, TValue>
     /// Gets the index of the specified <paramref name="key"/> in the dictionary.
     /// </summary>
     /// <param name="key">The key to find the index for.</param>
-    /// <returns>
-    /// The index of the key in the dictionary, or -1 if the key is not found.
-    /// </returns>
+    /// <returns>The index of the key in the dictionary, or -1 if the key is not found.</returns>
     public int IndexOf(TKey key)
     {
         lock (m_syncRoot)
@@ -111,12 +108,8 @@ public class ConcurrentIndexedDictionary<TKey, TValue>
     /// </summary>
     /// <param name="key">The key to add to the dictionary.</param>
     /// <param name="value">The value associated with the key.</param>
-    /// <returns>
-    /// The index at which the key-value pair was added in the dictionary.
-    /// </returns>
-    /// <exception cref="DuplicateNameException">
-    /// Thrown if the specified key already exists in the dictionary.
-    /// </exception>
+    /// <returns>The index at which the key-value pair was added in the dictionary.</returns>
+    /// <exception cref="DuplicateNameException">Thrown if the specified key already exists in the dictionary.</exception>
     public int Add(TKey key, TValue value)
     {
         lock (m_syncRoot)
@@ -150,13 +143,11 @@ public class ConcurrentIndexedDictionary<TKey, TValue>
     }
 
     /// <summary>
-    /// Gets the value associated with the specified <paramref name="key"/> from the dictionary or adds it if not found.
+    /// Gets the value associated with the specified <paramref name="key"/> from the dictionary, or adds it if not found.
     /// </summary>
     /// <param name="key">The key to retrieve or add.</param>
-    /// <param name="createFunction">A function to create the value if the key is not found.</param>
-    /// <returns>
-    /// The existing value associated with the key if found, or a newly created value if the key is not found.
-    /// </returns>
+    /// <param name="createFunction">A function that creates the value if the key is not found.</param>
+    /// <returns>The existing value associated with the key if found, or a newly created value if the key is not found.</returns>
     public TValue GetOrAdd(TKey key, Func<TValue> createFunction)
     {
         lock (m_syncRoot)
