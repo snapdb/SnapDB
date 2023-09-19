@@ -438,7 +438,7 @@ public sealed class BitArray
     }
 
     /// <summary>
-    /// Yields a list of all bits that are set.
+    /// Returns a yielded list of all bits that are set.
     /// </summary>
     /// <returns>An <see cref="IEnumerable{T}"/> of integers representing the positions of set bits in the bit array.</returns>
     public IEnumerable<int> GetAllSetBits()
@@ -463,7 +463,7 @@ public sealed class BitArray
     }
 
     /// <summary>
-    /// Yields a list of all bits that are cleared.
+    /// Returns a yielded list of all bits that are cleared.
     /// </summary>
     /// <returns>An <see cref="IEnumerable{T}"/> of integers representing the positions of cleared bits in the bit array.</returns>
     public IEnumerable<int> GetAllClearedBits()
