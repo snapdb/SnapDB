@@ -69,7 +69,7 @@ public sealed class BitArray
     /// If this is set to true, all elements will be set. 
     /// If it is set to false, all elements will be cleared.
     /// </param>
-    /// <param name="count">The number of bit positions to support</param>
+    /// <param name="count">The number of bit positions to support.</param>
     public BitArray(bool initialState, int count = BitsPerElement)
     {
         if (count < 0)
