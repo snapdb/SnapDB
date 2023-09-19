@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34024.191
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnapDB", "SnapDB.csproj", "{AB3102F3-053C-4505-928D-C90078B6FE03}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AB3102F3-053C-4505-928D-C90078B6FE03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB3102F3-053C-4505-928D-C90078B6FE03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB3102F3-053C-4505-928D-C90078B6FE03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB3102F3-053C-4505-928D-C90078B6FE03}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7E46A9C7-6A36-42E7-B47C-083F3F9F5373}
+	EndGlobalSection
+EndGlobal

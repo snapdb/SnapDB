@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Gemstone.Common" Version="1.0.100" />
+    <PackageReference Include="Gemstone.Diagnostics" Version="1.0.100" />
+    <PackageReference Include="Gemstone.IO" Version="1.0.100" />
+    <PackageReference Include="Gemstone.Security" Version="1.0.100" />
+  </ItemGroup>
+
+</Project>
