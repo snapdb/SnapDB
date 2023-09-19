@@ -37,7 +37,7 @@ public class WeakList<T> : IEnumerable<T>
     where T : class
 {
     /// <summary>
-    /// Contains a snapshot of the data so read operations can be non-blocking
+    /// Contains a snapshot of the data so read operations can be non-blocking.
     /// </summary>
     private class Snapshot
     {
@@ -63,7 +63,7 @@ public class WeakList<T> : IEnumerable<T>
         {
             int itemCount = 0;
 
-            // Counts the number of entries that are valid
+            // Counts the number of entries that are valid.
             for (int x = 0; x < Items.Length; x++)
             {
                 WeakReference reference = Items[x];
@@ -95,7 +95,7 @@ public class WeakList<T> : IEnumerable<T>
                     continue;
 
                 // Since checking the weak reference is slow, just assume that 
-                // it still has reference. It won't hurt anything
+                // it still has reference. It won't hurt anything.
                 if (!clone.TryAdd(reference))
                     throw new Exception("List is full");
             }
@@ -104,7 +104,7 @@ public class WeakList<T> : IEnumerable<T>
         }
 
         /// <summary>
-        /// Removes all occurrences of <see cref="item"/> from the list
+        /// Removes all occurrences of <see cref="item"/> from the list.
         /// </summary>
         /// <param name="item">Item to remove.</param>
         public void Remove(T item)
@@ -289,7 +289,7 @@ public class WeakList<T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Removes all occurrences of the <see cref="item"/> from the list. Method is thread safe.
+    /// Removes all occurrences of the <see cref="item"/> from the list. Method is thread-safe.
     /// </summary>
     /// <param name="item">Item to remove.</param>
     public void Remove(T item)
