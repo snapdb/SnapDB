@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  8/20/2012 - Steven E. Chisholm
+//  08/20/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using System.Collections;
@@ -28,12 +29,12 @@ using System.Collections;
 namespace SnapDB.Collections;
 
 /// <summary>
-/// Quickly creates a <see cref="SortedList"/> from the provided list of keys and values.
+/// Quickly creates a <see cref="SortedList"/> from a provided list of keys and values.
 /// </summary>
 public static class SortedListConstructor
 {
     /// <summary>
-    /// Creates a sorted list from the provided keys and values.
+    /// Creates a sorted list from a provided keys and values.
     /// </summary>
     /// <typeparam name="TKey">The type of keys in the sorted list.</typeparam>
     /// <typeparam name="TValue">The type of values in the sorted list.</typeparam>
