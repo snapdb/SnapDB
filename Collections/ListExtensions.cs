@@ -51,6 +51,7 @@ public static class ListExtensions
             if (list[x] is null)
             {
                 list[x] = item;
+                
                 return x;
             }
 
@@ -77,6 +78,7 @@ public static class ListExtensions
             if (list[x] is null)
             {
                 list[x] = item;
+                
                 return x;
             }
         }
