@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  3/20/2012 - Steven E. Chisholm
+//  03/20/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
-//       
+//
 //  09/14/2023 - Lillian Gensolin
 //       Converted code to .NET core.  
+//
 //******************************************************************************************************
 
 using Gemstone;
@@ -29,7 +30,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Collections;
 
 /// <summary>
-/// Provides an array of bits much like the native .NET implementation, 
+/// Represents an array of bits much like the native .NET implementation, 
 /// however this focuses on providing a free space bit array.
 /// </summary>
 public sealed class BitArray
@@ -37,17 +38,17 @@ public sealed class BitArray
     #region [ Members ]
 
     /// <summary>
-    /// The number of bits to shift to get the index of the array.
+    /// Defines the number of bits to shift to get the index of the array.
     /// </summary>
     public const int BitsPerElementShift = 5;
 
     /// <summary>
-    /// The mask to apply to get the bit position of the value.
+    /// Defines the mask to apply to get the bit position of the value.
     /// </summary>
     public const int BitsPerElementMask = BitsPerElement - 1;
 
     /// <summary>
-    /// The number of bits per array element.
+    /// Defines the number of bits per array element.
     /// </summary>
     public const int BitsPerElement = sizeof(int) * 8;
 
@@ -66,8 +67,8 @@ public sealed class BitArray
     /// Initializes <see cref="BitArray"/>.
     /// </summary>
     /// <param name="initialState">
-    /// If this is set to true, all elements will be set. 
-    /// If it is set to false, all elements will be cleared.
+    /// If this is set to <c>true</c>, all elements will be set. 
+    /// If it is set to <c>false</c>, all elements will be cleared.
     /// </param>
     /// <param name="count">The number of bit positions to support.</param>
     public BitArray(bool initialState, int count = BitsPerElement)
@@ -142,7 +143,7 @@ public sealed class BitArray
     /// <summary>
     /// Gets the status of the corresponding bit.
     /// </summary>
-    /// <param name="index"></param>
+    /// <param name="index">Bit position to access.</param>
     /// <returns><c>true</c> if set; otherwise, <c>false</c> if cleared.</returns>
     public bool GetBit(int index)
     {
@@ -156,8 +157,8 @@ public sealed class BitArray
     /// This method does not validate the bounds of the array, 
     /// and will be Aggressively Inlined.
     /// </summary>
-    /// <param name="index"></param>
-    /// <returns>True if set. False if cleared</returns>
+    /// <param name="index">Bit position to access.</param>
+    /// <returns><c>true</c> if set; otherwise, <c>false</c> if cleared.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool GetBitUnchecked(int index)
     {
@@ -167,20 +168,20 @@ public sealed class BitArray
     }
 
     /// <summary>
-    /// Sets the corresponding bit to true
+    /// Sets the corresponding bit to <c>true</c>.
     /// </summary>
-    /// <param name="index"></param>
+    /// <param name="index">Bit position to set.</param>
     public void SetBit(int index)
     {
         TrySetBit(index);
     }
 
     /// <summary>
-    /// Sets the corresponding bit to true. 
-    /// Returns true if the bit state was changed.
+    /// Sets the corresponding bit to <c>true</c>. 
+    /// Returns <c>true</c> if the bit state was changed.
     /// </summary>
-    /// <param name="index"></param>
-    /// <remarks>True if the bit state was changed. False if the bit was already set.</remarks>
+    /// <param name="index">Bit position to set.</param>
+    /// <returns><c>true</c> if the bit state was changed; otherwise, <c>false</c> if the bit was already set.</returns>
     public bool TrySetBit(int index)
     {
         Validate(index);
@@ -197,24 +198,34 @@ public sealed class BitArray
 
             return true;
         }
+
         return false;
     }
+
+    /// <summary>
+    /// Clears all bits.
+    /// </summary>
     public void ClearAll()
     {
         m_setCount = 0;
         Array.Clear(m_array, 0, m_array.Length);
     }
+
+    /// <summary>
+    /// Clears bit at the specified <paramref name="index"/>.
+    /// </summary>
+    /// <param name="index">Bit position to set.</param>
     public void ClearBit(int index)
     {
         TryClearBit(index);
     }
 
     /// <summary>
-    /// Sets the corresponding bit to false.
-    /// Returns true if the bit state was changed.
+    /// Sets the corresponding bit to <c>false</c>.
+    /// Returns <c>true</c> if the bit state was changed.
     /// </summary>
-    /// <param name="index"></param>
-    /// <remarks>True if the bit state was changed. False if the bit was already cleared.</remarks>
+    /// <param name="index">Bit position to clear.</param>
+    /// <returns><c>true</c> if the bit state was changed; othwerwise, <c>false</c> if the bit was already cleared.</returns>
     public bool TryClearBit(int index)
     {
         Validate(index);
@@ -236,8 +247,8 @@ public sealed class BitArray
     /// <summary>
     /// Clears a specified series of bits.
     /// </summary>
-    /// <param name="index">the starting index to clear</param>
-    /// <param name="length">the length of bits</param>
+    /// <param name="index">Starting index to clear.</param>
+    /// <param name="length">Length of bits to clear.</param>
     public void ClearBits(int index, int length)
     {
         Validate(index, length);
@@ -252,6 +263,7 @@ public sealed class BitArray
     public void SetAll()
     {
         m_setCount = m_count;
+
         for (int x = 0; x < m_array.Length; x++)
             m_array[x] = -1; // (-1 is all bits set)
     }
@@ -259,8 +271,8 @@ public sealed class BitArray
     /// <summary>
     /// Sets a specified series of bits.
     /// </summary>
-    /// <param name="index">the starting index to clear</param>
-    /// <param name="length">the length of bits</param>
+    /// <param name="index">Starting index to set.</param>
+    /// <param name="length">Length of bits to set.</param>
     public void SetBits(int index, int length)
     {
         Validate(index, length);
@@ -272,26 +284,28 @@ public sealed class BitArray
     /// <summary>
     /// Determines if any of the provided bits are set.
     /// </summary>
-    /// <param name="index">the starting index</param>
-    /// <param name="length">the length of the run</param>
-    /// <returns></returns>
+    /// <param name="index">Starting index to check.</param>
+    /// <param name="length">Number of bits to check.</param>
+    /// <returns><c>true</c> if all bits in range are set; otherwise, <c>false</c>.</returns>
     public bool AreAllBitsSet(int index, int length)
     {
         Validate(index, length);
+
         for (int x = index; x < index + length; x++)
         {
             if ((m_array[x >> BitsPerElementShift] & (1 << (x & BitsPerElementMask))) == 0)
                 return false;
         }
+
         return true;
     }
 
     /// <summary>
     /// Determines if any of the provided bits are cleared.
     /// </summary>
-    /// <param name="index">the starting index</param>
-    /// <param name="length">the length of the run</param>
-    /// <returns></returns>
+    /// <param name="index">Starting index to check.</param>
+    /// <param name="length">Number of bits to check.</param>
+    /// <returns><c>true</c> if all bits in range are clear; otherwise, <c>false</c>.</returns>
     public bool AreAllBitsCleared(int index, int length)
     {
         Validate(index, length);
@@ -301,14 +315,15 @@ public sealed class BitArray
             if ((m_array[x >> BitsPerElementShift] & (1 << (x & BitsPerElementMask))) != 0)
                 return false;
         }
+
         return true;
     }
 
     /// <summary>
-    /// Increases the capacity of the bit array. Decreasing capacity is currently not supported
+    /// Increases the capacity of the bit array.
+    /// Decreasing capacity is currently not supported.
     /// </summary>
-    /// <param name="capacity">the number of bits to support</param>
-    /// <returns></returns>
+    /// <param name="capacity">Number of bits to support.</param>
     public void SetCapacity(int capacity)
     {
         int[] array;
@@ -316,7 +331,7 @@ public sealed class BitArray
         if (m_count >= capacity)
             return;
 
-        //If the number does not lie on a 32 bit boundary, add 1 to the number of items in the array.
+        // If the number does not lie on a 32 bit boundary, add 1 to the number of items in the array.
         if ((capacity & BitsPerElementMask) != 0)
             array = new int[(capacity >> BitsPerElementShift) + 1];
         else
@@ -324,9 +339,9 @@ public sealed class BitArray
 
         m_array.CopyTo(array, 0);
 
-        //If initial state is to set all of the bits, set them.
-        //Note: Since the initial state already initialized any remaining bits
-        //after m_count, this does not need to be done again.
+        // If initial state is to set all of the bits, set them.
+        // Note: Since the initial state already initialized any remaining bits
+        // after m_count, this does not need to be done again.
         if (m_initialState)
         {
             m_setCount += capacity - m_count;
@@ -334,6 +349,7 @@ public sealed class BitArray
             for (int x = m_array.Length; x < array.Length; x++)
                 array[x] = -1;
         }
+
         m_array = array;
         m_count = capacity;
     }
@@ -341,7 +357,7 @@ public sealed class BitArray
     /// <summary>
     /// Ensures that the bit array has a minimum capacity to accommodate a specified number of bits.
     /// </summary>
-    /// <param name="capacity">The minimum number of bits the bit array should be able to hold.</param>
+    /// <param name="capacity">Minimum number of bits the bit array should be able to hold.</param>
     /// <remarks>
     /// If the current capacity of the bit array is less than the specified capacity, the method
     /// increases the capacity to either double the current capacity or the specified capacity,
@@ -356,9 +372,7 @@ public sealed class BitArray
     /// <summary>
     /// Finds the position of the next cleared (unset) bit in the bit array.
     /// </summary>
-    /// <returns>
-    /// The position of the next cleared bit, or -1 if no cleared bit is found.
-    /// </returns>
+    /// <returns>Position of the next cleared bit; otherwise, -1 if no cleared bit is found.</returns>
     public int FindClearedBit()
     {
         // Get the total number of 32 - bit elements in the bit array.
@@ -384,6 +398,7 @@ public sealed class BitArray
                 return position;
             }
         }
+
         // If no cleared bit is found in the entire bit array, return -1.
         return -1;
     }
@@ -391,9 +406,7 @@ public sealed class BitArray
     /// <summary>
     /// Finds the position of the next set (1) bit in the bit array.
     /// </summary>
-    /// <returns>
-    /// The position of the next set bit, or -1 if no set bit is found.
-    /// </returns>
+    /// <returns>Position of the next set bit; otherwise, -1 if no set bit is found.</returns>
     public int FindSetBit()
     {
         // Get the total number of 32-bit elements in the bit array.
@@ -427,8 +440,7 @@ public sealed class BitArray
     /// <summary>
     /// Yields a list of all bits that are set.
     /// </summary>
-    /// An IEnumerable of integers representing the positions of set bits in the bit array.
-    /// </returns>
+    /// <returns>An <see cref="IEnumerable{T}"/> of integers representing the positions of set bits in the bit array.</returns>
     public IEnumerable<int> GetAllSetBits()
     {
         // Get the total number of 32-bit elements in the bit array.
@@ -453,7 +465,7 @@ public sealed class BitArray
     /// <summary>
     /// Yields a list of all bits that are cleared.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>An <see cref="IEnumerable{T}"/> of integers representing the positions of cleared bits in the bit array.</returns>
     public IEnumerable<int> GetAllClearedBits()
     {
         // Get the total number of 32-bit elements in the bit array.
@@ -489,6 +501,7 @@ public sealed class BitArray
     {
         if (index < 0)
             throw new ArgumentOutOfRangeException("index", "Must be greater than or equal to zero.");
+
         if (index >= m_count)
             throw new ArgumentOutOfRangeException("index", "Exceedes the length of the array.");
     }
@@ -507,10 +520,13 @@ public sealed class BitArray
     {
         if (index < 0)
             throw new ArgumentOutOfRangeException("index", "Must be greater than or equal to zero.");
+
         if (length < 0)
             throw new ArgumentOutOfRangeException("length", "Must be greater than or equal to zero.");
+
         if (index + length > m_count)
             throw new ArgumentOutOfRangeException("length", "index + length exceedes the length of the array.");
     }
+
     #endregion
 }
