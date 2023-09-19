@@ -116,8 +116,8 @@ internal class MemoryPoolPageList
         if (!Environment.Is64BitProcess)
         {
             Log.Publish(MessageLevel.Info, "Process running in 32-bit mode. Memory Pool is Limited in size.");
-            totalMemory = Math.Min(int.MaxValue, totalMemory); //Clip at 2GB
-            availableMemory = Math.Min(int.MaxValue - GC.GetTotalMemory(false), availableMemory); //Clip at 2GB
+            totalMemory = Math.Min(int.MaxValue, totalMemory); // Clip at 2GB
+            availableMemory = Math.Min(int.MaxValue - GC.GetTotalMemory(false), availableMemory); // Clip at 2GB
         }
 
         m_memoryBlockSize = CalculateMemoryBlockSize(PageSize, totalMemory);
@@ -125,9 +125,9 @@ internal class MemoryPoolPageList
 
         if (maximumBufferSize < 0)
         {
-            //Maximum size defaults to the larger of:
-            //50% of the free ram
-            //25% of the total system memory.
+            // Maximum size defaults to the larger of:
+            // 50% of the free ram
+            // 25% of the total system memory.
             MaximumPoolSize = Math.Max(MemoryPool.MinimumTestedSupportedMemoryFloor, availableMemory / 2);
             MaximumPoolSize = Math.Max(MaximumPoolSize, totalMemory / 4);
         }
@@ -256,8 +256,8 @@ internal class MemoryPoolPageList
 
                 if (m_isPageFree.TrySetBit(index))
                 {
-                    //IntPtr page = GetPageAddress(index);
-                    //Memory.Clear(page,PageSize);
+                    // IntPtr page = GetPageAddress(index);
+                    // Memory.Clear(page,PageSize);
                     m_usedPageCount--;
                     return;
                 }
@@ -274,7 +274,7 @@ internal class MemoryPoolPageList
     /// <param name="size">The size of the buffer pool</param>
     /// <returns>The final size of the buffer pool</returns>
     /// <remarks>The buffer pool shrinks to a size less than or equal to <see cref="size"/>.</remarks>
-    //ToDo: Expose this method and test it.
+    // ToDo: Expose this method and test it.
     public long ShrinkMemoryPool(long size)
     {
         lock (m_syncRoot)

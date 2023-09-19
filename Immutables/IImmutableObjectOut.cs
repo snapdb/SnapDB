@@ -31,7 +31,7 @@ namespace SnapDB.Immutables;
 /// In order to modify the contest of this object, a clone of the object must be created with <see cref="CloneEditable"/>.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-internal interface IImmutableObject<out T>
+public interface IImmutableObject<out T>
     : IImmutableObject
 {
     /// <summary>

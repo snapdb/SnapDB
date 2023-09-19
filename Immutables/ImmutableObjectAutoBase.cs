@@ -33,7 +33,7 @@ namespace SnapDB.Immutables;
 /// This class will automatically clone any field that implements <see cref="IImmutableObject"/>
 /// </summary>
 /// <typeparam name="T"></typeparam>
-internal abstract class ImmutableObjectAutoBase<T>
+public abstract class ImmutableObjectAutoBase<T>
     : ImmutableObjectBase<T>
     where T : ImmutableObjectAutoBase<T>
 {

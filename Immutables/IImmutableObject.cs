@@ -28,7 +28,7 @@ namespace SnapDB.Immutables;
 /// <summary>
 /// Represents an object that can be configured as read only and thus made immutable.  
 /// </summary>
-internal interface IImmutableObject
+public interface IImmutableObject
     : ICloneable
 {
     /// <summary>
