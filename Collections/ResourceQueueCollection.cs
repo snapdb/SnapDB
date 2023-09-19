@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  9/22/2012 - Steven E. Chisholm
+//  09/22/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.Collections;
@@ -28,56 +29,53 @@ namespace SnapDB.Collections;
 /// <summary>
 /// Provides a thread-safe collection of many different resources of the same type.
 /// </summary>
-/// <typeparam name="TKey">An ICompariable type that is used to distinguish different resource queues.</typeparam>
+/// <typeparam name="TKey">An IComparable type key that is used to distinguish different resource queues.</typeparam>
 /// <typeparam name="TResource">The type of the resource queue.</typeparam>
 public class ResourceQueueCollection<TKey, TResource>
     where TResource : class
 {
+    
     private readonly SortedList<TKey, ResourceQueue<TResource>> m_list;
     private readonly Func<TKey, Func<TResource>> m_instanceObject;
     private readonly Func<TKey, int> m_maximumCount;
     private readonly Func<TKey, int> m_initialCount;
 
     /// <summary>
-    /// Creates a new ResourceQueueCollection.
+    /// Initializes a new instance of the <see cref="ResourceQueueCollection{TKey, TResource}"/> class
+    /// with a default instance creation function and initial and maximum counts.
     /// </summary>
-    /// <param name="instance">A function to pass to the ResourceQueue for a given TCompare </param>
-    /// <param name="initialCount">The initial size of each resource queue</param>
-    /// <param name="maximumCount">The maximum size of each resource queue</param>
+    /// <param name="instance">A function to create instances of the resource queues.</param>
+    /// <param name="initialCount">The initial number of resources in each queue.</param>
+    /// <param name="maximumCount">The maximum number of resources in each queue.</param>    
     public ResourceQueueCollection(Func<TResource> instance, int initialCount, int maximumCount)
         : this(x => instance, x => initialCount, x => maximumCount)
     {
     }
 
     /// <summary>
-    /// Creates a new ResourceQueueCollection.
+    /// Initializes a new instance of the <see cref="ResourceQueueCollection{TKey, TResource}"/> class
+    /// with a custom instance creation function and initial and maximum counts.
     /// </summary>
-    /// <param name="instance">A function that will return the function to pass to the ResourceQueue for a given TCompare </param>
-    /// <param name="initialCount">The initial size of each resource queue</param>
-    /// <param name="maximumCount">The maximum size of each resource queue</param>
+    /// <param name="instance">A function that returns the instance creation function for each key.</param>
+    /// <param name="initialCount">The initial number of resources in each queue.</param>
+    /// <param name="maximumCount">The maximum number of resources in each queue.</param>
     public ResourceQueueCollection(Func<TKey, TResource> instance, int initialCount, int maximumCount)
         : this(key => () => instance(key), x => initialCount, x => maximumCount)
     {
-
     }
 
-    /// <summary>
-    /// Creates a new ResourceQueueCollection.
-    /// </summary>
-    /// <param name="instance">A function that will return the function to pass to the ResourceQueue for a given TCompare </param>
-    /// <param name="initialCount">The initial size of each resource queue</param>
-    /// <param name="maximumCount">The maximum size of each resource queue</param>
     public ResourceQueueCollection(Func<TKey, Func<TResource>> instance, int initialCount, int maximumCount)
         : this(instance, x => initialCount, x => maximumCount)
     {
     }
 
     /// <summary>
-    /// Creates a new ResourceQueueCollection.
+    /// Initializes a new instance of the <see cref="ResourceQueueCollection{TKey, TResource}"/> class
+    /// with a custom instance creation function, initial counts, and maximum counts.
     /// </summary>
-    /// <param name="instance">A function that will return the function to pass to the ResourceQueue for a given TCompare </param>
-    /// <param name="initialCount">The initial size of each resource queue</param>
-    /// <param name="maximumCount">The maximum size of each resource queue</param>
+    /// <param name="instance">A function that returns the instance creation function for each key.</param>
+    /// <param name="initialCount">A function that specifies the initial count for each queue based on the key.</param>
+    /// <param name="maximumCount">A function that specifies the maximum count for each queue based on the key.</param>
     public ResourceQueueCollection(Func<TKey, Func<TResource>> instance, Func<TKey, int> initialCount, Func<TKey, int> maximumCount)
     {
         m_instanceObject = instance;
@@ -87,9 +85,9 @@ public class ResourceQueueCollection<TKey, TResource>
     }
 
     /// <summary>
-    /// Gets the resource queue for a key of this.
+    /// Gets the resource queue for a key of <c>this</c>.
     /// </summary>
-    /// <param name="key">The key identifying the resource queue to pull from</param>
+    /// <param name="key">The key identifying the resource queue to pull from.</param>
     /// <returns></returns>
     public ResourceQueue<TResource> this[TKey key] => GetResourceQueue(key);
 
