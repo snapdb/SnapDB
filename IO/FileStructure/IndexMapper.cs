@@ -16,7 +16,7 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  1/4/2012 - Steven E. Chisholm
+//  01/04/2012 - Steven E. Chisholm
 //       Generated original version of source code.
 //
 //  09/18/2023 - Lillian Gensolin
@@ -62,7 +62,7 @@ internal class IndexMapper
         m_addressPerBlock2 = (uint)Math.Min(uint.MaxValue, m_addressPerBlock * (ulong)m_addressPerBlock);
         m_addressPerBlock3 = (uint)Math.Min(uint.MaxValue, m_addressPerBlock * (ulong)m_addressPerBlock * m_addressPerBlock);
         m_lastAddressableBlockIndex = (uint)Math.Min(uint.MaxValue - 1, m_addressPerBlock * (ulong)m_addressPerBlock * m_addressPerBlock * m_addressPerBlock - 1);
-        //initializes all of the values
+        // Initializes all of the values.
         MapPosition(0);
     }
 
@@ -83,7 +83,7 @@ internal class IndexMapper
     /// Gets the offset position for the address that must be read within the indirect block
     /// at the first indirect block. 
     /// </summary>
-    /// <remarks>Returns a -1 of invalid.  -1 was chosen since it will likely generate an error if not handled properly.</remarks>
+    /// <remarks>Returns a -1 of invalid. -1 was chosen since it will likely generate an error if not handled properly.</remarks>
     public int FirstIndirectOffset
     {
         get;
@@ -94,7 +94,7 @@ internal class IndexMapper
     /// Gets the offset position for the address that must be read within the indirect block
     /// at the second indirect block. 
     /// </summary>
-    /// <remarks>Returns a -1 of invalid.  -1 was chosen since it will likely generate an error if not handled properly.</remarks>
+    /// <remarks>Returns a -1 of invalid. -1 was chosen since it will likely generate an error if not handled properly.</remarks>
     public int SecondIndirectOffset
     {
         get;
@@ -105,7 +105,7 @@ internal class IndexMapper
     /// Gets the offset position for the address that must be read within the indirect block
     /// at the third indirect block. 
     /// </summary>
-    /// <remarks>Returns a -1 of invalid.  -1 was chosen since it will likely generate an error if not handled properly.</remarks>
+    /// <remarks>Returns a -1 of invalid. -1 was chosen since it will likely generate an error if not handled properly.</remarks>
     public int ThirdIndirectOffset
     {
         get;
@@ -116,7 +116,7 @@ internal class IndexMapper
     /// Gets the offset position for the address that must be read within the indirect block
     /// at the forth indirect block. 
     /// </summary>
-    /// <remarks>Returns a -1 of invalid.  -1 was chosen since it will likely generate an error if not handled properly.</remarks>
+    /// <remarks>Returns a -1 of invalid. -1 was chosen since it will likely generate an error if not handled properly.</remarks>
     protected int FourthIndirectOffset
     {
         get;
@@ -124,13 +124,13 @@ internal class IndexMapper
     }
 
     /// <summary>
-    /// Gets the index of the first cluster that can be accessed by this indirect block.  This value is useful because 
+    /// Gets the index of the first cluster that can be accessed by this indirect block. This value is useful because 
     /// the footer of the indirect page will have this address.
     /// </summary>
     protected const uint FirstIndirectBaseIndex = 0;
 
     /// <summary>
-    /// Gets the index of the second cluster that can be accessed by this indirect block.  This value is useful because 
+    /// Gets the index of the second cluster that can be accessed by this indirect block. This value is useful because 
     /// the footer of the indirect page will have this address.
     /// </summary>
     protected uint SecondIndirectBaseIndex
@@ -140,7 +140,7 @@ internal class IndexMapper
     }
 
     /// <summary>
-    /// Gets the index of the third cluster that can be accessed by this indirect block.  This value is useful because 
+    /// Gets the index of the third cluster that can be accessed by this indirect block. This value is useful because 
     /// the footer of the indirect page will have this address.
     /// </summary>
     protected uint ThirdIndirectBaseIndex
@@ -150,7 +150,7 @@ internal class IndexMapper
     }
 
     /// <summary>
-    /// Gets the index of the third cluster that can be accessed by this indirect block.  This value is useful because 
+    /// Gets the index of the third cluster that can be accessed by this indirect block. This value is useful because 
     /// the footer of the indirect page will have this address.
     /// </summary>
     protected uint FourthIndirectBaseIndex
@@ -166,7 +166,7 @@ internal class IndexMapper
     /// <summary>
     /// Updates this class to reflect the path that must be taken to reach the cluster that contains this virtual point
     /// </summary>
-    /// <param name="positionIndex">The address that is being translated</param>
+    /// <param name="positionIndex">The address that is being translated.</param>
     /// <returns>
     /// This determines what has changed in the most recent update request.
     /// The calling classes can use this to determine what lookup information needs to be 
@@ -178,7 +178,7 @@ internal class IndexMapper
         if (positionIndex > m_lastAddressableBlockIndex)
             throw new ArgumentOutOfRangeException("positionIndex", "position is not indexable with the current page size.");
 
-        //uint addressesPerBlock = m_addressesPerBlock;
+        // uint addressesPerBlock = m_addressesPerBlock;
         uint addressPerBlock3U = m_addressPerBlock3;
         uint addressPerBlock2U = m_addressPerBlock2;
         uint addressPerBlockU = m_addressPerBlock;
@@ -197,7 +197,7 @@ internal class IndexMapper
 
         if (positionIndex >= addressPerBlock3U)
         {
-            //Note, if the position is greater than addressesPerBlock^3 then addressesPerBlock^3 is a 32 bit number.
+            // Note, if the position is greater than addressesPerBlock^3 then addressesPerBlock^3 is a 32 bit number.
             firstIndirect = positionIndex / addressPerBlock3U; // 3187/1000, returns 3
             positionIndex -= firstIndirect * addressPerBlock3U;
 
@@ -212,11 +212,11 @@ internal class IndexMapper
             ThirdIndirectOffset = (int)thirdIndirect;
             FourthIndirectOffset = (int)positionIndex;
 
-            SecondIndirectBaseIndex = firstIndirect * addressPerBlock3U; //Contains 3000
-            ThirdIndirectBaseIndex = SecondIndirectBaseIndex + secondIndirect * addressPerBlock2U; //Contains 3000 + 100
-            FourthIndirectBaseIndex = ThirdIndirectBaseIndex + thirdIndirect * addressPerBlockU; //Contains 3000 + 100 + 80
+            SecondIndirectBaseIndex = firstIndirect * addressPerBlock3U; // Contains 3000
+            ThirdIndirectBaseIndex = SecondIndirectBaseIndex + secondIndirect * addressPerBlock2U; // Contains 3000 + 100
+            FourthIndirectBaseIndex = ThirdIndirectBaseIndex + thirdIndirect * addressPerBlockU; // Contains 3000 + 100 + 80
         }
-        //Value is now 187
+        // Value is now 187
         else if (positionIndex >= addressPerBlock2U)
         {
             secondIndirect = positionIndex / addressPerBlock2U; // 187/100, returns 1
@@ -230,11 +230,11 @@ internal class IndexMapper
             ThirdIndirectOffset = (int)thirdIndirect;
             FourthIndirectOffset = (int)positionIndex;
 
-            SecondIndirectBaseIndex = 0; //Contains 3000
-            ThirdIndirectBaseIndex = secondIndirect * addressPerBlock2U; //Contains 3000 + 100
-            FourthIndirectBaseIndex = ThirdIndirectBaseIndex + thirdIndirect * addressPerBlockU; //Contains 3000 + 100 + 80
+            SecondIndirectBaseIndex = 0; // Contains 3000
+            ThirdIndirectBaseIndex = secondIndirect * addressPerBlock2U; // Contains 3000 + 100
+            FourthIndirectBaseIndex = ThirdIndirectBaseIndex + thirdIndirect * addressPerBlockU; // Contains 3000 + 100 + 80
         }
-        //Value is now 87
+        // Value is now 87
         else if (positionIndex >= addressPerBlockU)
         {
             thirdIndirect = positionIndex / addressPerBlockU; // 87/10, returns 8
@@ -249,7 +249,7 @@ internal class IndexMapper
             ThirdIndirectBaseIndex = 0;
             FourthIndirectBaseIndex = thirdIndirect * addressPerBlockU;
         }
-        //Value is now 7
+        // Value is now 7
         else if (positionIndex > 0)
         {
             FirstIndirectOffset = 0;

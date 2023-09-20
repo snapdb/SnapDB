@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  1/4/2012 - Steven E. Chisholm
+//  01/04/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
-//       
+//
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 
@@ -32,7 +33,7 @@ namespace SnapDB.IO.FileStructure;
 internal enum BlockType : byte
 {
     /// <summary>
-    /// The first few pages of a file system
+    /// The first few pages of a file system.
     /// </summary>
     FileAllocationTable = 1,
     /// <summary>

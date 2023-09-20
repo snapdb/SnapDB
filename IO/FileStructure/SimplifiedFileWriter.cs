@@ -21,6 +21,7 @@
 //
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using SnapDB.IO.Unmanaged;
@@ -130,7 +131,7 @@ public class SimplifiedFileWriter
     /// <summary>
     /// Releases the unmanaged resources used by the <see cref="SimplifiedFileWriter"/> object and optionally releases the managed resources.
     /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
         if (!m_disposed)

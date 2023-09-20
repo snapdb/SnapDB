@@ -16,7 +16,7 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  12/2/2011 - Steven E. Chisholm
+//  12/02/2011 - Steven E. Chisholm
 //       Generated original version of source code.
 //
 //  09/18/2023 - Lillian Gensolin

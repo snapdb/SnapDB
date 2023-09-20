@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  1/4/2012 - Steven E. Chisholm
+//  01/04/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 // Checksum is based on code found at the following websites
@@ -31,7 +32,7 @@
 namespace SnapDB.IO.FileStructure;
 
 /// <summary>
-/// A specialized implementation of MurMur3 that requires the data be aligned 
+/// A specialized implementation of Murmur3 that requires the data be aligned 
 /// to 16-byte boundaries.
 /// </summary>
 internal static unsafe class Murmur3
@@ -171,7 +172,7 @@ internal class Murmur3Orig
     private static readonly ulong C2 = 0x4cf5ad432745937fL;
 
     private ulong length;
-    private uint seed; // if want to start with a seed, create a constructor
+    private uint seed; // If want to start with a seed, create a constructor.
     private ulong h1;
     private ulong h2;
 
@@ -208,7 +209,7 @@ internal class Murmur3Orig
 
     private static ulong MixFinal(ulong k)
     {
-        // avalanche bits
+        // Avalanche bits.
 
         k ^= k >> 33;
         k *= 0xff51afd7ed558ccdL;
@@ -233,7 +234,7 @@ internal class Murmur3Orig
         int pos = 0;
         ulong remaining = (ulong)bb.Length;
 
-        // read 128 bits, 16 bytes, 2 longs in eacy cycle
+        // Read 128 bits, 16 bytes, 2 longs in eacy cycle.
         while (remaining >= READ_SIZE)
         {
             ulong k1 = bb.GetUInt64(pos);
@@ -248,7 +249,7 @@ internal class Murmur3Orig
             MixBody(k1, k2);
         }
 
-        // if the input MOD 16 != 0
+        // If the input MOD 16 != 0
         if (remaining > 0)
             ProcessBytesRemaining(bb, remaining, pos);
     }
@@ -259,53 +260,53 @@ internal class Murmur3Orig
         ulong k2 = 0;
         length += remaining;
 
-        // little endian (x86) processing
+        // Little endian (x86) processing.
         switch (remaining)
         {
             case 15:
-                k2 ^= (ulong)bb[pos + 14] << 48; // fall through
+                k2 ^= (ulong)bb[pos + 14] << 48; // Fall through.
                 goto case 14;
             case 14:
-                k2 ^= (ulong)bb[pos + 13] << 40; // fall through
+                k2 ^= (ulong)bb[pos + 13] << 40; // Fall through.
                 goto case 13;
             case 13:
-                k2 ^= (ulong)bb[pos + 12] << 32; // fall through
+                k2 ^= (ulong)bb[pos + 12] << 32; // Fall through.
                 goto case 12;
             case 12:
-                k2 ^= (ulong)bb[pos + 11] << 24; // fall through
+                k2 ^= (ulong)bb[pos + 11] << 24; // Fall through.
                 goto case 11;
             case 11:
-                k2 ^= (ulong)bb[pos + 10] << 16; // fall through
+                k2 ^= (ulong)bb[pos + 10] << 16; // Fall through.
                 goto case 10;
             case 10:
-                k2 ^= (ulong)bb[pos + 9] << 8; // fall through
+                k2 ^= (ulong)bb[pos + 9] << 8; // Fall through.
                 goto case 9;
             case 9:
-                k2 ^= bb[pos + 8]; // fall through
+                k2 ^= bb[pos + 8]; // Fall through.
                 goto case 8;
             case 8:
                 k1 ^= bb.GetUInt64(pos);
                 break;
             case 7:
-                k1 ^= (ulong)bb[pos + 6] << 48; // fall through
+                k1 ^= (ulong)bb[pos + 6] << 48; // Fall through.
                 goto case 6;
             case 6:
-                k1 ^= (ulong)bb[pos + 5] << 40; // fall through
+                k1 ^= (ulong)bb[pos + 5] << 40; // Fall through.
                 goto case 5;
             case 5:
-                k1 ^= (ulong)bb[pos + 4] << 32; // fall through
+                k1 ^= (ulong)bb[pos + 4] << 32; // Fall through.
                 goto case 4;
             case 4:
-                k1 ^= (ulong)bb[pos + 3] << 24; // fall through
+                k1 ^= (ulong)bb[pos + 3] << 24; // Fall through.
                 goto case 3;
             case 3:
-                k1 ^= (ulong)bb[pos + 2] << 16; // fall through
+                k1 ^= (ulong)bb[pos + 2] << 16; // Fall through.
                 goto case 2;
             case 2:
-                k1 ^= (ulong)bb[pos + 1] << 8; // fall through
+                k1 ^= (ulong)bb[pos + 1] << 8; // Fall through.
                 goto case 1;
             case 1:
-                k1 ^= bb[pos]; // fall through
+                k1 ^= bb[pos]; // Fall through.
                 break;
             default:
                 throw new Exception("Something went wrong with remaining bytes calculation.");

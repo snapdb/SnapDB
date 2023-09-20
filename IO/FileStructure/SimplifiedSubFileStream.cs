@@ -21,6 +21,7 @@
 //
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using SnapDB.IO.Unmanaged;
@@ -44,7 +45,7 @@ internal sealed class SimplifiedSubFileStream
     private bool m_disposed;
 
     /// <summary>
-    /// The FileAllocationTable
+    /// The FileAllocationTable.
     /// </summary>
     private readonly FileHeaderBlock m_fileHeaderBlock;
 
@@ -73,7 +74,7 @@ internal sealed class SimplifiedSubFileStream
     /// </summary>
     /// <param name="stream">The location to read from.</param>
     /// <param name="subFile">The file to read.</param>
-    /// <param name="fileHeaderBlock">The FileAllocationTable</param>
+    /// <param name="fileHeaderBlock">The FileAllocationTable</param>.
     internal SimplifiedSubFileStream(FileStream stream, SubFileHeader subFile, FileHeaderBlock fileHeaderBlock)
     {
         if (stream is null)

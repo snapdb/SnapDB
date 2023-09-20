@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  1/4/2012 - Steven E. Chisholm
+//  01/04/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/19/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using SnapDB.IO.FileStructure.Media;
@@ -186,7 +187,7 @@ internal unsafe class ShadowCopyAllocator
             sourceBlockAddress = indexIndirectBlock;
             return true;
         }
-        // If the data page is an old page, allocate space to create a new copy
+        // If the data page is an old page, allocate space to create a new copy.
         else if (sourceBlockAddress <= m_lastReadOnlyBlock)
         {
             indexIndirectBlock = m_fileHeaderBlock.AllocateFreeBlocks(1);
@@ -253,13 +254,13 @@ internal unsafe class ShadowCopyAllocator
     #region [ Data Block Shadow Copy ]
 
     /// <summary>
-    /// Makes a copy of the data block. Returns true if a copy was made. False if no copy was made
+    /// Makes a copy of the data block. Returns <c>true</c> if a copy was made, otherwise <c>false</c> if no copy was made.
     /// </summary>
     /// <returns>True if the block's address was changed.</returns>
     private bool TryShadowCopyDataBlock()
     {
         // If the page does not exist -or-
-        // If the data page is an old page, allocate space to create a new copy
+        // If the data page is an old page, allocate space to create a new copy.
         if (DataClusterAddress == 0 || DataClusterAddress <= m_lastReadOnlyBlock)
         {
             uint dataBlockAddress = m_fileHeaderBlock.AllocateFreeBlocks(1);
@@ -283,8 +284,8 @@ internal unsafe class ShadowCopyAllocator
     /// </summary>
     /// <param name="sourceClusterAddress">the address of the first block in the cluster. 
     /// If address is zero, it simply creates an empty cluster.</param>
-    /// <param name="indexValue">the index value of this first block</param>
-    /// <param name="destinationClusterAddress">the first block of the destination cluster</param>
+    /// <param name="indexValue">the index value of this first block.</param>
+    /// <param name="destinationClusterAddress">the first block of the destination cluster.</param>
     private void ShadowCopyDataCluster(uint sourceClusterAddress, uint indexValue, uint destinationClusterAddress)
     {
         // If source exists

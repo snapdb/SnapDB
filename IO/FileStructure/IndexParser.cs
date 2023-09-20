@@ -16,7 +16,7 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  1/4/2012 - Steven E. Chisholm
+//  01/04/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/18/2023 - Lillian Gensolin
@@ -64,22 +64,22 @@ internal unsafe class IndexParser
     #region [ Properties ]
 
     /// <summary>
-    /// The address of the first indirect block
+    /// The address of the first indirect block.
     /// </summary>
     protected uint FirstIndirectBlockAddress;
 
     /// <summary>
-    /// The address of the second indirect block
+    /// The address of the second indirect block.
     /// </summary>
     protected uint SecondIndirectBlockAddress;
 
     /// <summary>
-    /// The address of the third indirect block
+    /// The address of the third indirect block.
     /// </summary>
     protected uint ThirdIndirectBlockAddress;
 
     /// <summary>
-    /// The address of the third indirect block
+    /// The address of the fourth indirect block.
     /// </summary>
     protected uint FourthIndirectBlockAddress;
 
@@ -89,22 +89,22 @@ internal unsafe class IndexParser
     protected uint DataClusterAddress;
 
     /// <summary>
-    /// The address of the first indirect block
+    /// The address of the first indirect block.
     /// </summary>
     private int m_oldFirstOffset;
 
     /// <summary>
-    /// The address of the second indirect block
+    /// The address of the second indirect block.
     /// </summary>
     private int m_oldSecondOffset;
 
     /// <summary>
-    /// The address of the third indirect block
+    /// The address of the third indirect block.
     /// </summary>
     private int m_oldThirdOffset;
 
     /// <summary>
-    /// The address of the fourth indirect block
+    /// The address of the fourth indirect block.
     /// </summary>
     private int m_oldFourthOffset;
 
@@ -116,7 +116,7 @@ internal unsafe class IndexParser
     /// This function will also call <see cref="IndexMapper.MapPosition"/> so after it returns, the current block data will be updated.
     /// </summary>
     /// <param name="positionIndex">The virtual index address.</param>
-    /// <returns>the physical position index for the provided virtual position</returns>
+    /// <returns>The physical position index for the provided virtual position.</returns>
     public uint VirtualToPhysical(uint positionIndex)
     {
         MapPosition(positionIndex);
@@ -134,7 +134,7 @@ internal unsafe class IndexParser
         UpdateBlockInformation();
     }
     /// <summary>
-    /// Resets the index cache with the information from the supplied <see cref="mostRecentParser"/>
+    /// Resets the index cache with the information from the supplied <see cref="mostRecentParser"/>.
     /// </summary>
     /// <param name="mostRecentParser"></param>
     public void ClearIndexCache(IndexParser mostRecentParser)
@@ -227,13 +227,13 @@ internal unsafe class IndexParser
     }
 
     /// <summary>
-    /// This uses the (blockIndex,offset) values to determine what the next block index is.
-    /// This also has consistency checks to determine if the file is inconsistent (potentially corruption)
+    /// This uses the (blockIndex, offset) values to determine what the next block index is.
+    /// This also has consistency checks to determine if the file is inconsistent (potentially corruption).
     /// </summary>
-    /// <param name="blockIndex">the index of the block to read</param>
-    /// <param name="offset">the offset inside the block to use to determine the next index block</param>
-    /// <param name="blockType">the value 1-4 which tell what indirect block this is</param>
-    /// <param name="blockBaseIndex">the lowest virtual address that can be referenced from this indirect block</param>
+    /// <param name="blockIndex">The index of the block to read.</param>
+    /// <param name="offset">The offset inside the block to use to determine the next index block.</param>
+    /// <param name="blockType">The value 1-4 which tell what indirect block this is.</param>
+    /// <param name="blockBaseIndex">The lowest virtual address that can be referenced from this indirect block.</param>
     /// <returns></returns>
     private uint GetBlockIndexValue(uint blockIndex, int offset, BlockType blockType, uint blockBaseIndex)
     {
