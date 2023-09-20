@@ -79,7 +79,6 @@ public class ReadSnapshot
     /// Opens an ArchiveFileStream that can be used to read the file passed to this function.
     /// </summary>
     /// <param name="fileIndex">The index of the file to open.</param>
-    /// <returns></returns>
     public SubFileStream OpenFile(int fileIndex)
     {
         if (fileIndex < 0 || fileIndex >= m_fileHeaderBlock.Files.Count)
@@ -91,7 +90,6 @@ public class ReadSnapshot
     /// <summary>
     /// Opens an ArchiveFileStream that can be used to read/write to the file passed to this function.
     /// </summary>
-    /// <returns></returns>
     public SubFileStream OpenFile(SubFileName fileName)
     {
         for (int x = 0; x < m_fileHeaderBlock.Files.Count; x++)

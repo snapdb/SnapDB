@@ -151,7 +151,6 @@ internal unsafe class IndexParser
     /// <summary>
     /// Looks up the physical/virtual block positions for the address given.
     /// </summary>
-    /// <returns></returns>
     private void UpdateBlockInformation()
     {
         int lowestChange;
