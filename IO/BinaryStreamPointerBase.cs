@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  8/17/2014 - Steven E. Chisholm
+//  08/17/2014 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using System.Runtime.InteropServices;
@@ -44,8 +45,8 @@ public unsafe abstract class BinaryStreamPointerBase
     }
 
     /// <summary>
-    /// Gets the pointer version number assuming that this binary stream has an unmanaged buffer backing this stream. 
-    /// If the pointer version is the same, than any pointer acquired is still valid.
+    /// Gets the pointer version number, assuming that this binary stream has an unmanaged buffer backing this stream. 
+    /// If the pointer version is the same, then any pointer acquired is still valid.
     /// </summary>
     public long PointerVersion { get; protected set; }
 
@@ -55,7 +56,7 @@ public unsafe abstract class BinaryStreamPointerBase
     protected long FirstPosition;
 
     /// <summary>
-    /// Contains the position for the last position
+    /// Contains the position for the last position.
     /// </summary>
     protected long LastPosition;
 
@@ -65,17 +66,17 @@ public unsafe abstract class BinaryStreamPointerBase
     protected byte* Current;
 
     /// <summary>
-    /// The first position of the block
+    /// The first position of the block.
     /// </summary>
     protected byte* First;
 
     /// <summary>
-    /// One past the last address for reading
+    /// One past the last address for reading.
     /// </summary>
     protected byte* LastRead;
 
     /// <summary>
-    /// One past the last address for writing
+    /// One past the last address for writing.
     /// </summary>
     protected byte* LastWrite;
 
@@ -89,11 +90,13 @@ public unsafe abstract class BinaryStreamPointerBase
     public override bool CanSeek => true;
 
     /// <summary>
-    /// Gets/Sets the current position for the stream.
-    /// <remarks>It is important to use this to Get/Set the position from the underlying stream since 
-    /// this class buffers the results of the query.  Setting this field does not gaurentee that
-    /// the underlying stream will get set. Call FlushToUnderlyingStream to acomplish this.</remarks>
+    /// Gets or Sets the current position for the stream.
     /// </summary>
+    /// <remarks>
+    /// It is important to use this to Get or Set the position from the underlying stream since 
+    /// this class buffers the results of the query. Setting this field does not guarantee that
+    /// the underlying stream will get set. Call FlushToUnderlyingStream to acomplish this.
+    /// </remarks>
     public override long Position
     {
         get => FirstPosition + (Current - First);
@@ -130,8 +133,7 @@ public unsafe abstract class BinaryStreamPointerBase
     /// The current position is not advanced after calling this function.
     /// </summary>
     /// <param name="position"></param>
-    /// <param name="length">the number of bytes valid for the writing.</param>
-    /// <returns></returns>
+    /// <param name="length">The number of bytes valid for the writing.</param>
     /// <remarks>This method will throw an exeption if the provided length cannot be provided.</remarks>
     public byte* GetWritePointer(long position, int length)
     {
@@ -150,7 +152,7 @@ public unsafe abstract class BinaryStreamPointerBase
     /// The current position is not advanced after calling this function.
     /// </summary>
     /// <param name="position"></param>
-    /// <param name="length">the number of bytes valid for the writing.</param>
+    /// <param name="length">The number of bytes valid for the writing.</param>
     /// <remarks>This method will throw an exeption if the provided length cannot be provided.</remarks>
     public byte* GetReadPointer(long position, int length)
     {
@@ -169,8 +171,8 @@ public unsafe abstract class BinaryStreamPointerBase
     /// The current position is not advanced after calling this function.
     /// </summary>
     /// <param name="position"></param>
-    /// <param name="length">the number of bytes valid for the writing.</param>
-    /// <param name="supportsWriting">an output parameter detailing if writing to this block is supported.</param>
+    /// <param name="length">The number of bytes valid for the writing.</param>
+    /// <param name="supportsWriting">An output parameter detailing if writing to this block is supported.</param>
     /// <remarks>This method will throw an exeption if the provided length cannot be provided.</remarks>
     public byte* GetReadPointer(long position, int length, out bool supportsWriting)
     {
@@ -185,7 +187,7 @@ public unsafe abstract class BinaryStreamPointerBase
     }
 
     /// <summary>
-    /// Copies a specified number of bytes to a new location
+    /// Copies a specified number of bytes to a new location.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="destination"></param>
@@ -205,7 +207,7 @@ public unsafe abstract class BinaryStreamPointerBase
         Position = source;
         UpdateLocalBuffer(false);
 
-        bool containsSource = length <= LastRead - Current; //RemainingReadLength = (m_lastRead - m_current)
+        bool containsSource = length <= LastRead - Current; // RemainingReadLength = (m_lastRead - m_current)
         bool containsDestination = FirstPosition <= destination && destination + length < LastPosition;
 
         if (containsSource && containsDestination)
@@ -219,7 +221,7 @@ public unsafe abstract class BinaryStreamPointerBase
             return;
         }
 
-        //manually perform the copy
+        // Manually perform the copy.
         byte[] data = new byte[length];
         Position = source;
         ReadAll(data, 0, data.Length);
@@ -637,6 +639,6 @@ public unsafe abstract class BinaryStreamPointerBase
 
     public override void Flush()
     {
-        //Do Nothing
+        // Do Nothing
     }
 }

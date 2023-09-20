@@ -21,6 +21,7 @@
 //       
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using SnapDB.Threading;
@@ -117,7 +118,7 @@ public class RemoteBinaryStream
 
         int receiveBufferLength = ReceiveBufferAvailable;
 
-        //if there is enough in the receive buffer to fulfill this request
+        // If there is enough in the receive buffer to fulfill this request.
         if (count <= receiveBufferLength)
         {
             Array.Copy(m_receiveBuffer, m_receivePosition, buffer, offset, count);
@@ -126,7 +127,7 @@ public class RemoteBinaryStream
         }
         int origionalCount = count;
 
-        //first empty the receive buffer.
+        // First, empty the receive buffer.
         if (receiveBufferLength > 0)
         {
             Array.Copy(m_receiveBuffer, m_receivePosition, buffer, offset, receiveBufferLength);
@@ -136,11 +137,11 @@ public class RemoteBinaryStream
             count -= receiveBufferLength;
         }
 
-        //if still asking for more than 100 bytes, skip the receive buffer 
-        //and copy directly to the destination
+        // If still asking for more than 100 bytes, skip the receive buffer
+        // and copy directly to the destination.
         if (count > 100)
         {
-            //Loop since ReceiveFromSocket can return parial results.
+            // Loop, since ReceiveFromSocket can return parial results.
             while (count > 0)
             {
                 m_workerThreadSynchronization.BeginSafeToCallbackRegion();
@@ -163,9 +164,9 @@ public class RemoteBinaryStream
         }
         else
         {
-            //With fewer than 100 bytes requested, 
-            //first fill up the receive buffer, 
-            //then copy this to the destination.
+            // With fewer than 100 bytes requested, 
+            // first fill up the receive buffer, 
+            // then copy this to the destination.
             int prebufferLength = m_receiveBuffer.Length;
             m_receiveLength = 0;
             while (m_receiveLength < count)

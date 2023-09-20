@@ -17,11 +17,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  8/16/2014 - Steven E. Chisholm
+//  08/16/2014 - Steven E. Chisholm
 //       Generated original version of source code.
 //
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.IO;
@@ -31,8 +32,8 @@ namespace SnapDB.IO;
 /// </summary>
 /// <remarks>
 /// A <see cref="Stream"/> inherits from <see cref="MarshalByRefObject"/>
-/// which prevents any methods from inlining. Therefore a <see cref="BinaryStreamBase"/>
-/// will not inhert from <see cref="Stream"/>.
+/// which prevents any methods from inlining. Therefore, a <see cref="BinaryStreamBase"/>
+/// will not inherit from <see cref="Stream"/>.
 /// </remarks>
 public class BinaryStreamStream
     : Stream
@@ -51,7 +52,8 @@ public class BinaryStreamStream
     /// <summary>
     /// When overridden in a derived class, clears all buffers for this stream and causes any buffered data to be written to the underlying device.
     /// </summary>
-    /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>2</filterpriority>
+    /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
+    /// <filterpriority>2</filterpriority>
     public override void Flush()
     {
         BaseStream.Flush();
@@ -63,7 +65,12 @@ public class BinaryStreamStream
     /// <returns>
     /// The new position within the current stream.
     /// </returns>
-    /// <param name="offset">A byte offset relative to the <paramref name="origin"/> parameter. </param><param name="origin">A value of type <see cref="T:System.IO.SeekOrigin"/> indicating the reference point used to obtain the new position. </param><exception cref="T:System.IO.IOException">An I/O error occurs. </exception><exception cref="T:System.NotSupportedException">The stream does not support seeking, such as if the stream is constructed from a pipe or console output. </exception><exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception><filterpriority>1</filterpriority>
+    /// <param name="offset">A byte offset relative to the <paramref name="origin"/> parameter.</param>
+    /// <param name="origin">A value of type <see cref="T:System.IO.SeekOrigin"/> indicating the reference point used to obtain the new position.</param>
+    /// <exception cref="T:System.IO.IOException">An I/O error occurs.</exception>
+    /// <exception cref="T:System.NotSupportedException">The stream does not support seeking, such as if the stream is constructed from a pipe or console output.</exception>
+    /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+    /// <filterpriority>1</filterpriority>
     public override long Seek(long offset, SeekOrigin origin)
     {
         return BaseStream.Seek(offset, origin);
@@ -72,7 +79,11 @@ public class BinaryStreamStream
     /// <summary>
     /// When overridden in a derived class, sets the length of the current stream.
     /// </summary>
-    /// <param name="value">The desired length of the current stream in bytes. </param><exception cref="T:System.IO.IOException">An I/O error occurs. </exception><exception cref="T:System.NotSupportedException">The stream does not support both writing and seeking, such as if the stream is constructed from a pipe or console output. </exception><exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception><filterpriority>2</filterpriority>
+    /// <param name="value">The desired length of the current stream in bytes.</param>
+    /// <exception cref="T:System.IO.IOException">An I/O error occurs.</exception>
+    /// <exception cref="T:System.NotSupportedException">The stream does not support both writing and seeking, such as if the stream is constructed from a pipe or console output.</exception>
+    /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+    /// <filterpriority>2</filterpriority>
     public override void SetLength(long value)
     {
         BaseStream.SetLength(value);
@@ -84,7 +95,23 @@ public class BinaryStreamStream
     /// <returns>
     /// The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many bytes are not currently available, or zero (0) if the end of the stream has been reached.
     /// </returns>
-    /// <param name="buffer">An array of bytes. When this method returns, the buffer contains the specified byte array with the values between <paramref name="offset"/> and (<paramref name="offset"/> + <paramref name="count"/> - 1) replaced by the bytes read from the current source. </param><param name="offset">The zero-based byte offset in <paramref name="buffer"/> at which to begin storing the data read from the current stream. </param><param name="count">The maximum number of bytes to be read from the current stream. </param><exception cref="T:System.ArgumentException">The sum of <paramref name="offset"/> and <paramref name="count"/> is larger than the buffer length. </exception><exception cref="T:System.ArgumentNullException"><paramref name="buffer"/> is null. </exception><exception cref="T:System.ArgumentOutOfRangeException"><paramref name="offset"/> or <paramref name="count"/> is negative. </exception><exception cref="T:System.IO.IOException">An I/O error occurs. </exception><exception cref="T:System.NotSupportedException">The stream does not support reading. </exception><exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception><filterpriority>1</filterpriority>
+    /// <param name="buffer">
+    /// An array of bytes. When this method returns, the buffer contains the specified byte array with the values between <paramref name="offset"/> 
+    /// and (<paramref name="offset"/> + <paramref name="count"/> - 1) replaced by the bytes read from the current source. 
+    /// </param>
+    /// <param name="offset">
+    /// The zero-based byte offset in <paramref name="buffer"/> at which to begin storing the data read from the current stream.
+    /// </param>
+    /// <param name="count">
+    /// The maximum number of bytes to be read from the current stream.</param>
+    /// <exception cref="T:System.ArgumentException">
+    /// The sum of <paramref name="offset"/> and <paramref name="count"/> is larger than the buffer length.</exception>
+    /// <exception cref="T:System.ArgumentNullException"><paramref name="buffer"/> is null.</exception>
+    /// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="offset"/> or <paramref name="count"/> is negative.</exception>
+    /// <exception cref="T:System.IO.IOException">An I/O error occurs.</exception>
+    /// <exception cref="T:System.NotSupportedException">The stream does not support reading.</exception>
+    /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+    /// <filterpriority>1</filterpriority>
     public override int Read(byte[] buffer, int offset, int count)
     {
         return BaseStream.Read(buffer, offset, count);
@@ -103,7 +130,7 @@ public class BinaryStreamStream
     /// When overridden in a derived class, gets a value indicating whether the current stream supports reading.
     /// </summary>
     /// <returns>
-    /// true if the stream supports reading; otherwise, false.
+    /// <c>true</c> if the stream supports reading; otherwise, <c>false</c>.
     /// </returns>
     /// <filterpriority>1</filterpriority>
     public override bool CanRead => BaseStream.CanRead;
@@ -112,7 +139,7 @@ public class BinaryStreamStream
     /// When overridden in a derived class, gets a value indicating whether the current stream supports seeking.
     /// </summary>
     /// <returns>
-    /// true if the stream supports seeking; otherwise, false.
+    /// <c>true</c> if the stream supports seeking; otherwise, <c>false</c>.
     /// </returns>
     /// <filterpriority>1</filterpriority>
     public override bool CanSeek => BaseStream.CanSeek;
@@ -121,7 +148,7 @@ public class BinaryStreamStream
     /// When overridden in a derived class, gets a value indicating whether the current stream supports writing.
     /// </summary>
     /// <returns>
-    /// true if the stream supports writing; otherwise, false.
+    /// <c>true</c> if the stream supports seeking; otherwise, <c>false</c>.
     /// </returns>
     /// <filterpriority>1</filterpriority>
     public override bool CanWrite => BaseStream.CanWrite;

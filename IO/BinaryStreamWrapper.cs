@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  12/8/2012 - Steven E. Chisholm
+//  12/08/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.IO;
@@ -49,11 +50,13 @@ public class BinaryStreamWrapper
     public override bool CanSeek => m_stream.CanSeek;
 
     /// <summary>
-    /// Gets/Sets the current position for the stream.
-    /// <remarks>It is important to use this to Get/Set the position from the underlying stream since 
-    /// this class buffers the results of the query.  Setting this field does not gaurentee that
-    /// the underlying stream will get set. Call FlushToUnderlyingStream to acomplish this.</remarks>
+    /// Gets or sets the current position for the stream.
     /// </summary>
+    /// <remarks>
+    /// It is important to use this to get or set the position from the underlying stream since 
+    /// this class buffers the results of the query. Setting this field does not guarantee that
+    /// the underlying stream will get set. Call FlushToUnderlyingStream to accomplish this.
+    /// </remarks>
     public override long Position
     {
         get => m_stream.Position;

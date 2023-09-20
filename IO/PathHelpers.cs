@@ -20,7 +20,8 @@
 //       Generated original version of source code. 
 //
 //  09/15/2023 - Lillian Gensolin
-//       Converted code to .NET core.       
+//       Converted code to .NET core.
+//       
 //******************************************************************************************************
 
 namespace SnapDB.IO;
@@ -68,9 +69,9 @@ public static class PathHelpers
     /// <summary>
     /// Ensures the supplied file name is valid.
     /// </summary>
-    /// <param name="fileName">any filename.</param>
+    /// <param name="fileName">any file name.</param>
     /// <remarks>
-    /// throws a series of exceptions if the <see cref="fileName"/> is invalid.
+    /// Throws a series of exceptions if the <see cref="fileName"/> is invalid.
     /// </remarks>
     public static void ValidateFileName(string fileName)
     {
@@ -86,7 +87,7 @@ public static class PathHelpers
     /// </summary>
     /// <param name="pathName">any path.</param>
     /// <remarks>
-    /// throws a series of exceptions if the <see cref="pathName"/> is invalid.
+    /// Throws a series of exceptions if the <see cref="pathName"/> is invalid.
     /// </remarks>
     public static void ValidatePathName(string pathName)
     {

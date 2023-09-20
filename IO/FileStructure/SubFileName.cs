@@ -34,13 +34,13 @@ using Gemstone.Security.Cryptography;
 namespace SnapDB.IO.FileStructure;
 
 /// <summary>
-/// This is used to generate the file name that will be used for the sub file. 
+/// This is used to generate the file name that will be used for the subfile. 
 /// </summary>
 public class SubFileName
     : IComparable<SubFileName>, IEquatable<SubFileName>
 {
     /// <summary>
-    /// the first 8 bytes of the <see cref="SubFileName"/>
+    /// The first 8 bytes of the <see cref="SubFileName"/>.
     /// </summary>
     public long RawValue1
     {
@@ -49,7 +49,7 @@ public class SubFileName
     }
 
     /// <summary>
-    /// the next 8 bytes of the <see cref="SubFileName"/>
+    /// The next 8 bytes of the <see cref="SubFileName"/>.
     /// </summary>
     public long RawValue2
     {
@@ -58,7 +58,7 @@ public class SubFileName
     }
 
     /// <summary>
-    /// The final 4 bytes of the <see cref="SubFileName"/>
+    /// The final 4 bytes of the <see cref="SubFileName"/>.
     /// </summary>
     public int RawValue3
     {
@@ -88,7 +88,9 @@ public class SubFileName
     /// Compares the current object with another object of the same type.
     /// </summary>
     /// <returns>
-    /// A value that indicates the relative order of the objects being compared. The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other"/> parameter.Zero This object is equal to <paramref name="other"/>. Greater than zero This object is greater than <paramref name="other"/>. 
+    /// A value that indicates the relative order of the objects being compared. 
+    /// The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other"/> parameter.Zero 
+    /// This object is equal to <paramref name="other"/>. Greater than zero This object is greater than <paramref name="other"/>. 
     /// </returns>
     /// <param name="other">An object to compare with this object.</param>
     public int CompareTo(SubFileName other)
@@ -108,9 +110,10 @@ public class SubFileName
     /// Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/>.
     /// </summary>
     /// <returns>
-    /// true if the specified object  is equal to the current object; otherwise, false.
+    /// <c>true</c> if the specified object  is equal to the current object; otherwise, <c>false</c>.
     /// </returns>
-    /// <param name="obj">The object to compare with the current object. </param><filterpriority>2</filterpriority>
+    /// <param name="obj">The object to compare with the current object. </param>
+    /// <filterpriority>2</filterpriority>
     public override bool Equals(object obj)
     {
         if (ReferenceEquals(obj, null))
@@ -124,7 +127,7 @@ public class SubFileName
     /// Indicates whether the current object is equal to another object of the same type.
     /// </summary>
     /// <returns>
-    /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+    /// <c>true</c> if the current object is equal to the <paramref name="other"/> parameter; otherwise, <c>false</c>.
     /// </returns>
     /// <param name="other">An object to compare with this object.</param>
     public bool Equals(SubFileName other)
@@ -141,16 +144,16 @@ public class SubFileName
     /// <filterpriority>2</filterpriority>
     public override int GetHashCode()
     {
-        //Since using SHA1 to compute the name. Taking a single field is good enough.
-        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        // Since using SHA1 to compute the name. Taking a single field is good enough.
+        // ReSharper disable once NonReadonlyMemberInGetHashCode.
         return RawValue3 & int.MaxValue;
     }
 
     #region [ Static ]
 
     /// <summary>
-    /// An empty sub file name. Should not generally be used as a single file system 
-    /// must have unique file names.
+    /// An empty subfile name. Should not generally be used as a single file system. 
+    /// Must have unique file names.
     /// </summary>
     public static SubFileName Empty => new SubFileName(0, 0, 0);
 
@@ -165,10 +168,9 @@ public class SubFileName
     /// <summary>
     /// Creates a <see cref="SubFileName"/> from the supplied data.
     /// </summary>
-    /// <param name="fileType">the type identifier of the file</param>
-    /// <param name="keyType">the guid identifier of the type of the SortedTreeStore</param>
-    /// <param name="valueType">the guid identifier of the value type of the SortedTreeStore</param>
-    /// <returns></returns>
+    /// <param name="fileType">The type identifier of the file</param>
+    /// <param name="keyType">The GUID identifier of the type of the SortedTreeStore.</param>
+    /// <param name="valueType">The GUID identifier of the value type of the SortedTreeStore.</param>
     public static unsafe SubFileName Create(Guid fileType, Guid keyType, Guid valueType)
     {
         byte[] data = new byte[16 * 3];
@@ -184,9 +186,9 @@ public class SubFileName
     /// <summary>
     /// Creates a <see cref="SubFileName"/> from the supplied data.
     /// </summary>
-    /// <param name="fileName">a name associated with the data</param>
-    /// <param name="keyType">the guid identifier of the type of the SortedTreeStore</param>
-    /// <param name="valueType">the guid identifier of the value type of the SortedTreeStore</param>
+    /// <param name="fileName">A name associated with the data.</param>
+    /// <param name="keyType">The GUID identifier of the type of the <see cref="SortedTreeStore"/>.</param>
+    /// <param name="valueType">the GUID identifier of the value type of the <see cref="SortedTreeStore"/>.</param>
     /// <returns></returns>
     public static unsafe SubFileName Create(string fileName, Guid keyType, Guid valueType)
     {
@@ -220,8 +222,8 @@ public class SubFileName
     /// <summary>
     /// Loads the <see cref="SubFileName"/> from the supplied <see cref="reader"/>.
     /// </summary>
-    /// <param name="reader">the reader to read from.</param>
-    /// <returns></returns>
+    /// <param name="reader">The reader to read from.</param>
+    /// <returns>The subfile's corresponding values.</returns>
     public static SubFileName Load(BinaryReader reader)
     {
         long value1 = reader.ReadInt64();
@@ -235,7 +237,7 @@ public class SubFileName
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
-    /// <returns></returns>
+    /// <returns><c>true</c>if they are equal, <c>false</c> if they are not.</returns>
     public static bool operator ==(SubFileName a, SubFileName b)
     {
         if (ReferenceEquals(a, b))
@@ -246,11 +248,11 @@ public class SubFileName
     }
 
     /// <summary>
-    /// Compares if the two files are not equal.
+    /// Compares the two files if they are not equal.
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
-    /// <returns></returns>
+    /// <returns>The two files.</returns>
     public static bool operator !=(SubFileName a, SubFileName b)
     {
         return !(a == b);

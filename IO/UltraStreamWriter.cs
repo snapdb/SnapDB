@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  2/11/2014 - Steven E. Chisholm
+//  02/11/2014 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 using System.Runtime.CompilerServices;
 
@@ -40,9 +41,9 @@ public class UltraStreamWriter
     private readonly string m_nl = Environment.NewLine;
 
     /// <summary>
-    /// Creates a <see cref="UltraStreamWriter"/> around <see cref="Stream"/>
+    /// Creates a <see cref="UltraStreamWriter"/> around <see cref="Stream"/>.
     /// </summary>
-    /// <param name="stream">The stream to wrap</param>
+    /// <param name="stream">The stream to wrap.</param>
     public UltraStreamWriter(StreamWriter stream)
     {
         m_buffer = new char[Size];
@@ -50,7 +51,7 @@ public class UltraStreamWriter
     }
 
     /// <summary>
-    /// Writes the provided character to the stream
+    /// Writes the provided character to the stream.
     /// </summary>
     /// <param name="value">the character to write.</param>
     public void Write(char value)
@@ -62,7 +63,7 @@ public class UltraStreamWriter
     }
 
     /// <summary>
-    /// Writes the provided float to the stream
+    /// Writes the provided float to the stream.
     /// </summary>
     /// <param name="value">the value to write.</param>
     public void Write(float value)
@@ -73,7 +74,7 @@ public class UltraStreamWriter
     }
 
     /// <summary>
-    /// Writes a NewLine to the stream
+    /// Writes a <see cref="NewLine"/> to the stream.
     /// </summary>
     public void WriteLine()
     {
@@ -93,7 +94,7 @@ public class UltraStreamWriter
     }
 
     /// <summary>
-    /// Flushes to the underlying stream
+    /// Flushes to the underlying stream.
     /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public void Flush()
