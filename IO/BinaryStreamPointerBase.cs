@@ -151,7 +151,6 @@ public unsafe abstract class BinaryStreamPointerBase
     /// </summary>
     /// <param name="position"></param>
     /// <param name="length">the number of bytes valid for the writing.</param>
-    /// <returns></returns>
     /// <remarks>This method will throw an exeption if the provided length cannot be provided.</remarks>
     public byte* GetReadPointer(long position, int length)
     {
@@ -172,7 +171,6 @@ public unsafe abstract class BinaryStreamPointerBase
     /// <param name="position"></param>
     /// <param name="length">the number of bytes valid for the writing.</param>
     /// <param name="supportsWriting">an output parameter detailing if writing to this block is supported.</param>
-    /// <returns></returns>
     /// <remarks>This method will throw an exeption if the provided length cannot be provided.</remarks>
     public byte* GetReadPointer(long position, int length, out bool supportsWriting)
     {

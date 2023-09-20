@@ -206,7 +206,6 @@ public class SubFileName
     /// Creates a <see cref="SubFileName"/> from the supplied data.
     /// </summary>
     /// <param name="data"></param>
-    /// <returns></returns>
     public static unsafe SubFileName Create(byte[] data)
     {
         using (SHA1 sha1 = SHA1.Create()) 
