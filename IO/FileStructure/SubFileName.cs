@@ -157,7 +157,6 @@ public class SubFileName
     /// <summary>
     /// Creates a random <see cref="SubFileName"/>
     /// </summary>
-    /// <returns></returns>
     public static SubFileName CreateRandom()
     {
         return Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
