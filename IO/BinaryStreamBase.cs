@@ -171,7 +171,6 @@ public abstract unsafe class BinaryStreamBase
     /// <param name="isWriting">hints to the stream if write access is desired.</param>
     public virtual void UpdateLocalBuffer(bool isWriting)
     {
-
     }
 
     /// <summary>
