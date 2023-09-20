@@ -849,7 +849,6 @@ public abstract unsafe class BinaryStreamBase
     /// </summary>
     /// <param name="maxLength"></param>
     /// <param name="value"></param>
-    /// <returns></returns>
     /// <remarks>
     /// This method can be used to limit the byte size returned.
     /// Since an untrusted source could claim that the length is 
