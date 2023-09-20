@@ -30,6 +30,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Gemstone.Security.Cryptography;
 
+
 namespace SnapDB.IO.FileStructure;
 
 /// <summary>
@@ -208,7 +209,7 @@ public class SubFileName
     /// <returns></returns>
     public static unsafe SubFileName Create(byte[] data)
     {
-        using (SHA1 sha1 = Cipher.CreateSHA1())
+        using (SHA1 sha1 = SHA1.Create()) 
         {
             byte[] hash = sha1.ComputeHash(data);
             fixed (byte* lp = hash)
