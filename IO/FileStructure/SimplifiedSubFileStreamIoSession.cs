@@ -214,7 +214,6 @@ internal unsafe class SimplifiedSubFileStreamIoSession
             Marshal.Copy(m_buffer, 0, m_memory.Address, m_buffer.Length);
         }
 
-        // I don't need to verify any of the footer data since I've written it all correctly.
         m_currentPhysicalBlock = physicalBlockIndex;
         m_currentBlockIndex = blockIndex;
     }

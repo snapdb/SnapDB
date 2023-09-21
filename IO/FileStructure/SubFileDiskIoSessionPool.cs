@@ -38,18 +38,12 @@ internal class SubFileDiskIoSessionPool
 {
     private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(SubFileDiskIoSessionPool), MessageClass.Component);
 
-    /// <summary>
-    /// 
-    /// </summary>
     public DiskIoSession SourceData;
     /// <summary>
     /// Null if in readonly mode
     /// </summary>
     public DiskIoSession DestinationData;
 
-    /// <summary>
-    /// 
-    /// </summary>
     public DiskIoSession SourceIndex;
     /// <summary>
     /// Null if in readonly mode

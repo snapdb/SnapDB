@@ -137,7 +137,6 @@ public sealed class TransactionalEdit
     /// <summary>
     /// Creates and Opens a new file on the current file system.
     /// </summary>
-    /// <returns></returns>
     public SubFileStream CreateFile(SubFileName fileName)
     {
         if (m_disposed)
@@ -150,7 +149,6 @@ public sealed class TransactionalEdit
     /// Opens a ArchiveFileStream that can be used to read/write to the file passed to this function.
     /// </summary>
     /// <param name="fileIndex">The index of the file to open.</param>
-    /// <returns></returns>
     public SubFileStream OpenFile(int fileIndex)
     {
         if (m_disposed)
@@ -166,7 +164,6 @@ public sealed class TransactionalEdit
     /// <summary>
     /// Opens a ArchiveFileStream that can be used to read/write to the file passed to this function.
     /// </summary>
-    /// <returns></returns>
     public SubFileStream OpenFile(SubFileName fileName)
     {
         if (m_disposed)
@@ -175,10 +172,8 @@ public sealed class TransactionalEdit
         {
             SubFileHeader? file = Files[x];
             if (file.FileName == fileName)
-            {
                 return OpenFile(x);
             }
-        }
         throw new Exception("File does not exist");
     }
 

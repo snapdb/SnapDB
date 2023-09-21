@@ -60,11 +60,6 @@ public partial class SubFileStream
 
         #endregion
 
-        #region [ Properties ]
-
-
-        #endregion
-
         #region [ Methods ]
 
         /// <summary>

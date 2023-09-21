@@ -130,7 +130,6 @@ public class TransactionalFileStructure
     /// <summary>
     /// Gets the last committed read snapshot on the file system.
     /// </summary>
-    /// <returns></returns>
     public ReadSnapshot Snapshot => m_currentReadTransaction;
 
     /// <summary>
@@ -143,7 +142,6 @@ public class TransactionalFileStructure
     /// <summary>
     /// This will start a transactional edit on the file. 
     /// </summary>
-    /// <returns></returns>
     public TransactionalEdit BeginEdit()
     {
         if (m_diskIo.IsReadOnly)
