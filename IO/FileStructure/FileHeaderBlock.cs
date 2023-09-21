@@ -48,7 +48,7 @@ public class FileHeaderBlock
     /// <summary>
     /// The file header bytes which equals: "openHistorian 2.0 Archive\00"
     /// </summary>
-    private static readonly byte[] FileAllocationTableHeaderBytes = Encoding.ASCII.GetBytes("openHistorian 2.0 Archive\0");
+    private static readonly byte[] FileAllocationTableHeaderBytes = "openHistorian 2.0 Archive\0"u8.ToArray();
 
     private const short FileAllocationReadTableVersion = 2;
     private const short FileAllocationWriteTableVersion = 2;
@@ -246,10 +246,10 @@ public class FileHeaderBlock
         m_flags = m_flags.CloneEditable();
         m_files = m_files.CloneEditable();
 
-        if (m_userAttributes != null)
+        if (m_userAttributes is not null)
             m_userAttributes = new Dictionary<Guid, byte[]>(m_userAttributes);
 
-        if (m_unknownAttributes != null) 
+        if (m_unknownAttributes is not null) 
             m_unknownAttributes = new Dictionary<short, byte[]>(m_unknownAttributes);
     }
 
@@ -368,7 +368,7 @@ public class FileHeaderBlock
                 dataWriter.Write(flag.ToLittleEndianBytes());
         }
 
-        if (m_unknownAttributes != null)
+        if (m_unknownAttributes is not null)
         {
             foreach (KeyValuePair<short, byte[]> md in m_unknownAttributes)
             {
@@ -378,7 +378,7 @@ public class FileHeaderBlock
             }
         }
 
-        if (m_userAttributes != null)
+        if (m_userAttributes is not null)
         {
             foreach (KeyValuePair<Guid, byte[]> md in m_userAttributes)
             {

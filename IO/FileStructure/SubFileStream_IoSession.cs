@@ -107,7 +107,7 @@ public partial class SubFileStream
 
                     if (disposing)
                     {
-                        if (m_ioSessions != null)
+                        if (m_ioSessions is not null)
                         {
                             m_ioSessions.Dispose();
                             m_ioSessions = null;

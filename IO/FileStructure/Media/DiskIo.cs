@@ -206,7 +206,7 @@ internal sealed class DiskIo : IDisposable
         {
             try
             {
-                if (m_stream != null)
+                if (m_stream is not null)
                 {
                     m_stream.Dispose();
                 }

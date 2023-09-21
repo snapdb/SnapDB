@@ -198,13 +198,13 @@ public class TransactionalFileStructure
         {
             try
             {
-                if (m_currentTransaction != null)
+                if (m_currentTransaction is not null)
                 {
                     m_currentTransaction.Dispose();
                     m_currentTransaction = null;
                 }
 
-                if (m_diskIo != null)
+                if (m_diskIo is not null)
                 {
                     m_diskIo.Dispose();
                     m_diskIo = null;

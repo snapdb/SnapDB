@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Globalization;
 
 namespace SnapDB;
 
@@ -54,7 +54,7 @@ public static class Number
         if (value > MaxValue || value < MinValue || value < ZeroMax && value > ZeroMin)
         {
             //Not worth coding for this case.
-            string T = value.ToString();
+            string T = value.ToString(CultureInfo.InvariantCulture);
             for (int x = 0; x < T.Length; x++)
             {
                 str[pos + x] = T[pos + x];

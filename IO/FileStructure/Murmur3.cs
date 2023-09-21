@@ -57,11 +57,9 @@ internal static unsafe class Murmur3
 
         // Cast the byte data to ulong blocks for processing.
         ulong* blocks = (ulong*)bb;
-        ulong h1;
-        ulong h2;
         int nblocks = length >> 4;
-        h1 = seed;
-        h2 = seed;
+        ulong h1 = seed;
+        ulong h2 = seed;
 
         for (int i = 0; i < nblocks; i++)
         {

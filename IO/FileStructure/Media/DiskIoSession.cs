@@ -297,7 +297,7 @@ internal unsafe class DiskIoSession : IDisposable
         {
             try
             {
-                if (m_diskMediumIoSession != null)
+                if (m_diskMediumIoSession is not null)
                 {
                     m_diskMediumIoSession.Dispose();
                     m_diskMediumIoSession = null;

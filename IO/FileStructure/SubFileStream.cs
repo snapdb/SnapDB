@@ -168,9 +168,9 @@ public sealed partial class SubFileStream
     {
         if (!m_fileHeaderBlock.IsSimplifiedFileFormat)
         {
-            if (m_ioStream1 != null && !m_ioStream1.IsDisposed && m_ioStream1 != caller)
+            if (m_ioStream1 is not null && !m_ioStream1.IsDisposed && m_ioStream1 != caller)
                 (m_ioStream1 as IoSession).ClearIndexCache(mostRecentParser);
-            if (m_ioStream2 != null && !m_ioStream2.IsDisposed && m_ioStream2 != caller)
+            if (m_ioStream2 is not null && !m_ioStream2.IsDisposed && m_ioStream2 != caller)
                 (m_ioStream2 as IoSession).ClearIndexCache(mostRecentParser);
         }
     }
@@ -185,12 +185,12 @@ public sealed partial class SubFileStream
         {
             try
             {
-                if (m_ioStream1 != null)
+                if (m_ioStream1 is not null)
                 {
                     m_ioStream1.Dispose();
                     m_ioStream1 = null;
                 }
-                if (m_ioStream2 != null)
+                if (m_ioStream2 is not null)
                 {
                     m_ioStream2.Dispose();
                     m_ioStream2 = null;

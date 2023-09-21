@@ -378,15 +378,13 @@ public class MemoryPoolStreamCore : IDisposable
     /// <returns></returns>
     public void ReadBlock(long position, out IntPtr pointer, out int validLength)
     {
-        long firstPosition;
-
         if (m_disposed)
             throw new ObjectDisposedException("MemoryStream");
         if (position < m_firstValidPosition)
             throw new ArgumentOutOfRangeException(nameof(position), "position is before the beginning of the stream");
 
         validLength = m_pageSize;
-        firstPosition = ((position - m_firstAddressablePosition) & m_invertMask) + m_firstAddressablePosition;
+        var firstPosition = ((position - m_firstAddressablePosition) & m_invertMask) + m_firstAddressablePosition;
         pointer = GetPage(position - m_firstAddressablePosition);
 
         if (firstPosition < m_firstValidPosition)

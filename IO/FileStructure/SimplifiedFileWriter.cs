@@ -142,12 +142,12 @@ public class SimplifiedFileWriter
 
                 if (disposing)
                 {
-                    if (m_subFileStream != null)
+                    if (m_subFileStream is not null)
                     {
                         m_subFileStream.Dispose();
                         m_subFileStream = null;
                     }
-                    if (m_stream != null)
+                    if (m_stream is not null)
                     {
                         m_stream.Dispose();
                     }

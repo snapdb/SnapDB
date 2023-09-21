@@ -53,7 +53,7 @@ public partial class ThreadSafeList<T>
         /// <returns></returns>
         public bool UnsafeTryGetNextItem(out T item)
         {
-            if (m_itemCurrentlyLocked != null)
+            if (m_itemCurrentlyLocked is not null)
                 throw new Exception("Invalid use of ThreadSafeIterator. Must Call Unregister before calling another TryGetNextItem");
 
             Wrapper currentObject = null;

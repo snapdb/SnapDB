@@ -157,7 +157,7 @@ internal sealed class SimplifiedSubFileStream
         {
             try
             {
-                if (m_ioStream1 != null)
+                if (m_ioStream1 is not null)
                 {
                     m_ioStream1.Dispose();
                     m_ioStream1 = null;

@@ -288,7 +288,7 @@ internal class MemoryPoolPageList
             for (int x = 0; x < m_memoryBlocks.Capacity; x++)
             {
 
-                if (m_memoryBlocks[x] != null)
+                if (m_memoryBlocks[x] is not null)
                 {
                     if (m_isPageFree.AreAllBitsCleared(x * m_pagesPerMemoryBlock, m_pagesPerMemoryBlock))
                     {

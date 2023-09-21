@@ -159,13 +159,13 @@ internal class SubFileDiskIoSessionPool
     /// </summary>
     public void Clear()
     {
-        if (SourceData != null)
+        if (SourceData is not null)
             SourceData.Clear();
-        if (DestinationData != null)
+        if (DestinationData is not null)
             DestinationData.Clear();
-        if (SourceIndex != null)
+        if (SourceIndex is not null)
             SourceIndex.Clear();
-        if (DestinationIndex != null)
+        if (DestinationIndex is not null)
             DestinationIndex.Clear();
     }
 
@@ -177,22 +177,22 @@ internal class SubFileDiskIoSessionPool
     {
         GC.SuppressFinalize(this);
         IsDisposed = true;
-        if (SourceData != null)
+        if (SourceData is not null)
         {
             SourceData.Dispose();
             SourceData = null;
         }
-        if (DestinationData != null)
+        if (DestinationData is not null)
         {
             DestinationData.Dispose();
             DestinationData = null;
         }
-        if (SourceIndex != null)
+        if (SourceIndex is not null)
         {
             SourceIndex.Dispose();
             SourceIndex = null;
         }
-        if (DestinationIndex != null)
+        if (DestinationIndex is not null)
         {
             DestinationIndex.Dispose();
             DestinationIndex = null;

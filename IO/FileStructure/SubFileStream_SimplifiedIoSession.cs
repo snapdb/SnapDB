@@ -24,7 +24,6 @@
 //******************************************************************************************************
 
 using SnapDB.IO.FileStructure.Media;
-using SnapDB.IO.FileStructure;
 using SnapDB.IO.Unmanaged;
 
 namespace SnapDB.IO.FileStructure;
@@ -82,7 +81,7 @@ public partial class SubFileStream
 
                     if (disposing)
                     {
-                        if (m_dataIoSession != null)
+                        if (m_dataIoSession is not null)
                         {
                             m_dataIoSession.Dispose();
                             m_dataIoSession = null;
@@ -121,7 +120,6 @@ public partial class SubFileStream
             if (pos >= blockDataLength * (uint.MaxValue - 1))
                 throw new ArgumentOutOfRangeException("position", "position reaches past the end of the file.");
 
-            uint physicalBlockIndex;
             uint indexPosition;
 
             if (pos <= uint.MaxValue) //64-bit divide is 2 times slower
@@ -140,7 +138,7 @@ public partial class SubFileStream
             //Reading
             if (indexPosition >= m_stream.m_subFile.DataBlockCount)
                 throw new ArgumentOutOfRangeException("position", "position reaches past the end of the file.");
-            physicalBlockIndex = m_stream.m_subFile.DirectBlock + indexPosition;
+            var physicalBlockIndex = m_stream.m_subFile.DirectBlock + indexPosition;
 
             m_dataIoSession.Read(physicalBlockIndex, BlockType.DataBlock, indexPosition);
             args.FirstPointer = (IntPtr)m_dataIoSession.Pointer;

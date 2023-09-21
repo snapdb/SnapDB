@@ -45,11 +45,11 @@ public class SecureStream
     {
         string localChallenge = string.Empty;
         string remoteChallenge = string.Empty;
-        if (stream.RemoteCertificate != null)
+        if (stream.RemoteCertificate is not null)
         {
             remoteChallenge = stream.RemoteCertificate.GetCertHashString();
         }
-        if (stream.LocalCertificate != null)
+        if (stream.LocalCertificate is not null)
         {
             localChallenge = stream.LocalCertificate.GetCertHashString();
         }

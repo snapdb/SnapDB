@@ -106,11 +106,11 @@ public class SortedTreeTableReadSnapshot<TKey, TValue>
         {
             try
             {
-                if (m_binaryStream != null)
+                if (m_binaryStream is not null)
                 {
                     m_binaryStream.Dispose();
                 }
-                if (m_subStream != null)
+                if (m_subStream is not null)
                 {
                     m_subStream.Dispose();
                 }

@@ -143,7 +143,7 @@ public partial class SortedTreeTable<TKey, TValue>
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
-        if (m_activeEditor != null)
+        if (m_activeEditor is not null)
             throw new Exception("Only one concurrent edit is supported");
         m_activeEditor = new Editor(this);
         return m_activeEditor;
@@ -157,7 +157,7 @@ public partial class SortedTreeTable<TKey, TValue>
     {
         if (!m_disposed)
         {
-            if (m_activeEditor != null)
+            if (m_activeEditor is not null)
                 m_activeEditor.Dispose();
             m_fileStructure.Dispose();
             m_disposed = true;

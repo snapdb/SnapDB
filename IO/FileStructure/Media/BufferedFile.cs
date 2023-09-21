@@ -308,11 +308,11 @@ internal partial class BufferedFile
 
                 lock (m_syncRoot)
                 {
-                    if (m_pageReplacementAlgorithm != null)
+                    if (m_pageReplacementAlgorithm is not null)
                         m_pageReplacementAlgorithm.Dispose();
-                    if (m_queue != null)
+                    if (m_queue is not null)
                         m_queue.Dispose();
-                    if (m_writeBuffer != null)
+                    if (m_writeBuffer is not null)
                         m_writeBuffer.Dispose();
                 }
             }

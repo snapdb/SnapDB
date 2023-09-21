@@ -502,10 +502,10 @@ public unsafe abstract class BinaryStreamPointerBase
     {
         const int size = 5;
         byte* stream = Current;
+
         if (stream + size <= LastRead)
         {
-            uint value11;
-            value11 = stream[0];
+            uint value11 = stream[0];
             if (value11 < 128)
             {
                 Current += 1;
@@ -543,8 +543,7 @@ public unsafe abstract class BinaryStreamPointerBase
 
         if (stream + size <= LastRead)
         {
-            ulong value11;
-            value11 = stream[0];
+            ulong value11 = stream[0];
             if (value11 < 128)
             {
                 Current += 1;

@@ -206,7 +206,7 @@ public class SecureStreamServer<T>
             }
             else
             {
-                certSignatures = new byte[0];
+                certSignatures = Array.Empty<byte>();
                 stream2 = stream;
             }
 
@@ -221,7 +221,7 @@ public class SecureStreamServer<T>
                     if (!state.ContainsDefaultCredentials)
                     {
                         stream2.Write(false);
-                        if (ssl != null)
+                        if (ssl is not null)
                             ssl.Dispose();
                         return false;
                     }
@@ -234,7 +234,7 @@ public class SecureStreamServer<T>
                 case AuthenticationMode.Integrated: //Integrated
                     if (!m_integrated.TryAuthenticateAsServer(stream2, out userToken, certSignatures))
                     {
-                        if (ssl != null)
+                        if (ssl is not null)
                             ssl.Dispose();
                         return false;
                     }
@@ -285,7 +285,7 @@ public class SecureStreamServer<T>
         catch (Exception ex)
         {
             Log.Publish(MessageLevel.Info, "Authentication Failed: Unknown Exception", null, null, ex);
-            if (ssl != null)
+            if (ssl is not null)
                 ssl.Dispose();
             return false;
         }

@@ -194,14 +194,14 @@ public sealed class TransactionalEdit
 
         foreach (SubFileStream file in m_openedFiles)
         {
-            if (file != null && !file.IsDisposed)
+            if (file is not null && !file.IsDisposed)
                 throw new Exception("Not all files have been properly disposed of.");
         }
         try
         {
             // TODO: First commit the data, then the file system.
             m_dataReader.CommitChanges(m_fileHeaderBlock);
-            if (m_delHasBeenCommitted != null)
+            if (m_delHasBeenCommitted is not null)
                 m_delHasBeenCommitted.Invoke();
         }
         finally
@@ -224,7 +224,7 @@ public sealed class TransactionalEdit
 
         foreach (SubFileStream file in m_openedFiles)
         {
-            if (file != null && !file.IsDisposed)
+            if (file is not null && !file.IsDisposed)
             {
                 file.Dispose();
             }
@@ -232,7 +232,7 @@ public sealed class TransactionalEdit
         try
         {
             m_dataReader.RollbackChanges();
-            if (m_delHasBeenRolledBack != null)
+            if (m_delHasBeenRolledBack is not null)
                 m_delHasBeenRolledBack.Invoke();
         }
         finally

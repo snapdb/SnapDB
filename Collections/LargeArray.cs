@@ -60,7 +60,7 @@ public class LargeArray<T>
         m_size = (int)BitMath.RoundUpToNearestPowerOfTwo((uint)jaggedArrayDepth);
         m_mask = m_size - 1;
         m_bitShift = BitMath.CountBitsSet((uint)m_mask);
-        m_array = new T[0][];
+        m_array = Array.Empty<T[]>();
         m_capacity = 0;
     }
 
@@ -153,7 +153,7 @@ public class LargeArray<T>
     {
         foreach (T[] items in m_array)
         {
-            if (items != null)
+            if (items is not null)
                 Array.Clear(items, 0, items.Length);
         }
     }

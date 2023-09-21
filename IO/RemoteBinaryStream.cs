@@ -358,8 +358,7 @@ public class RemoteBinaryStream
             fixed (byte* lp = m_receiveBuffer)
             {
                 byte* stream = lp + m_receivePosition;
-                ulong value11;
-                value11 = stream[0];
+                ulong value11 = stream[0];
                 if (value11 < 128)
                 {
                     m_receivePosition += 1;

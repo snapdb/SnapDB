@@ -87,7 +87,7 @@ public class WorkerThreadSynchronization
         public void Run()
         {
             Action callback = Interlocked.Exchange(ref m_callback, null);
-            if ((object)callback != null)
+            if ((object)callback is not null)
             {
                 callback();
             }

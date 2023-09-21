@@ -29,7 +29,6 @@
 using Gemstone.ArrayExtensions;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
-using System.Threading;
 
 namespace SnapDB;
 
@@ -154,7 +153,7 @@ public class IsolatedQueue<T>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public void Enqueue(T item)
     {
-        if (m_currentHead != null && m_currentHead.CanEnqueue)
+        if (m_currentHead is not null && m_currentHead.CanEnqueue)
         {
             m_currentHead.Enqueue(item);
             m_enqueueCount++;
@@ -166,7 +165,7 @@ public class IsolatedQueue<T>
     [MethodImpl(MethodImplOptions.NoInlining)]
     void EnqueueSlower(T item)
     {
-        if (m_currentHead == null || !m_currentHead.CanEnqueue)
+        if (m_currentHead is null || !m_currentHead.CanEnqueue)
         {
             m_currentHead = new IsolatedNode(m_unitCount);
             Thread.MemoryBarrier();
@@ -184,7 +183,7 @@ public class IsolatedQueue<T>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public bool TryDequeue(out T item)
     {
-        if (m_currentTail != null && m_currentTail.CanDequeue)
+        if (m_currentTail is not null && m_currentTail.CanDequeue)
         {
             item = m_currentTail.Dequeue();
             m_dequeueCount++;
@@ -196,7 +195,7 @@ public class IsolatedQueue<T>
     [MethodImpl(MethodImplOptions.NoInlining)]
     bool TryDequeueSlower(out T item)
     {
-        if (m_currentTail == null)
+        if (m_currentTail is null)
         {
             if (!m_blocks.TryDequeue(out m_currentTail))
             {

@@ -23,10 +23,12 @@
 //       Converted code to .NET core.
 //******************************************************************************************************
 
+using System.Net.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using Gemstone.Diagnostics;
 using Gemstone.IO.StreamExtensions;
+using GSF.Security;
 
 namespace SnapDB.Security;
 
@@ -110,7 +112,7 @@ public abstract class SecureStreamClientBase
         else
         {
             stream2 = stream;
-            certSignatures = new byte[0];
+            certSignatures = Array.Empty<byte>();
         }
 
         try
@@ -138,14 +140,14 @@ public abstract class SecureStreamClientBase
                 return true;
             }
 
-            if (ssl != null)
+            if (ssl is not null)
                 ssl.Dispose();
             return false;
         }
         catch (Exception ex)
         {
             Log.Publish(MessageLevel.Info, "Authentication Failed", null, null, ex);
-            if (ssl != null)
+            if (ssl is not null)
                 ssl.Dispose();
             return false;
         }
@@ -157,7 +159,7 @@ public abstract class SecureStreamClientBase
 #if SQLCLR
         return false;
 #else
-        if (m_resumeTicket != null && m_sessionSecret != null)
+        if (m_resumeTicket is not null && m_sessionSecret is not null)
         {
             //Resume Session:
             // C => S
@@ -242,7 +244,7 @@ public abstract class SecureStreamClientBase
         }
         finally
         {
-            if (secureStream != null)
+            if (secureStream is not null)
                 secureStream.Dispose();
         }
     }
@@ -265,7 +267,7 @@ public abstract class SecureStreamClientBase
         }
         catch
         {
-            if (secureStream != null)
+            if (secureStream is not null)
                 secureStream.Dispose();
             throw;
         }

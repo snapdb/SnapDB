@@ -189,6 +189,7 @@ internal sealed class CustomFileStream
 
             int totalLengthRead = 0;
             int len = 0;
+
             while (length > 0)
             {
                 using (m_isUsingStream.EnterReadLock())
@@ -342,7 +343,7 @@ internal sealed class CustomFileStream
         //Therefore WinApi must be called.
         using (m_isUsingStream.EnterReadLock())
         {
-            if (m_stream != null)
+            if (m_stream is not null)
             {
                 m_stream.Flush(true);
                 WinApi.FlushFileBuffers(m_stream.SafeFileHandle);
@@ -405,7 +406,7 @@ internal sealed class CustomFileStream
     {
         using (m_isUsingStream.EnterWriteLock())
         {
-            if (m_stream != null)
+            if (m_stream is not null)
             {
                 m_stream.Dispose();
                 m_stream = new FileStream(m_fileName, FileMode.Open, isReadOnly ? FileAccess.Read : FileAccess.ReadWrite, isSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);

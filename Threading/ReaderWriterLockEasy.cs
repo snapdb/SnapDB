@@ -44,7 +44,7 @@ public struct DisposableReadLock
 
     public void Dispose()
     {
-        if (m_l != null)
+        if (m_l is not null)
         {
             m_l.ReleaseReaderLock();
             m_l = null;
@@ -71,7 +71,7 @@ public struct DisposableWriteLock
 
     public void Dispose()
     {
-        if (m_l != null)
+        if (m_l is not null)
         {
             m_l.ReleaseWriterLock();
             m_l = null;

@@ -367,9 +367,8 @@ public class MemoryPool
         sw.Start();
         StringBuilder sb = new();
         sb.AppendLine("Collection Cycle Started");
-        bool lockTaken;
 
-        Monitor.Enter(m_syncRoot); lockTaken = true;
+        Monitor.Enter(m_syncRoot); var lockTaken = true;
         try
         {
             long size = CurrentCapacity;

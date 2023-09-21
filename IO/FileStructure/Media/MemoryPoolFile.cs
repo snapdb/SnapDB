@@ -25,100 +25,99 @@
 
 using SnapDB.IO.Unmanaged;
 
-namespace SnapDB.IO.FileStructure.Media
+namespace SnapDB.IO.FileStructure.Media;
+
+/// <summary>
+/// Provides a in memory stream that uses pages that are pooled in the unmanaged buffer pool.
+/// </summary>
+internal partial class MemoryPoolFile
+    : MemoryPoolStreamCore, IDiskMediumCoreFunctions
 {
+    #region [ Members ]
+
+
     /// <summary>
-    /// Provides a in memory stream that uses pages that are pooled in the unmanaged buffer pool.
+    /// A Reusable I/O session for all BinaryStreams
     /// </summary>
-    internal partial class MemoryPoolFile
-        : MemoryPoolStreamCore, IDiskMediumCoreFunctions
+    private readonly IoSession m_ioSession;
+
+    private bool m_isReadOnly;
+
+    #endregion
+
+    #region [ Constructors ]
+
+    /// <summary>
+    /// Create a new <see cref="MemoryPoolFile"/>
+    /// </summary>
+    public MemoryPoolFile(MemoryPool pool)
+        : base(pool)
     {
-        #region [ Members ]
-
-
-        /// <summary>
-        /// A Reusable I/O session for all BinaryStreams
-        /// </summary>
-        private readonly IoSession m_ioSession;
-
-        private bool m_isReadOnly;
-
-        #endregion
-
-        #region [ Constructors ]
-
-        /// <summary>
-        /// Create a new <see cref="MemoryPoolFile"/>
-        /// </summary>
-        public MemoryPoolFile(MemoryPool pool)
-            : base(pool)
-        {
-            m_ioSession = new IoSession(this);
-            m_isReadOnly = false;
-        }
-
-        #endregion
-
-        #region [ Properties ]
-
-        #endregion
-
-        #region [ Methods ]
-
-        /// <summary>
-        /// Creates a <see cref="BinaryStreamIoSessionBase"/> that can be used to read from this disk medium.
-        /// </summary>
-        /// <returns></returns>
-        public BinaryStreamIoSessionBase CreateIoSession()
-        {
-            if (IsDisposed)
-                throw new ObjectDisposedException("MemoryStream");
-            return m_ioSession;
-        }
-
-        public string FileName => string.Empty;
-
-        /// <summary>
-        /// Executes a commit of data. This will flush the data to the disk use the provided header data to properly
-        /// execute this function.
-        /// </summary>
-        /// <param name="headerBlock"></param>
-        public void CommitChanges(FileHeaderBlock headerBlock)
-        {
-            if (IsDisposed)
-                throw new ObjectDisposedException("MemoryStream");
-        }
-
-        /// <summary>
-        /// Rolls back all edits to the DiskMedium
-        /// </summary>
-        public void RollbackChanges()
-        {
-            if (IsDisposed)
-                throw new ObjectDisposedException("MemoryStream");
-        }
-
-        /// <summary>
-        /// Changes the extension of the current file.
-        /// </summary>
-        /// <param name="extension">the new extension</param>
-        /// <param name="isReadOnly">If the file should be reopened as readonly</param>
-        /// <param name="isSharingEnabled">If the file should share read privileges.</param>
-        public void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled)
-        {
-            m_isReadOnly = isReadOnly;
-        }
-
-        /// <summary>
-        /// Reopens the file with different permissions.
-        /// </summary>
-        /// <param name="isReadOnly">If the file should be reopened as readonly</param>
-        /// <param name="isSharingEnabled">If the file should share read privileges.</param>
-        public void ChangeShareMode(bool isReadOnly, bool isSharingEnabled)
-        {
-            m_isReadOnly = isReadOnly;
-        }
-
-        #endregion
+        m_ioSession = new IoSession(this);
+        m_isReadOnly = false;
     }
+
+    #endregion
+
+    #region [ Properties ]
+
+    #endregion
+
+    #region [ Methods ]
+
+    /// <summary>
+    /// Creates a <see cref="BinaryStreamIoSessionBase"/> that can be used to read from this disk medium.
+    /// </summary>
+    /// <returns></returns>
+    public BinaryStreamIoSessionBase CreateIoSession()
+    {
+        if (IsDisposed)
+            throw new ObjectDisposedException("MemoryStream");
+        return m_ioSession;
+    }
+
+    public string FileName => string.Empty;
+
+    /// <summary>
+    /// Executes a commit of data. This will flush the data to the disk use the provided header data to properly
+    /// execute this function.
+    /// </summary>
+    /// <param name="headerBlock"></param>
+    public void CommitChanges(FileHeaderBlock headerBlock)
+    {
+        if (IsDisposed)
+            throw new ObjectDisposedException("MemoryStream");
+    }
+
+    /// <summary>
+    /// Rolls back all edits to the DiskMedium
+    /// </summary>
+    public void RollbackChanges()
+    {
+        if (IsDisposed)
+            throw new ObjectDisposedException("MemoryStream");
+    }
+
+    /// <summary>
+    /// Changes the extension of the current file.
+    /// </summary>
+    /// <param name="extension">the new extension</param>
+    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="isSharingEnabled">If the file should share read privileges.</param>
+    public void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled)
+    {
+        m_isReadOnly = isReadOnly;
+    }
+
+    /// <summary>
+    /// Reopens the file with different permissions.
+    /// </summary>
+    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="isSharingEnabled">If the file should share read privileges.</param>
+    public void ChangeShareMode(bool isReadOnly, bool isSharingEnabled)
+    {
+        m_isReadOnly = isReadOnly;
+    }
+
+    #endregion
 }

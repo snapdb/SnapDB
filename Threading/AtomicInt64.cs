@@ -23,9 +23,7 @@
 //       Converted code to .NET core.
 //******************************************************************************************************
 
-using System;
 using System.Runtime.CompilerServices;
-using System.Threading;
 
 namespace SnapDB.Threading;
 

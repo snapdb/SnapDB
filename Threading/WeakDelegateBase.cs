@@ -35,7 +35,7 @@ public abstract class WeakDelegateBase<T> : WeakReference
     protected WeakDelegateBase(Delegate target)
         : base(target is null ? null : target.Target)
     {
-        if (target != null)
+        if (target is not null)
             m_method = target.Method;
     }
 
@@ -57,7 +57,7 @@ public abstract class WeakDelegateBase<T> : WeakReference
             return false;
 
         WeakDelegateBase<T> typeObject = obj as WeakDelegateBase<T>;
-        if (typeObject != null)
+        if (typeObject is not null)
             return Equals(typeObject);
 
         return false;

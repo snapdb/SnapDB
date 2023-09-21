@@ -85,7 +85,7 @@ public class ImmutableList<T>
     {
         TestForEditable();
 
-        m_list.Add(m_formatter == null ? item : m_formatter(item));
+        m_list.Add(m_formatter is null ? item : m_formatter(item));
     }
 
     /// <summary>
@@ -99,7 +99,7 @@ public class ImmutableList<T>
     {
         TestForEditable();
 
-        if (m_formatter != null)
+        if (m_formatter is not null)
         {
             foreach (T? item in collection) 
                 m_list.Add(m_formatter(item));
@@ -173,7 +173,7 @@ public class ImmutableList<T>
         {
             IImmutableObject? item = (IImmutableObject?)m_list[x];
 
-            if (item != null) 
+            if (item is not null) 
                 item.IsReadOnly = true;
         }
     }
@@ -192,7 +192,7 @@ public class ImmutableList<T>
             {
                 IImmutableObject? item = (IImmutableObject?)oldList[x];
 
-                if (item == null)
+                if (item is null)
                     m_list.Add(default);
                 else
                     m_list.Add((T)item.CloneEditable());
@@ -223,7 +223,7 @@ public class ImmutableList<T>
     {
         TestForEditable();
 
-        if (m_formatter == null)
+        if (m_formatter is null)
             m_list.Insert(index, item);
         else
             m_list.Insert(index, m_formatter(item));
@@ -250,7 +250,7 @@ public class ImmutableList<T>
         set
         {
             TestForEditable();
-            if (m_formatter == null)
+            if (m_formatter is null)
             {
                 m_list[index] = value;
             }

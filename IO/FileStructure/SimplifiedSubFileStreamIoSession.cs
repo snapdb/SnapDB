@@ -149,7 +149,6 @@ internal unsafe class SimplifiedSubFileStreamIoSession
         if (pos >= m_blockDataLength * (uint.MaxValue - 1))
             throw new ArgumentOutOfRangeException("position", "position reaches past the end of the file.");
 
-        uint physicalBlockIndex;
         uint indexPosition;
 
         if (pos <= uint.MaxValue) // 64-bit divide is 2 times slower
@@ -160,7 +159,7 @@ internal unsafe class SimplifiedSubFileStreamIoSession
         args.FirstPosition = indexPosition * m_blockDataLength;
         args.Length = m_blockDataLength;
 
-        physicalBlockIndex = m_subFile.DirectBlock + indexPosition;
+        var physicalBlockIndex = m_subFile.DirectBlock + indexPosition;
 
         Read(physicalBlockIndex, indexPosition);
 

@@ -57,7 +57,7 @@ public class NetworkBinaryStream
         }
     }
 
-    public bool Connected => m_socket != null && m_socket.Connected;
+    public bool Connected => m_socket is not null && m_socket.Connected;
 
     public int AvailableReadBytes
     {
@@ -84,7 +84,7 @@ public class NetworkBinaryStream
     public void Disconnect()
     {
         Socket socket = Interlocked.Exchange(ref m_socket, null);
-        if (socket != null)
+        if (socket is not null)
         {
             try
             {

@@ -139,9 +139,9 @@ public unsafe class BinaryStream
         LastRead = null;
         LastWrite = null;
 
-        if (m_mainIoSession != null)
+        if (m_mainIoSession is not null)
             m_mainIoSession.Clear();
-        if (m_secondaryIoSession != null)
+        if (m_secondaryIoSession is not null)
             m_secondaryIoSession.Clear();
     }
 
@@ -185,15 +185,15 @@ public unsafe class BinaryStream
             try
             {
                 // Dispose of the main I/O session
-                if (m_mainIoSession != null)
+                if (m_mainIoSession is not null)
                     m_mainIoSession.Dispose();
 
                 // Dispose of the secondary I/O session
-                if (m_secondaryIoSession != null)
+                if (m_secondaryIoSession is not null)
                     m_secondaryIoSession.Dispose();
                 
                 // Dispose of the I/O stream
-                if (!m_leaveOpen && m_stream != null)
+                if (!m_leaveOpen && m_stream is not null)
                     m_stream.Dispose();
             }
             finally

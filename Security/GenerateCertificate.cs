@@ -27,7 +27,6 @@
 
 using System.Numerics;
 using System.Security.Cryptography.X509Certificates;
-using Gemstone.Security;
 
 namespace SnapDB.Security;
 
@@ -86,12 +85,11 @@ public static class GenerateCertificate
         SecureRandom random = new SecureRandom(randomGenerator);
 
         // Generate public/private keys.
-        AsymmetricCipherKeyPair encryptionKeys;
 
         KeyGenerationParameters keyGenerationParameters = new KeyGenerationParameters(random, keyStrength);
         RsaKeyPairGenerator keyPairGenerator = new RsaKeyPairGenerator();
         keyPairGenerator.Init(keyGenerationParameters);
-        encryptionKeys = keyPairGenerator.GenerateKeyPair();
+        AsymmetricCipherKeyPair encryptionKeys = keyPairGenerator.GenerateKeyPair();
 
         // The Certificate Generator
         X509V3CertificateGenerator certificateGenerator = new X509V3CertificateGenerator();
@@ -135,7 +133,7 @@ public static class GenerateCertificate
     public static X509Certificate2 CreateSelfSignedCertificate(string subjectDirName, int signatureBits, int keyStrength)
     {
         DateTime startDate = DateTime.UtcNow.AddYears(-1);
-        DateTime endDate = DateTime.UtcNow.AddYears(100); ;
+        DateTime endDate = DateTime.UtcNow.AddYears(100);
 
         string signatureAlgorithm;
         switch (signatureBits)
@@ -158,12 +156,11 @@ public static class GenerateCertificate
         SecureRandom random = new SecureRandom(randomGenerator);
 
         // Generate public/private keys.
-        AsymmetricCipherKeyPair encryptionKeys;
 
         KeyGenerationParameters keyGenerationParameters = new KeyGenerationParameters(random, keyStrength);
         RsaKeyPairGenerator keyPairGenerator = new RsaKeyPairGenerator();
         keyPairGenerator.Init(keyGenerationParameters);
-        encryptionKeys = keyPairGenerator.GenerateKeyPair();
+        AsymmetricCipherKeyPair encryptionKeys = keyPairGenerator.GenerateKeyPair();
 
         // The Certificate Generator
         X509V3CertificateGenerator certificateGenerator = new X509V3CertificateGenerator();

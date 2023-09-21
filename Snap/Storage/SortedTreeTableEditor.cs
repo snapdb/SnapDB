@@ -64,17 +64,17 @@ public partial class SortedTreeTable<TKey, TValue>
 
             GetKeyRange(m_sortedTreeFile.m_firstKey, m_sortedTreeFile.m_lastKey);
 
-            if (m_tree != null)
+            if (m_tree is not null)
             {
                 m_tree.Flush();
                 m_tree = null;
             }
-            if (m_binaryStream1 != null)
+            if (m_binaryStream1 is not null)
             {
                 m_binaryStream1.Dispose();
                 m_binaryStream1 = null;
             }
-            if (m_subStream != null)
+            if (m_subStream is not null)
             {
                 m_subStream.Dispose();
                 m_subStream = null;
@@ -93,12 +93,12 @@ public partial class SortedTreeTable<TKey, TValue>
                 throw new ObjectDisposedException(GetType().FullName);
 
             m_tree = null;
-            if (m_binaryStream1 != null)
+            if (m_binaryStream1 is not null)
             {
                 m_binaryStream1.Dispose();
                 m_binaryStream1 = null;
             }
-            if (m_subStream != null)
+            if (m_subStream is not null)
             {
                 m_subStream.Dispose();
                 m_subStream = null;

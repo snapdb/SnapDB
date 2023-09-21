@@ -28,7 +28,7 @@ namespace SnapDB.Security;
 /// <summary>
 /// Provides a way for byte arrays to be added to sorted lists and dictionaries.
 /// </summary>
-public struct ReadonlyByteArray
+public readonly struct ReadonlyByteArray
     : IComparable<ReadonlyByteArray>, IEquatable<ReadonlyByteArray>
 {
     private readonly byte[] m_value;
