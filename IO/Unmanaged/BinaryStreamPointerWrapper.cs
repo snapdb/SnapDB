@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  4/6/2012 - Steven E. Chisholm
+//  04/06/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.IO.Unmanaged;
@@ -60,7 +61,7 @@ public unsafe class BinaryStreamPointerWrapper
         if (Position < 0)
             throw new EndOfStreamException("Before the start of the buffer buffer.");
 
-        //Do Nothing
+        // Do Nothing
     }
 
 }
