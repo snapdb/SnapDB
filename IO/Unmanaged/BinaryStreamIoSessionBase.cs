@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  4/26/2012 - Steven E. Chisholm
+//  04/26/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.IO.Unmanaged;
@@ -34,7 +35,7 @@ public abstract class BinaryStreamIoSessionBase
     private bool m_disposed;
 
     /// <summary>
-    /// Gets if the object has been disposed
+    /// Gets if the object has been disposed.
     /// </summary>
     public bool IsDisposed => m_disposed;
 
