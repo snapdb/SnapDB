@@ -35,8 +35,8 @@ public unsafe class BinaryStreamPointerWrapper
     /// <summary>
     /// Creates a <see cref="BinaryStreamPointerWrapper"/>.
     /// </summary>
-    /// <param name="stream">the byte pointer that starts the stream</param>
-    /// <param name="length">the valid length of the pointer.</param>
+    /// <param name="stream">The byte pointer that starts the stream.</param>
+    /// <param name="length">The valid length of the pointer.</param>
     public BinaryStreamPointerWrapper(byte* stream, int length)
     {
         if (!BitConverter.IsLittleEndian)

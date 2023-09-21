@@ -74,7 +74,7 @@ internal sealed class SimplifiedSubFileStream
     /// </summary>
     /// <param name="stream">The location to read from.</param>
     /// <param name="subFile">The file to read.</param>
-    /// <param name="fileHeaderBlock">The FileAllocationTable</param>
+    /// <param name="fileHeaderBlock">The FileAllocationTable.</param>
     internal SimplifiedSubFileStream(FileStream stream, SubFileHeader? subFile, FileHeaderBlock fileHeaderBlock)
     {
         if (stream is null)
@@ -104,7 +104,7 @@ internal sealed class SimplifiedSubFileStream
     internal SubFileHeader? SubFile => m_subFile;
 
     /// <summary>
-    /// Gets if this file was opened in readonly mode.
+    /// Gets if this file was opened in "read only" mode.
     /// </summary>
     public bool IsReadOnly
     {
@@ -122,10 +122,12 @@ internal sealed class SimplifiedSubFileStream
     public bool IsDisposed => m_disposed;
 
     /// <summary>
-    /// Gets the number of available simultaneous read/write sessions.
+    /// Gets the number of available simultaneous read or write sessions.
     /// </summary>
-    /// <remarks>This value is used to determine if a binary stream can be cloned
-    /// to improve read/write/copy performance.</remarks>
+    /// <remarks>
+    /// This value is used to determine if a binary stream can be cloned
+    /// to improve read, write, or copy performance.
+    /// </remarks>
     public int RemainingSupportedIoSessions
     {
         get

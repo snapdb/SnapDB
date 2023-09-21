@@ -21,6 +21,7 @@
 //
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using System.Runtime.InteropServices;
@@ -30,7 +31,7 @@ using SnapDB.IO.Unmanaged;
 namespace SnapDB.IO.FileStructure;
 
 /// <summary>
-/// An IoSession for a Simplified Sub File Stream
+/// An IoSession for a Simplified Sub File Stream.
 /// </summary>
 internal unsafe class SimplifiedSubFileStreamIoSession
     : BinaryStreamIoSessionBase
@@ -209,8 +210,10 @@ internal unsafe class SimplifiedSubFileStreamIoSession
             ReadBlockCount++;
             m_stream.Position = physicalBlockIndex * m_blockSize;
             int bytesRead = m_stream.Read(m_buffer, 0, m_blockSize);
+
             if (bytesRead < m_buffer.Length)
                 Array.Clear(m_buffer, bytesRead, m_buffer.Length - bytesRead);
+
             Marshal.Copy(m_buffer, 0, m_memory.Address, m_buffer.Length);
         }
 

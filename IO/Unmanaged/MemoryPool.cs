@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  3/16/2012 - Steven E. Chisholm
+//  03/16/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using System.Diagnostics;
@@ -32,7 +33,7 @@ using SnapDB.Threading;
 namespace SnapDB.IO.Unmanaged;
 
 /// <summary>
-/// Deteremines the desired buffer pool utilization level.
+/// Determines the desired buffer pool utilization level.
 /// Setting to Low will cause collection cycles to occur more often to keep the 
 /// utilization level to low. 
 /// </summary>
@@ -70,19 +71,19 @@ public class MemoryPool
     #region [ Members ]
 
     /// <summary>
-    /// Represents the ceiling for the amount of memory the buffer pool can use (124GB)
+    /// Represents the ceiling for the amount of memory the buffer pool can use (124GB).
     /// </summary>
     public const long MaximumTestedSupportedMemoryCeiling = 124 * 1024 * 1024 * 1024L;
 
     /// <summary>
-    /// Represents the minimum amount of memory that the buffer pool needs to work properly (10MB)
+    /// Represents the minimum amount of memory that the buffer pool needs to work properly (10MB).
     /// </summary>
     public const long MinimumTestedSupportedMemoryFloor = 10 * 1024 * 1024;
 
     /// <summary>
     /// Delegates are placed in a List because
     /// in a later version, some sort of concurrent garbage collection may be implemented
-    /// which means more control will need to be with the Event
+    /// which means more control will need to be with the Event.
     /// </summary>
     private readonly ThreadSafeList<WeakAction<CollectionEventArgs>> m_requestCollectionEvent;
     private long m_levelNone;
@@ -113,7 +114,7 @@ public class MemoryPool
     public TargetUtilizationLevels TargetUtilizationLevel { get; private set; }
 
     /// <summary>
-    /// Each page will be exactly this size (Based on RAM)
+    /// Each page will be exactly this size (based on RAM).
     /// </summary>
     public readonly int PageSize;
 
@@ -132,13 +133,16 @@ public class MemoryPool
     /// <summary>
     /// Requests that classes using this <see cref="MemoryPool"/> release any unused buffers.
     /// Failing to do so may result in an <see cref="OutOfMemoryException"/> to occur.
-    /// <remarks>IMPORTANT NOTICE: No not call <see cref="AllocatePage"/> via the thread
+    /// </summary>
+    /// <remarks>
+    /// IMPORTANT NOTICE: Do not call <see cref="AllocatePage"/> via the thread
     /// that raises this event. Also, be careful about entering a lock via this thread
     /// because a potential deadlock might occur. 
-    /// 
+    /// </remarks>
+    /// <remarks>
     /// Also, Do not remove a handler from within a lock context as the remove
-    /// blocks until all events have been called. A potential for another deadlock.</remarks>
-    /// </summary>
+    /// blocks until all events have been called. A potential for another deadlock.
+    /// </remarks>
     public event EventHandler<CollectionEventArgs> RequestCollection
     {
         add
@@ -160,7 +164,7 @@ public class MemoryPool
     /// <summary>
     /// Creates a new <see cref="MemoryPool"/>.
     /// </summary>
-    /// <param name="pageSize">The desired page size. Must be between 4KB and 256KB</param>
+    /// <param name="pageSize">The desired page size. Must be between 4KB and 256KB.</param>
     /// <param name="maximumBufferSize">The desired maximum size of the allocation. Note: could be less if there is not enough system memory.</param>
     /// <param name="utilizationLevel">Specifies the desired utilization level of the allocated space.</param>
     public MemoryPool(int pageSize = 64 * 1024, long maximumBufferSize = -1, TargetUtilizationLevels utilizationLevel = TargetUtilizationLevels.Low)
@@ -194,13 +198,13 @@ public class MemoryPool
     #region [ Properties ]
 
     /// <summary>
-    /// Returns the number of bytes currently allocated by the buffer pool to other objects
+    /// Returns the number of bytes currently allocated by the buffer pool to other objects.
     /// </summary>
     public long AllocatedBytes => CurrentAllocatedSize;
 
     /// <summary>
-    /// The maximum amount of RAM that this memory pool is configured to support
-    /// Attempting to allocate more than this will cause an out of memory exception
+    /// The maximum amount of RAM that this memory pool is configured to support.
+    /// Attempting to allocate more than this will cause an out of memory exception.
     /// </summary>
     public long MaximumPoolSize => m_pageList.MaximumPoolSize;
 
@@ -250,8 +254,8 @@ public class MemoryPool
 
         lock (m_syncAllocate)
         {
-            //m_releasePageVersion is approximately the number of times that a release page function has been called.
-            //                     due to race conditions, the number may not be exact, but it will have at least changed.
+            // m_releasePageVersion is approximately the number of times that a release page function has been called.
+            // due to race conditions, the number may not be exact, but it will have at least changed.
 
             while (true)
             {
@@ -266,8 +270,8 @@ public class MemoryPool
                     throw new OutOfMemoryException("Memory pool is full");
                 }
 
-                //Due to a race condition, it is possible that someone else get the freed block
-                //and we must request freeing again.
+                // Due to a race condition, it is possible that someone else get the freed block
+                // and we must request freeing again.
             }
         }
     }
@@ -275,7 +279,7 @@ public class MemoryPool
     /// <summary>
     /// Releases the page back to the buffer pool for reallocation.
     /// </summary>
-    /// <param name="pageIndex">A value of zero or less will return silently</param>
+    /// <param name="pageIndex">A value of zero or less will return silently.</param>
     /// <remarks>The page released will not be initialized.
     /// Releasing a page is on the honor system.  
     /// Rereferencing a released page will most certainly cause 
@@ -288,7 +292,7 @@ public class MemoryPool
     }
 
     /// <summary>
-    /// Releases all of the supplied pages
+    /// Releases all of the supplied pages.
     /// </summary>
     /// <param name="pageIndexes">A collection of pages.</param>
     public void ReleasePages(IEnumerable<int> pageIndexes)
@@ -301,10 +305,9 @@ public class MemoryPool
     }
 
     /// <summary>
-    /// Changes the allowable buffer size
+    /// Changes the allowable buffer size.
     /// </summary>
-    /// <param name="value">the number of bytes to set.</param>
-    /// <returns></returns>
+    /// <param name="value">The number of bytes to set.</param>
     public long SetMaximumBufferSize(long value)
     {
         lock (m_syncRoot)
@@ -322,10 +325,9 @@ public class MemoryPool
     }
 
     /// <summary>
-    /// Changes the utilization level
+    /// Changes the utilization level.
     /// </summary>
     /// <param name="utilizationLevel"></param>
-    /// <returns></returns>
     public void SetTargetUtilizationLevel(TargetUtilizationLevels utilizationLevel)
     {
         lock (m_syncRoot)
@@ -481,19 +483,23 @@ public class MemoryPool
     /// Gets the number of collection rounds base on the size.
     /// </summary>
     /// <param name="size"></param>
-    /// <returns></returns>
     private int GetCollectionLevelBasedOnSize(long size)
     {
         if (size < m_levelNone)
             return 0;
+
         if (size < m_levelLow)
             return 1;
+
         if (size < m_levelNormal)
             return 2;
+
         if (size < m_levelHigh)
             return 3;
+
         if (size < m_levelVeryHigh)
             return 4;
+
         return 5;
     }
 
@@ -503,16 +509,22 @@ public class MemoryPool
         {
             case 0:
                 return "0 (None)";
+
             case 1:
                 return "1 (Low)";
+
             case 2:
                 return "2 (Normal)";
+
             case 3:
                 return "3 (High)";
+
             case 4:
                 return "4 (Very High)";
+
             case 5:
                 return "5 (Critical)";
+
             default:
                 return iterations + " (Unknown)";
         }
@@ -529,6 +541,7 @@ public class MemoryPool
                 m_levelHigh = (long)(0.75 * maximumBufferSize);
                 m_levelVeryHigh = (long)(0.90 * maximumBufferSize);
                 break;
+
             case TargetUtilizationLevels.Medium:
                 m_levelNone = (long)(0.25 * maximumBufferSize);
                 m_levelLow = (long)(0.50 * maximumBufferSize);
@@ -536,6 +549,7 @@ public class MemoryPool
                 m_levelHigh = (long)(0.85 * maximumBufferSize);
                 m_levelVeryHigh = (long)(0.95 * maximumBufferSize);
                 break;
+
             case TargetUtilizationLevels.High:
                 m_levelNone = (long)(0.5 * maximumBufferSize);
                 m_levelLow = (long)(0.75 * maximumBufferSize);
@@ -543,6 +557,7 @@ public class MemoryPool
                 m_levelHigh = (long)(0.95 * maximumBufferSize);
                 m_levelVeryHigh = (long)(0.97 * maximumBufferSize);
                 break;
+
             default:
                 throw new ArgumentOutOfRangeException(nameof(levels));
         }
@@ -555,8 +570,9 @@ public class MemoryPool
     /// <returns></returns>
     private long CalculateStopShrinkingLimit(long size)
     {
-        //once the size has been reduced by 15% of Memory but no less than 5% of memory
+        // Once the size has been reduced by 15% of Memory but no less than 5% of memory.
         long stopShrinkingLimit = size - (long)(MaximumPoolSize * 0.15);
+
         return Math.Max(stopShrinkingLimit, (long)(MaximumPoolSize * 0.05));
     }
 

@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  4/6/2012 - Steven E. Chisholm
+//  04/06/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.IO.Unmanaged;
@@ -92,8 +93,10 @@ public unsafe class BinaryStream
     /// Creates a <see cref="BinaryStream"/> that is at position 0 of the provided stream.
     /// </summary>
     /// <param name="stream">The base stream to use.</param>
-    /// <param name="leaveOpen">Determines if the underlying stream will automatically be 
-    /// disposed of when this class has it's dispose method called.</param>
+    /// <param name="leaveOpen">
+    /// Determines if the underlying stream will automatically be 
+    /// disposed of when this class has it's dispose method called.
+    /// </param>
     public BinaryStream(ISupportsBinaryStream stream, bool leaveOpen = true)
     {
         m_args = new BlockArguments();
@@ -107,8 +110,6 @@ public unsafe class BinaryStream
         if (stream.RemainingSupportedIoSessions < 1)
             throw new Exception("Stream has run out of read sessions");
         m_mainIoSession = stream.CreateIoSession();
-        //if (stream.RemainingSupportedIoSessions >= 1)
-        //    m_secondaryIoSession = stream.CreateIoSession();
     }
 
     ~BinaryStream()

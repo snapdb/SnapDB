@@ -21,6 +21,7 @@
 //
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using SnapDB.IO.FileStructure.Media;
@@ -52,7 +53,7 @@ public class TransactionalFileStructure
     private DiskIo m_diskIo;
 
     /// <summary>
-    /// Contains the current active transaction.  If this null, there is no active transaction.
+    /// Contains the current active transaction. If this <c>null</c>, there is no active transaction.
     /// </summary>
     private TransactionalEdit m_currentTransaction;
 
@@ -79,7 +80,7 @@ public class TransactionalFileStructure
 #endif
 
     /// <summary>
-    /// Creates a new archive file that is completely in memory
+    /// Creates a new archive file that is completely in memory.
     ///  </summary>
     public static TransactionalFileStructure CreateInMemory(int blockSize, params Guid[] flags)
     {
@@ -108,6 +109,7 @@ public class TransactionalFileStructure
     {
         if (fileName is null)
             throw new ArgumentNullException(nameof(fileName));
+
         if (!File.Exists(fileName))
             throw new Exception("fileName Does Not Exists");
 
@@ -117,6 +119,7 @@ public class TransactionalFileStructure
             disk.Dispose();
             throw new Exception("Cannot open a simplified file structure with write support.");
         }
+
         return new TransactionalFileStructure(disk);
     }
 
@@ -157,8 +160,8 @@ public class TransactionalFileStructure
     /// <summary>
     /// Changes the extension of the current file.
     /// </summary>
-    /// <param name="extension">the new extension</param>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="extension">the new extension.</param>
+    /// <param name="isReadOnly">If the file should be reopened as readonly.</param>
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     public void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled)
     {
@@ -168,7 +171,7 @@ public class TransactionalFileStructure
     /// <summary>
     /// Reopens the file with different permissions.
     /// </summary>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="isReadOnly">If the file should be reopened as readonly.</param>
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     public void ChangeShareMode(bool isReadOnly, bool isSharingEnabled)
     {

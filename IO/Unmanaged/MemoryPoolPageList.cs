@@ -19,6 +19,8 @@
 //  6/8/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
+// 09/21/2023 - Lillian Gensolin
+//       Converted code to .NET core.
 //
 //******************************************************************************************************
 
@@ -43,7 +45,7 @@ internal class MemoryPoolPageList
     #region [ Members ]
 
     /// <summary>
-    /// Pointers to each windows API allocation.
+    /// Points to each windows API allocation.
     /// </summary>
     private readonly List<Memory> m_memoryBlocks;
 
@@ -78,13 +80,13 @@ internal class MemoryPoolPageList
     private bool m_disposed;
 
     /// <summary>
-    /// Each page will be exactly this size (Based on RAM)
+    /// Each page will be exactly this size (based on RAM).
     /// </summary>
     public readonly int PageSize;
 
     /// <summary>
     /// The maximum supported number of bytes that can be allocated based
-    /// on the amount of RAM in the system.  This is not user configurable.
+    /// on the amount of RAM in the system. This is not user configurable.
     /// </summary>
     public readonly long MemoryPoolCeiling;
 
@@ -97,9 +99,11 @@ internal class MemoryPoolPageList
     /// <summary>
     /// Create a thread safe list of MemoryPool pages.
     /// </summary>
-    /// <param name="pageSize">The desired page size. Must be between 4KB and 256KB</param>
-    /// <param name="maximumBufferSize">The desired maximum size of the allocation. Note: could be less if there is not enough system memory.
-    /// A value of -1 will default based on available system memory</param>
+    /// <param name="pageSize">The desired page size. Must be between 4KB and 256KB.</param>
+    /// <param name="maximumBufferSize">
+    /// The desired maximum size of the allocation. Note: could be less if there is not enough system memory.
+    /// A value of -1 will default based on available system memory
+    /// </param>
     public MemoryPoolPageList(int pageSize, long maximumBufferSize)
     {
         m_syncRoot = new object();
@@ -126,7 +130,7 @@ internal class MemoryPoolPageList
         if (maximumBufferSize < 0)
         {
             // Maximum size defaults to the larger of:
-            // 50% of the free ram
+            // 50% of the free ram.
             // 25% of the total system memory.
             MaximumPoolSize = Math.Max(MemoryPool.MinimumTestedSupportedMemoryFloor, availableMemory / 2);
             MaximumPoolSize = Math.Max(MaximumPoolSize, totalMemory / 4);
@@ -158,7 +162,7 @@ internal class MemoryPoolPageList
     #region [ Properties ]
 
     /// <summary>
-    /// The maximum amount of RAM that this memory pool is configured to support
+    /// The maximum amount of RAM that this memory pool is configured to support.
     /// Attempting to allocate more than this will cause an out of memory exception
     /// </summary>
     public long MaximumPoolSize
@@ -187,7 +191,7 @@ internal class MemoryPoolPageList
         Math.Max(CurrentCapacity - CurrentAllocatedSize, 0);
 
     /// <summary>
-    /// Gets if the pool is currently full
+    /// Gets if the pool is currently full.
     /// </summary>
     public bool IsFull => CurrentCapacity == CurrentAllocatedSize;
 
@@ -198,9 +202,9 @@ internal class MemoryPoolPageList
     /// <summary>
     /// Requests a new block from the buffer pool.
     /// </summary>
-    /// <param name="index">the index identifier of the block</param>
-    /// <param name="addressPointer">the address to the start of the block</param>
-    /// <exception cref="OutOfMemoryException">Thrown if the list is full</exception>
+    /// <param name="index">The index identifier of the block.</param>
+    /// <param name="addressPointer">The address to the start of the block.</param>
+    /// <exception cref="OutOfMemoryException">Thrown if the list is full.</exception>
     public bool TryGetNextPage(out int index, out IntPtr addressPointer)
     {
         lock (m_syncRoot)
@@ -243,7 +247,7 @@ internal class MemoryPoolPageList
     /// <summary>
     /// Releases a block back to the pool so it can be re-allocated.
     /// </summary>
-    /// <param name="index">the index identifier of the block</param>
+    /// <param name="index">The index identifier of the block.</param>
     public void ReleasePage(int index)
     {
         if (index > 0)
@@ -269,10 +273,10 @@ internal class MemoryPoolPageList
     }
 
     /// <summary>
-    /// Tries to shrink the buffer pool to the provided size
+    /// Tries to shrink the buffer pool to the provided size.
     /// </summary>
-    /// <param name="size">The size of the buffer pool</param>
-    /// <returns>The final size of the buffer pool</returns>
+    /// <param name="size">The size of the buffer pool.</param>
+    /// <returns>The final size of the buffer pool.</returns>
     /// <remarks>The buffer pool shrinks to a size less than or equal to <see cref="size"/>.</remarks>
     // ToDo: Expose this method and test it.
     public long ShrinkMemoryPool(long size)
@@ -305,10 +309,9 @@ internal class MemoryPoolPageList
     }
 
     /// <summary>
-    /// Changes the allowable buffer size
+    /// Changes the allowable buffer size.
     /// </summary>
     /// <param name="value">the number of bytes to set.</param>
-    /// <returns></returns>
     public long SetMaximumPoolSize(long value)
     {
         lock (m_syncRoot)
@@ -322,7 +325,7 @@ internal class MemoryPoolPageList
     }
 
     /// <summary>
-    /// Grows the buffer pool to have the desired size
+    /// Grows the buffer pool to have the desired size.
     /// </summary>
     public bool GrowMemoryPool(long size)
     {
@@ -384,23 +387,19 @@ internal class MemoryPoolPageList
     #region [ Static ]
 
     /// <summary>
-    /// Computes the ceiling of the buffer pool
+    /// Computes the ceiling of the buffer pool.
     /// </summary>
     /// <returns></returns>
     private static long CalculateMemoryPoolCeiling(int memoryBlockSize, long systemTotalPhysicalMemory)
     {
         long size = MemoryPool.MaximumTestedSupportedMemoryCeiling;
 
-        //Physical upper limit is
-        //the greater of 
-        //  50% of memory
-        //or
-        //  all but 8GB of RAM
+        // Physical upper limit is the greater of 50% of memory or all but 8 GB of RAM.
         long physicalUpperLimit = Math.Max(systemTotalPhysicalMemory / 2, systemTotalPhysicalMemory - 8 * 1024 * 1024 * 1024L);
 
         size = Math.Min(size, physicalUpperLimit);
 
-        size = size - size % memoryBlockSize; //Rounds down to the nearest allocation size
+        size = size - size % memoryBlockSize; // Rounds down to the nearest allocation size.
 
         return size;
     }
@@ -408,12 +407,13 @@ internal class MemoryPoolPageList
     /// <summary>
     /// Calculates the desired allocation block size to request from the OS.
     /// </summary>
-    /// <param name="pageSize">the size of each page</param>
-    /// <param name="totalSystemMemory">the total amount of system memory</param>
-    /// <returns>The recommended block size</returns>
+    /// <param name="pageSize">The size of each page.</param>
+    /// <param name="totalSystemMemory">The total amount of system memory.</param>
+    /// <returns>The recommended block size.</returns>
     /// <remarks>
     /// The recommended block size is the <see cref="totalSystemMemory"/> divided by 1000 
-    /// but must be a multiple of the system allocation size and the page size and cannot be larger than 1GB</remarks>
+    /// but must be a multiple of the system allocation size and the page size and cannot be larger than 1GB
+    /// </remarks>
     private static int CalculateMemoryBlockSize(int pageSize, long totalSystemMemory)
     {
         long targetMemoryBlockSize = totalSystemMemory / 1000;

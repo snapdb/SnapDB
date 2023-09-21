@@ -16,7 +16,7 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  5/1/2012 - Steven E. Chisholm
+//  05/01/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/15/2023 - Lillian Gensolin
@@ -69,7 +69,7 @@ public partial class MemoryPoolStream
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the unit size of an individual block
+    /// Gets the unit size of an individual block.
     /// </summary>
     public int BlockSize => m_blockSize;
 
@@ -79,10 +79,12 @@ public partial class MemoryPoolStream
     public bool IsReadOnly => false;
 
     /// <summary>
-    /// Gets the number of available simultaneous read/write sessions.
+    /// Gets the number of available simultaneous read and write sessions.
     /// </summary>
-    /// <remarks>This value is used to determine if a binary stream can be cloned
-    /// to improve read/write/copy performance.</remarks>
+    /// <remarks>
+    /// This value is used to determine if a binary stream can be cloned
+    /// to improve read, write, and copy performance.
+    /// </remarks>
     int ISupportsBinaryStream.RemainingSupportedIoSessions => int.MaxValue;
 
     #endregion
@@ -90,7 +92,7 @@ public partial class MemoryPoolStream
     #region [ Methods ]
 
     /// <summary>
-    /// Aquire an IO Session.
+    /// Acquire an IO Session.
     /// </summary>
     public BinaryStreamIoSessionBase CreateIoSession()
     {
@@ -98,9 +100,8 @@ public partial class MemoryPoolStream
     }
 
     /// <summary>
-    /// Creates a new binary from an IO session
+    /// Creates a new binary from an IO session.
     /// </summary>
-    /// <returns></returns>
     public BinaryStreamBase CreateBinaryStream()
     {
         return new BinaryStream(this);

@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  2/10/2014 - Steven E. Chisholm
+//  02/10/2014 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.IO.Unmanaged;
@@ -103,7 +104,7 @@ public class MemoryPoolStreamCore : IDisposable
             int bigIndex = index >> ShiftBits; // Calculate the outer array index.
             int smallIndex = index & Mask; // Calculate the inner array index.
 
-            // Assign the page index and page pointer to their respective arrays
+            // Assign the page index and page pointer to their respective arrays.
             m_pageIndex[bigIndex][smallIndex] = pageIndex; 
             m_pagePointer[bigIndex][smallIndex] = pagePointer; 
 
@@ -120,9 +121,8 @@ public class MemoryPoolStreamCore : IDisposable
         }
 
         /// <summary>
-        /// Returns all of the buffer pool page indexes used by this class
+        /// Returns all of the buffer pool page indexes used by this class.
         /// </summary>
-        /// <returns></returns>
         public IEnumerable<int> GetAllPageIndexes()
         {
             for (int x = 0; x < PageCount; x++)
@@ -139,12 +139,12 @@ public class MemoryPoolStreamCore : IDisposable
     private volatile Settings m_settings;
 
     /// <summary>
-    /// The buffer pool to utilize
+    /// The buffer pool to utilize.
     /// </summary>
     private MemoryPool m_pool;
 
     /// <summary>
-    /// The first position that can be accessed by users of this stream
+    /// The first position that can be accessed by users of this stream.
     /// </summary>
     private long m_firstValidPosition;
 
@@ -152,7 +152,7 @@ public class MemoryPoolStreamCore : IDisposable
 
     /// <summary>
     /// The first position of this stream. This may be different from <see cref="m_firstValidPosition"/> 
-    /// due to alignment requirements
+    /// due to alignment requirements.
     /// </summary>
     private long m_firstAddressablePosition;
 
@@ -225,7 +225,7 @@ public class MemoryPoolStreamCore : IDisposable
     /// <summary>
     /// Configure the natural alignment of the data.
     /// </summary>
-    /// <param name="startPosition">The first addressable position</param>
+    /// <param name="startPosition">The first addressable position.</param>
     public void ConfigureAlignment(long startPosition)
     {
         ConfigureAlignment(startPosition, 1);
@@ -235,8 +235,10 @@ public class MemoryPoolStreamCore : IDisposable
     /// Configure the natural alignment of the data.
     /// </summary>
     /// <param name="startPosition">The first addressable position</param>
-    /// <param name="alignment">Forces alignment on this boundary.
-    /// Alignment must be a factor of the BufferPool's page boudary.</param>
+    /// <param name="alignment">
+    /// Forces alignment on this boundary.
+    /// Alignment must be a factor of the BufferPool's page boudary.
+    /// </param>
     public void ConfigureAlignment(long startPosition, int alignment)
     {
         if (startPosition < 0)
@@ -253,7 +255,7 @@ public class MemoryPoolStreamCore : IDisposable
     }
 
     /// <summary>
-    /// Gets a block for the following Io session.
+    /// Gets a block for the following IO session.
     /// </summary>
     public void GetBlock(BlockArguments args)
     {
@@ -287,7 +289,7 @@ public class MemoryPoolStreamCore : IDisposable
     /// <summary>
     /// Releases the unmanaged resources used by the <see cref="MemoryFile"/> object and optionally releases the managed resources.
     /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     private void Dispose(bool disposing)
     {
         if (!m_disposed)
@@ -375,7 +377,6 @@ public class MemoryPoolStreamCore : IDisposable
     /// <param name="position">the starting position of the read</param>
     /// <param name="pointer">an output pointer to <see cref="position"/>.</param>
     /// <param name="validLength">the number of bytes that are valid after this position.</param>
-    /// <returns></returns>
     public void ReadBlock(long position, out IntPtr pointer, out int validLength)
     {
         if (m_disposed)

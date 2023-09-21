@@ -21,6 +21,7 @@ ok﻿//*************************************************************************
 //
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.IO.Unmanaged;
@@ -34,8 +35,10 @@ public interface ISupportsBinaryStream
     /// <summary>
     /// Gets the number of available simultaneous read and write sessions.
     /// </summary>
-    /// <remarks>This value is used to determine if a binary stream can be cloned
-    /// to improve read, write, and copy performance.</remarks>
+    /// <remarks>
+    /// This value is used to determine if a binary stream can be cloned
+    /// to improve read, write, and copy performance.
+    /// </remarks>
     int RemainingSupportedIoSessions
     {
         get;

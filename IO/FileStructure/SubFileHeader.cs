@@ -21,6 +21,7 @@
 //       
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using System.Runtime.CompilerServices;
@@ -55,8 +56,8 @@ public class SubFileHeader
     /// Creates a <see cref="SubFileHeader"/> from the data stream.
     /// </summary>
     /// <param name="dataReader"></param>
-    /// <param name="isImmutable">Determines if this class will be immutable upon creation</param>
-    /// <param name="isSimplified">gets if the file structure is the simplified type</param>
+    /// <param name="isImmutable">Determines if this class will be immutable upon creation.</param>
+    /// <param name="isSimplified">gets if the file structure is the simplified type.</param>
     public SubFileHeader(BinaryReader dataReader, bool isImmutable, bool isSimplified)
     {
         m_isSimplified = isSimplified;
@@ -83,7 +84,7 @@ public class SubFileHeader
     /// </summary>
     /// <param name="fileId"></param>
     /// <param name="fileName"></param>
-    /// <param name="isImmutable">Determines if this class will be immutable upon creation</param>
+    /// <param name="isImmutable">Determines if this class will be immutable upon creation.</param>
     /// <param name="isSimplified">if this header is a simplified header.</param>
     public SubFileHeader(ushort fileId, SubFileName fileName, bool isImmutable, bool isSimplified)
     {
@@ -110,7 +111,7 @@ public class SubFileHeader
     public SubFileName FileName => m_fileName;
 
     /// <summary>
-    /// Gets the number of blocks the data portion of this file contains
+    /// Gets the number of blocks the data portion of this file contains.
     /// </summary>
     public uint DataBlockCount
     {
@@ -124,7 +125,7 @@ public class SubFileHeader
 
     /// <summary>
     /// Gets the total number of blocks that has been used by this file. 
-    /// This includes meta data blocks and previous version blocks
+    /// This includes meta data blocks and previous version blocks.
     /// </summary>
     public uint TotalBlockCount
     {
@@ -273,6 +274,3 @@ public class SubFileHeader
 
     #endregion
 }
-//  09/18/2023 - Lillian Gensolin
-//       Converted code to .NET core.//  09/18/2023 - Lillian Gensolin
-//       Converted code to .NET core.

@@ -25,6 +25,7 @@
 //
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using SnapDB.IO.FileStructure.Media;
@@ -56,7 +57,7 @@ public sealed partial class SubFileStream
     private readonly bool m_isReadOnly;
 
     /// <summary>
-    /// The FileAllocationTable
+    /// The FileAllocationTable.
     /// </summary>
     private readonly FileHeaderBlock m_fileHeaderBlock;
 
@@ -77,11 +78,11 @@ public sealed partial class SubFileStream
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates an SubFileStream
+    /// Creates an SubFileStream.
     /// </summary>
     /// <param name="dataReader">The location to read from.</param>
     /// <param name="subFile">The file to read.</param>
-    /// <param name="fileHeaderBlock">The FileAllocationTable</param>
+    /// <param name="fileHeaderBlock">The FileAllocationTable.</param>
     /// <param name="isReadOnly">Determines if the stream allows editing.</param>
     internal SubFileStream(DiskIo dataReader, SubFileHeader? subFile, FileHeaderBlock fileHeaderBlock, bool isReadOnly)
     {
@@ -143,8 +144,10 @@ public sealed partial class SubFileStream
     /// <summary>
     /// Gets the number of available simultaneous read/write sessions.
     /// </summary>
-    /// <remarks>This value is used to determine if a binary stream can be cloned
-    /// to improve read/write/copy performance.</remarks>
+    /// <remarks>
+    /// This value is used to determine if a binary stream can be cloned
+    /// to improve read, write, and copy performance.
+    /// </remarks>
     public int RemainingSupportedIoSessions
     {
         get
@@ -168,9 +171,9 @@ public sealed partial class SubFileStream
     {
         if (!m_fileHeaderBlock.IsSimplifiedFileFormat)
         {
-            if (m_ioStream1 is not null && !m_ioStream1.IsDisposed && m_ioStream1 != caller)
+            if (m_ioStream1 is not null && !m_ioStream1.IsDisposed && m_ioStream1 is not caller)
                 (m_ioStream1 as IoSession).ClearIndexCache(mostRecentParser);
-            if (m_ioStream2 is not null && !m_ioStream2.IsDisposed && m_ioStream2 != caller)
+            if (m_ioStream2 is not null && !m_ioStream2.IsDisposed && m_ioStream2 is not caller)
                 (m_ioStream2 as IoSession).ClearIndexCache(mostRecentParser);
         }
     }

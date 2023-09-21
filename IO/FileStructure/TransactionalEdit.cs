@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  12/2/2011 - Steven E. Chisholm
+//  12/02/2011 - Steven E. Chisholm
 //       Generated original version of source code.
 //
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using Gemstone.Diagnostics;
@@ -32,7 +33,7 @@ namespace SnapDB.IO.FileStructure;
 /// <summary>
 /// Provides the state information for a transaction on the file system.
 /// </summary>
-/// <remarks>Failing to call Commit or Rollback will inhibit additional transactions to be aquired</remarks>
+/// <remarks>Failing to call Commit or Rollback will inhibit additional transactions to be aquired.</remarks>
 public sealed class TransactionalEdit
     : IDisposable
 {
@@ -55,12 +56,12 @@ public sealed class TransactionalEdit
     private Action m_delHasBeenRolledBack;
 
     /// <summary>
-    /// Prevents duplicate calls to Dispose;
+    /// Prevents duplicate calls to dispose.
     /// </summary>
     private bool m_disposed;
 
     /// <summary>
-    /// The underlying diskIO to do the read/writes against.
+    /// The underlying diskIO to do the read and write against.
     /// </summary>
     private readonly DiskIo m_dataReader;
 
@@ -79,11 +80,11 @@ public sealed class TransactionalEdit
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates an editable copy of the transaction
+    /// Creates an editable copy of the transaction.
     /// </summary>
     /// <param name="dataReader"> </param>
-    /// <param name="delHasBeenRolledBack">the delegate to call when this transaction has been rolled back</param>
-    /// <param name="delHasBeenCommitted">the delegate to call when this transaction has been committed</param>
+    /// <param name="delHasBeenRolledBack">The delegate to call when this transaction has been rolled back.</param>
+    /// <param name="delHasBeenCommitted">The delegate to call when this transaction has been committed.</param>
     internal TransactionalEdit(DiskIo dataReader, Action? delHasBeenRolledBack = null, Action? delHasBeenCommitted = null)
     {
         if (dataReader is null)
@@ -122,7 +123,7 @@ public sealed class TransactionalEdit
     }
 
     /// <summary>
-    /// The guid for this archive type.
+    /// The GUID for this archive type.
     /// </summary>
     public Guid ArchiveType
     {
@@ -135,7 +136,7 @@ public sealed class TransactionalEdit
     #region [ Methods ]
 
     /// <summary>
-    /// Creates and Opens a new file on the current file system.
+    /// Creates and opens a new file on the current file system.
     /// </summary>
     public SubFileStream CreateFile(SubFileName fileName)
     {
@@ -173,15 +174,15 @@ public sealed class TransactionalEdit
             SubFileHeader? file = Files[x];
             if (file.FileName == fileName)
                 return OpenFile(x);
-            }
+        }
         throw new Exception("File does not exist");
     }
 
     /// <summary>
     /// This will cause the transaction to be written to the database.
-    /// Also Calls Dispose()
+    /// Also calls Dispose().
     /// </summary>
-    /// <remarks>Duplicate calls to this function, or subsequent calls to RollbackTransaction will throw an exception</remarks>
+    /// <remarks>Duplicate calls to this function, or subsequent calls to RollbackTransaction will throw an exception.</remarks>
     public void CommitAndDispose()
     {
         if (m_disposed)
@@ -211,7 +212,7 @@ public sealed class TransactionalEdit
     /// <summary>
     /// This will rollback the transaction by not writing the table of contents to the file.
     /// </summary>
-    /// <remarks>Duplicate calls to this function, or subsequent calls to CommitTransaction will throw an exception</remarks>
+    /// <remarks>Duplicate calls to this function, or subsequent calls to CommitTransaction will throw an exception.</remarks>
     public void RollbackAndDispose()
     {
         if (m_disposed)
@@ -220,9 +221,7 @@ public sealed class TransactionalEdit
         foreach (SubFileStream file in m_openedFiles)
         {
             if (file is not null && !file.IsDisposed)
-            {
                 file.Dispose();
-            }
         }
         try
         {
@@ -235,6 +234,7 @@ public sealed class TransactionalEdit
             m_delHasBeenCommitted = null;
             m_delHasBeenRolledBack = null;
             m_disposed = true;
+
             GC.SuppressFinalize(this);
         }
     }

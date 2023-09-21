@@ -21,6 +21,7 @@
 //
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using SnapDB.IO.FileStructure.Media;
@@ -39,7 +40,7 @@ public partial class SubFileStream
         #region [ Members ]
 
         /// <summary>
-        /// The address parser
+        /// The address parser.
         /// </summary>
         private IndexParser m_parser;
 
@@ -51,7 +52,7 @@ public partial class SubFileStream
         private readonly SubFileStream m_stream;
 
         /// <summary>
-        /// Contains the read/write buffer.
+        /// Contains the read and write buffer.
         /// </summary>
         private SubFileDiskIoSessionPool m_ioSessions;
         private bool m_disposed;
@@ -96,7 +97,7 @@ public partial class SubFileStream
         /// <summary>
         /// Releases the unmanaged resources used by the <see cref="IoSession"/> object and optionally releases the managed resources.
         /// </summary>
-        /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
             if (!m_disposed)
@@ -127,7 +128,7 @@ public partial class SubFileStream
         }
 
         /// <summary>
-        /// Sets the current usage of the <see cref="BinaryStreamIoSessionBase"/> to null.
+        /// Sets the current usage of the <see cref="BinaryStreamIoSessionBase"/> to <c>null</c>.
         /// </summary>
         public override void Clear()
         {
@@ -157,17 +158,17 @@ public partial class SubFileStream
             uint physicalBlockIndex;
             uint indexPosition;
 
-            if (pos <= uint.MaxValue) //64-bit divide is 2 times slower
+            if (pos <= uint.MaxValue) // 64-bit signed divide is twice as slow as 64-bit unsigned.
                 indexPosition = (uint)pos / (uint)blockDataLength;
             else
-                indexPosition = (uint)((ulong)pos / (ulong)blockDataLength); //64-bit signed divide is twice as slow as 64-bit unsigned.
+                indexPosition = (uint)((ulong)pos / (ulong)blockDataLength); // 64-bit signed divide is twice as slow as 64-bit unsigned.
 
             args.FirstPosition = indexPosition * blockDataLength;
             args.Length = blockDataLength;
 
             if (args.IsWriting)
             {
-                //Writing
+                // Writing
                 if (m_isReadOnly)
                     throw new Exception("File is read only");
                 physicalBlockIndex = m_pager.VirtualToShadowPagePhysical(indexPosition, out bool wasShadowPaged);
@@ -184,8 +185,9 @@ public partial class SubFileStream
             }
             else
             {
-                //Reading
+                // Reading
                 physicalBlockIndex = m_parser.VirtualToPhysical(indexPosition);
+
                 if (physicalBlockIndex <= 0)
                     throw new Exception("Page does not exist");
 

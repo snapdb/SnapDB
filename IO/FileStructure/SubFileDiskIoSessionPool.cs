@@ -16,7 +16,7 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  2/21/2013 - Steven E. Chisholm
+//  02/21/2013 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/18/2023 - Lillian Gensolin
@@ -40,18 +40,18 @@ internal class SubFileDiskIoSessionPool
 
     public DiskIoSession SourceData;
     /// <summary>
-    /// Null if in readonly mode
+    /// <c>null</c> if in readonly mode
     /// </summary>
     public DiskIoSession DestinationData;
 
     public DiskIoSession SourceIndex;
     /// <summary>
-    /// Null if in readonly mode
+    /// <c>null</c> if in readonly mode.
     /// </summary>
     public DiskIoSession DestinationIndex;
 
     /// <summary>
-    /// The file
+    /// The file.
     /// </summary>
     public SubFileHeader? File
     {
@@ -60,7 +60,7 @@ internal class SubFileDiskIoSessionPool
     }
 
     /// <summary>
-    /// The Header
+    /// The Header.
     /// </summary>
     public FileHeaderBlock Header
     {
@@ -69,7 +69,7 @@ internal class SubFileDiskIoSessionPool
     }
 
     /// <summary>
-    /// Contains the last block that is considered as read only. This is the same as the end of the committed space
+    /// Contains the last block that is considered as "read only". This is the same as the end of the committed space
     /// in the transactional file system.
     /// </summary>
     public uint LastReadonlyBlock
@@ -79,7 +79,7 @@ internal class SubFileDiskIoSessionPool
     }
 
     /// <summary>
-    /// Gets if the file is read only.
+    /// Gets if the file is "read only".
     /// </summary>
     public bool IsReadOnly
     {
@@ -137,7 +137,7 @@ internal class SubFileDiskIoSessionPool
     }
 
     /// <summary>
-    /// Swaps the source and destination Data I/O Sessions
+    /// Swaps the source and destination Data I/O Sessions.
     /// </summary>
     public void SwapData()
     {

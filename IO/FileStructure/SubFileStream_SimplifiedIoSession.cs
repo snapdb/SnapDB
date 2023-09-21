@@ -21,6 +21,7 @@
 //
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using SnapDB.IO.FileStructure.Media;
@@ -65,7 +66,7 @@ public partial class SubFileStream
         /// <summary>
         /// Releases the unmanaged resources used by the <see cref="IoSession"/> object and optionally releases the managed resources.
         /// </summary>
-        /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
             if (!m_disposed)
@@ -117,10 +118,10 @@ public partial class SubFileStream
 
             uint indexPosition;
 
-            if (pos <= uint.MaxValue) //64-bit divide is 2 times slower
+            if (pos <= uint.MaxValue) // 64-bit divide is twice as slow as 64-bit unsigned.
                 indexPosition = (uint)pos / (uint)blockDataLength;
             else
-                indexPosition = (uint)((ulong)pos / (ulong)blockDataLength); //64-bit signed divide is twice as slow as 64-bit unsigned.
+                indexPosition = (uint)((ulong)pos / (ulong)blockDataLength); // 64-bit signed divide is twice as slow as 64-bit unsigned.
 
             args.FirstPosition = indexPosition * blockDataLength;
             args.Length = blockDataLength;
@@ -130,9 +131,10 @@ public partial class SubFileStream
                 throw new Exception("File is read only");
             }
 
-            //Reading
+            // Reading
             if (indexPosition >= m_stream.m_subFile.DataBlockCount)
                 throw new ArgumentOutOfRangeException("position", "position reaches past the end of the file.");
+            
             var physicalBlockIndex = m_stream.m_subFile.DirectBlock + indexPosition;
 
             m_dataIoSession.Read(physicalBlockIndex, BlockType.DataBlock, indexPosition);

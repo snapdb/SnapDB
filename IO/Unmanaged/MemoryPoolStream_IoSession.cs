@@ -18,11 +18,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  5/1/2012 - Steven E. Chisholm
+//  05/01/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
-//       
+//
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 
