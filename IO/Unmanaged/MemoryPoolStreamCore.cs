@@ -240,13 +240,13 @@ public class MemoryPoolStreamCore : IDisposable
     public void ConfigureAlignment(long startPosition, int alignment)
     {
         if (startPosition < 0)
-            throw new ArgumentOutOfRangeException("startPosition", "Cannot be negative");
+            throw new ArgumentOutOfRangeException(nameof(startPosition), "Cannot be negative");
         if (alignment <= 0)
-            throw new ArgumentOutOfRangeException("alignment", "Must be a positive factor of the buffer pool's page size.");
+            throw new ArgumentOutOfRangeException(nameof(alignment), "Must be a positive factor of the buffer pool's page size.");
         if (alignment > m_pageSize)
-            throw new ArgumentOutOfRangeException("alignment", "Cannot be greater than the buffer pool's page size.");
+            throw new ArgumentOutOfRangeException(nameof(alignment), "Cannot be greater than the buffer pool's page size.");
         if (m_pageSize % alignment != 0)
-            throw new ArgumentException("Must be an even factor of the buffer pool's page size", "alignment");
+            throw new ArgumentException("Must be an even factor of the buffer pool's page size", nameof(alignment));
 
         m_firstValidPosition = startPosition;
         m_firstAddressablePosition = startPosition - startPosition % alignment;
@@ -367,7 +367,7 @@ public class MemoryPoolStreamCore : IDisposable
 
     #endregion
 
-    //ToDo: Consider removing these methods
+    // TODO: Consider removing these methods
     /// <summary>
     /// Reads from the underlying stream the requested set of data. 
     /// This function is more user friendly than calling GetBlock().
@@ -383,7 +383,7 @@ public class MemoryPoolStreamCore : IDisposable
         if (m_disposed)
             throw new ObjectDisposedException("MemoryStream");
         if (position < m_firstValidPosition)
-            throw new ArgumentOutOfRangeException("position", "position is before the beginning of the stream");
+            throw new ArgumentOutOfRangeException(nameof(position), "position is before the beginning of the stream");
 
         validLength = m_pageSize;
         firstPosition = ((position - m_firstAddressablePosition) & m_invertMask) + m_firstAddressablePosition;

@@ -188,7 +188,7 @@ internal class DiskMedium
     public static DiskMedium CreateMemoryFile(MemoryPool pool, int fileStructureBlockSize, params Guid[] flags)
     {
         FileHeaderBlock header = FileHeaderBlock.CreateNew(fileStructureBlockSize, flags);
-        MemoryPoolFile disk = new MemoryPoolFile(pool);
+        MemoryPoolFile disk = new(pool);
         return new DiskMedium(disk, header);
     }
 
@@ -210,7 +210,7 @@ internal class DiskMedium
     {
         FileHeaderBlock header = FileHeaderBlock.CreateNew(fileStructureBlockSize, flags);
 
-        BufferedFile disk = new BufferedFile(stream, pool, header, isNewFile: true);
+        BufferedFile disk = new(stream, pool, header, isNewFile: true);
         return new DiskMedium(disk, header);
     }
 
@@ -228,7 +228,7 @@ internal class DiskMedium
         byte[] buffer = new byte[fileStructureBlockSize];
         stream.ReadRaw(0, buffer, fileStructureBlockSize);
         FileHeaderBlock header = FileHeaderBlock.Open(buffer);
-        BufferedFile disk = new BufferedFile(stream, pool, header, isNewFile: false);
+        BufferedFile disk = new(stream, pool, header, isNewFile: false);
         return new DiskMedium(disk, header);
     }
 

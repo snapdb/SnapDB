@@ -88,7 +88,7 @@ internal class MemoryPoolPageList
     /// </summary>
     public readonly long MemoryPoolCeiling;
 
-    private readonly AtomicInt64 m_maximumPoolSize = new AtomicInt64();
+    private readonly AtomicInt64 m_maximumPoolSize = new();
 
     #endregion
 
@@ -338,7 +338,7 @@ internal class MemoryPoolPageList
             size = Math.Min(size, MaximumPoolSize);
             while (CurrentCapacity < size)
             {
-                Memory memory = new Memory(m_memoryBlockSize);
+                Memory memory = new(m_memoryBlockSize);
                 int pageIndex = m_memoryBlocks.ReplaceFirstNullOrAdd(memory);
                 m_memoryBlockAllocations++;
                 m_isPageFree.EnsureCapacity((pageIndex + 1) * m_pagesPerMemoryBlock);

@@ -48,16 +48,13 @@ public class ResourceQueue<T>
     /// <param name="maximumCount">The maximum number of resources the queue can hold.</param>
     public ResourceQueue(Func<T> instance, int initialCount, int maximumCount)
     {
-        if (instance is null)
-            throw new ArgumentNullException("instance");
-        
         if (initialCount < 0)
-            throw new ArgumentOutOfRangeException("initialCount", "Must be positive");
+            throw new ArgumentOutOfRangeException(nameof(initialCount), "Must be positive");
         
         if (maximumCount < initialCount)
-            throw new ArgumentOutOfRangeException("maximumCount", "Must be greater than or equal to initialCount");
+            throw new ArgumentOutOfRangeException(nameof(maximumCount), "Must be greater than or equal to initialCount");
 
-        m_instanceObject = instance;
+        m_instanceObject = instance ?? throw new ArgumentNullException(nameof(instance));
         m_queue = new ConcurrentQueue<T>();
         m_maximumCount = maximumCount;
 
@@ -72,7 +69,7 @@ public class ResourceQueue<T>
     /// <returns>The dequeued or newly recreated item of type T.</returns>
     public T Dequeue()
     {
-        if (m_queue.TryDequeue(result: out T item))
+        if (m_queue.TryDequeue(result: out T? item))
             return item;
 
         // Create a new instance of T using the provided delegate if the queue is empty.

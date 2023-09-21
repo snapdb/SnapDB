@@ -547,7 +547,7 @@ public abstract unsafe class BinaryStreamBase
                 Write(value);
                 return;
         }
-        throw new ArgumentOutOfRangeException("bytes", "must be between 0 and 8 inclusive.");
+        throw new ArgumentOutOfRangeException(nameof(bytes), "must be between 0 and 8 inclusive.");
     }
     /// <summary>
     /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
@@ -712,7 +712,7 @@ public abstract unsafe class BinaryStreamBase
             case 8:
                 return ReadUInt64();
         }
-        throw new ArgumentOutOfRangeException("bytes", "must be between 0 and 8 inclusive.");
+        throw new ArgumentOutOfRangeException(nameof(bytes), "must be between 0 and 8 inclusive.");
     }
     /// <summary>
     /// Reads from the underlying stream in little-endian format. Advancing the position.
@@ -802,25 +802,24 @@ public abstract unsafe class BinaryStreamBase
                 return *(decimal*)lp;
             }
         }
-        else
-        {
-            decimal rv;
-            byte* ptr = (byte*)&rv;
 
-            ptr[3] = m_buffer[0];
-            ptr[2] = m_buffer[1];
-            ptr[1] = m_buffer[2];
-            ptr[0] = m_buffer[3];
+        decimal rv;
+        byte* ptr = (byte*)&rv;
 
-            ptr[7] = m_buffer[4];
-            ptr[6] = m_buffer[5];
-            ptr[5] = m_buffer[6];
-            ptr[4] = m_buffer[7];
+        ptr[3] = m_buffer[0];
+        ptr[2] = m_buffer[1];
+        ptr[1] = m_buffer[2];
+        ptr[0] = m_buffer[3];
 
-            ptr[11] = m_buffer[8];
-            ptr[10] = m_buffer[9];
-            ptr[9] = m_buffer[10];
-            ptr[8] = m_buffer[11];
+        ptr[7] = m_buffer[4];
+        ptr[6] = m_buffer[5];
+        ptr[5] = m_buffer[6];
+        ptr[4] = m_buffer[7];
+
+        ptr[11] = m_buffer[8];
+        ptr[10] = m_buffer[9];
+        ptr[9] = m_buffer[10];
+        ptr[8] = m_buffer[11];
 
             ptr[15] = m_buffer[12];
             ptr[14] = m_buffer[13];
@@ -907,7 +906,7 @@ public abstract unsafe class BinaryStreamBase
 
     /// <summary>
     /// Reads a byte array from the provided stream. 
-    /// If the size of the stream exceedes <see cref="maxLength"/>, then
+    /// If the size of the stream exceeds <see cref="maxLength"/>, then
     /// <see cref="value"/> is set to <c>null</c> and this function returns <c>false</c>.
     /// </summary>
     /// <param name="maxLength"></param>
@@ -941,7 +940,7 @@ public abstract unsafe class BinaryStreamBase
 
     /// <summary>
     /// Reads a string from the provided stream. 
-    /// If the size of the string exceedes <see cref="maxLength"/>,
+    /// If the size of the string exceeds <see cref="maxLength"/>,
     /// <see cref="value"/> is set to <c>null</c> and this function returns <c>false</c>.
     /// </summary>
     /// <param name="maxLength">The maximum number of characters in the string.</param>

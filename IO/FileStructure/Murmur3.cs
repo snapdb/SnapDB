@@ -229,7 +229,7 @@ internal class Murmur3Orig
     {
         h1 = seed;
         h2 = seed;
-        this.length = 0L;
+        length = 0L;
 
         int pos = 0;
         ulong remaining = (ulong)bb.Length;

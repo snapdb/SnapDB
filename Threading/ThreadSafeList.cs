@@ -91,7 +91,7 @@ public partial class ThreadSafeList<T>
     /// <returns></returns>
     public bool RemoveAndWait(T item)
     {
-        SpinWait wait = new SpinWait();
+        SpinWait wait = new();
         Wrapper itemToRemove = null;
         lock (m_syncRoot)
         {

@@ -136,7 +136,7 @@ public class WorkerThreadSynchronization
     /// </returns>
     public CallbackRequest RequestCallback(Action callback)
     {
-        CallbackRequest request = new CallbackRequest(callback);
+        CallbackRequest request = new(callback);
 
         lock (m_syncRoot)
         {

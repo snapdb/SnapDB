@@ -106,11 +106,11 @@ namespace SnapDB.IO.FileStructure.Media
                     if (m_parent.m_disposed)
                         throw new ObjectDisposedException(GetType().FullName);
                     if (position < 0)
-                        throw new ArgumentOutOfRangeException("position", "Cannot be negative");
+                        throw new ArgumentOutOfRangeException(nameof(position), "Cannot be negative");
                     if (position > m_parent.m_maxValidPosition)
-                        throw new ArgumentOutOfRangeException("position", "Position index can no longer be specified as an Int32");
+                        throw new ArgumentOutOfRangeException(nameof(position), "Position index can no longer be specified as an Int32");
                     if ((position & m_parent.m_memoryPageSizeMask) != 0)
-                        throw new ArgumentOutOfRangeException("position", "must lie on a page boundary");
+                        throw new ArgumentOutOfRangeException(nameof(position), "must lie on a page boundary");
 
                     int positionIndex = (int)(position >> m_parent.m_memoryPageSizeShiftBits);
                     if (m_parent.m_pageList.TryGetPageIndex(positionIndex, out int pageIndex))
@@ -143,11 +143,11 @@ namespace SnapDB.IO.FileStructure.Media
                     if (m_parent.m_disposed)
                         throw new ObjectDisposedException(GetType().FullName);
                     if (position < 0)
-                        throw new ArgumentOutOfRangeException("position", "Cannot be negative");
+                        throw new ArgumentOutOfRangeException(nameof(position), "Cannot be negative");
                     if (position > m_parent.m_maxValidPosition)
-                        throw new ArgumentOutOfRangeException("position", "Position index can no longer be specified as an Int32");
+                        throw new ArgumentOutOfRangeException(nameof(position), "Position index can no longer be specified as an Int32");
                     if ((position & m_parent.m_memoryPageSizeMask) != 0)
-                        throw new ArgumentOutOfRangeException("position", "must lie on a page boundary");
+                        throw new ArgumentOutOfRangeException(nameof(position), "must lie on a page boundary");
                     int positionIndex = (int)(position >> m_parent.m_memoryPageSizeShiftBits);
 
                     if (m_parent.m_pageList.TryGetPageIndex(positionIndex, out int pageIndex))

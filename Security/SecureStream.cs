@@ -57,10 +57,8 @@ public class SecureStream
         {
             return Encoding.UTF8.GetBytes(remoteChallenge + localChallenge);
         }
-        else
-        {
-            return Encoding.UTF8.GetBytes(localChallenge + remoteChallenge);
-        }
+
+        return Encoding.UTF8.GetBytes(localChallenge + remoteChallenge);
     }
 
 }

@@ -51,9 +51,9 @@ internal class IndexMapper
     public IndexMapper(int blockSize)
     {
         if (blockSize < 64)
-            throw new ArgumentOutOfRangeException("blockSize", "Cannot be less than 64");
+            throw new ArgumentOutOfRangeException(nameof(blockSize), "Cannot be less than 64");
         if (blockSize > 1024 * 1024)
-            throw new ArgumentOutOfRangeException("blockSize", "Cannot be greater than 1048576");
+            throw new ArgumentOutOfRangeException(nameof(blockSize), "Cannot be greater than 1048576");
         if (!BitMath.IsPowerOfTwo(blockSize))
             throw new Exception("block size must be a power of 2");
 
@@ -176,7 +176,7 @@ internal class IndexMapper
     public void MapPosition(uint positionIndex)
     {
         if (positionIndex > m_lastAddressableBlockIndex)
-            throw new ArgumentOutOfRangeException("positionIndex", "position is not indexable with the current page size.");
+            throw new ArgumentOutOfRangeException(nameof(positionIndex), "position is not indexable with the current page size.");
 
         // uint addressesPerBlock = m_addressesPerBlock;
         uint addressPerBlock3U = m_addressPerBlock3;

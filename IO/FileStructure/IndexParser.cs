@@ -39,7 +39,7 @@ internal unsafe class IndexParser
     /// <summary>
     /// The file that is being read by this parser.
     /// </summary>
-    private readonly SubFileHeader m_subFile;
+    private readonly SubFileHeader? m_subFile;
 
     private readonly SubFileDiskIoSessionPool m_ioSessions;
 

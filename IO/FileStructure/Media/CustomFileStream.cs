@@ -53,18 +53,18 @@ internal sealed class CustomFileStream
     private readonly int m_fileStructureBlockSize;
     private FileStream m_stream;
     private int m_streamUsers;
-    private readonly ResourceQueue<byte[]> m_bufferQueue;
+    private readonly ResourceQueue<byte[]>? m_bufferQueue;
 
     /// <summary>
     /// Lock this first. Allows the <see cref="m_stream"/> item to be replaced in 
     /// a synchronized fashion. 
     /// </summary>
-    private readonly ReaderWriterLockEasy m_isUsingStream = new ReaderWriterLockEasy();
+    private readonly ReaderWriterLockEasy m_isUsingStream = new();
     /// <summary>
     /// Needed to properly synchronize Read/Write operations.
     /// </summary>
     private readonly object m_syncRoot;
-    private readonly AtomicInt64 m_length = new AtomicInt64();
+    private readonly AtomicInt64 m_length = new();
 
     /// <summary>
     /// Creates a new CustomFileStream
@@ -78,13 +78,13 @@ internal sealed class CustomFileStream
     private CustomFileStream(int ioSize, int fileStructureBlockSize, string fileName, bool isReadOnly, bool isSharingEnabled)
     {
         if (ioSize < 4096)
-            throw new ArgumentOutOfRangeException("ioSize", "Cannot be less than 4096");
+            throw new ArgumentOutOfRangeException(nameof(ioSize), "Cannot be less than 4096");
         if (fileStructureBlockSize > ioSize)
-            throw new ArgumentOutOfRangeException("fileStructureBlockSize", "Must not be greater than BufferPoolSize");
+            throw new ArgumentOutOfRangeException(nameof(fileStructureBlockSize), "Must not be greater than BufferPoolSize");
         if (!BitMath.IsPowerOfTwo(ioSize))
-            throw new ArgumentException("Must be a power of 2", "ioSize");
+            throw new ArgumentException("Must be a power of 2", nameof(ioSize));
         if (!BitMath.IsPowerOfTwo(fileStructureBlockSize))
-            throw new ArgumentException("Must be a power of 2", "fileStructureBlockSize");
+            throw new ArgumentException("Must be a power of 2", nameof(fileStructureBlockSize));
 
         m_ioSize = ioSize;
         m_fileName = fileName;
@@ -94,7 +94,7 @@ internal sealed class CustomFileStream
         m_bufferQueue = ResourceList.GetResourceQueue(ioSize);
         m_syncRoot = new object();
 
-        FileInfo fileInfo = new FileInfo(fileName);
+        FileInfo fileInfo = new(fileName);
         m_length.Value = fileInfo.Length;
     }
 
@@ -466,7 +466,7 @@ internal sealed class CustomFileStream
     /// <returns></returns>
     public static CustomFileStream OpenFile(string fileName, int ioBlockSize, out int fileStructureBlockSize, bool isReadOnly, bool isSharingEnabled)
     {
-        using (FileStream fileStream = new FileStream(fileName, FileMode.Open, isReadOnly ? FileAccess.Read : FileAccess.ReadWrite, isSharingEnabled ? FileShare.Read : FileShare.None, 2048, true))
+        using (FileStream fileStream = new(fileName, FileMode.Open, isReadOnly ? FileAccess.Read : FileAccess.ReadWrite, isSharingEnabled ? FileShare.Read : FileShare.None, 2048, true))
         {
             fileStructureBlockSize = FileHeaderBlock.SearchForBlockSize(fileStream);
         }

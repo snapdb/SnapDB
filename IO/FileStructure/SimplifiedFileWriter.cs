@@ -94,7 +94,7 @@ public class SimplifiedFileWriter
             throw new ObjectDisposedException(GetType().FullName);
         CloseCurrentFile();
 
-        SubFileHeader subFile = m_fileHeaderBlock.CreateNewFile(fileName);
+        SubFileHeader? subFile = m_fileHeaderBlock.CreateNewFile(fileName);
         subFile.DirectBlock = m_fileHeaderBlock.LastAllocatedBlock + 1;
         m_subFileStream = new SimplifiedSubFileStream(m_stream, subFile, m_fileHeaderBlock);
         return m_subFileStream;

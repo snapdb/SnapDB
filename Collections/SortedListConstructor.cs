@@ -41,7 +41,7 @@ public static class SortedListConstructor
     /// <param name="keys">A collection of keys to be used in the sorted list.</param>
     /// <param name="values">A collection of values to be associated with the keys in the sorted list.</param>
     /// <returns>A sorted list containing the specified keys and values.</returns>
-    public static SortedList<TKey, TValue> Create<TKey, TValue>(ICollection<TKey> keys, ICollection<TValue> values)
+    public static SortedList<TKey, TValue> Create<TKey, TValue>(ICollection<TKey> keys, ICollection<TValue> values) where TKey : notnull
     {
         // Creates a sorted list from the keys and values using a helper class.
         return new DictionaryWrapper<TKey, TValue>(keys, values).ToSortedList();
@@ -49,7 +49,7 @@ public static class SortedListConstructor
 
     // A wrapper class that creates a SortedList from a set of key/value pair. 
     private class DictionaryWrapper<TKey, TValue>
-        : IDictionary<TKey, TValue>
+        : IDictionary<TKey, TValue> where TKey : notnull
     {
         // Initializes a new instance of the <see cref="DictionaryWrapper{TKey, TValue}"/> class with the provided collections of keys and values.
         public DictionaryWrapper(ICollection<TKey> keys, ICollection<TValue> values)
@@ -68,12 +68,11 @@ public static class SortedListConstructor
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             // Iterate through keys and values to yield key-value pairs.
-            using (IEnumerator<TKey> keys = Keys.GetEnumerator())
-            using (IEnumerator<TValue> values = Values.GetEnumerator())
-            {
-                while (keys.MoveNext() && values.MoveNext())
-                    yield return new KeyValuePair<TKey, TValue>(keys.Current, values.Current);
-            }
+            using IEnumerator<TKey> keys = Keys.GetEnumerator();
+            using IEnumerator<TValue> values = Values.GetEnumerator();
+
+            while (keys.MoveNext() && values.MoveNext())
+                yield return new KeyValuePair<TKey, TValue>(keys.Current, values.Current);
         }
 
         // Returns an enumerator that iterates through the key-value pairs in the dictionary.
@@ -138,8 +137,7 @@ public static class SortedListConstructor
             set => throw new NotImplementedException();
         }
 
-        public ICollection<TKey> Keys { get; private set; }
-        public ICollection<TValue> Values { get; private set; }
+        public ICollection<TKey> Keys { get; }
+        public ICollection<TValue> Values { get; }
     }
-
 }

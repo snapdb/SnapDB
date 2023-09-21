@@ -88,7 +88,7 @@ public class SubFileHeader
     public SubFileHeader(ushort fileId, SubFileName fileName, bool isImmutable, bool isSimplified)
     {
         if (fileName is null)
-            throw new ArgumentException("The feature type cannot be an empty GUID value", "fileName");
+            throw new ArgumentException("The feature type cannot be an empty GUID value", nameof(fileName));
         m_isSimplified = isSimplified;
         IsReadOnly = isImmutable;
         m_fileIdNumber = fileId;

@@ -44,18 +44,16 @@ public class CertificateClient
 
     public bool AuthenticateAsClient(Stream stream)
     {
-        using (NegotiateStream negotiateStream = new NegotiateStream(stream, true))
+        using NegotiateStream negotiateStream = new(stream, true);
+        try
         {
-            try
-            {
-                negotiateStream.AuthenticateAsClient(m_credentials, string.Empty);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-            return true;
+            negotiateStream.AuthenticateAsClient(m_credentials, string.Empty);
         }
+        catch (Exception)
+        {
+            return false;
+        }
+        return true;
     }
 
 }

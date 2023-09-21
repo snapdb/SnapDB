@@ -136,17 +136,15 @@ public partial class SubFileStream
             {
                 throw new Exception("File is read only");
             }
-            else
-            {
-                //Reading
-                if (indexPosition >= m_stream.m_subFile.DataBlockCount)
-                    throw new ArgumentOutOfRangeException("position", "position reaches past the end of the file.");
-                physicalBlockIndex = m_stream.m_subFile.DirectBlock + indexPosition;
 
-                m_dataIoSession.Read(physicalBlockIndex, BlockType.DataBlock, indexPosition);
-                args.FirstPointer = (IntPtr)m_dataIoSession.Pointer;
-                args.SupportsWriting = false;
-            }
+            //Reading
+            if (indexPosition >= m_stream.m_subFile.DataBlockCount)
+                throw new ArgumentOutOfRangeException("position", "position reaches past the end of the file.");
+            physicalBlockIndex = m_stream.m_subFile.DirectBlock + indexPosition;
+
+            m_dataIoSession.Read(physicalBlockIndex, BlockType.DataBlock, indexPosition);
+            args.FirstPointer = (IntPtr)m_dataIoSession.Pointer;
+            args.SupportsWriting = false;
         }
 
         #endregion

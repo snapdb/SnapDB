@@ -40,13 +40,13 @@ public class SortedTreeFile
     /// <summary>
     /// The main type of the archive file.
     /// </summary>
-    internal static readonly Guid FileType = new Guid(0x63ab3fea, 0x14cd, 0x4eca, 0x93, 0x9b, 0x0d, 0xd2, 0x37, 0x42, 0xe1, 0x70);
+    internal static readonly Guid FileType = new(0x63ab3fea, 0x14cd, 0x4eca, 0x93, 0x9b, 0x0d, 0xd2, 0x37, 0x42, 0xe1, 0x70);
 
     // {E0FCA590-F46E-4060-8764-DFDCFC74D728}
     /// <summary>
     /// The guid where the primary archive component exists
     /// </summary>
-    internal static readonly Guid PrimaryArchiveType = new Guid(0xe0fca590, 0xf46e, 0x4060, 0x87, 0x64, 0xdf, 0xdc, 0xfc, 0x74, 0xd7, 0x28);
+    internal static readonly Guid PrimaryArchiveType = new(0xe0fca590, 0xf46e, 0x4060, 0x87, 0x64, 0xdf, 0xdc, 0xfc, 0x74, 0xd7, 0x28);
 
     #region [ Members ]
 
@@ -72,7 +72,7 @@ public class SortedTreeFile
     /// <param name="flags">Flags to write to the file</param>
     public static SortedTreeFile CreateInMemory(int blockSize = 4096, params Guid[] flags)
     {
-        SortedTreeFile file = new SortedTreeFile();
+        SortedTreeFile file = new();
         file.m_filePath = string.Empty;
         file.m_fileStructure = TransactionalFileStructure.CreateInMemory(blockSize, flags);
         return file;
@@ -86,7 +86,7 @@ public class SortedTreeFile
     /// <param name="flags">Flags to write to the file</param>
     public static SortedTreeFile CreateFile(string file, int blockSize = 4096, params Guid[] flags)
     {
-        SortedTreeFile af = new SortedTreeFile();
+        SortedTreeFile af = new();
         file = Path.GetFullPath(file);
         af.m_filePath = file;
         af.m_fileStructure = TransactionalFileStructure.CreateFile(file, blockSize, flags);
@@ -101,7 +101,7 @@ public class SortedTreeFile
     /// <returns></returns>
     public static SortedTreeFile OpenFile(string file, bool isReadOnly)
     {
-        SortedTreeFile af = new SortedTreeFile();
+        SortedTreeFile af = new();
         file = Path.GetFullPath(file);
         af.m_filePath = file;
         af.m_fileStructure = TransactionalFileStructure.OpenFile(file, isReadOnly);
@@ -249,7 +249,7 @@ public class SortedTreeFile
         where TValue : SnapTypeBase<TValue>, new()
     {
         if (storageMethod is null)
-            throw new ArgumentNullException("storageMethod");
+            throw new ArgumentNullException(nameof(storageMethod));
 
         SubFileName fileName = GetFileName<TKey, TValue>(tableName);
         return OpenOrCreateTable<TKey, TValue>(storageMethod, fileName, maxSortedTreeBlockSize);
@@ -269,7 +269,7 @@ public class SortedTreeFile
         where TValue : SnapTypeBase<TValue>, new()
     {
         if (storageMethod is null)
-            throw new ArgumentNullException("storageMethod");
+            throw new ArgumentNullException(nameof(storageMethod));
 
         SubFileName fileName = GetFileName<TKey, TValue>();
         return OpenOrCreateTable<TKey, TValue>(storageMethod, fileName, maxSortedTreeBlockSize);
@@ -319,26 +319,24 @@ public class SortedTreeFile
         if (maxSortedTreeBlockSize < 1024)
             throw new ArgumentOutOfRangeException(nameof(maxSortedTreeBlockSize), "Must be greater than 1024");
         if (storageMethod is null)
-            throw new ArgumentNullException("storageMethod");
+            throw new ArgumentNullException(nameof(storageMethod));
 
-        using (TransactionalEdit trans = m_fileStructure.BeginEdit())
+        using TransactionalEdit trans = m_fileStructure.BeginEdit();
+        using (SubFileStream fs = trans.CreateFile(fileName))
+        using (BinaryStream bs = new(fs))
         {
-            using (SubFileStream fs = trans.CreateFile(fileName))
-            using (BinaryStream bs = new BinaryStream(fs))
+            int blockSize = m_fileStructure.Snapshot.Header.DataBlockSize;
+
+            while (blockSize > maxSortedTreeBlockSize)
             {
-                int blockSize = m_fileStructure.Snapshot.Header.DataBlockSize;
-
-                while (blockSize > maxSortedTreeBlockSize)
-                {
-                    blockSize >>= 2;
-                }
-
-                SortedTree<TKey, TValue> tree = SortedTree<TKey, TValue>.Create(bs, blockSize, storageMethod);
-                tree.Flush();
+                blockSize >>= 2;
             }
-            trans.ArchiveType = FileType;
-            trans.CommitAndDispose();
+
+            SortedTree<TKey, TValue> tree = SortedTree<TKey, TValue>.Create(bs, blockSize, storageMethod);
+            tree.Flush();
         }
+        trans.ArchiveType = FileType;
+        trans.CommitAndDispose();
     }
 
 

@@ -46,7 +46,7 @@ internal unsafe class ShadowCopyAllocator
     /// <summary>
     /// The file being read.
     /// </summary>
-    private readonly SubFileHeader m_subFileHeader;
+    private readonly SubFileHeader? m_subFileHeader;
 
     /// <summary>
     /// The FileAllocationTable that can be used to allocate space.
@@ -67,9 +67,9 @@ internal unsafe class ShadowCopyAllocator
         : base(ioSessions)
     {
         if (ioSessions is null)
-            throw new ArgumentNullException("ioSessions");
+            throw new ArgumentNullException(nameof(ioSessions));
         if (ioSessions.IsReadOnly)
-            throw new ArgumentException("DataReader is read only", "ioSessions");
+            throw new ArgumentException("DataReader is read only", nameof(ioSessions));
         m_lastReadOnlyBlock = ioSessions.LastReadonlyBlock;
         m_fileHeaderBlock = ioSessions.Header;
         m_subFileHeader = ioSessions.File;
@@ -198,11 +198,8 @@ internal unsafe class ShadowCopyAllocator
             return true;
         }
         // The page has already been copied. Use the existing address.
-        else
-        {
-            ReadThenWriteIndexIndirectBlock(sourceBlockAddress, sourceBlockAddress, indexValue, blockType, remoteAddressOffset, remoteBlockAddress);
-            return false;
-        }
+        ReadThenWriteIndexIndirectBlock(sourceBlockAddress, sourceBlockAddress, indexValue, blockType, remoteAddressOffset, remoteBlockAddress);
+        return false;
     }
 
     /// <summary>
@@ -272,11 +269,9 @@ internal unsafe class ShadowCopyAllocator
             DataClusterAddress = dataBlockAddress;
             return true;
         }
-        else
-        {
-            // The page has already been copied, use the existing address.
-            return false;
-        }
+
+        // The page has already been copied, use the existing address.
+        return false;
     }
 
     /// <summary>

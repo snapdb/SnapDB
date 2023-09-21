@@ -453,6 +453,7 @@ public sealed class BitArray
             if (m_array[x] != 0)
             {
                 int end = Math.Min(x * BitsPerElement + BitsPerElement, m_count);
+
                 for (int k = x * BitsPerElement; k < end; k++)
                 {
                     if (GetBitUnchecked(k))
@@ -478,6 +479,7 @@ public sealed class BitArray
             if (m_array[x] != -1)
             {
                 int end = Math.Min(x * BitsPerElement + BitsPerElement, m_count);
+
                 for (int k = x * BitsPerElement; k < end; k++)
                 {
                     if (!GetBitUnchecked(k))
@@ -503,7 +505,7 @@ public sealed class BitArray
             throw new ArgumentOutOfRangeException(nameof(index), "Must be greater than or equal to zero.");
 
         if (index >= m_count)
-            throw new ArgumentOutOfRangeException(nameof(index), "Exceedes the length of the array.");
+            throw new ArgumentOutOfRangeException(nameof(index), "exceeds the length of the array.");
     }
 
     // Validates that a range of bits (specified by index AND length) is within the valid range in the bit array. 
@@ -525,7 +527,7 @@ public sealed class BitArray
             throw new ArgumentOutOfRangeException(nameof(length), "Must be greater than or equal to zero.");
 
         if (index + length > m_count)
-            throw new ArgumentOutOfRangeException(nameof(length), "index + length exceedes the length of the array.");
+            throw new ArgumentOutOfRangeException(nameof(length), "index + length exceeds the length of the array.");
     }
 
     #endregion

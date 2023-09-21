@@ -51,7 +51,7 @@ public class RemoteBinaryStream
     /// </summary>
     /// <param name="stream">the underlying stream to wrap</param>
     /// <param name="workerThreadSynchronization">the synchronization object</param>
-    public RemoteBinaryStream(Stream stream, WorkerThreadSynchronization workerThreadSynchronization = null)
+    public RemoteBinaryStream(Stream stream, WorkerThreadSynchronization? workerThreadSynchronization = null)
     {
         if (!BitConverter.IsLittleEndian)
             throw new Exception("BigEndian processors are not supported");

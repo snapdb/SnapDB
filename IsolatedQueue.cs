@@ -65,35 +65,17 @@ public class IsolatedQueue<T>
         /// <summary>
         /// Gets if the current node is out of entries.
         /// </summary>
-        public bool DequeueMustMoveToNextNode
-        {
-            get
-            {
-                return m_tail == m_lastBlock;
-            }
-        }
+        public bool DequeueMustMoveToNextNode => m_tail == m_lastBlock;
 
         /// <summary>
         /// Gets if there are items that can be dequeued
         /// </summary>
-        public bool CanDequeue
-        {
-            get
-            {
-                return m_head != m_tail;
-            }
-        }
+        public bool CanDequeue => m_head != m_tail;
 
         /// <summary>
         /// Gets if this list can be enqueued
         /// </summary>
-        public bool CanEnqueue
-        {
-            get
-            {
-                return m_head != m_lastBlock;
-            }
-        }
+        public bool CanEnqueue => m_head != m_lastBlock;
 
         /// <summary>
         /// Adds the following item to the queue. Be sure to check if it is full first.

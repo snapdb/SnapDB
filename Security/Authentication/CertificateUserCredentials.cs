@@ -37,7 +37,7 @@ namespace SnapDB.Security.Authentication;
 /// </remarks>
 public class CertificateUserCredentials
 {
-    private readonly Dictionary<string, CertificateUserCredential> m_users = new Dictionary<string, CertificateUserCredential>();
+    private readonly Dictionary<string, CertificateUserCredential> m_users = new();
 
     /// <summary>
     /// Looks up the username from the database.
@@ -72,7 +72,7 @@ public class CertificateUserCredentials
     /// <param name="username"></param>
     public void AddUser(string username)
     {
-        CertificateUserCredential user = new CertificateUserCredential(username);
+        CertificateUserCredential user = new(username);
         lock (m_users)
         {
             m_users.Add(user.UserID, user);

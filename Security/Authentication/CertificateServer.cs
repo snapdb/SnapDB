@@ -38,21 +38,19 @@ public class CertificateServer
 
     public string AuthenticateAsServer(Stream stream)
     {
-        using (NegotiateStream negotiateStream = new NegotiateStream(stream, true))
+        using NegotiateStream negotiateStream = new(stream, true);
+        try
         {
-            try
-            {
-                negotiateStream.AuthenticateAsServer();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-            if (Users.Exists(negotiateStream.RemoteIdentity))
-            {
-                return "";
-            }
+            negotiateStream.AuthenticateAsServer();
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+        if (Users.Exists(negotiateStream.RemoteIdentity))
+        {
             return "";
         }
+        return "";
     }
 }

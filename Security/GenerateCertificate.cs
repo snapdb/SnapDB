@@ -78,7 +78,7 @@ public static class GenerateCertificate
                 signatureAlgorithm = "SHA512withRSA";
                 break;
             default:
-                throw new ArgumentException("Invalid signature bit size.", "signatureBits");
+                throw new ArgumentException("Invalid signature bit size.", nameof(signatureBits));
         }
 
         // Generating Random Numbers
@@ -112,7 +112,7 @@ public static class GenerateCertificate
         store.SetCertificateEntry(friendlyName, certificateEntry);
         store.SetKeyEntry(friendlyName, new AsymmetricKeyEntry(encryptionKeys.Private), new[] { certificateEntry });
 
-        MemoryStream stream = new MemoryStream();
+        MemoryStream stream = new();
         store.Save(stream, password.ToCharArray(), random);
 
         //Verify that the certificate is valid.
@@ -150,7 +150,7 @@ public static class GenerateCertificate
                 signatureAlgorithm = "SHA384withRSA";
                 break;
             default:
-                throw new ArgumentException("Invalid signature bit size.", "signatureBits");
+                throw new ArgumentException("Invalid signature bit size.", nameof(signatureBits));
         }
 
         // Generating Random Numbers
@@ -184,11 +184,11 @@ public static class GenerateCertificate
         store.SetCertificateEntry(friendlyName, certificateEntry);
         store.SetKeyEntry(friendlyName, new AsymmetricKeyEntry(encryptionKeys.Private), new[] { certificateEntry });
 
-        MemoryStream stream = new MemoryStream();
+        MemoryStream stream = new();
         store.Save(stream, "".ToCharArray(), random);
 
         //Verify that the certificate is valid.
-        X509Certificate2 convertedCertificate = new X509Certificate2(stream.ToArray(), "", X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
+        X509Certificate2 convertedCertificate = new(stream.ToArray(), "", X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
 
         return convertedCertificate;
     }

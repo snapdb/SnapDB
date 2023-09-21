@@ -165,11 +165,11 @@ public class MemoryPool
     /// <param name="utilizationLevel">Specifies the desired utilization level of the allocated space.</param>
     public MemoryPool(int pageSize = 64 * 1024, long maximumBufferSize = -1, TargetUtilizationLevels utilizationLevel = TargetUtilizationLevels.Low)
     {
-        if (pageSize < 4096 || pageSize > 256 * 1024)
-            throw new ArgumentOutOfRangeException("pageSize", "Page size must be between 4KB and 256KB and a power of 2");
+        if (pageSize is < 4096 or > 256 * 1024)
+            throw new ArgumentOutOfRangeException(nameof(pageSize), "Page size must be between 4KB and 256KB and a power of 2");
 
         if (!BitMath.IsPowerOfTwo((uint)pageSize))
-            throw new ArgumentOutOfRangeException("pageSize", "Page size must be between 4KB and 256KB and a power of 2");
+            throw new ArgumentOutOfRangeException(nameof(pageSize), "Page size must be between 4KB and 256KB and a power of 2");
 
         m_syncRoot = new object();
         m_syncAllocate = new object();
@@ -363,9 +363,9 @@ public class MemoryPool
     /// </summary>
     private void RequestMoreFreeBlocks()
     {
-        Stopwatch sw = new Stopwatch();
+        Stopwatch sw = new();
         sw.Start();
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         sb.AppendLine("Collection Cycle Started");
         bool lockTaken;
 
@@ -387,7 +387,7 @@ public class MemoryPool
                 if (CurrentAllocatedSize < stopShrinkingLimit)
                     break;
 
-                CollectionEventArgs eventArgs = new CollectionEventArgs(ReleasePage, MemoryPoolCollectionMode.Normal, 0);
+                CollectionEventArgs eventArgs = new(ReleasePage, MemoryPoolCollectionMode.Normal, 0);
                 Monitor.Exit(m_syncRoot); lockTaken = false;
 
                 foreach (WeakAction<CollectionEventArgs> c in m_requestCollectionEvent)
@@ -421,7 +421,7 @@ public class MemoryPool
 
                 Log.Publish(MessageLevel.Warning, MessageFlags.PerformanceIssue, "Pool Emergency", string.Format("Memory pool is reaching an Emergency level. Desiring Pages To Release: {0}", pagesToBeReleased));
 
-                CollectionEventArgs eventArgs = new CollectionEventArgs(ReleasePage, MemoryPoolCollectionMode.Emergency, pagesToBeReleased);
+                CollectionEventArgs eventArgs = new(ReleasePage, MemoryPoolCollectionMode.Emergency, pagesToBeReleased);
 
                 Monitor.Exit(m_syncRoot); lockTaken = false;
 
@@ -545,7 +545,7 @@ public class MemoryPool
                 m_levelVeryHigh = (long)(0.97 * maximumBufferSize);
                 break;
             default:
-                throw new ArgumentOutOfRangeException("levels");
+                throw new ArgumentOutOfRangeException(nameof(levels));
         }
     }
 

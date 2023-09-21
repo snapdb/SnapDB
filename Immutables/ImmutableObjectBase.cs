@@ -50,19 +50,17 @@ public abstract class ImmutableObjectBase<T>
     /// </summary>
     public bool IsReadOnly
     {
-        get
-        {
-            return m_isReadOnly;
-        }
+        get => m_isReadOnly;
         set
         {
-            if (value ^ m_isReadOnly) // If values are different.
-            {
-                if (m_isReadOnly)
-                    throw new ReadOnlyException("Object has been set as read only and cannot be reversed");
-                m_isReadOnly = true;
-                SetMembersAsReadOnly();
-            }
+            if (!(value ^ m_isReadOnly))
+                return; // If values are different.
+            
+            if (m_isReadOnly)
+                throw new ReadOnlyException("Object has been set as read only and cannot be reversed");
+
+            m_isReadOnly = true;
+            SetMembersAsReadOnly();
         }
     }
 
@@ -98,8 +96,10 @@ public abstract class ImmutableObjectBase<T>
     public virtual T CloneEditable()
     {
         T initializer = (T)MemberwiseClone();
+        
         initializer.m_isReadOnly = false;
         initializer.CloneMembersAsEditable();
+        
         return initializer;
     }
 
@@ -142,9 +142,6 @@ public abstract class ImmutableObjectBase<T>
     /// </summary>
     public object Clone()
     {
-        if (IsReadOnly)
-            return this;
-
-        return CloneEditable();
+        return IsReadOnly ? this : CloneEditable();
     }
 }

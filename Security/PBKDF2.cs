@@ -66,7 +66,7 @@ public class PBKDF2
     /// <summary>
     /// A temporary location to store the hashed bytes.
     /// </summary>
-    private readonly Queue<byte> m_results = new Queue<byte>();
+    private readonly Queue<byte> m_results = new();
 
     private HMac m_hash1;
 
@@ -82,7 +82,7 @@ public class PBKDF2
     public PBKDF2(HMACMethod method, byte[] password, byte[] salt, int iterations)
     {
         if (password is null)
-            throw new ArgumentNullException("password");
+            throw new ArgumentNullException(nameof(password));
 
         switch (method)
         {
@@ -114,16 +114,16 @@ public class PBKDF2
                 //Initialize(new HMACSHA512(password), salt, iterations);
                 break;
             default:
-                throw new ArgumentOutOfRangeException("method");
+                throw new ArgumentOutOfRangeException(nameof(method));
         }
     }
 
     private void Initialize(HMac hash, byte[] passwordBytes, byte[] salt, int iterations)
     {
         if (hash is null)
-            throw new ArgumentNullException("hash");
+            throw new ArgumentNullException(nameof(hash));
         if (salt is null)
-            throw new ArgumentNullException("salt");
+            throw new ArgumentNullException(nameof(salt));
 
         hash.Init(new KeyParameter(passwordBytes));
         m_blockNumber = 1;
@@ -152,7 +152,7 @@ public class PBKDF2
     public override byte[] GetBytes(int length)
     {
         if (length <= 0)
-            throw new ArgumentOutOfRangeException("length", "must be positive");
+            throw new ArgumentOutOfRangeException(nameof(length), "must be positive");
 
         byte[] results = new byte[length];
         for (int x = 0; x < length; x++)
@@ -230,10 +230,8 @@ public class PBKDF2
     /// </returns>
     public static byte[] ComputeSaltedPassword(HMACMethod method, byte[] password, byte[] salt, int iterations, int length)
     {
-        using (PBKDF2 kdf = new PBKDF2(method, password, salt, iterations))
-        {
-            return kdf.GetBytes(length);
-        }
+        using PBKDF2 kdf = new(method, password, salt, iterations);
+        return kdf.GetBytes(length);
     }
 
 }

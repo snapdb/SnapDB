@@ -47,7 +47,7 @@ public partial class SortedTreeTable<TKey, TValue>
     /// <summary>
     /// Gets the archive file where this table exists.
     /// </summary>
-    public SortedTreeFile BaseFile { get; private set; }
+    public SortedTreeFile BaseFile { get; }
 
     #endregion
 
@@ -66,10 +66,8 @@ public partial class SortedTreeTable<TKey, TValue>
         m_fileStructure = fileStructure;
         m_firstKey = new TKey();
         m_lastKey = new TKey();
-        using (SortedTreeTableReadSnapshot<TKey, TValue> snapshot = BeginRead())
-        {
-            snapshot.GetKeyRange(m_firstKey, m_lastKey);
-        }
+        using SortedTreeTableReadSnapshot<TKey, TValue> snapshot = BeginRead();
+        snapshot.GetKeyRange(m_firstKey, m_lastKey);
     }
 
     #endregion

@@ -41,11 +41,9 @@ public static class SaltGenerator
     /// </returns>
     public static byte[] Create(int length)
     {
-        using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
-        {
-            byte[] salt = new byte[length];
-            rng.GetBytes(salt);
-            return salt;
-        }
+        using RNGCryptoServiceProvider rng = new();
+        byte[] salt = new byte[length];
+        rng.GetBytes(salt);
+        return salt;
     }
 }

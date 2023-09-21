@@ -36,11 +36,11 @@ namespace SnapDB.Collections;
 /// This is a special purpose class that supports only the 'Add' and 'Get' operations.
 /// It is designed to have indexing and dictionary lookup capabilities.
 /// </remarks>
-public class ConcurrentIndexedDictionary<TKey, TValue>
+public class ConcurrentIndexedDictionary<TKey, TValue> where TKey : notnull
 {
     private TValue[] m_items = new TValue[4];
-    private readonly Dictionary<TKey, int> m_lookup = new Dictionary<TKey, int>();
-    private readonly object m_syncRoot = new object();
+    private readonly Dictionary<TKey, int> m_lookup = new();
+    private readonly object m_syncRoot = new();
 
     /// <summary>
     /// Gets the number of items in the dictionary.

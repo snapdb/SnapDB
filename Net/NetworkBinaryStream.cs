@@ -34,7 +34,7 @@ public class NetworkBinaryStream
 {
     private Socket m_socket;
 
-    public NetworkBinaryStream(Socket socket, int timeout = -1, WorkerThreadSynchronization workerThreadSynchronization = null)
+    public NetworkBinaryStream(Socket socket, int timeout = -1, WorkerThreadSynchronization? workerThreadSynchronization = null)
         : base(new NetworkStream(socket), workerThreadSynchronization)
     {
         if (!BitConverter.IsLittleEndian)
@@ -64,7 +64,7 @@ public class NetworkBinaryStream
         get
         {
             WorkerThreadSynchronization.PulseSafeToCallback();
-            //ToDo: Don't call m_socket.Available since it's a windows API Call and terribly slow.
+            // TODO: Don't call m_socket.Available since it's a windows API Call and terribly slow.
             return ReceiveBufferAvailable + m_socket.Available;
         }
     }

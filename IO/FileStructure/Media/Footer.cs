@@ -103,11 +103,11 @@ internal static unsafe class Footer
     public static void WriteChecksumResultsToFooter(IntPtr data, int blockSize, int length)
     {
         if (!BitMath.IsPowerOfTwo(blockSize))
-            throw new ArgumentOutOfRangeException("blockSize", "Must be a power of two.");
+            throw new ArgumentOutOfRangeException(nameof(blockSize), "Must be a power of two.");
         if (blockSize > length)
-            throw new ArgumentException("Must be greater than blockSize", "length");
+            throw new ArgumentException("Must be greater than blockSize", nameof(length));
         if ((length & (blockSize - 1)) != 0)
-            throw new ArgumentException("Length is not a multiple of the block size", "length");
+            throw new ArgumentException("Length is not a multiple of the block size", nameof(length));
 
         for (int offset = 0; offset < length; offset += blockSize)
         {
@@ -165,11 +165,11 @@ internal static unsafe class Footer
     public static void ComputeChecksumAndClearFooter(IntPtr data, int blockSize, int length)
     {
         if (!BitMath.IsPowerOfTwo(blockSize))
-            throw new ArgumentOutOfRangeException("blockSize", "Must be a power of two.");
+            throw new ArgumentOutOfRangeException(nameof(blockSize), "Must be a power of two.");
         if (blockSize > length)
-            throw new ArgumentException("Must be greater than blockSize", "length");
+            throw new ArgumentException("Must be greater than blockSize", nameof(length));
         if ((length & (blockSize - 1)) != 0)
-            throw new ArgumentException("Length is not a multiple of the block size", "length");
+            throw new ArgumentException("Length is not a multiple of the block size", nameof(length));
 
         for (int offset = 0; offset < length; offset += blockSize)
         {

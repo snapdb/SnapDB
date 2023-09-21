@@ -85,8 +85,7 @@ public unsafe class BinaryStream
     {
         if (allocatesOwnMemory)
             return new UnmanagedMemoryStream();
-        else
-            return new MemoryPoolStream();
+        return new MemoryPoolStream();
     }
 
     /// <summary>

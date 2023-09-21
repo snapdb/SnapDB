@@ -84,10 +84,10 @@ public sealed class TransactionalEdit
     /// <param name="dataReader"> </param>
     /// <param name="delHasBeenRolledBack">the delegate to call when this transaction has been rolled back</param>
     /// <param name="delHasBeenCommitted">the delegate to call when this transaction has been committed</param>
-    internal TransactionalEdit(DiskIo dataReader, Action delHasBeenRolledBack = null, Action delHasBeenCommitted = null)
+    internal TransactionalEdit(DiskIo dataReader, Action? delHasBeenRolledBack = null, Action? delHasBeenCommitted = null)
     {
         if (dataReader is null)
-            throw new ArgumentNullException("dataReader");
+            throw new ArgumentNullException(nameof(dataReader));
 
         m_openedFiles = new List<SubFileStream>();
         m_disposed = false;
@@ -111,7 +111,7 @@ public sealed class TransactionalEdit
     /// <summary>
     /// A list of all of the files in this collection.
     /// </summary>
-    public ImmutableList<SubFileHeader> Files
+    public ImmutableList<SubFileHeader?> Files
     {
         get
         {
@@ -156,9 +156,9 @@ public sealed class TransactionalEdit
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
         if (fileIndex < 0 || fileIndex >= m_fileHeaderBlock.Files.Count)
-            throw new ArgumentOutOfRangeException("fileIndex", "The file index provided could not be found in the header.");
-        SubFileHeader subFile = m_fileHeaderBlock.Files[fileIndex];
-        SubFileStream fileStream = new SubFileStream(m_dataReader, subFile, m_fileHeaderBlock, isReadOnly: false);
+            throw new ArgumentOutOfRangeException(nameof(fileIndex), "The file index provided could not be found in the header.");
+        SubFileHeader? subFile = m_fileHeaderBlock.Files[fileIndex];
+        SubFileStream fileStream = new(m_dataReader, subFile, m_fileHeaderBlock, isReadOnly: false);
         m_openedFiles.Add(fileStream);
         return fileStream;
     }
@@ -173,7 +173,7 @@ public sealed class TransactionalEdit
             throw new ObjectDisposedException(GetType().FullName);
         for (int x = 0; x < Files.Count; x++)
         {
-            SubFileHeader file = Files[x];
+            SubFileHeader? file = Files[x];
             if (file.FileName == fileName)
             {
                 return OpenFile(x);
@@ -199,7 +199,7 @@ public sealed class TransactionalEdit
         }
         try
         {
-            //ToDo: First commit the data, then the file system.
+            // TODO: First commit the data, then the file system.
             m_dataReader.CommitChanges(m_fileHeaderBlock);
             if (m_delHasBeenCommitted != null)
                 m_delHasBeenCommitted.Invoke();

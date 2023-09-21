@@ -60,16 +60,16 @@ internal unsafe class DiskIoSession : IDisposable
     /// <param name="diskIo">owner of the disk</param>
     /// <param name="ioSession">the base ioSession to use for this io session</param>
     /// <param name="file">The file that will be read from this diskIoSession</param>
-    public DiskIoSession(DiskIo diskIo, BinaryStreamIoSessionBase ioSession, FileHeaderBlock header, SubFileHeader file)
+    public DiskIoSession(DiskIo diskIo, BinaryStreamIoSessionBase ioSession, FileHeaderBlock header, SubFileHeader? file)
     {
         if (diskIo is null)
-            throw new ArgumentNullException("diskIo");
+            throw new ArgumentNullException(nameof(diskIo));
         if (diskIo.IsDisposed)
             throw new ObjectDisposedException(diskIo.GetType().FullName);
         if (ioSession is null)
-            throw new ArgumentNullException("ioSession");
+            throw new ArgumentNullException(nameof(ioSession));
         if (file is null)
-            throw new ArgumentNullException("file");
+            throw new ArgumentNullException(nameof(file));
 
         m_args = new BlockArguments();
         m_lastReadonlyBlock = diskIo.LastReadonlyBlock;
@@ -178,7 +178,7 @@ internal unsafe class DiskIoSession : IDisposable
         if (m_isReadOnly)
             throw new ReadOnlyException("The subfile used for this io session is read only.");
         if (blockIndex > 10 && blockIndex <= m_lastReadonlyBlock)
-            throw new ArgumentOutOfRangeException("blockIndex", "Cannot write to committed blocks");
+            throw new ArgumentOutOfRangeException(nameof(blockIndex), "Cannot write to committed blocks");
 
         IsValid = true;
 
@@ -212,7 +212,7 @@ internal unsafe class DiskIoSession : IDisposable
         if (m_isReadOnly)
             throw new ReadOnlyException("The subfile used for this io session is read only.");
         if (blockIndex > 10 && blockIndex <= m_lastReadonlyBlock)
-            throw new ArgumentOutOfRangeException("blockIndex", "Cannot write to committed blocks");
+            throw new ArgumentOutOfRangeException(nameof(blockIndex), "Cannot write to committed blocks");
 
         IsValid = true;
 
@@ -366,7 +366,7 @@ internal unsafe class DiskIoSession : IDisposable
         int checksumState = lpdata[28];
         if (checksumState == Footer.ChecksumIsNotValid)
             return IoReadState.ChecksumInvalid;
-        if (checksumState == Footer.ChecksumIsValid || checksumState == Footer.ChecksumMustBeRecomputed)
+        if (checksumState is Footer.ChecksumIsValid or Footer.ChecksumMustBeRecomputed)
         {
             if (lpdata[0] != BlockType)
                 return IoReadState.BlockTypeMismatch;
@@ -387,7 +387,7 @@ internal unsafe class DiskIoSession : IDisposable
         int checksumState = lpdata[28];
         if (checksumState == Footer.ChecksumIsNotValid)
             return IoReadState.ChecksumInvalid;
-        if (checksumState == Footer.ChecksumIsValid || checksumState == Footer.ChecksumMustBeRecomputed)
+        if (checksumState is Footer.ChecksumIsValid or Footer.ChecksumMustBeRecomputed)
         {
             if (lpdata[0] != BlockType)
                 return IoReadState.BlockTypeMismatch;
@@ -408,7 +408,7 @@ internal unsafe class DiskIoSession : IDisposable
         int checksumState = lpdata[28];
         if (checksumState == Footer.ChecksumIsNotValid)
             return IoReadState.ChecksumInvalid;
-        if (checksumState == Footer.ChecksumIsValid || checksumState == Footer.ChecksumMustBeRecomputed)
+        if (checksumState is Footer.ChecksumIsValid or Footer.ChecksumMustBeRecomputed)
         {
             if (lpdata[0] != BlockType)
                 return IoReadState.BlockTypeMismatch;
@@ -440,7 +440,7 @@ internal unsafe class DiskIoSession : IDisposable
         ptr[0] = 0;
         ptr[1] = 0;
         ptr[2] = 0;
-        ptr[3] = 0; //ToDo: Consider if this should not be done. This will clear the footer status page.
+        ptr[3] = 0; // TODO: Consider if this should not be done. This will clear the footer status page.
     }
 
     #endregion

@@ -85,7 +85,7 @@ public struct DisposableWriteLock
 /// </summary>
 public class ReaderWriterLockEasy
 {
-    private readonly ReaderWriterLock m_lock = new ReaderWriterLock();
+    private readonly ReaderWriterLock m_lock = new();
 
     /// <summary>
     /// Enters a read lock. Be sure to call within a using block.

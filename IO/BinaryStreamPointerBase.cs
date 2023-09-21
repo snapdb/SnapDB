@@ -195,11 +195,11 @@ public unsafe abstract class BinaryStreamPointerBase
     public override void Copy(long source, long destination, int length)
     {
         if (source < 0)
-            throw new ArgumentException("value cannot be less than zero", "source");
+            throw new ArgumentException("value cannot be less than zero", nameof(source));
         if (destination < 0)
-            throw new ArgumentException("value cannot be less than zero", "destination");
+            throw new ArgumentException("value cannot be less than zero", nameof(destination));
         if (length < 0)
-            throw new ArgumentException("value cannot be less than zero", "length");
+            throw new ArgumentException("value cannot be less than zero", nameof(length));
 
         if (length == 0 || source == destination)
             return;

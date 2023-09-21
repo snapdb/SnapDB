@@ -68,7 +68,7 @@ public sealed partial class SubFileStream
     /// <summary>
     /// The file used by the stream.
     /// </summary>
-    private readonly SubFileHeader m_subFile;
+    private readonly SubFileHeader? m_subFile;
 
     private readonly int m_blockSize;
 
@@ -83,30 +83,30 @@ public sealed partial class SubFileStream
     /// <param name="subFile">The file to read.</param>
     /// <param name="fileHeaderBlock">The FileAllocationTable</param>
     /// <param name="isReadOnly">Determines if the stream allows editing.</param>
-    internal SubFileStream(DiskIo dataReader, SubFileHeader subFile, FileHeaderBlock fileHeaderBlock, bool isReadOnly)
+    internal SubFileStream(DiskIo dataReader, SubFileHeader? subFile, FileHeaderBlock fileHeaderBlock, bool isReadOnly)
     {
         if (dataReader is null)
-            throw new ArgumentNullException("dataReader");
+            throw new ArgumentNullException(nameof(dataReader));
         if (subFile is null)
-            throw new ArgumentNullException("subFile");
+            throw new ArgumentNullException(nameof(subFile));
         if (fileHeaderBlock is null)
-            throw new ArgumentNullException("subFile");
+            throw new ArgumentNullException(nameof(subFile));
 
         if (!isReadOnly)
         {
             if (dataReader.IsReadOnly)
-                throw new ArgumentException("This parameter cannot be read only when opening for writing", "dataReader");
+                throw new ArgumentException("This parameter cannot be read only when opening for writing", nameof(dataReader));
             if (fileHeaderBlock.IsReadOnly)
-                throw new ArgumentException("This parameter cannot be read only when opening for writing", "fileHeaderBlock");
+                throw new ArgumentException("This parameter cannot be read only when opening for writing", nameof(fileHeaderBlock));
             if (subFile.IsReadOnly)
-                throw new ArgumentException("This parameter cannot be read only when opening for writing", "subFile");
+                throw new ArgumentException("This parameter cannot be read only when opening for writing", nameof(subFile));
         }
         if (isReadOnly)
         {
             if (!fileHeaderBlock.IsReadOnly)
-                throw new ArgumentException("This parameter must be read only when opening for reading", "fileHeaderBlock");
+                throw new ArgumentException("This parameter must be read only when opening for reading", nameof(fileHeaderBlock));
             if (!subFile.IsReadOnly)
-                throw new ArgumentException("This parameter must be read only when opening for reading", "subFile");
+                throw new ArgumentException("This parameter must be read only when opening for reading", nameof(subFile));
         }
 
         m_blockSize = dataReader.BlockSize;
@@ -120,7 +120,7 @@ public sealed partial class SubFileStream
 
     #region [ Properties ]
 
-    internal SubFileHeader SubFile => m_subFile;
+    internal SubFileHeader? SubFile => m_subFile;
 
     /// <summary>
     /// Gets if this file was opened in readonly mode.

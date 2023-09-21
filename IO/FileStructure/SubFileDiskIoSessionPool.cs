@@ -59,7 +59,7 @@ internal class SubFileDiskIoSessionPool
     /// <summary>
     /// The file
     /// </summary>
-    public SubFileHeader File
+    public SubFileHeader? File
     {
         get;
         private set;
@@ -90,7 +90,6 @@ internal class SubFileDiskIoSessionPool
     public bool IsReadOnly
     {
         get;
-        private set;
     }
 
     /// <summary>
@@ -109,7 +108,7 @@ internal class SubFileDiskIoSessionPool
     /// <param name="header"></param>
     /// <param name="file"></param>
     /// <param name="isReadOnly"></param>
-    public SubFileDiskIoSessionPool(DiskIo diskIo, FileHeaderBlock header, SubFileHeader file, bool isReadOnly)
+    public SubFileDiskIoSessionPool(DiskIo diskIo, FileHeaderBlock header, SubFileHeader? file, bool isReadOnly)
     {
         LastReadonlyBlock = diskIo.LastCommittedHeader.LastAllocatedBlock;
         File = file;

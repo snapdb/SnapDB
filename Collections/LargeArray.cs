@@ -140,10 +140,10 @@ public class LargeArray<T>
     private void ThrowException(int index)
     {
         if (index < 0)
-            throw new ArgumentOutOfRangeException("index", "Must be greater than or equal to zero.");
+            throw new ArgumentOutOfRangeException(nameof(index), "Must be greater than or equal to zero.");
             
         if (index >= m_capacity)
-            throw new ArgumentOutOfRangeException("index", "Exceedes the length of the array.");
+            throw new ArgumentOutOfRangeException(nameof(index), "exceeds the length of the array.");
     }
 
     /// <summary>

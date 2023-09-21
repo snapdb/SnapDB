@@ -38,22 +38,23 @@ public static class ListExtensions
     /// <param name="list">The list to iterate through.</param>
     /// <param name="item">The item to add.</param>
     /// <returns>The index of the added item.</returns>
-    public static int ReplaceFirstNullOrAdd<T>(this IList<T> list, T item)
+    public static int ReplaceFirstNullOrAdd<T>(this IList<T?> list, T item)
         where T : class
     {
         if (list is null)
-            throw new ArgumentException("list");
+            throw new ArgumentNullException(nameof(list));
 
-        if (list is List<T> lst)
-            return lst.ReplaceFirstNullOrAdd(item);
+        if (list is List<T?> instance)
+            return instance.ReplaceFirstNullOrAdd(item);
 
         for (int x = 0; x < list.Count; x++)
-            if (list[x] is null)
-            {
-                list[x] = item;
-                
-                return x;
-            }
+        {
+            if (list[x] is not null)
+                continue;
+            
+            list[x] = item;
+            return x;
+        }
 
         list.Add(item);
 
@@ -67,20 +68,19 @@ public static class ListExtensions
     /// <param name="list">the list to iterate through</param>
     /// <param name="item">the item to add</param>
     /// <returns>the index of the added item</returns>
-    public static int ReplaceFirstNullOrAdd<T>(this List<T> list, T item)
+    public static int ReplaceFirstNullOrAdd<T>(this List<T?> list, T item)
        where T : class
     {
         if (list is null)
-            throw new ArgumentException("list");
+            throw new ArgumentNullException(nameof(list));
 
         for (int x = 0; x < list.Count; x++)
         {
-            if (list[x] is null)
-            {
-                list[x] = item;
-                
-                return x;
-            }
+            if (list[x] is not null)
+                continue;
+            
+            list[x] = item;
+            return x;
         }
 
         list.Add(item);

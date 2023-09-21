@@ -40,7 +40,7 @@ namespace SnapDB.Snap;
 public class SnapTypeCustomMethods<T>
     where T : SnapTypeBase<T>, new()
 {
-    protected T TempKey = new T();
+    protected T TempKey = new();
     protected int LastFoundIndex;
 
     /// <summary>
@@ -130,8 +130,8 @@ public class SnapTypeCustomMethods<T>
                     LastFoundIndex++;
                     return ~LastFoundIndex;
                 }
-                else
-                    searchHigherBoundsIndex = LastFoundIndex - 1;
+
+                searchHigherBoundsIndex = LastFoundIndex - 1;
             }
         }
 

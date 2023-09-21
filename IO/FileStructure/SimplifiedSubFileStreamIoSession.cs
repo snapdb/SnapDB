@@ -48,7 +48,7 @@ internal unsafe class SimplifiedSubFileStreamIoSession
     private uint m_currentBlockIndex;
     private readonly int m_blockSize;
     private readonly FileHeaderBlock m_header;
-    private readonly SubFileHeader m_subFile;
+    private readonly SubFileHeader? m_subFile;
     private readonly int m_blockDataLength;
 
     #endregion
@@ -67,15 +67,15 @@ internal unsafe class SimplifiedSubFileStreamIoSession
     /// <exception cref="Exception">
     /// Thrown if the <paramref name="subFile"/> does not have a valid direct block assignment.
     /// </exception>
-    public SimplifiedSubFileStreamIoSession(FileStream stream, SubFileHeader subFile, FileHeaderBlock header)
+    public SimplifiedSubFileStreamIoSession(FileStream stream, SubFileHeader? subFile, FileHeaderBlock header)
     {
         // Check for null arguments.
         if (stream is null)
-            throw new ArgumentNullException("stream");
+            throw new ArgumentNullException(nameof(stream));
         if (subFile is null)
-            throw new ArgumentNullException("subFile");
+            throw new ArgumentNullException(nameof(subFile));
         if (header is null)
-            throw new ArgumentNullException("header");
+            throw new ArgumentNullException(nameof(header));
 
         // Check for a valid direct block assignment in the subFile.
         if (subFile.DirectBlock == 0)
@@ -139,7 +139,7 @@ internal unsafe class SimplifiedSubFileStreamIoSession
     public override void GetBlock(BlockArguments args)
     {
         if (args is null)
-            throw new ArgumentNullException("args");
+            throw new ArgumentNullException(nameof(args));
 
         long pos = args.Position;
         if (IsDisposed)

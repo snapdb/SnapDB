@@ -62,7 +62,7 @@ public sealed class Memory
     public Memory(int requestedSize)
     {
         if (requestedSize <= 0)
-            throw new ArgumentOutOfRangeException("requestedSize", "must be greater than zero");
+            throw new ArgumentOutOfRangeException(nameof(requestedSize), "must be greater than zero");
 
         m_address = Marshal.AllocHGlobal(requestedSize);
         m_size = requestedSize;

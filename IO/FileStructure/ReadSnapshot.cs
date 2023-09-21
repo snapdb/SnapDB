@@ -57,7 +57,7 @@ public class ReadSnapshot
     internal ReadSnapshot(DiskIo dataReader)
     {
         if (dataReader is null)
-            throw new ArgumentNullException("dataReader");
+            throw new ArgumentNullException(nameof(dataReader));
         m_fileHeaderBlock = dataReader.LastCommittedHeader;
         m_dataReader = dataReader;
     }
@@ -82,7 +82,7 @@ public class ReadSnapshot
     public SubFileStream OpenFile(int fileIndex)
     {
         if (fileIndex < 0 || fileIndex >= m_fileHeaderBlock.Files.Count)
-            throw new ArgumentOutOfRangeException("fileIndex", "The file index provided could not be found in the header.");
+            throw new ArgumentOutOfRangeException(nameof(fileIndex), "The file index provided could not be found in the header.");
 
         return new SubFileStream(m_dataReader, m_fileHeaderBlock.Files[fileIndex], m_fileHeaderBlock, isReadOnly: true);
     }
@@ -94,7 +94,7 @@ public class ReadSnapshot
     {
         for (int x = 0; x < m_fileHeaderBlock.Files.Count; x++)
         {
-            SubFileHeader file = m_fileHeaderBlock.Files[x];
+            SubFileHeader? file = m_fileHeaderBlock.Files[x];
             if (file.FileName == fileName)
             {
                 return OpenFile(x);

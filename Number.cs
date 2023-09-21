@@ -146,38 +146,28 @@ public static class Number
             {
                 if (value >= Digits10)
                     return 10;
-                else if (value >= Digits9)
+                if (value >= Digits9)
                     return 9;
-                else
-                    return 8;
+                return 8;
             }
-            else
-            {
-                if (value >= Digits7)
-                    return 7;
-                else if (value >= Digits6)
-                    return 6;
-                else
-                    return 5;
-            }
+
+            if (value >= Digits7)
+                return 7;
+            if (value >= Digits6)
+                return 6;
+            return 5;
         }
-        else
+
+        if (value >= Digits3)
         {
-            if (value >= Digits3)
-            {
-                if (value >= Digits4)
-                    return 4;
-                else
-                    return 3;
-            }
-            else
-            {
-                if (value >= Digits2)
-                    return 2;
-                else
-                    return 1;
-            }
+            if (value >= Digits4)
+                return 4;
+            return 3;
         }
+
+        if (value >= Digits2)
+            return 2;
+        return 1;
     }
 
     public static unsafe int WriteToChars2(this uint value, char[] destination, int position)
@@ -303,38 +293,32 @@ public static class Number
                     goto Digits8;
 
                 }
-                else
-                {
-                    //5,6,7
-                    if (value >= Digits7)
-                        goto Digits7;
-                    if (value >= Digits6)
-                        goto Digits6;
-                    goto Digits5;
-                }
+
+                //5,6,7
+                if (value >= Digits7)
+                    goto Digits7;
+                if (value >= Digits6)
+                    goto Digits6;
+                goto Digits5;
             }
-            else
+
+            //1,2,3,4
+            if (value >= Digits3)
             {
-                //1,2,3,4
-                if (value >= Digits3)
-                {
-                    //3 or 4
-                    if (value >= Digits4)
-                        goto Digits4;
-                    goto Digits3;
-                }
-                else
-                {
-                    //1 or 2
-                    if (value >= Digits2)
-                        goto Digits2;
-                    goto Digits1;
-                }
+                //3 or 4
+                if (value >= Digits4)
+                    goto Digits4;
+                goto Digits3;
             }
 
+            //1 or 2
+            if (value >= Digits2)
+                goto Digits2;
+            goto Digits1;
 
 
-        Digits10:
+
+            Digits10:
 
             if (value >= 4 * Digits10) { value -= 4 * Digits10; digit += 4; }
             if (value >= 2 * Digits10) { value -= 2 * Digits10; digit += 2; }

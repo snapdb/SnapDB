@@ -47,7 +47,7 @@ public class WeakList<T> : IEnumerable<T>
         // This is because a delegate is a small wrapper of (Object,Method) and is usually recreated on the fly
         // rather than stored. Therefore if the only reference to the delegate is passed to this list, it will be
         // collected at the next GC cycle.
-        public WeakReference[] Items;
+        public WeakReference?[] Items;
         public int Size;
            
         public Snapshot(int capacity)
@@ -66,7 +66,7 @@ public class WeakList<T> : IEnumerable<T>
             // Counts the number of entries that are valid.
             for (int x = 0; x < Items.Length; x++)
             {
-                WeakReference reference = Items[x];
+                WeakReference? reference = Items[x];
 
                 if (reference is null)
                     continue;
@@ -81,16 +81,14 @@ public class WeakList<T> : IEnumerable<T>
             // Copies the snapshot.
             int capacity = Math.Max(itemCount * 2, 8);
 
-            Snapshot clone = new Snapshot(capacity)
+            Snapshot clone = new(capacity)
             {
                 Items = new WeakReference[capacity],
                 Size = 0
             };
 
-            for (int x = 0; x < Items.Length; x++)
+            foreach (WeakReference? reference in Items)
             {
-                WeakReference reference = Items[x];
-
                 if (reference is null)
                     continue;
 
@@ -107,7 +105,7 @@ public class WeakList<T> : IEnumerable<T>
         /// Removes all occurrences of <see cref="item"/> from the list.
         /// </summary>
         /// <param name="item">Item to remove.</param>
-        public void Remove(T item)
+        public void Remove(T? item)
         {
             if (item is null)
                 return;
@@ -117,7 +115,7 @@ public class WeakList<T> : IEnumerable<T>
 
             for (int x = 0; x < count; x++)
             {
-                WeakReference reference = Items[x];
+                WeakReference? reference = Items[x];
 
                 if (reference is null)
                     continue;
@@ -128,7 +126,9 @@ public class WeakList<T> : IEnumerable<T>
                         Items[x] = null;
                 }
                 else
+                {
                     Items[x] = null;
+                }
             }
         }
 
@@ -136,7 +136,7 @@ public class WeakList<T> : IEnumerable<T>
         /// Attempts to add <see cref="item"/> to the list. 
         /// </summary>
         /// <param name="item"></param>
-        /// <returns<c>true</c> if added, <c>false</c> otherwise.</returns>
+        /// <returns><c>true</c> if added, <c>false</c> otherwise.</returns>
         public bool TryAdd(T item)
         {
             return TryAdd(new WeakReference(item));
@@ -144,24 +144,22 @@ public class WeakList<T> : IEnumerable<T>
 
         private bool TryAdd(WeakReference item)
         {
-            if (Size < Items.Length)
-            {
-                Items[Size] = item;
-                Size++;
+            if (Size >= Items.Length)
+                return false;
 
-                return true;
-            }
+            Items[Size] = item;
+            Size++;
 
-            return false;
+            return true;
         }
     }
 
     /// <summary>
     /// An <see cref="IEnumerator{T}"/> for <see cref="WeakList{T}"/>
     /// </summary>
-    public struct Enumerator : IEnumerator<T>
+    public struct Enumerator : IEnumerator<T?>
     {
-        private readonly WeakReference[] m_items;
+        private readonly WeakReference?[] m_items;
         private readonly int m_lastItem;
         private int m_currentIndex;
         private T? m_current;
@@ -171,7 +169,7 @@ public class WeakList<T> : IEnumerable<T>
         /// </summary>
         /// <param name="items">The weak referenced items.</param>
         /// <param name="count">The number of valid items in the list.</param>
-        public Enumerator(WeakReference[] items, int count)
+        public Enumerator(WeakReference?[] items, int count)
         {
             m_items = items;
             m_lastItem = count - 1;
@@ -185,7 +183,7 @@ public class WeakList<T> : IEnumerable<T>
         /// <returns>
         /// The element in the collection at the current position of the enumerator.
         /// </returns>
-        public T Current => m_current;
+        public T? Current => m_current;
 
         /// <summary>
         /// Gets the current element in the collection.
@@ -193,7 +191,7 @@ public class WeakList<T> : IEnumerable<T>
         /// <returns>
         /// The current element in the collection.
         /// </returns>
-        object IEnumerator.Current => Current;
+        object? IEnumerator.Current => Current;
 
         /// <summary>
         /// Advances the enumerator to the next valid item in the collection.
@@ -209,7 +207,7 @@ public class WeakList<T> : IEnumerable<T>
             while (m_currentIndex < m_lastItem)
             {
                 m_currentIndex++; // Move to the next index in the collection.
-                WeakReference reference = m_items[m_currentIndex];
+                WeakReference? reference = m_items[m_currentIndex];
 
                 if (reference is null)
                     continue; // Skip null references.
@@ -278,13 +276,13 @@ public class WeakList<T> : IEnumerable<T>
     {
         lock (m_syncRoot)
         {
-            if (!m_data.TryAdd(item))
-            {
-                m_data = m_data.Grow();
+            if (m_data.TryAdd(item))
+                return;
 
-                if (!m_data.TryAdd(item))
-                    throw new Exception("Could not grow list");
-            }
+            m_data = m_data.Grow();
+
+            if (!m_data.TryAdd(item))
+                throw new Exception("Could not grow list");
         }
     }
 

@@ -45,7 +45,6 @@ public class SubFileName
     public long RawValue1
     {
         get;
-        private set;
     }
 
     /// <summary>
@@ -54,7 +53,6 @@ public class SubFileName
     public long RawValue2
     {
         get;
-        private set;
     }
 
     /// <summary>
@@ -63,7 +61,6 @@ public class SubFileName
     public int RawValue3
     {
         get;
-        private set;
     }
 
     private SubFileName(long rawValue1, long rawValue2, int rawValue3)
@@ -155,7 +152,7 @@ public class SubFileName
     /// An empty subfile name. Should not generally be used as a single file system. 
     /// Must have unique file names.
     /// </summary>
-    public static SubFileName Empty => new SubFileName(0, 0, 0);
+    public static SubFileName Empty => new(0, 0, 0);
 
     /// <summary>
     /// Creates a random <see cref="SubFileName"/>

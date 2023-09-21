@@ -40,8 +40,8 @@ namespace SnapDB.IO.FileStructure.Media;
 /// This is accomplised by incrementing a counter every time a page is accessed 
 /// and dividing by 2 every time a collection occurs from the <see cref="MemoryPool"/>.
 /// </remarks>
-//ToDo: Consider allowing this class to scale horizontally like how the concurrent dictionary scales.
-//ToDo: this will reduce the concurrent contention on the class at the cost of more memory required.
+// TODO: Consider allowing this class to scale horizontally like how the concurrent dictionary scales.
+// TODO: this will reduce the concurrent contention on the class at the cost of more memory required.
 internal partial class BufferedFile
     : IDiskMediumCoreFunctions
 {
@@ -185,7 +185,7 @@ internal partial class BufferedFile
     /// <param name="header"></param>
     public void CommitChanges(FileHeaderBlock header)
     {
-        using (IoSession pageLock = new IoSession(this, m_pageReplacementAlgorithm))
+        using (IoSession pageLock = new(this, m_pageReplacementAlgorithm))
         {
             //Determine how much committed data to write
             long lengthOfAllData = (header.LastAllocatedBlock + 1) * m_fileStructureBlockSize;
@@ -354,14 +354,14 @@ internal partial class BufferedFile
         else if (args.Position < m_lengthOfHeader)
         {
             //If the block is in the header, error because this area of the file is not designed to be accessed.
-            throw new ArgumentOutOfRangeException("args", "Cannot use this function to modify the file header.");
+            throw new ArgumentOutOfRangeException(nameof(args), "Cannot use this function to modify the file header.");
         }
         else
         {
             //If it is between the file header and uncommitted space, 
             //it is in the committed space, which this space by design is never to be modified. 
             if (args.IsWriting)
-                throw new ArgumentException("Cannot write to committed data space", "args");
+                throw new ArgumentException("Cannot write to committed data space", nameof(args));
             args.SupportsWriting = false;
             args.Length = m_diskBlockSize;
             //rounds to the beginning of the block to be looked up.
@@ -415,7 +415,7 @@ internal partial class BufferedFile
 
         if (e.CollectionMode == MemoryPoolCollectionMode.Critical)
         {
-            //ToDo: actually do something differently if collection level reaches critical
+            // TODO: actually do something differently if collection level reaches critical
             m_pageReplacementAlgorithm.DoCollection(e);
         }
     }

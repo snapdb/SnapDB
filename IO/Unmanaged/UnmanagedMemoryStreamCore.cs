@@ -146,7 +146,7 @@ namespace SnapDB.IO.Unmanaged
         protected UnmanagedMemoryStreamCore(int allocationSize = 4096)
         {
             if (!BitMath.IsPowerOfTwo(allocationSize) || allocationSize < 4096 || allocationSize > 1024 * 1024)
-                throw new ArgumentOutOfRangeException("allocationSize", "Must be a power of 2 between 4KB and 1MB");
+                throw new ArgumentOutOfRangeException(nameof(allocationSize), "Must be a power of 2 between 4KB and 1MB");
             m_shiftLength = BitMath.CountBitsSet((uint)(allocationSize - 1));
             m_pageSize = allocationSize;
             m_invertMask = ~(allocationSize - 1);
@@ -191,13 +191,13 @@ namespace SnapDB.IO.Unmanaged
         public void ConfigureAlignment(long startPosition, int alignment)
         {
             if (startPosition < 0)
-                throw new ArgumentOutOfRangeException("startPosition", "Cannot be negative");
+                throw new ArgumentOutOfRangeException(nameof(startPosition), "Cannot be negative");
             if (alignment <= 0)
-                throw new ArgumentOutOfRangeException("alignment", "Must be a positive factor of the buffer pool's page size.");
+                throw new ArgumentOutOfRangeException(nameof(alignment), "Must be a positive factor of the buffer pool's page size.");
             if (alignment > m_pageSize)
-                throw new ArgumentOutOfRangeException("alignment", "Cannot be greater than the buffer pool's page size.");
+                throw new ArgumentOutOfRangeException(nameof(alignment), "Cannot be greater than the buffer pool's page size.");
             if (m_pageSize % alignment != 0)
-                throw new ArgumentException("Must be an even factor of the buffer pool's page size", "alignment");
+                throw new ArgumentException("Must be an even factor of the buffer pool's page size", nameof(alignment));
 
             m_firstValidPosition = startPosition;
             m_firstAddressablePosition = startPosition - startPosition % alignment;
@@ -301,7 +301,7 @@ namespace SnapDB.IO.Unmanaged
                 while (pageCount > settings.PageCount)
                 {
                     IntPtr pagePointer;
-                    Memory block = new Memory(m_pageSize);
+                    Memory block = new(m_pageSize);
                     pagePointer = block.Address;
                     m_memoryBlocks.Add(block);
                     Memory.Clear(pagePointer, m_pageSize);
@@ -318,7 +318,7 @@ namespace SnapDB.IO.Unmanaged
 
         #endregion
 
-        //ToDo: Consider removing these methods
+        // TODO: Consider removing these methods
         /// <summary>
         /// Reads from the underlying stream the requested set of data. 
         /// This function is more user friendly than calling GetBlock().
@@ -334,7 +334,7 @@ namespace SnapDB.IO.Unmanaged
             if (m_disposed)
                 throw new ObjectDisposedException("MemoryStream");
             if (position < m_firstValidPosition)
-                throw new ArgumentOutOfRangeException("position", "position is before the beginning of the stream");
+                throw new ArgumentOutOfRangeException(nameof(position), "position is before the beginning of the stream");
 
             validLength = m_pageSize;
             firstPosition = ((position - m_firstAddressablePosition) & m_invertMask) + m_firstAddressablePosition;

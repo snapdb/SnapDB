@@ -48,8 +48,8 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     private const int IndexSize = sizeof(uint);
     protected int KeySize;
     protected int ValueSize;
-    protected TKey UpperKey = new TKey();
-    protected TKey LowerKey = new TKey();
+    protected TKey UpperKey = new();
+    protected TKey LowerKey = new();
     private readonly Func<TKey, byte, uint> m_lookupKey;
     private readonly TKey m_tempKey;
     //private TKey m_lowerKey;
@@ -124,7 +124,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     /// <summary>
     /// The number of bytes in the header of any given node.
     /// </summary>
-    protected int HeaderSize { get; private set; }
+    protected int HeaderSize { get; }
     //protected int OffsetOfUpperBounds;
 
     protected SortedTreeScannerBase(byte level, int blockSize, BinaryStreamPointerBase stream, Func<TKey, byte, uint> lookupKey)
@@ -470,7 +470,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     private void LoadNode(uint index)
     {
         if (index == uint.MaxValue)
-            throw new ArgumentNullException("index", "Cannot be uint.MaxValue. Which is null.");
+            throw new ArgumentNullException(nameof(index), "Cannot be uint.MaxValue. Which is null.");
         NodeIndex = index;
 
         RefreshPointer();

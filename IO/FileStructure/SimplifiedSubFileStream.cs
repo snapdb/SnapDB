@@ -62,7 +62,7 @@ internal sealed class SimplifiedSubFileStream
     /// <summary>
     /// The file used by the stream.
     /// </summary>
-    private readonly SubFileHeader m_subFile;
+    private readonly SubFileHeader? m_subFile;
 
 
     #endregion
@@ -74,22 +74,22 @@ internal sealed class SimplifiedSubFileStream
     /// </summary>
     /// <param name="stream">The location to read from.</param>
     /// <param name="subFile">The file to read.</param>
-    /// <param name="fileHeaderBlock">The FileAllocationTable</param>.
-    internal SimplifiedSubFileStream(FileStream stream, SubFileHeader subFile, FileHeaderBlock fileHeaderBlock)
+    /// <param name="fileHeaderBlock">The FileAllocationTable</param>
+    internal SimplifiedSubFileStream(FileStream stream, SubFileHeader? subFile, FileHeaderBlock fileHeaderBlock)
     {
         if (stream is null)
-            throw new ArgumentNullException("stream");
+            throw new ArgumentNullException(nameof(stream));
         if (subFile is null)
-            throw new ArgumentNullException("subFile");
+            throw new ArgumentNullException(nameof(subFile));
         if (fileHeaderBlock is null)
-            throw new ArgumentNullException("fileHeaderBlock");
+            throw new ArgumentNullException(nameof(fileHeaderBlock));
 
         if (subFile.DirectBlock == 0)
             throw new Exception("Must assign subFile.DirectBlock");
         if (fileHeaderBlock.IsReadOnly)
-            throw new ArgumentException("This parameter cannot be read only when opening for writing", "fileHeaderBlock");
+            throw new ArgumentException("This parameter cannot be read only when opening for writing", nameof(fileHeaderBlock));
         if (subFile.IsReadOnly)
-            throw new ArgumentException("This parameter cannot be read only when opening for writing", "subFile");
+            throw new ArgumentException("This parameter cannot be read only when opening for writing", nameof(subFile));
 
         m_blockSize = fileHeaderBlock.BlockSize;
         m_stream = stream;
@@ -101,7 +101,7 @@ internal sealed class SimplifiedSubFileStream
 
     #region [ Properties ]
 
-    internal SubFileHeader SubFile => m_subFile;
+    internal SubFileHeader? SubFile => m_subFile;
 
     /// <summary>
     /// Gets if this file was opened in readonly mode.

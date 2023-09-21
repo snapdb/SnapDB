@@ -183,18 +183,18 @@ internal sealed unsafe class PageList
     /// <param name="e">Arguments for the collection.</param>
     /// <returns>The number of pages returned to the memory pool</returns>
     /// <remarks>If the collection mode is Emergency or Critical, it will only release the required number of pages and no more</remarks>
-    //ToDo: Since i'll be parsing the entire list, rebuilding a new sorted tree may be quicker than removing individual blocks and copying.
-    //ToDo: Also, I should probably change the ShouldCollect callback to an IEnumerable<int>.
+    // TODO: Since i'll be parsing the entire list, rebuilding a new sorted tree may be quicker than removing individual blocks and copying.
+    // TODO: Also, I should probably change the ShouldCollect callback to an IEnumerable<int>.
     public int DoCollection(int shiftLevel, HashSet<int> excludedList, CollectionEventArgs e)
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
         if (shiftLevel < 0)
-            throw new ArgumentOutOfRangeException("shiftLevel", "must be non negative");
+            throw new ArgumentOutOfRangeException(nameof(shiftLevel), "must be non negative");
 
         int collectionCount = 0;
         int maxCollectCount = -1;
-        if (e.CollectionMode == MemoryPoolCollectionMode.Emergency || e.CollectionMode == MemoryPoolCollectionMode.Critical)
+        if (e.CollectionMode is MemoryPoolCollectionMode.Emergency or MemoryPoolCollectionMode.Critical)
         {
             maxCollectCount = e.DesiredPageReleaseCount;
         }

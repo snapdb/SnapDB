@@ -32,10 +32,10 @@ namespace SnapDB.Collections;
 /// <typeparam name="TKey">An IComparable type key that is used to distinguish different resource queues.</typeparam>
 /// <typeparam name="TResource">The type of the resource queue.</typeparam>
 public class ResourceQueueCollection<TKey, TResource>
-    where TResource : class
+    where TResource : class where TKey : notnull
 {
     
-    private readonly SortedList<TKey, ResourceQueue<TResource>> m_list;
+    private readonly SortedList<TKey, ResourceQueue<TResource>?> m_list;
     private readonly Func<TKey, Func<TResource>> m_instanceObject;
     private readonly Func<TKey, int> m_maximumCount;
     private readonly Func<TKey, int> m_initialCount;
@@ -48,7 +48,7 @@ public class ResourceQueueCollection<TKey, TResource>
     /// <param name="initialCount">The initial number of resources in each queue.</param>
     /// <param name="maximumCount">The maximum number of resources in each queue.</param>    
     public ResourceQueueCollection(Func<TResource> instance, int initialCount, int maximumCount)
-        : this(x => instance, x => initialCount, x => maximumCount)
+        : this(_ => instance, _ => initialCount, _ => maximumCount)
     {
     }
 
@@ -60,12 +60,19 @@ public class ResourceQueueCollection<TKey, TResource>
     /// <param name="initialCount">The initial number of resources in each queue.</param>
     /// <param name="maximumCount">The maximum number of resources in each queue.</param>
     public ResourceQueueCollection(Func<TKey, TResource> instance, int initialCount, int maximumCount)
-        : this(key => () => instance(key), x => initialCount, x => maximumCount)
+        : this(key => () => instance(key), _ => initialCount, _ => maximumCount)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ResourceQueueCollection{TKey, TResource}"/> class
+    /// with a custom instance creation function and initial and maximum counts.
+    /// </summary>
+    /// <param name="instance">A function that returns the instance creation function for each key.</param>
+    /// <param name="initialCount">The initial number of resources in each queue.</param>
+    /// <param name="maximumCount">The maximum number of resources in each queue.</param>
     public ResourceQueueCollection(Func<TKey, Func<TResource>> instance, int initialCount, int maximumCount)
-        : this(instance, x => initialCount, x => maximumCount)
+        : this(instance, _ => initialCount, _ => maximumCount)
     {
     }
 
@@ -81,7 +88,7 @@ public class ResourceQueueCollection<TKey, TResource>
         m_instanceObject = instance;
         m_initialCount = initialCount;
         m_maximumCount = maximumCount;
-        m_list = new SortedList<TKey, ResourceQueue<TResource>>();
+        m_list = new SortedList<TKey, ResourceQueue<TResource>?>();
     }
 
     /// <summary>
@@ -89,16 +96,16 @@ public class ResourceQueueCollection<TKey, TResource>
     /// </summary>
     /// <param name="key">The key identifying the resource queue to pull from.</param>
     /// <returns></returns>
-    public ResourceQueue<TResource> this[TKey key] => GetResourceQueue(key);
+    public ResourceQueue<TResource>? this[TKey key] => GetResourceQueue(key);
 
     /// <summary>
     /// Gets the resource queue for a key of this.
     /// </summary>
     /// <param name="key">The key identifying the resource queue to pull from</param>
     /// <returns></returns>
-    public ResourceQueue<TResource> GetResourceQueue(TKey key)
+    public ResourceQueue<TResource>? GetResourceQueue(TKey key)
     {
-        ResourceQueue<TResource> resourceQueue;
+        ResourceQueue<TResource>? resourceQueue;
 
         // Locking ensures thread safety while accessing or creating resource queues.
         lock (m_list)
@@ -111,6 +118,7 @@ public class ResourceQueueCollection<TKey, TResource>
                 m_list.Add(key, resourceQueue);
             }
         }
+
         return resourceQueue;
     }
 }

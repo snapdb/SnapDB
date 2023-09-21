@@ -35,31 +35,31 @@ namespace SnapDB.Immutables;
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class ImmutableList<T>
-    : ImmutableObjectBase<ImmutableList<T>>, IList<T>
+    : ImmutableObjectBase<ImmutableList<T?>>, IList<T?>
 {
     private readonly bool m_isISupportsReadonlyType;
-    private List<T> m_list;
-    private Func<T, T> m_formatter;
+    private List<T?> m_list;
+    private readonly Func<T?, T>? m_formatter;
 
     /// <summary>
     /// Creates a new <see cref="ImmutableList{TKey}"/>.
     /// </summary>
     /// <param name="formatter">Allows items to be formatted when inserted into a list.</param>
-    public ImmutableList(Func<T, T> formatter = null)
+    public ImmutableList(Func<T?, T>? formatter = null)
     {
         m_formatter = formatter;
         m_isISupportsReadonlyType = typeof(IImmutableObject).IsAssignableFrom(typeof(T));
-        m_list = new List<T>();
+        m_list = new List<T?>();
     }
 
     /// <summary>
     /// Creates a new <see cref="ImmutableList{TKey}"/>.
     /// </summary>
-    public ImmutableList(int capacity, Func<T, T> formatter = null)
+    public ImmutableList(int capacity, Func<T?, T>? formatter = null)
     {
         m_formatter = formatter;
         m_isISupportsReadonlyType = typeof(IImmutableObject).IsAssignableFrom(typeof(T));
-        m_list = new List<T>(capacity);
+        m_list = new List<T?>(capacity);
     }
 
     /// <summary>Returns an enumerator that iterates through the collection.</summary>
@@ -81,17 +81,11 @@ public class ImmutableList<T>
     /// <summary>Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1" />.</summary>
     /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
     /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
-    public void Add(T item)
+    public void Add(T? item)
     {
         TestForEditable();
-        if (m_formatter == null)
-        {
-            m_list.Add(item);
-        }
-        else
-        {
-            m_list.Add(m_formatter(item));
-        }
+
+        m_list.Add(m_formatter == null ? item : m_formatter(item));
     }
 
     /// <summary>
@@ -101,17 +95,18 @@ public class ImmutableList<T>
     /// The collection whose elements should be added to the end of the <see cref="T:System.Collections.Generic.List`1"/>. 
     /// The collection itself cannot be null, but it can contain elements that are null.
     /// </param>
-    public void AddRange(IEnumerable<T> collection)
+    public void AddRange(IEnumerable<T?> collection)
     {
         TestForEditable();
+
         if (m_formatter != null)
         {
-            foreach (var item in collection)
-            {
+            foreach (T? item in collection) 
                 m_list.Add(m_formatter(item));
-            }
+
             return;
         }
+
         m_list.AddRange(collection);
     }
 
@@ -129,7 +124,7 @@ public class ImmutableList<T>
     /// </summary>
     /// <returns><c>true</c> if <paramref name="item" /> is found in the <see cref="T:System.Collections.Generic.ICollection`1" />; otherwise, <c>false</c>.</returns>
     /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
-    public bool Contains(T item)
+    public bool Contains(T? item)
     {
         return m_list.Contains(item);
     }
@@ -142,7 +137,7 @@ public class ImmutableList<T>
     /// The <see cref="T:System.Array" /> must have zero-based indexing.
     /// </param>
     /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
-    public void CopyTo(T[] array, int arrayIndex)
+    public void CopyTo(T?[] array, int arrayIndex)
     {
         m_list.CopyTo(array, arrayIndex);
     }
@@ -154,7 +149,7 @@ public class ImmutableList<T>
     /// otherwise, <c>false</c>. This method also returns false if <paramref name="item" /> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1" />.
     /// </returns>
     /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
-    public bool Remove(T item)
+    public bool Remove(T? item)
     {
         TestForEditable();
         return m_list.Remove(item);
@@ -164,29 +159,22 @@ public class ImmutableList<T>
     /// Gets the number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1" />.
     /// </summary>
     /// <returns>The number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1" />.</returns>
-    public int Count
-    {
-        get
-        {
-            return m_list.Count;
-        }
-    }
+    public int Count => m_list.Count;
 
     /// <summary>
     /// Requests that member fields be set to "read-only". 
     /// </summary>
     protected override void SetMembersAsReadOnly()
     {
-        if (m_isISupportsReadonlyType)
+        if (!m_isISupportsReadonlyType)
+            return;
+        
+        for (int x = 0; x < m_list.Count; x++)
         {
-            for (int x = 0; x < m_list.Count; x++)
-            {
-                var item = (IImmutableObject)m_list[x];
-                if (item != null)
-                {
-                    item.IsReadOnly = true;
-                }
-            }
+            IImmutableObject? item = (IImmutableObject?)m_list[x];
+
+            if (item != null) 
+                item.IsReadOnly = true;
         }
     }
 
@@ -197,24 +185,22 @@ public class ImmutableList<T>
     {
         if (m_isISupportsReadonlyType)
         {
-            List<T> oldList = m_list;
-            m_list = new List<T>(oldList.Count);
+            List<T?> oldList = m_list;
+            m_list = new List<T?>(oldList.Count);
+
             for (int x = 0; x < oldList.Count; x++)
             {
-                var item = (IImmutableObject)oldList[x];
+                IImmutableObject? item = (IImmutableObject?)oldList[x];
+
                 if (item == null)
-                {
                     m_list.Add(default);
-                }
                 else
-                {
                     m_list.Add((T)item.CloneEditable());
-                }
             }
         }
         else
         {
-            m_list = new List<T>(m_list);
+            m_list = new List<T?>(m_list);
         }
     }
 
@@ -223,7 +209,7 @@ public class ImmutableList<T>
     /// </summary>
     /// <returns>The index of <paramref name="item" /> if found in the list; otherwise, -1.</returns>
     /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.IList`1" />.</param>
-    public int IndexOf(T item)
+    public int IndexOf(T? item)
     {
         return m_list.IndexOf(item);
     }
@@ -233,17 +219,14 @@ public class ImmutableList<T>
     /// </summary>
     /// <param name="index">The zero-based index at which <paramref name="item" /> should be inserted.</param>
     /// <param name="item">The object to insert into the <see cref="T:System.Collections.Generic.IList`1" />.</param>
-    public void Insert(int index, T item)
+    public void Insert(int index, T? item)
     {
         TestForEditable();
+
         if (m_formatter == null)
-        {
             m_list.Insert(index, item);
-        }
         else
-        {
             m_list.Insert(index, m_formatter(item));
-        }
     }
 
     /// <summary>
@@ -263,10 +246,7 @@ public class ImmutableList<T>
     /// <param name="index">The zero-based index of the element to get or set.</param>
     public T this[int index]
     {
-        get
-        {
-            return m_list[index];
-        }
+        get => m_list[index];
         set
         {
             TestForEditable();

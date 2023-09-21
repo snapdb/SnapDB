@@ -24,7 +24,6 @@
 //
 //******************************************************************************************************
 
-
 using System.Reflection;
 
 namespace SnapDB.Immutables;
@@ -39,12 +38,13 @@ public abstract class ImmutableObjectAutoBase<T>
     where T : ImmutableObjectAutoBase<T>
 {
     // ReSharper disable once StaticFieldInGenericType
-    private static List<FieldInfo> s_readonlyFields;
+    private static readonly List<FieldInfo> s_readonlyFields;
 
     static ImmutableObjectAutoBase()
     {
         s_readonlyFields = new List<FieldInfo>();
         Type newType = typeof(IImmutableObject);
+
         foreach (FieldInfo field in typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
         {
             if (newType.IsAssignableFrom(field.FieldType))
@@ -59,7 +59,7 @@ public abstract class ImmutableObjectAutoBase<T>
     {
         foreach (FieldInfo field in s_readonlyFields)
         {
-            IImmutableObject value = (IImmutableObject)field.GetValue(this);
+            IImmutableObject value = (IImmutableObject)field.GetValue(this)!;
             value.IsReadOnly = true;
         }
     }
@@ -71,7 +71,7 @@ public abstract class ImmutableObjectAutoBase<T>
     {
         foreach (FieldInfo field in s_readonlyFields)
         {
-            IImmutableObject value = (IImmutableObject)field.GetValue(this);
+            IImmutableObject value = (IImmutableObject)field.GetValue(this)!;
             field.SetValue(this, value.CloneEditable());
         }
     }

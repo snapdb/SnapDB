@@ -39,7 +39,7 @@ public partial class UnmanagedMemoryStream
         public IoSession(UnmanagedMemoryStream stream)
         {
             if (stream is null)
-                throw new ArgumentNullException("stream");
+                throw new ArgumentNullException(nameof(stream));
             m_stream = stream;
         }
 

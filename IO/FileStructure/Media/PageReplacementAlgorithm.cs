@@ -74,7 +74,7 @@ internal partial class PageReplacementAlgorithm
         if (pool.PageSize < 4096)
             throw new ArgumentOutOfRangeException("PageSize Must be greater than 4096", "pool");
         if (!BitMath.IsPowerOfTwo(pool.PageSize))
-            throw new ArgumentException("PageSize Must be a power of 2", "pool");
+            throw new ArgumentException("PageSize Must be a power of 2", nameof(pool));
 
         m_maxValidPosition = (int.MaxValue - 1) * (long)pool.PageSize; //Max position 
 
@@ -116,11 +116,11 @@ internal partial class PageReplacementAlgorithm
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
             if (position < 0)
-                throw new ArgumentOutOfRangeException("position", "Cannot be negative");
+                throw new ArgumentOutOfRangeException(nameof(position), "Cannot be negative");
             if (position > m_maxValidPosition)
-                throw new ArgumentOutOfRangeException("position", "Position index can no longer be specified as an Int32");
+                throw new ArgumentOutOfRangeException(nameof(position), "Position index can no longer be specified as an Int32");
             if ((position & m_memoryPageSizeMask) != 0)
-                throw new ArgumentOutOfRangeException("position", "must lie on a page boundary");
+                throw new ArgumentOutOfRangeException(nameof(position), "must lie on a page boundary");
             int positionIndex = (int)(position >> m_memoryPageSizeShiftBits);
 
             if (m_pageList.TryGetPageIndex(positionIndex, out int pageIndex))
@@ -143,7 +143,7 @@ internal partial class PageReplacementAlgorithm
             if (m_disposed)
                 return 0;
 
-            HashSet<int> pages = new HashSet<int>(m_arrayIndexLocks.Select(pageLock => pageLock.CurrentPageIndex));
+            HashSet<int> pages = new(m_arrayIndexLocks.Select(pageLock => pageLock.CurrentPageIndex));
 
             return m_pageList.DoCollection(1, pages, e);
         }

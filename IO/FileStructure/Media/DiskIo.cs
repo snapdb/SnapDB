@@ -52,7 +52,7 @@ internal sealed class DiskIo : IDisposable
     private DiskIo(DiskMedium stream, bool isReadOnly)
     {
         if (stream is null)
-            throw new ArgumentNullException("stream");
+            throw new ArgumentNullException(nameof(stream));
         m_isReadOnly = isReadOnly;
         m_blockSize = stream.BlockSize;
         m_stream = stream;
@@ -169,7 +169,7 @@ internal sealed class DiskIo : IDisposable
     /// Creates a <see cref="DiskIoSession"/> that can be used to perform basic read/write functions.
     /// </summary>
     /// <returns></returns>
-    public DiskIoSession CreateDiskIoSession(FileHeaderBlock header, SubFileHeader file)
+    public DiskIoSession CreateDiskIoSession(FileHeaderBlock header, SubFileHeader? file)
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);

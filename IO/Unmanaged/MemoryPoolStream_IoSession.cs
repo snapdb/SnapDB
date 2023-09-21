@@ -42,7 +42,7 @@ public partial class MemoryPoolStream
         public IoSession(MemoryPoolStream stream)
         {
             if (stream is null)
-                throw new ArgumentNullException("stream");
+                throw new ArgumentNullException(nameof(stream));
             m_stream = stream;
         }
 

@@ -101,8 +101,10 @@ public class SecureStreamServer<T>
         : base(MessageClass.Component)
     {
         m_syncRoot = new object();
-        m_state = new State();
-        m_state.ContainsDefaultCredentials = false;
+        m_state = new State
+        {
+            ContainsDefaultCredentials = false
+        };
         InvalidateAllTickets();
         m_userTokens = new Dictionary<Guid, T>();
         //m_srp = new SrpServer();
@@ -264,7 +266,7 @@ public class SecureStreamServer<T>
             stream2.Write(false);
             stream2.Flush();
 
-            //ToDo: Support resume tickets
+            // TODO: Support resume tickets
             //byte[] ticket;
             //byte[] secret;
             //CreateResumeTicket(userToken, out ticket, out secret);
@@ -389,7 +391,7 @@ public class SecureStreamServer<T>
 
         fixed (byte* lp = ticket)
         {
-            BinaryStreamPointerWrapper stream = new BinaryStreamPointerWrapper(lp, ticket.Length);
+            BinaryStreamPointerWrapper stream = new(lp, ticket.Length);
             if (stream.ReadUInt8() != 1)
                 return false;
 
@@ -431,19 +433,17 @@ public class SecureStreamServer<T>
 
             byte[] encryptedData = stream.ReadBytes(encryptedLength);
 
-            using (Aes aes = Cipher.CreateAes())
-            {
-                aes.Key = state.ServerEncryptionkey;
-                aes.IV = initializationVector;
-                aes.Mode = CipherMode.CBC;
-                aes.Padding = PaddingMode.None;
-                ICryptoTransform decrypt = aes.CreateDecryptor();
-                encryptedData = decrypt.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
+            using Aes aes = Cipher.CreateAes();
+            aes.Key = state.ServerEncryptionkey;
+            aes.IV = initializationVector;
+            aes.Mode = CipherMode.CBC;
+            aes.Padding = PaddingMode.None;
+            ICryptoTransform decrypt = aes.CreateDecryptor();
+            encryptedData = decrypt.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
 
-                sessionSecret = new byte[32];
-                Array.Copy(encryptedData, 0, sessionSecret, 0, 32);
-                userToken = encryptedData.ToRfcGuid(32);
-            }
+            sessionSecret = new byte[32];
+            Array.Copy(encryptedData, 0, sessionSecret, 0, 32);
+            userToken = encryptedData.ToRfcGuid(32);
 
             return true;
         }
@@ -477,26 +477,25 @@ public class SecureStreamServer<T>
         userTokenBytes.CopyTo(dataToEncrypt, sessionSecret.Length);
         ticket = new byte[ticketSize];
 
-        using (Aes aes = Cipher.CreateAes())
-        {
-            aes.Key = state.ServerEncryptionkey;
-            aes.IV = initializationVector;
-            aes.Mode = CipherMode.CBC;
-            aes.Padding = PaddingMode.None;
-            ICryptoTransform decrypt = aes.CreateEncryptor();
-            byte[] encryptedData = decrypt.TransformFinalBlock(dataToEncrypt, 0, dataToEncrypt.Length);
+        using Aes aes = Cipher.CreateAes();
+        aes.Key = state.ServerEncryptionkey;
+        aes.IV = initializationVector;
+        aes.Mode = CipherMode.CBC;
+        aes.Padding = PaddingMode.None;
+        ICryptoTransform decrypt = aes.CreateEncryptor();
+        byte[] encryptedData = decrypt.TransformFinalBlock(dataToEncrypt, 0, dataToEncrypt.Length);
 
-            fixed (byte* lp = ticket)
-            {
-                BinaryStreamPointerWrapper stream = new BinaryStreamPointerWrapper(lp, ticket.Length);
-                stream.Write((byte)1);
-                stream.Write(state.ServerKeyName);
-                stream.Write(DateTime.UtcNow.RoundDownToNearestMinute());
-                stream.Write(initializationVector);
-                stream.Write(encryptedData); //Encrypted data, 32 byte session key, n byte user token
-                stream.Write(HMAC<Sha256Digest>.Compute(state.ServerHMACKey, ticket, 0, ticket.Length - 32));
-            }
+        fixed (byte* lp = ticket)
+        {
+            BinaryStreamPointerWrapper stream = new(lp, ticket.Length);
+            stream.Write((byte)1);
+            stream.Write(state.ServerKeyName);
+            stream.Write(DateTime.UtcNow.RoundDownToNearestMinute());
+            stream.Write(initializationVector);
+            stream.Write(encryptedData); //Encrypted data, 32 byte session key, n byte user token
+            stream.Write(HMAC<Sha256Digest>.Compute(state.ServerHMACKey, ticket, 0, ticket.Length - 32));
         }
+
 #endif
     }
 }

@@ -34,9 +34,9 @@ namespace SnapDB.Collections;
 /// NextIndexOfNull-like functions is provided as well.
 /// </summary>
 /// <typeparam name="T">The type.</typeparam>
-public class NullableLargeArray<T> : IEnumerable<T>
+public class NullableLargeArray<T> : IEnumerable<T?>
 {
-    private readonly LargeArray<T> m_list;
+    private readonly LargeArray<T?> m_list;
     private readonly BitArray m_isUsed;
 
     /// <summary>
@@ -44,7 +44,7 @@ public class NullableLargeArray<T> : IEnumerable<T>
     /// </summary>
     public NullableLargeArray()
     {
-        m_list = new LargeArray<T>();
+        m_list = new LargeArray<T?>();
         m_isUsed = new BitArray(false, m_list.Capacity);
     }
 
@@ -64,20 +64,16 @@ public class NullableLargeArray<T> : IEnumerable<T>
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns><c>True</c> if the item exists; otherwise, <c>false</c> if null.</returns>
-    public bool TryGetValue(int index, out T value)
+    public bool TryGetValue(int index, out T? value)
     {
         if (HasValue(index))
         {
             value = m_list[index];
-
             return true;
         }
-        else
-        {
-            value = default;
 
-            return false;
-        }
+        value = default;
+        return false;
     }
 
     /// <summary>
@@ -100,7 +96,7 @@ public class NullableLargeArray<T> : IEnumerable<T>
     /// </summary>
     /// <param name="index">The index of the item.</param>
     /// <returns>The item at the specified index.</returns>
-    public T this[int index]
+    public T? this[int index]
     {
         get => GetValue(index);
         set => SetValue(index, value);
@@ -118,6 +114,7 @@ public class NullableLargeArray<T> : IEnumerable<T>
             m_list.SetCapacity(length);
             m_isUsed.SetCapacity(m_list.Capacity);
         }
+
         return Capacity;
     }
 
@@ -126,7 +123,7 @@ public class NullableLargeArray<T> : IEnumerable<T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns>The item from the specified index.</returns>
-    public T GetValue(int index)
+    public T? GetValue(int index)
     {
         if (!HasValue(index))
             throw new NullReferenceException();
@@ -149,7 +146,7 @@ public class NullableLargeArray<T> : IEnumerable<T>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
-    public void SetValue(int index, T value)
+    public void SetValue(int index, T? value)
     {
         m_isUsed.SetBit(index);
         m_list[index] = value;
@@ -160,7 +157,7 @@ public class NullableLargeArray<T> : IEnumerable<T>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
-    public void OverwriteValue(int index, T value)
+    public void OverwriteValue(int index, T? value)
     {
         if (!HasValue(index))
             throw new IndexOutOfRangeException("Index does not exist.");
@@ -174,9 +171,10 @@ public class NullableLargeArray<T> : IEnumerable<T>
     /// </summary>
     /// <param name="value">The value to add.</param>
     /// <returns>The index where the value was placed.</returns>
-    public int AddValue(T value)
+    public int AddValue(T? value)
     {
         int index = FindFirstEmptyIndex();
+
         if (index < 0)
         {
             SetCapacity(Capacity + 1);
@@ -195,10 +193,9 @@ public class NullableLargeArray<T> : IEnumerable<T>
     /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
     /// </returns>
     /// <filterpriority>1</filterpriority>
-    public IEnumerator<T> GetEnumerator()
+    public IEnumerator<T?> GetEnumerator()
     {
-        foreach (int index in m_isUsed.GetAllSetBits())
-            yield return m_list[index];
+        return m_isUsed.GetAllSetBits().Select(index => m_list[index]).GetEnumerator();
     }
 
     private int FindFirstEmptyIndex()

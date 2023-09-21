@@ -93,7 +93,7 @@ public class TransactionalFileStructure
     public static TransactionalFileStructure CreateFile(string fileName, int blockSize, params Guid[] flags)
     {
         if (fileName is null)
-            throw new ArgumentNullException("fileName");
+            throw new ArgumentNullException(nameof(fileName));
         if (File.Exists(fileName))
             throw new Exception("fileName Already Exists");
 
@@ -107,7 +107,7 @@ public class TransactionalFileStructure
     public static TransactionalFileStructure OpenFile(string fileName, bool isReadOnly)
     {
         if (fileName is null)
-            throw new ArgumentNullException("fileName");
+            throw new ArgumentNullException(nameof(fileName));
         if (!File.Exists(fileName))
             throw new Exception("fileName Does Not Exists");
 
@@ -149,7 +149,7 @@ public class TransactionalFileStructure
         if (m_diskIo.IsReadOnly)
             throw new Exception("File has been opened in readonly mode");
 
-        TransactionalEdit transaction = new TransactionalEdit(m_diskIo, OnTransactionRolledBack, OnTransactionCommitted);
+        TransactionalEdit transaction = new(m_diskIo, OnTransactionRolledBack, OnTransactionCommitted);
         Interlocked.CompareExchange(ref m_currentTransaction, transaction, null);
         if (m_currentTransaction != transaction)
             throw new Exception("Only one edit transaction can exist at one time.");

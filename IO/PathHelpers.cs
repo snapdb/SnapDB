@@ -44,7 +44,7 @@ public static class PathHelpers
     public static string FormatExtension(string extension)
     {
         if (string.IsNullOrWhiteSpace(extension))
-            throw new ArgumentNullException("extension", "Extension cannot be null or empty space");
+            throw new ArgumentNullException(nameof(extension), "Extension cannot be null or empty space");
 
         extension = extension.Trim();
 
@@ -58,10 +58,10 @@ public static class PathHelpers
             throw new ArgumentException("Invalid Extension. Contains too many periods.");
 
         if (extension.Length == 1)
-            throw new ArgumentException("Invalid Extension. Must contain more than just a period.", "extension");
+            throw new ArgumentException("Invalid Extension. Must contain more than just a period.", nameof(extension));
 
         if (extension.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
-            throw new ArgumentException("Extension has invalid characters.", "extension");
+            throw new ArgumentException("Extension has invalid characters.", nameof(extension));
 
         return extension;
     }
@@ -76,7 +76,7 @@ public static class PathHelpers
     public static void ValidateFileName(string fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))
-            throw new ArgumentNullException("fileName", "Extension cannot be null or empty space");
+            throw new ArgumentNullException(nameof(fileName), "Extension cannot be null or empty space");
 
         if (fileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
             throw new ArgumentException("filename has invalid characters.", "value");
@@ -92,7 +92,7 @@ public static class PathHelpers
     public static void ValidatePathName(string pathName)
     {
         if (string.IsNullOrWhiteSpace(pathName))
-            throw new ArgumentNullException("pathName", "Extension cannot be null or empty space");
+            throw new ArgumentNullException(nameof(pathName), "Extension cannot be null or empty space");
 
         if (pathName.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
             throw new ArgumentException("filename has invalid characters.", "value");

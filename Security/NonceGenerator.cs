@@ -48,13 +48,11 @@ public unsafe class NonceGenerator
     public NonceGenerator(int length)
     {
         if (length < 16)
-            throw new ArgumentOutOfRangeException("length", "Cannot be less than 16");
+            throw new ArgumentOutOfRangeException(nameof(length), "Cannot be less than 16");
         m_nonceNumber = 0;
         m_startingNonce = new byte[length];
-        using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
-        {
-            rng.GetBytes(m_startingNonce);
-        }
+        using RNGCryptoServiceProvider rng = new();
+        rng.GetBytes(m_startingNonce);
     }
 
     /// <summary>
