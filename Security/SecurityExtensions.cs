@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  8/23/2014 - Steven E. Chisholm
+//  08/23/2014 - Steven E. Chisholm
 //       Generated original version of source code. 
 //
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using Gemstone.ArrayExtensions;
@@ -37,7 +38,7 @@ public static class SecurityExtensions
     /// <param name="b"></param>
     /// <returns>true if both arrays are equal</returns>
     /// <remarks>
-    /// If a or b is null, function returns immediately with a false.
+    /// If a or b is <c>null</c>, function returns immediately with a <c>false</c>.
     /// 
     /// Certain cryptographic attacks can occur by comparing the amount of time it
     /// takes to do certain operations. Comparing two byte arrays is one example.
@@ -65,7 +66,7 @@ public static class SecurityExtensions
     /// <param name="bLength">the length of <see cref="b"/> to read past <see cref="bPosition"/></param>
     /// <returns>true if both arrays are equal</returns>
     /// <remarks>
-    /// If a or b is null, function returns immediately with a false.
+    /// If a or b is <c>null</c>, function returns immediately with a <c>false</c>.
     /// 
     /// Certain cryptographic attacks can occur by comparing the amount of time it
     /// takes to do certain operations. Comparing two byte arrays is one example.
@@ -86,15 +87,15 @@ public static class SecurityExtensions
     }
 
     /// <summary>
-    /// Does a time constant comparison of the two Guids. 
+    /// Does a time constant comparison of the two GUIDs. 
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
-    /// <returns>true if both Guids are equal</returns>
+    /// <returns><c>true</c> if both GUIDs are equal</returns>
     /// <remarks>
     /// Certain cryptographic attacks can occur by comparing the amount of time it
     /// takes to do certain operations. Comparing two byte arrays is one example.
-    /// Therefore this method should take constant time to do a comparison of two Guids.
+    /// Therefore this method should take constant time to do a comparison of two GUIDs.
     /// </remarks>
     [MethodImpl(MethodImplOptions.NoOptimization)]
     public unsafe static bool SecureEquals(this Guid a, Guid b)

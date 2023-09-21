@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  8/26/2014 - Steven E. Chisholm
+//  08/26/2014 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.Security;

@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  12/8/2012 - Steven E. Chisholm
+//  12/08/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using System.Net.Sockets;
@@ -78,9 +79,8 @@ public class NetworkBinaryStream
     }
 
     /// <summary>
-    /// Disconnects the socket.  Does not throw an exception.
+    /// Disconnects the socket. Does not throw an exception.
     /// </summary>
-    /// <remarks></remarks>
     public void Disconnect()
     {
         Socket socket = Interlocked.Exchange(ref m_socket, null);

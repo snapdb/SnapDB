@@ -18,11 +18,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  8/29/2014 - Steven E. Chisholm
+//  08/29/2014 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using System.Numerics;
@@ -53,9 +54,8 @@ public static class GenerateCertificate
     }
 
     /// <summary>
-    /// Creates new certificate
+    /// Creates new certificate.
     /// </summary>
-    /// <returns></returns>
     public static void CreateSelfSignedCertificate(string subjectDirName, DateTime startDate, DateTime endDate, int signatureBits, int keyStrength, string password, string fileName)
     {
         string signatureAlgorithm;
@@ -124,7 +124,7 @@ public static class GenerateCertificate
 
 
     /// <summary>
-    /// Creates a self signed certificate that can be used in SSL communications
+    /// Creates a self signed certificate that can be used in SSL communications.
     /// </summary>
     /// <param name="subjectDirName">A valid DirName formated string. Example: CN=ServerName</param>
     /// <param name="signatureBits">Bitstrength of signature algorithm. Supported Lengths are 160,256, and 384 </param>
