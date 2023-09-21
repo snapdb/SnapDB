@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  8/18/2012 - Steven E. Chisholm
+//  08/18/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.IO.Unmanaged;
@@ -69,7 +70,7 @@ public class CollectionEventArgs : EventArgs
     }
 
     /// <summary>
-    /// The mode for the collection
+    /// The mode for the collection.
     /// </summary>
     public MemoryPoolCollectionMode CollectionMode
     {
@@ -93,7 +94,7 @@ public class CollectionEventArgs : EventArgs
     /// <summary>
     /// Releases an unused page.
     /// </summary>
-    /// <param name="index">the index of the page</param>
+    /// <param name="index">The index of the page.</param>
     public void ReleasePage(int index)
     {
         m_releasePage(index);
