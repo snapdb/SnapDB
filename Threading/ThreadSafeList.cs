@@ -106,7 +106,7 @@ public partial class ThreadSafeList<T>
         if (itemToRemove is null)
             return false;
 
-        while (Interlocked.CompareExchange(ref itemToRemove.ReferencedCount, -1, 0) != 0)
+        while (Interlocked.CompareExchange(ref itemToRemove.ReferencedCount, -1, 0) is not 0)
         {
             wait.SpinOnce();
         }

@@ -205,10 +205,10 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
 
     protected bool PeekCatchAll(TKey key, TValue value)
     {
-        //If there are no more records in the current node.
+        // If there are no more records in the current node.
         if (IndexOfNextKeyValue >= RecordCount)
         {
-            //If the last leaf node, return false
+            // If the last leaf node, return <c>false</c>.
             if (RightSiblingNodeIndex == uint.MaxValue)
             {
                 key.Clear();
@@ -218,7 +218,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
             }
             LoadNode(RightSiblingNodeIndex);
         }
-        //if the pointer data is no longer valid, refresh the pointer
+        // If the pointer data is no longer valid, refresh the pointer.
         if (Stream.PointerVersion != PointerVersion)
         {
             RefreshPointer();
@@ -239,11 +239,11 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     /// </summary>
     /// <param name="key">Where to store the key</param>
     /// <param name="value">Where to store the value</param>
-    /// <param name="upperBounds">the test condition. Will return false if the returned point would have 
+    /// <param name="upperBounds">the test condition. Will return <c>false</c> if the returned point would have 
     /// exceeded this value</param>
     /// <returns>
-    /// Returns true if the point returned is valid. 
-    /// Returns false if:
+    /// Returns <c>true</c> if the point returned is valid. 
+    /// Returns <c>false</c> if:
     ///     The point read is greater than or equal to <see cref="upperBounds"/>.
     ///     The end of the stream is reached.
     ///     The end of the current node has been reached.
@@ -252,7 +252,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     {
         if (Stream.PointerVersion == PointerVersion)
         {
-            //A light weight function that can be called quickly since 99% of the time, this logic statement will return successfully.
+            // A light weight function that can be called quickly since 99% of the time, this logic statement will return successfully.
             if (IndexOfNextKeyValue < RecordCount)
             {
                 if (UpperKey.IsLessThan(upperBounds))
@@ -268,10 +268,10 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
 
     protected bool ReadWhileCatchAll(TKey key, TValue value, TKey upperBounds)
     {
-        //If there are no more records in the current node.
+        // If there are no more records in the current node.
         if (IndexOfNextKeyValue >= RecordCount)
         {
-            //If the last leaf node, return false
+            // If the last leaf node, return <c>false</c>
             if (RightSiblingNodeIndex == uint.MaxValue)
             {
                 key.Clear();
@@ -281,12 +281,12 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
             }
             LoadNode(RightSiblingNodeIndex);
         }
-        //if the pointer data is no longer valid, refresh the pointer
+        // If the pointer data is no longer valid, refresh the pointer.
         if (Stream.PointerVersion != PointerVersion)
         {
             RefreshPointer();
         }
-        //Reads the next key in the sequence.
+        // Reads the next key in the sequence.
         if (UpperKey.IsLessThan(upperBounds))
         {
             InternalRead(key, value);
@@ -301,14 +301,14 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     /// but stops short of returning the point that is equal to
     /// the provided key.
     /// </summary>
-    /// <param name="key">Where to store the key</param>
-    /// <param name="value">Where to store the value</param>
-    /// <param name="upperBounds">the test condition. Will return false if the returned point would have 
+    /// <param name="key">Where to store the key.</param>
+    /// <param name="value">Where to store the value.</param>
+    /// <param name="upperBounds">the test condition. Will return <c>false</c> if the returned point would have 
     /// exceeded this value</param>
     /// <param name="filter">the filter to apply to the reading.</param>
     /// <returns>
     /// Returns true if the point returned is valid. 
-    /// Returns false if:
+    /// Returns <c>false</c> if:
     ///     The point read is greater than or equal to <see cref="upperBounds"/>.
     ///     The end of the stream is reached.
     ///     The end of the current node has been reached.
@@ -328,10 +328,10 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
 
     protected bool ReadWhileCatchAll(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue> filter)
     {
-        //If there are no more records in the current node.
+        // If there are no more records in the current node.
         if (IndexOfNextKeyValue >= RecordCount)
         {
-            //If the last leaf node, return false
+            // If the last leaf node, return false
             if (RightSiblingNodeIndex == uint.MaxValue)
             {
                 key.Clear();
@@ -360,14 +360,14 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
 
     /// <summary>
     /// Advances the stream to the next value. 
-    /// If before the beginning of the stream, advances to the first value
+    /// If before the beginning of the stream, advances to the first value.
     /// </summary>
-    /// <returns>True if the advance was successful. False if the end of the stream was reached.</returns>
+    /// <returns><c>true</c> if the advance was successful; otherwise, <c>false</c> if the end of the stream was reached.</returns>
     protected override bool ReadNext(TKey key, TValue value)
     {
         if (Stream.PointerVersion == PointerVersion)
         {
-            //A light weight function that can be called quickly since 99% of the time, this logic statement will return successfully.
+            // A light weight function that can be called quickly since 99% of the time, this logic statement will return successfully.
             if (IndexOfNextKeyValue < RecordCount)
             {
                 InternalRead(key, value);
@@ -386,13 +386,12 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     /// </summary>
     /// <param name="key"></param>
     /// <param name="value"></param>
-    /// <returns></returns>
     public bool ReadBackwardish(TKey key, TValue value)
     {
-        //If there are no more records in the current node.
+        // If there are no more records in the current node.
         if (IndexOfNextKeyValue >= RecordCount)
         {
-            //If the last leaf node, return false
+            // If the last leaf node, return false
             if (LeftSiblingNodeIndex == uint.MaxValue)
             {
                 key.Clear();
@@ -402,26 +401,26 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
             }
             LoadNode(LeftSiblingNodeIndex);
         }
-        //if the pointer data is no longer valid, refresh the pointer
+        // If the pointer data is no longer valid, refresh the pointer.
         if (Stream.PointerVersion != PointerVersion)
         {
             RefreshPointer();
         }
-        //Reads the next key in the sequence.
+        // Reads the next key in the sequence.
         InternalRead(key, value);
+
         return true;
     }
 
     /// <summary>
     /// A catch all read function. That can be called if overriding <see cref="Read"/> in a derived class.
     /// </summary>
-    /// <returns></returns>
     protected bool ReadCatchAll(TKey key, TValue value)
     {
-        //If there are no more records in the current node.
+        // If there are no more records in the current node.
         if (IndexOfNextKeyValue >= RecordCount)
         {
-            //If the last leaf node, return false
+            // If the last leaf node, return false
             if (RightSiblingNodeIndex == uint.MaxValue)
             {
                 key.Clear();
@@ -431,12 +430,12 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
             }
             LoadNode(RightSiblingNodeIndex);
         }
-        //if the pointer data is no longer valid, refresh the pointer
+        // If the pointer data is no longer valid, refresh the pointer.
         if (Stream.PointerVersion != PointerVersion)
         {
             RefreshPointer();
         }
-        //Reads the next key in the sequence.
+        // Reads the next key in the sequence.
         InternalRead(key, value);
         return true;
     }
@@ -466,8 +465,10 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     /// Loads the header data for the provided node.
     /// </summary>
     /// <param name="index">the node index</param>
-    /// <exception cref="ArgumentNullException">occurs when <see cref="index"/>
-    /// is equal to uint.MaxValue.</exception>
+    /// <exception cref="ArgumentNullException">
+    /// occurs when <see cref="index"/>
+    /// is equal to uint.MaxValue.
+    /// </exception>
     private void LoadNode(uint index)
     {
         if (index == uint.MaxValue)
@@ -500,8 +501,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     /// <summary>
     /// Gets the block index when seeking for the provided key.
     /// </summary>
-    /// <param name="key">the key to start the search from.</param>
-    /// <returns></returns>
+    /// <param name="key">The key to start the search from.</param>
     protected uint FindLeafNodeAddress(TKey key)
     {
         return m_lookupKey(key, m_level);

@@ -387,13 +387,13 @@ public class SecureStreamServer<T>
         //  byte[]    Encrypted Session Data 32+16
         //  byte[32]  HMAC (Sha2-256)
 
-        if (ticket is null || ticket.Length != ticketSize)
+        if (ticket is null || ticket.Length is not ticketSize)
             return false;
 
         fixed (byte* lp = ticket)
         {
             BinaryStreamPointerWrapper stream = new(lp, ticket.Length);
-            if (stream.ReadUInt8() != 1)
+            if (stream.ReadUInt8() is not 1)
                 return false;
 
             if (!state.ServerKeyName.SecureEquals(stream.ReadGuid()))

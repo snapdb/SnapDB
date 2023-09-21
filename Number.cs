@@ -44,7 +44,7 @@ public static class Number
         }
 
 
-        //Any number outside of this range will take the exponent form,
+        // Any number outside of this range will take the exponent form,
         // and I'd rather not have to deal with this.
         const float MaxValue = 9999999f;
         const float MinValue = -9999999f;
@@ -53,7 +53,7 @@ public static class Number
 
         if (value > MaxValue || value < MinValue || value < ZeroMax && value > ZeroMin)
         {
-            //Not worth coding for this case.
+            // Not worth coding for this case.
             string T = value.ToString(CultureInfo.InvariantCulture);
             for (int x = 0; x < T.Length; x++)
             {
@@ -82,15 +82,15 @@ public static class Number
         double scaled = value * PowersOf10d[fracPrecision];
         uint number = (uint)scaled;
 
-        //Do the rounding
+        // Do the rounding
         double fraction = scaled - number;
         if (fraction >= 0.5)
         {
-            //Round
+            // Round
             number++;
         }
 
-        //Write the number
+        // Write the number
         ulong bcd = BinToReverseBCD(number);
 
         if (wholePrecision <= 0)
@@ -281,11 +281,11 @@ public static class Number
 
             if (value >= Digits5)
             {
-                //5,6,7,8,9,10
+                // 5,6,7,8,9,10
 
                 if (value >= Digits8)
                 {
-                    //8,9,10
+                    // 8,9,10
                     if (value >= Digits10)
                         goto Digits10;
                     if (value >= Digits9)
@@ -294,7 +294,7 @@ public static class Number
 
                 }
 
-                //5,6,7
+                // 5,6,7
                 if (value >= Digits7)
                     goto Digits7;
                 if (value >= Digits6)
@@ -302,16 +302,16 @@ public static class Number
                 goto Digits5;
             }
 
-            //1,2,3,4
+            // 1,2,3,4
             if (value >= Digits3)
             {
-                //3 or 4
+                // 3 or 4
                 if (value >= Digits4)
                     goto Digits4;
                 goto Digits3;
             }
 
-            //1 or 2
+            // 1 or 2
             if (value >= Digits2)
                 goto Digits2;
             goto Digits1;
@@ -398,7 +398,6 @@ public static class Number
     /// This means what was the Most Significant Digit is now the lease significant digit.
     /// </summary>
     /// <param name="value"></param>
-    /// <returns></returns>
     private static ulong BinToReverseBCD(this uint value)
     {
         ulong result = 0;

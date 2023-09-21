@@ -366,7 +366,7 @@ public class SortedTreeFile
     public void Delete()
     {
         Dispose();
-        if (m_filePath != string.Empty)
+        if (m_filePath is not string.Empty)
         {
             File.Delete(m_filePath);
         }

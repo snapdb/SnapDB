@@ -24,6 +24,7 @@
 //
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using Gemstone.ArrayExtensions;
@@ -67,12 +68,12 @@ public class IsolatedQueue<T>
         public bool DequeueMustMoveToNextNode => m_tail == m_lastBlock;
 
         /// <summary>
-        /// Gets if there are items that can be dequeued
+        /// Gets if there are items that can be dequeued.
         /// </summary>
         public bool CanDequeue => m_head != m_tail;
 
         /// <summary>
-        /// Gets if this list can be enqueued
+        /// Gets if this list can be enqueued.
         /// </summary>
         public bool CanEnqueue => m_head != m_lastBlock;
 
@@ -84,7 +85,7 @@ public class IsolatedQueue<T>
         public void Enqueue(T item)
         {
             m_blocks[m_head] = item;
-            //No memory barior here since .NET 2.0 ensures that writes will not be reordered.
+            // No memory barrier here since .NET 2.0 ensures that writes will not be reordered.
             m_head = m_head + 1;
         }
 
@@ -93,7 +94,7 @@ public class IsolatedQueue<T>
         {
             T item = m_blocks[m_tail];
             m_blocks[m_tail] = default(T);
-            //No memory barior here since .NET 2.0 ensures that writes will not be reordered.
+            // No memory barrier here since .NET 2.0 ensures that writes will not be reordered.
             m_tail = m_tail + 1;
             return item;
         }
@@ -176,10 +177,9 @@ public class IsolatedQueue<T>
     }
 
     /// <summary>
-    /// Attempts to dequeue the specified item from the <see cref="IsolatedQueue{T}"/>
+    /// Attempts to dequeue the specified item from the <see cref="IsolatedQueue{T}"/>.
     /// </summary>
-    /// <param name="item">an output for the item</param>
-    /// <returns></returns>
+    /// <param name="item">an output for the item.</param>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public bool TryDequeue(out T item)
     {
@@ -224,9 +224,9 @@ public class IsolatedQueue<T>
     /// <summary>
     /// Adds the provided items to the <see cref="IsolatedQueue{T}"/>.
     /// </summary>
-    /// <param name="items">the items to add</param>
-    /// <param name="offset">the offset position</param>
-    /// <param name="length">the length</param>
+    /// <param name="items">The items to add.</param>
+    /// <param name="offset">The offset position.</param>
+    /// <param name="length">The length.</param>
     public void Enqueue(T[] items, int offset, int length)
     {
         items.ValidateParameters(offset, length);
@@ -237,12 +237,12 @@ public class IsolatedQueue<T>
     }
 
     /// <summary>
-    /// Dequeues all of the items into the provided array
+    /// Dequeues all of the items into the provided array.
     /// </summary>
-    /// <param name="items">where to put the items</param>
-    /// <param name="startingIndex">the starting index</param>
-    /// <param name="length">the maximum number of times to store</param>
-    /// <returns>the number of items dequeued</returns>
+    /// <param name="items">Where to put the items.</param>
+    /// <param name="startingIndex">The starting index.</param>
+    /// <param name="length">The maximum number of times to store.</param>
+    /// <returns>The number of items dequeued.</returns>
     public int Dequeue(T[] items, int startingIndex, int length)
     {
         items.ValidateParameters(startingIndex, length);
