@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  9/30/2013 - Steven E. Chisholm
+//  09/30/2013 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using Gemstone;
@@ -88,7 +89,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
             int bigIndex = index >> ShiftBits;
             int smallIndex = index & Mask;
             m_pagePointer[bigIndex][smallIndex] = pagePointer;
-            Thread.MemoryBarrier(); //Incrementing the page count must occur after the data is correct.
+            Thread.MemoryBarrier(); // Incrementing the page count must occur after the data is correct.
             PageCount++;
         }
 
@@ -108,7 +109,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     private volatile Settings m_settings;
 
     /// <summary>
-    /// The first position that can be accessed by users of this stream
+    /// The first position that can be accessed by users of this stream.
     /// </summary>
     private long m_firstValidPosition;
 
@@ -116,7 +117,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
 
     /// <summary>
     /// The first position of this stream. This may be different from <see cref="m_firstValidPosition"/> 
-    /// due to alignment requirements
+    /// due to alignment requirements.
     /// </summary>
     private long m_firstAddressablePosition;
 
@@ -175,7 +176,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// <summary>
     /// Configure the natural alignment of the data.
     /// </summary>
-    /// <param name="startPosition">The first addressable position</param>
+    /// <param name="startPosition">The first addressable position.</param>
     public void ConfigureAlignment(long startPosition)
     {
         ConfigureAlignment(startPosition, 1);
@@ -184,9 +185,11 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// <summary>
     /// Configure the natural alignment of the data.
     /// </summary>
-    /// <param name="startPosition">The first addressable position</param>
-    /// <param name="alignment">Forces alignment on this boundary.
-    /// Alignment must be a factor of the BufferPool's page boudary.</param>
+    /// <param name="startPosition">The first addressable position.</param>
+    /// <param name="alignment">
+    /// Forces alignment on this boundary.
+    /// Alignment must be a factor of the BufferPool's page boundary.
+    /// </param>
     public void ConfigureAlignment(long startPosition, int alignment)
     {
         if (startPosition < 0)
@@ -203,7 +206,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     }
 
     /// <summary>
-    /// Gets a block for the following Io session.
+    /// Gets a block for the following IO session.
     /// </summary>
     public void GetBlock(BlockArguments args)
     {
@@ -236,7 +239,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// <summary>
     /// Releases the unmanaged resources used by the <see cref="MemoryFile"/> object and optionally releases the managed resources.
     /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     private void Dispose(bool disposing)
     {
         if (!m_disposed)
@@ -321,14 +324,14 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// Reads from the underlying stream the requested set of data. 
     /// This function is more user friendly than calling GetBlock().
     /// </summary>
-    /// <param name="position">the starting position of the read</param>
+    /// <param name="position">the starting position of the read.</param>
     /// <param name="pointer">an output pointer to <see cref="position"/>.</param>
     /// <param name="validLength">the number of bytes that are valid after this position.</param>
-    /// <returns></returns>
     public void ReadBlock(long position, out IntPtr pointer, out int validLength)
     {
         if (m_disposed)
             throw new ObjectDisposedException("MemoryStream");
+
         if (position < m_firstValidPosition)
             throw new ArgumentOutOfRangeException(nameof(position), "position is before the beginning of the stream");
 

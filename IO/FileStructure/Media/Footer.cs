@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  2/9/2013 - Steven E. Chisholm
+//  02/09/2013 - Steven E. Chisholm
 //       Generated original version of source code. 
 //
 //  09/15/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using Gemstone;
