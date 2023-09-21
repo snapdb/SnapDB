@@ -16,7 +16,7 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  4/26/2012 - Steven E. Chisholm
+//  04/26/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //
 //  09/15/2023 - Lillian Gensolin
@@ -31,33 +31,33 @@ namespace SnapDB.IO.Unmanaged;
 public class BlockArguments
 {
     /// <summary>
-    /// the block returned must contain this position
+    /// The block returned must contain this position.
     /// </summary>
     public long Position;
 
     /// <summary>
-    /// indicates if the stream plans to write to this block
+    /// Indicates if the stream plans to write to this block.
     /// </summary>
     public bool IsWriting;
 
     /// <summary>
-    /// the pointer for the first byte of the block
+    /// The pointer for the first byte of the block.
     /// </summary>
     public IntPtr FirstPointer;
 
     /// <summary>
-    /// the position that corresponds to <see cref="FirstPointer"/>
+    /// The position that corresponds to <see cref="FirstPointer"/>.
     /// </summary>
     public long FirstPosition;
 
     /// <summary>
-    /// the length of the block
+    /// The length of the block.
     /// </summary>
     public int Length;
 
     /// <summary>
-    /// notifies the calling class if this block supports 
-    /// writing without requiring this function to be called again if <see cref="IsWriting"/> was set to false.
+    /// Notifies the calling class if this block supports 
+    /// writing without requiring this function to be called again if <see cref="IsWriting"/> was set to <c>false</c>.
     /// </summary>
     public bool SupportsWriting;
 }
