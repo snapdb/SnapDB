@@ -1,4 +1,4 @@
-﻿//******************************************************************************************************
+ok﻿//******************************************************************************************************
 //  ISupportsBinaryStream.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
@@ -16,7 +16,7 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  2/11/2012 - Steven E. Chisholm
+//  02/11/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //
 //  09/15/2023 - Lillian Gensolin
@@ -32,10 +32,10 @@ public interface ISupportsBinaryStream
     : IDisposable
 {
     /// <summary>
-    /// Gets the number of available simultaneous read/write sessions.
+    /// Gets the number of available simultaneous read and write sessions.
     /// </summary>
     /// <remarks>This value is used to determine if a binary stream can be cloned
-    /// to improve read/write/copy performance.</remarks>
+    /// to improve read, write, and copy performance.</remarks>
     int RemainingSupportedIoSessions
     {
         get;
@@ -58,7 +58,7 @@ public interface ISupportsBinaryStream
     }
 
     /// <summary>
-    /// Aquire an IO Session.
+    /// Acquire an IO Session.
     /// </summary>
     BinaryStreamIoSessionBase CreateIoSession();
 }
