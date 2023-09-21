@@ -21,19 +21,20 @@
 //       
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.Threading;
 
 /// <summary>
-/// A read lock object
+/// A read lock object.
 /// </summary>
 public struct DisposableReadLock
     : IDisposable
 {
     private ReaderWriterLock m_l;
     /// <summary>
-    /// Creates a read lock
+    /// Creates a read lock.
     /// </summary>
     /// <param name="l"></param>
     public DisposableReadLock(ReaderWriterLock l)
@@ -53,14 +54,14 @@ public struct DisposableReadLock
 }
 
 /// <summary>
-/// A read lock object
+/// A read lock object.
 /// </summary>
 public struct DisposableWriteLock
     : IDisposable
 {
     private ReaderWriterLock m_l;
     /// <summary>
-    /// Creates a read lock
+    /// Creates a read lock.
     /// </summary>
     /// <param name="l"></param>
     public DisposableWriteLock(ReaderWriterLock l)
@@ -90,7 +91,6 @@ public class ReaderWriterLockEasy
     /// <summary>
     /// Enters a read lock. Be sure to call within a using block.
     /// </summary>
-    /// <returns></returns>
     public DisposableReadLock EnterReadLock()
     {
         return new DisposableReadLock(m_lock);

@@ -21,6 +21,7 @@
 //     
 //  09/19/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.Snap;
@@ -29,8 +30,8 @@ namespace SnapDB.Snap;
 /// <summary>
 /// Provides ability to seek and stream KeyValues.
 /// </summary>
-/// <typeparam name="TKey">The key of the pair</typeparam>
-/// <typeparam name="TValue">The value of the pair</typeparam>
+/// <typeparam name="TKey">The key of the pair.</typeparam>
+/// <typeparam name="TValue">The value of the pair.</typeparam>
 public abstract class SeekableTreeStream<TKey, TValue>
     : TreeStream<TKey, TValue>
     where TKey : class, new()
@@ -38,7 +39,7 @@ public abstract class SeekableTreeStream<TKey, TValue>
 {
 
     /// <summary>
-    /// Seeks the stream to the first value greater than or equal to <see cref="key"/>
+    /// Seeks the stream to the first value greater than or equal to <see cref="key"/>.
     /// </summary>
     /// <param name="key">the key to seek to.</param>
     public abstract void SeekToKey(TKey key);

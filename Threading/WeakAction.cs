@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  1/16/2013 - Steven E. Chisholm
+//  01/16/2013 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.Threading;
@@ -38,7 +39,7 @@ public class WeakAction : WeakDelegateBase<Action>
     /// <summary>
     /// Attempts to invoke the delegate to a weak reference object.
     /// </summary>
-    /// <returns>True if successful, false if not</returns>
+    /// <returns><c>true</c> if successful, <c>false</c> if not.</returns>
     public bool TryInvoke()
     {
         return TryInvokeInternal(null);

@@ -21,6 +21,7 @@
 //       
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using System.Runtime.CompilerServices;
@@ -29,18 +30,18 @@ namespace SnapDB.Threading;
 
 /// <summary>
 /// Since 64 bit reads/asignments are not atomic on a 32-bit process, this class
-/// wrapps the <see cref="Interlocked"/> class to if using a 32-bit process to ensure
-/// atomic reads/writes.
+/// wraps the <see cref="Interlocked"/> class to if using a 32-bit process to ensure
+/// atomic reads and writes.
 /// </summary>
 public class AtomicInt64
 {
     //Note: This is a class and not a struct to prevent users from copying the struct value
-    //      which would result in a non-atomic clone of the struct.  
+    // which would result in a non-atomic clone of the struct.  
 
     private long m_value;
 
     /// <summary>
-    /// Creates a new AtomicInt64
+    /// Creates a new AtomicInt64.
     /// </summary>
     /// <param name="value"></param>
     public AtomicInt64(long value = 0)
@@ -49,7 +50,7 @@ public class AtomicInt64
     }
 
     /// <summary>
-    /// Gets/Sets the value
+    /// Gets or sets the value.
     /// </summary>
     public long Value
     {
@@ -71,10 +72,9 @@ public class AtomicInt64
     }
 
     /// <summary>
-    /// Converts to a long
+    /// Converts to a long.
     /// </summary>
     /// <param name="value"></param>
-    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator long(AtomicInt64 value)
     {

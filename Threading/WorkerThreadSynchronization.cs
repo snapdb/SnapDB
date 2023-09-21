@@ -19,7 +19,8 @@
 //  05/17/2014 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
-//
+//  09/20/2023 - Lillian Gensolin
+//       Converted code to .NET core.
 //******************************************************************************************************
 
 using System.Runtime.CompilerServices;
@@ -74,7 +75,7 @@ public class WorkerThreadSynchronization
         }
 
         /// <summary>
-        /// Disposes of the callback
+        /// Disposes of the callback.
         /// </summary>
         public void Dispose()
         {
@@ -82,7 +83,7 @@ public class WorkerThreadSynchronization
         }
 
         /// <summary>
-        /// Executes the callback item
+        /// Executes the callback item.
         /// </summary>
         public void Run()
         {
@@ -104,7 +105,7 @@ public class WorkerThreadSynchronization
     private volatile bool m_isSafeToCallback;
 
     /// <summary>
-    /// Only to be set within lock(m_syncRoot)
+    /// Only to be set within lock(m_syncRoot).
     /// </summary>
     private volatile bool m_isCallbackWaiting;
 
@@ -186,10 +187,10 @@ public class WorkerThreadSynchronization
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void BeginSafeToCallbackRegion()
     {
-        //Do a double tap so locking is not required.
-        //This method will cordinate with RequestCallback
+        // Do a double tap so locking is not required.
+        // This method will cordinate with RequestCallback
         m_isSafeToCallback = true;
-        Thread.MemoryBarrier(); //Since volatile reads can be reordered above writes.
+        Thread.MemoryBarrier(); // Since volatile reads can be reordered above writes.
         if (m_isCallbackWaiting)
         {
             ExecuteAllCallbacks();
@@ -203,11 +204,11 @@ public class WorkerThreadSynchronization
     public void EndSafeToCallbackRegion()
     {
         m_isSafeToCallback = false;
-        Thread.MemoryBarrier(); //Since volatile reads can be reordered above writes.
+        Thread.MemoryBarrier(); // Since volatile reads can be reordered above writes.
         if (m_isRequestCallbackMethodProcessing || m_isCallbackWaiting)
         {
-            //If I set m_isSafeToCallback while RequestCallback was running,
-            //I need to check and see if the RequestCallback got the message.
+            // If I set m_isSafeToCallback while RequestCallback was running,
+            // I need to check and see if the RequestCallback got the message.
             ExecuteAllCallbacks();
         }
     }

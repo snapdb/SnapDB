@@ -16,7 +16,7 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  1/26/2013 - Steven E. Chisholm
+//  01/26/2013 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/18/2023 - Lillian Gensolin
@@ -53,7 +53,7 @@ public partial class ThreadSafeList<T>
     private long m_version;
 
     /// <summary>
-    /// Creates a new <see cref="ThreadSafeList{T}"/>
+    /// Creates a new <see cref="ThreadSafeList{T}"/>.
     /// </summary>
     public ThreadSafeList()
     {
@@ -64,9 +64,9 @@ public partial class ThreadSafeList<T>
     }
 
     /// <summary>
-    /// Adds the supplied item to the list
+    /// Adds the supplied item to the list.
     /// </summary>
-    /// <param name="item">The item to add</param>
+    /// <param name="item">The item to add.</param>
     public void Add(T item)
     {
         lock (m_syncRoot)
@@ -80,12 +80,11 @@ public partial class ThreadSafeList<T>
     /// <summary>
     /// Removes an item from the list. 
     /// This method will block until the item has successfully been removed 
-    /// and will no longer show up in the Iterator.
+    /// and will no longer show up in the iterator.
     /// DO NOT call this function from within a ForEach loop as it will block indefinately
     /// since the for each loop reads all items.
     /// </summary>
     /// <param name="item"></param>
-    /// <returns></returns>
     public bool RemoveAndWait(T item)
     {
         SpinWait wait = new();
@@ -118,7 +117,6 @@ public partial class ThreadSafeList<T>
     /// Removes an item from the list. 
     /// </summary>
     /// <param name="item"></param>
-    /// <returns></returns>
     public bool Remove(T item)
     {
         Wrapper itemToRemove = null;
@@ -143,7 +141,7 @@ public partial class ThreadSafeList<T>
     }
 
     /// <summary>
-    /// Removes the specified item if the lamda expression is true.
+    /// Removes the specified item if the lambda expression is true.
     /// </summary>
     /// <param name="condition"></param>
     public void RemoveIf(Func<T, bool> condition)
@@ -177,7 +175,8 @@ public partial class ThreadSafeList<T>
     /// Returns an enumerator that iterates through the collection.
     /// </summary>
     /// <returns>
-    /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
+    /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to 
+    /// iterate through the collection.
     /// </returns>
     /// <filterpriority>1</filterpriority>
     public IEnumerator<T> GetEnumerator()

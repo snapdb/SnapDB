@@ -19,6 +19,8 @@
 //  12/19/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //
+// 09/21/2023 - Lillian Gensolin
+//       Converted code to .NET core.
 //******************************************************************************************************
 
 namespace SnapDB.Snap;
@@ -26,7 +28,7 @@ namespace SnapDB.Snap;
 public static class Stats
 {
     /// <summary>
-    /// Checks how many times the checksum was computed.  This is used to see IO amplification.
+    /// Checks how many times the checksum was computed. This is used to see IO amplification.
     /// It is currently a debug term that will soon disappear.
     /// </summary>
     public static long ChecksumCount;

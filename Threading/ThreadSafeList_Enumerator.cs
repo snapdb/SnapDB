@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  1/26/2013 - Steven E. Chisholm
+//  01/26/2013 - Steven E. Chisholm
 //       Generated original version of source code. 
-//       
+//
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using System.Collections;
@@ -30,7 +31,7 @@ namespace SnapDB.Threading;
 public partial class ThreadSafeList<T>
 {
     /// <summary>
-    /// The Enumerator for a <see cref="ThreadSafeList{T}"/>
+    /// The Enumerator for a <see cref="ThreadSafeList{T}"/>.
     /// </summary>
     private class Enumerator : IEnumerator<T>
     {
@@ -75,9 +76,10 @@ public partial class ThreadSafeList<T>
         /// Advances the enumerator to the next element of the collection.
         /// </summary>
         /// <returns>
-        /// true if the enumerator was successfully advanced to the next element; false if the enumerator has passed the end of the collection.
+        /// <c>true</c> if the enumerator was successfully advanced to the next element; <c>false</c> if the enumerator has passed the end of the collection.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created. </exception><filterpriority>2</filterpriority>
+        /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+        /// <filterpriority>2</filterpriority>
         public bool MoveNext()
         {
             if (m_disposed)
@@ -92,7 +94,8 @@ public partial class ThreadSafeList<T>
         /// <summary>
         /// Sets the enumerator to its initial position, which is before the first element in the collection.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created. </exception><filterpriority>2</filterpriority>
+        /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+        /// <filterpriority>2</filterpriority>
         public void Reset()
         {
             if (m_disposed)

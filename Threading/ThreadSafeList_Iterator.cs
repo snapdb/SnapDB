@@ -16,11 +16,12 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  1/26/2013 - Steven E. Chisholm
+//  01/26/2013 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
 //  09/18/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.Threading;
@@ -28,7 +29,7 @@ namespace SnapDB.Threading;
 public partial class ThreadSafeList<T>
 {
     /// <summary>
-    /// Parses through a list in a thread safe mannor.
+    /// Parses through a list in a thread safe manner.
     /// </summary>
     private class Iterator
     {
@@ -50,14 +51,13 @@ public partial class ThreadSafeList<T>
         /// result in a infinite loop. Therefore wrap each call in a Try/Finally block.
         /// </summary>
         /// <param name="item">an output parameter for the next item</param>
-        /// <returns></returns>
         public bool UnsafeTryGetNextItem(out T item)
         {
             if (m_itemCurrentlyLocked is not null)
                 throw new Exception("Invalid use of ThreadSafeIterator. Must Call Unregister before calling another TryGetNextItem");
 
             Wrapper currentObject = null;
-            //Get the next item in the list.
+            // Get the next item in the list.
             lock (m_list.m_syncRoot)
             {
                 IList<long> keys = m_list.m_list.Keys;
@@ -88,7 +88,7 @@ public partial class ThreadSafeList<T>
 
         /// <summary>
         /// Should be called each time after <see cref="UnsafeTryGetNextItem"/>.
-        /// Note, it is optional to call this function if <see cref="UnsafeTryGetNextItem"/> returns false.
+        /// Note, it is optional to call this function if <see cref="UnsafeTryGetNextItem"/> returns <c>false</c>.
         /// </summary>
         public void UnsafeUnregisterItem()
         {

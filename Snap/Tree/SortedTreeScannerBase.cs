@@ -21,6 +21,7 @@
 //     
 //  09/19/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using SnapDB.IO;
@@ -52,8 +53,8 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     protected TKey LowerKey = new();
     private readonly Func<TKey, byte, uint> m_lookupKey;
     private readonly TKey m_tempKey;
-    //private TKey m_lowerKey;
-    //private TKey m_upperKey;
+    // private TKey m_lowerKey;
+    // private TKey m_upperKey;
     protected SnapTypeCustomMethods<TKey> KeyMethods;
 
     /// <summary>
@@ -95,7 +96,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     }
 
     /// <summary>
-    /// Gets the byte offset of the upper bounds key
+    /// Gets the byte offset of the upper bounds key.
     /// </summary>
     private int OffsetOfUpperBounds => OffsetOfLowerBounds + KeySize;
 
@@ -117,7 +118,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
 
     /// <summary>
     /// The index number of the next key/value that needs to be read.
-    /// The valid range of this field is [0, RecordCount - 1]
+    /// The valid range of this field is [0, RecordCount - 1].
     /// </summary>
     protected int IndexOfNextKeyValue;
 
@@ -125,22 +126,22 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     /// The number of bytes in the header of any given node.
     /// </summary>
     protected int HeaderSize { get; }
-    //protected int OffsetOfUpperBounds;
+    // protected int OffsetOfUpperBounds;
 
     protected SortedTreeScannerBase(byte level, int blockSize, BinaryStreamPointerBase stream, Func<TKey, byte, uint> lookupKey)
     {
         m_tempKey = new TKey();
-        //m_lowerKey = new TKey();
-        //m_upperKey = new TKey();
+        // m_lowerKey = new TKey();
+        // m_upperKey = new TKey();
         m_lookupKey = lookupKey;
         m_level = level;
 
-        //m_currentNode = new Node(stream, blockSize);
+        // m_currentNode = new Node(stream, blockSize);
         KeyMethods = m_tempKey.CreateValueMethods();
         KeySize = new TKey().Size;
         ValueSize = new TValue().Size;
 
-        //OffsetOfUpperBounds = OffsetOfLowerBounds + KeySize;
+        // OffsetOfUpperBounds = OffsetOfLowerBounds + KeySize;
         HeaderSize = OffsetOfLowerBounds + 2 * KeySize;
         m_blockSize = blockSize;
         Stream = stream;
@@ -150,13 +151,13 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     }
 
     /// <summary>
-    /// Gets if the stream is always in sequential order. Do not return true unless it is Guaranteed that 
+    /// Gets if the stream is always in sequential order. Do not return true unless it is guaranteed that 
     /// the data read from this stream is sequential.
     /// </summary>
     public override bool IsAlwaysSequential => true;
 
     /// <summary>
-    /// Gets if the stream will never return duplicate keys. Do not return true unless it is Guaranteed that 
+    /// Gets if the stream will never return duplicate keys. Do not return true unless it is guaranteed that 
     /// the data read from this stream will never contain duplicates.
     /// </summary>
     public override bool NeverContainsDuplicates => true;
@@ -172,9 +173,9 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     protected abstract bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue> filter);
 
     /// <summary>
-    /// Using <see cref="Pointer"/> advance to the search location of the provided <see cref="key"/>
+    /// Using <see cref="Pointer"/> advance to the search location of the provided <see cref="key"/>.
     /// </summary>
-    /// <param name="key">the key to advance to</param>
+    /// <param name="key">the key to advance to.</param>
     protected abstract void FindKey(TKey key);
 
     #region [ Peek ]
@@ -452,7 +453,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     }
 
     /// <summary>
-    /// Seeks the stream to the first value greater than or equal to <see cref="key"/>
+    /// Seeks the stream to the first value greater than or equal to <see cref="key"/>.
     /// </summary>
     /// <param name="key">the key to seek to.</param>
     public override void SeekToKey(TKey key)
@@ -466,7 +467,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     /// </summary>
     /// <param name="index">the node index</param>
     /// <exception cref="ArgumentNullException">occurs when <see cref="index"/>
-    /// is equal to uint.MaxValue</exception>
+    /// is equal to uint.MaxValue.</exception>
     private void LoadNode(uint index)
     {
         if (index == uint.MaxValue)

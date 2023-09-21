@@ -24,6 +24,7 @@
 //     
 //  09/19/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.Snap;
@@ -93,39 +94,39 @@ public class SnapTypeCustomMethods<T>
             LastFoundIndex = Math.Min(LastFoundIndex, recordCount - 1);
 
             compare = key.CompareTo(pointer + keyPointerSize * LastFoundIndex);
-            if (compare == 0) //Are Equal
+            if (compare == 0) // Are Equal
                 return LastFoundIndex;
-            if (compare > 0) //Key > CompareKey
+            if (compare > 0) // Key > CompareKey
             {
-                //Value is greater, check the next key
+                // Value is greater, check the next key.
                 LastFoundIndex++;
 
-                //There is no greater key
+                // There is no greater key.
                 if (LastFoundIndex == recordCount)
                     return ~recordCount;
 
                 compare = key.CompareTo(pointer + keyPointerSize * LastFoundIndex);
 
-                if (compare == 0) //Are Equal
+                if (compare == 0) // Are Equal.
                     return LastFoundIndex;
-                if (compare > 0) //Key > CompareKey
+                if (compare > 0) // Key > CompareKey.
                     searchLowerBoundsIndex = LastFoundIndex + 1;
                 else
                     return ~LastFoundIndex;
             }
             else
             {
-                //Value is lesser, check the previous key
-                //There is no lesser key;
+                // Value is lesser, check the previous key.
+                // There is no lesser key.
                 if (LastFoundIndex == 0)
                     return ~0;
 
                 LastFoundIndex--;
                 compare = key.CompareTo(pointer + keyPointerSize * LastFoundIndex);
 
-                if (compare == 0) //Are Equal
+                if (compare == 0) // Are Equal.
                     return LastFoundIndex;
-                if (compare > 0) //Key > CompareKey
+                if (compare > 0) // Key > CompareKey.
                 {
                     LastFoundIndex++;
                     return ~LastFoundIndex;
@@ -141,12 +142,12 @@ public class SnapTypeCustomMethods<T>
 
             compare = key.CompareTo(pointer + keyPointerSize * currentTestIndex);
 
-            if (compare == 0) //Are Equal
+            if (compare == 0) // Are Equal.
             {
                 LastFoundIndex = currentTestIndex;
                 return currentTestIndex;
             }
-            if (compare > 0) //Key > CompareKey
+            if (compare > 0) // Key > CompareKey.
                 searchLowerBoundsIndex = currentTestIndex + 1;
             else
                 searchHigherBoundsIndex = currentTestIndex - 1;
@@ -164,7 +165,6 @@ public class SnapTypeCustomMethods<T>
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
-    /// <returns></returns>
     public virtual unsafe bool IsGreaterThan(T left, byte* right)
     {
         return CompareTo(left, right) > 0;
@@ -175,18 +175,16 @@ public class SnapTypeCustomMethods<T>
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
-    /// <returns></returns>
     public virtual unsafe bool IsGreaterThan(byte* left, T right)
     {
         return CompareTo(left, right) > 0;
     }
 
     /// <summary>
-    /// Compares Left to Right
+    /// Compares left to right
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
-    /// <returns></returns>
     public virtual unsafe int CompareTo(T left, byte* right)
     {
         TempKey.Read(right);
@@ -198,7 +196,6 @@ public class SnapTypeCustomMethods<T>
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
-    /// <returns></returns>
     public virtual unsafe int CompareTo(byte* left, T right)
     {
         TempKey.Read(left);

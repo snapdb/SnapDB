@@ -21,15 +21,16 @@
 //       
 //  09/19/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 namespace SnapDB.Snap;
 
 /// <summary>
-/// Represents a stream of KeyValues
+/// Represents a stream of KeyValues.
 /// </summary>
-/// <typeparam name="TKey">The key associated with the point</typeparam>
-/// <typeparam name="TValue">The value associated with the point</typeparam>
+/// <typeparam name="TKey">The key associated with the point.</typeparam>
+/// <typeparam name="TValue">The value associated with the point.</typeparam>
 public abstract class TreeStream<TKey, TValue> : IDisposable
     where TKey : class, new()
     where TValue : class, new()
@@ -43,13 +44,13 @@ public abstract class TreeStream<TKey, TValue> : IDisposable
     public bool EOS => m_eos;
 
     /// <summary>
-    /// Gets if the stream is always in sequential order. Do not return true unless it is Guaranteed that 
+    /// Gets if the stream is always in sequential order. Do not return true unless it is guaranteed that 
     /// the data read from this stream is sequential.
     /// </summary>
     public virtual bool IsAlwaysSequential => false;
 
     /// <summary>
-    /// Gets if the stream will never return duplicate keys. Do not return true unless it is Guaranteed that 
+    /// Gets if the stream will never return duplicate keys. Do not return true unless it is guaranteed that 
     /// the data read from this stream will never contain duplicates.
     /// </summary>
     public virtual bool NeverContainsDuplicates => false;
@@ -58,7 +59,7 @@ public abstract class TreeStream<TKey, TValue> : IDisposable
     /// Advances the stream to the next value. 
     /// If before the beginning of the stream, advances to the first value
     /// </summary>
-    /// <returns>True if the advance was successful. False if the end of the stream was reached.</returns>
+    /// <returns><c>true</c> if the advance was successful; otherwise, <c>false</c> if the end of the stream was reached.</returns>
     public bool Read(TKey key, TValue value)
     {
         if (m_eos || !ReadNext(key, value))
@@ -80,8 +81,10 @@ public abstract class TreeStream<TKey, TValue> : IDisposable
     /// <summary>
     /// Allow rolling back the EOS
     /// </summary>
-    /// <exception cref="ObjectDisposedException">Thrown if <see cref="value"/> is <see cref="Boolean.False"/> and this class
-    /// has already been disposed</exception>
+    /// <exception cref="ObjectDisposedException">
+    /// Thrown if <see cref="value"/> is <see cref="Boolean.False"/> and this class
+    /// has already been disposed.
+    /// </exception>
     protected void SetEos(bool value)
     {
         if (m_disposed && !value)
@@ -93,7 +96,9 @@ public abstract class TreeStream<TKey, TValue> : IDisposable
     /// Advances the stream to the next value. 
     /// If before the beginning of the stream, advances to the first value
     /// </summary>
-    /// <returns>True if the advance was successful. False if the end of the stream was reached.</returns>
+    /// <returns>
+    /// <c>true</c> if the advance was successful; <c>false</c> if the end of the stream was reached.
+    /// </returns>
     protected abstract bool ReadNext(TKey key, TValue value);
 
     /// <summary>
@@ -120,7 +125,7 @@ public abstract class TreeStream<TKey, TValue> : IDisposable
     /// <summary>
     /// Releases the unmanaged resources used by the <see cref="TreeStream{TKey,TValue}"/> object and optionally releases the managed resources.
     /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
         m_eos = true;
