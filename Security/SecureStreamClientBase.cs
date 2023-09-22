@@ -29,7 +29,6 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using Gemstone.Diagnostics;
 using Gemstone.IO.StreamExtensions;
-using GSF.Security;
 
 namespace SnapDB.Security;
 

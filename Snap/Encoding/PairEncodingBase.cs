@@ -24,8 +24,6 @@
 //
 //******************************************************************************************************
 
-using GSF.IO;
-using GSF.IO.Unmanaged;
 using SnapDB.IO.Unmanaged;
 using SnapDB.IO;
 

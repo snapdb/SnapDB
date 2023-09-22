@@ -24,10 +24,7 @@
 //
 //******************************************************************************************************
 
-using System;
-using GSF.IO;
 using SnapDB.IO;
-using SnapDB.Snap.Encoding;
 
 namespace SnapDB.Snap.Encoding;
 
@@ -36,7 +33,7 @@ namespace SnapDB.Snap.Encoding;
 /// </summary>
 internal class IndividualEncodingFixedSize<T>
     : IndividualEncodingBase<T>
-    where T : SnapTypeBase<T>, new()
+    where T : SnapTypeBaseOfT<T>, new()
 {
     private readonly int m_size;
 

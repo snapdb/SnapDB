@@ -24,9 +24,6 @@
 //
 //******************************************************************************************************
 
-using System;
-using System.Collections.Generic;
-using GSF.Snap.Definitions;
 using SnapDB.Snap.Definitions;
 
 namespace SnapDB.Snap.Encoding;

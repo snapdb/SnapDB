@@ -24,8 +24,6 @@
 //
 //******************************************************************************************************
 
-using System;
-using GSF.IO;
 using SnapDB.IO;
 
 namespace SnapDB.Snap.Encoding;
