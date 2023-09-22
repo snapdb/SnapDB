@@ -24,6 +24,8 @@
 //
 //******************************************************************************************************
 
+using SnapDB.Snap.Definitions;
+
 namespace SnapDB.Snap.Encoding;
 
 /// <summary>
@@ -66,7 +68,7 @@ public class EncodingLibrary
     /// <param name="encodingMethod"></param>
     /// <returns></returns>
     public IndividualEncodingBase<T> GetEncodingMethod<T>(Guid encodingMethod)
-        where T : SnapTypeBase<T>, new()
+        where T : SnapTypeBaseOfT<T>, new()
     {
         if (encodingMethod == EncodingDefinition.FixedSizeIndividualGuid)
             return new IndividualEncodingFixedSize<T>();
@@ -85,8 +87,8 @@ public class EncodingLibrary
     /// <param name="encodingMethod"></param>
     /// <returns></returns>
     public PairEncodingBase<TKey, TValue> GetEncodingMethod<TKey, TValue>(EncodingDefinition encodingMethod)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         if (encodingMethod.IsFixedSizeEncoding)
             return new PairEncodingFixedSize<TKey, TValue>();
