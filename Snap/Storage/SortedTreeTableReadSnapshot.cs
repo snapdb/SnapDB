@@ -35,8 +35,8 @@ namespace SnapDB.Snap.Storage;
 /// </summary>
 public class SortedTreeTableReadSnapshot<TKey, TValue>
     : IDisposable
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TValue : SnapTypeBaseOfT<TValue>, new()
 {
     #region [ Members ]
 

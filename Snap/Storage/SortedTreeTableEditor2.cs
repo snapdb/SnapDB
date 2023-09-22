@@ -32,8 +32,8 @@ namespace SnapDB.Snap.Storage;
 /// </summary>
 public abstract class SortedTreeTableEditor<TKey, TValue>
     : IDisposable
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TValue : SnapTypeBaseOfT<TValue>, new()
 {
     private bool m_disposed;
 

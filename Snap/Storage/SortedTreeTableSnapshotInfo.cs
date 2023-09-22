@@ -33,8 +33,8 @@ namespace SnapDB.Snap.Storage;
 /// transactions to have snapshot isolation of the entire data set.
 /// </summary>
 public class SortedTreeTableSnapshotInfo<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TValue : SnapTypeBaseOfT<TValue>, new()
 {
     #region [ Members ]
 

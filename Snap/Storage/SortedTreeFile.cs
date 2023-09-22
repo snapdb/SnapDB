@@ -192,8 +192,8 @@ public class SortedTreeFile
     /// </remarks>
     /// <returns>null if table does not exist</returns>
     public SortedTreeTable<TKey, TValue> OpenTable<TKey, TValue>()
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         return OpenTable<TKey, TValue>(GetFileName<TKey, TValue>());
     }
@@ -209,8 +209,8 @@ public class SortedTreeFile
     /// </remarks>
     /// <returns>null if table does not exist</returns>
     public SortedTreeTable<TKey, TValue> OpenTable<TKey, TValue>(string tableName)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         return OpenTable<TKey, TValue>(GetFileName<TKey, TValue>(tableName));
     }
@@ -223,8 +223,8 @@ public class SortedTreeFile
     /// <param name="fileName">the filename to open</param>
     /// <returns>null if table does not exist</returns>
     private SortedTreeTable<TKey, TValue> OpenTable<TKey, TValue>(SubFileName fileName)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         if (!m_openedFiles.ContainsKey(fileName))
         {
@@ -246,8 +246,8 @@ public class SortedTreeFile
     /// <param name="tableName">the name of an internal table</param>
     /// <returns></returns>
     public SortedTreeTable<TKey, TValue> OpenOrCreateTable<TKey, TValue>(EncodingDefinition storageMethod, string tableName, int maxSortedTreeBlockSize = 4096)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         if (storageMethod is null)
             throw new ArgumentNullException(nameof(storageMethod));
@@ -266,8 +266,8 @@ public class SortedTreeFile
     /// <param name="maxSortedTreeBlockSize">the maximum desired block size for a SortedTree. Must be at least 1024.</param>
     /// <returns></returns>
     public SortedTreeTable<TKey, TValue> OpenOrCreateTable<TKey, TValue>(EncodingDefinition storageMethod, int maxSortedTreeBlockSize = 4096)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         if (storageMethod is null)
             throw new ArgumentNullException(nameof(storageMethod));
@@ -277,8 +277,8 @@ public class SortedTreeFile
     }
 
     private SortedTreeTable<TKey, TValue> OpenOrCreateTable<TKey, TValue>(EncodingDefinition storageMethod, SubFileName fileName, int maxSortedTreeBlockSize)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         if (!m_openedFiles.ContainsKey(fileName))
         {
@@ -296,8 +296,8 @@ public class SortedTreeFile
     /// <typeparam name="TValue"></typeparam>
     /// <returns></returns>
     private SubFileName GetFileName<TKey, TValue>()
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         Guid keyType = new TKey().GenericTypeGuid;
         Guid valueType = new TValue().GenericTypeGuid;
@@ -305,8 +305,8 @@ public class SortedTreeFile
     }
 
     private SubFileName GetFileName<TKey, TValue>(string fileName)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         Guid keyType = new TKey().GenericTypeGuid;
         Guid valueType = new TValue().GenericTypeGuid;
@@ -314,8 +314,8 @@ public class SortedTreeFile
     }
 
     private void CreateArchiveFile<TKey, TValue>(SubFileName fileName, EncodingDefinition storageMethod, int maxSortedTreeBlockSize)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         if (maxSortedTreeBlockSize < 1024)
             throw new ArgumentOutOfRangeException(nameof(maxSortedTreeBlockSize), "Must be greater than 1024");

@@ -39,7 +39,7 @@ namespace SnapDB.Snap;
 /// </remarks>
 /// <typeparam name="T"></typeparam>
 public class SnapTypeCustomMethods<T>
-    where T : SnapTypeBase<T>, new()
+    where T : SnapTypeBaseOfT<T>, new()
 {
     protected T TempKey = new();
     protected int LastFoundIndex;
