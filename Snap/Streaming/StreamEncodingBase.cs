@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  StreamEncodingBase`2.cs - Gbtc
+//  StreamEncodingBase.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -23,12 +23,11 @@
 //       Converted code to .NET core.
 //******************************************************************************************************
 
-using GSF.IO;
-using GSF.Snap.Encoding;
+using SnapDB.Snap.Encoding;
 using SnapDB.IO;
 
-namespace GSF.Snap.Streaming
-{
+namespace SnapDB.Snap.Streaming;
+
     /// <summary>
     /// Encoding that is stream based. This encoding is similar to <see cref="PairEncodingBase{TKey,TValue}"/>
     /// except it contains end of stream data.
@@ -54,18 +53,18 @@ namespace GSF.Snap.Streaming
         /// <summary>
         /// Encodes the current key/value to the stream.
         /// </summary>
-        /// <param name="stream">the stream to write to</param>
-        /// <param name="currentKey">the key to write</param>
-        /// <param name="currentValue">the value to write</param>
+        /// <param name="stream">The stream to write to.</param>
+        /// <param name="currentKey">The key to write.</param>
+        /// <param name="currentValue">The value to write.</param>
         public abstract void Encode(BinaryStreamBase stream, TKey currentKey, TValue currentValue);
 
         /// <summary>
         /// Attempts to read the next point from the stream. 
         /// </summary>
         /// <param name="stream">The stream to read from</param>
-        /// <param name="key">the key to store the value to</param>
-        /// <param name="value">the value to store to</param>
-        /// <returns>True if successful. False if end of the stream has been reached.</returns>
+        /// <param name="key">The key to store the value to.</param>
+        /// <param name="value">The value to store to.</param>
+        /// <returns><c>true</c> if successful; <c>false</c> if end of the stream has been reached.</returns>
         public abstract bool TryDecode(BinaryStreamBase stream, TKey key, TValue value);
 
         /// <summary>
@@ -75,4 +74,4 @@ namespace GSF.Snap.Streaming
         public abstract void ResetEncoder();
 
     }
-}
+
