@@ -24,8 +24,9 @@
 //
 //******************************************************************************************************
 
-using System.Runtime.InteropServices;
 using Gemstone;
+using SnapDB.IO.Unmanaged;
+using System.Runtime.InteropServices;
 
 namespace SnapDB.IO;
 

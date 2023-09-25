@@ -34,14 +34,14 @@ namespace SnapDB.Security;
 /// </summary>
 internal class PBDKFCredentials
 {
-    //Origional Username and Passwords
+    // Original username and password
     /// <summary>
     /// The UTF8 encoded normalized username.
     /// </summary>
     public byte[] UsernameBytes;
     private readonly byte[] m_passwordBytes;
 
-    //Salted Password, base on PBKDF2
+    // Salted password, base on PBKDF2
     private HashMethod m_hashMethod;
     private int m_iterations;
     private byte[] m_salt;
@@ -63,7 +63,7 @@ internal class PBDKFCredentials
     /// <param name="hashMethod"></param>
     /// <param name="salt"></param>
     /// <param name="iterations"></param>
-    /// <returns>Returns False if the password value did not change.</returns>
+    /// <returns>Returns <c>false</c> if the password value did not change.</returns>
     public bool TryUpdate(HashMethod hashMethod, byte[] salt, int iterations)
     {
         bool hasChanged = false;

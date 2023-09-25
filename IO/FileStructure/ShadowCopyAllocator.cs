@@ -17,7 +17,7 @@
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
 //  01/04/2012 - Steven E. Chisholm
-//       Generated original version of source code. 
+//       Generated original version of source code.
 //       
 //  09/19/2023 - Lillian Gensolin
 //       Converted code to .NET core.
@@ -38,7 +38,7 @@ internal unsafe class ShadowCopyAllocator
     #region [ Members ]
 
     /// <summary>
-    /// This address is used to determine if the block being referenced is an old block or a new one. 
+    /// This address is used to determine if the block being referenced is an old block or a new one.
     /// Any addresses greater than or equal to this are new blocks for this transaction. Values before this are old.
     /// </summary>
     private readonly uint m_lastReadOnlyBlock;

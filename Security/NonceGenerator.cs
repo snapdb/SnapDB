@@ -59,7 +59,6 @@ public unsafe class NonceGenerator
     /// <summary>
     /// Gets the next nonce value.
     /// </summary>
-    /// <returns></returns>
     public byte[] Next()
     {
         long date = Stopwatch.GetTimestamp();
