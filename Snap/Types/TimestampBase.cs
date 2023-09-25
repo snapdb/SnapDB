@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  TimestampBase'1.cs - Gbtc
+//  TimestampBase.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -46,7 +46,7 @@ public abstract class TimestampBase<TKey>
     /// is not able to be converted.
     /// </summary>
     /// <param name="timestamp">an output field of the timestamp</param>
-    /// <returns>True if a timestamp could be parsed. False otherwise.</returns>
+    /// <returns><c>true</c> if a timestamp could be parsed; otherwise, <c>false</c>.</returns>
     bool IHasTimestampField.TryGetDateTime(out DateTime timestamp)
     {
         if (Timestamp <= (ulong)DateTime.MaxValue.Ticks)
