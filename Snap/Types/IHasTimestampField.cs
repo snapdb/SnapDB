@@ -35,7 +35,7 @@ public interface IHasTimestampField
     /// Attempts to get the timestamp field of a point. This function might fail if the datetime field
     /// is not able to be converted.
     /// </summary>
-    /// <param name="timestamp">an output field of the timestamp</param>
-    /// <returns>True if a timestamp could be parsed. False otherwise.</returns>
+    /// <param name="timestamp">An output field of the timestamp.</param>
+    /// <returns><c>true</c> if a timestamp could be parsed; otherwise, <c>false</c>.</returns>
     bool TryGetDateTime(out DateTime timestamp);
 }
