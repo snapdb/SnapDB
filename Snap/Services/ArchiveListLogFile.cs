@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  RolloverLogFile.cs - Gbtc
+//  ArchiveListLogFile.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -16,7 +16,7 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  03/27/2014 - Steven E. Chisholm
+//  10/02/2014 - Steven E. Chisholm
 //       Generated original version of source code.
 //
 //  04/11/2017 - J. Ritchie Carroll
@@ -24,7 +24,6 @@
 //
 //  09/25/2023 - Lillian Gensolin
 //       Converted code to .NET core.
-//
 //******************************************************************************************************
 
 using Gemstone.Diagnostics;
@@ -32,71 +31,65 @@ using Gemstone.IO.StreamExtensions;
 using Gemstone.Security.Cryptography;
 using System.Security.Cryptography;
 
-namespace SnapDB.Snap.Services.Writer;
+namespace SnapDB.Snap.Services;
 
 /// <summary>
-/// Logs the rollover process so that it can be properly finished in the event of a power outage or process crash
+/// A individual archive list log file
 /// </summary>
-public class RolloverLogFile
+internal class ArchiveListLogFile
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(RolloverLogFile), MessageClass.Framework);
+    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(ArchiveListLogFile), MessageClass.Framework);
 
     /// <summary>
     /// Gets if the file is valid and not corrupt.
     /// </summary>
-    public readonly bool IsValid;
+    public bool IsValid { get; private set; }
 
     /// <summary>
-    /// Gets all of the source files.
+    /// Gets the list of all files that are pending deletion.
     /// </summary>
-    public readonly List<Guid> SourceFiles = new List<Guid>();
-    /// <summary>
-    /// Gets the destination file
-    /// </summary>
-    public readonly Guid DestinationFile;
+    public readonly List<Guid> FilesToDelete = new List<Guid>();
 
     /// <summary>
     /// Gets the filename of this log file. String.Empty if not currently associated with a file.
     /// </summary>
-    public readonly string FileName;
+    public string FileName = string.Empty;
 
-    /// <summary>
-    /// Creates a new rollover log
-    /// </summary>
-    /// <param name="fileName">the name of the file to save</param>
-    /// <param name="sourceFiles">the source files in the rollover process</param>
-    /// <param name="destinationFile">the destination file in the rollover process.</param>
-    public RolloverLogFile(string fileName, List<Guid> sourceFiles, Guid destinationFile)
+    public ArchiveListLogFile()
     {
-        SourceFiles = sourceFiles;
-        DestinationFile = destinationFile;
         IsValid = true;
-        FileName = fileName;
+    }
 
-        MemoryStream stream = new MemoryStream();
-        stream.Write(Header);
-        stream.Write((byte)1);
-        stream.Write(SourceFiles.Count);
-        foreach (Guid file in SourceFiles)
-        {
-            stream.Write(file);
-        }
-        stream.Write(destinationFile);
-        using (SHA1 sha = Cipher.CreateSHA1())
-        {
-            stream.Write(sha.ComputeHash(stream.ToArray()));
-        }
-        File.WriteAllBytes(fileName, stream.ToArray());
+    public ArchiveListLogFile(string fileName)
+    {
+        Load(fileName);
     }
 
     /// <summary>
-    /// Resumes a rollover log
+    /// Removes any files that have already been deleted from this log file.
     /// </summary>
-    /// <param name="fileName">the name of the log file to load.</param>
-    public RolloverLogFile(string fileName)
+    /// <remarks>
+    /// Note, the log file should not be modified to prevent corrupting the log file.
+    /// </remarks>
+    public void RemoveDeletedFiles(HashSet<Guid> allFiles)
+    {
+        for (int x = FilesToDelete.Count - 1; x >= 0; x--)
+        {
+            if (!allFiles.Contains(FilesToDelete[x]))
+            {
+                FilesToDelete.RemoveAt(x);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Loads from the disk
+    /// </summary>
+    /// <param name="fileName">the name of the log file</param>
+    public void Load(string fileName)
     {
         FileName = fileName;
-        SourceFiles.Clear();
+        FilesToDelete.Clear();
         IsValid = false;
 
         try
@@ -104,26 +97,27 @@ public class RolloverLogFile
             byte[] data = File.ReadAllBytes(fileName);
             if (data.Length < Header.Length + 1 + 20) //Header + Version + SHA1
             {
-                Log.Publish(MessageLevel.Warning, "Failed to load file.", "Expected file length is not long enough", fileName);
+                Log.Publish(MessageLevel.Warning, "Failed to load file.", "Expected file length is not long enough");
                 return;
             }
             for (int x = 0; x < Header.Length; x++)
             {
                 if (data[x] != Header[x])
                 {
-                    Log.Publish(MessageLevel.Warning, "Failed to load file.", "Incorrect File Header", fileName);
+                    Log.Publish(MessageLevel.Warning, "Failed to load file.", "Incorrect File Header");
                     return;
                 }
             }
 
             byte[] hash = new byte[20];
             Array.Copy(data, data.Length - 20, hash, 0, 20);
+
             using (SHA1 sha = Cipher.CreateSHA1())
             {
                 byte[] checksum = sha.ComputeHash(data, 0, data.Length - 20);
                 if (!hash.SequenceEqual(checksum))
                 {
-                    Log.Publish(MessageLevel.Warning, "Failed to load file.", "Hash sum failed.", fileName);
+                    Log.Publish(MessageLevel.Warning, "Failed to load file.", "Hash sum failed.");
                     return;
                 }
             }
@@ -140,44 +134,42 @@ public class RolloverLogFile
                     while (count > 0)
                     {
                         count--;
-                        SourceFiles.Add(stream.ReadGuid());
+                        FilesToDelete.Add(stream.ReadGuid());
                     }
-                    DestinationFile = stream.ReadGuid();
                     IsValid = true;
                     return;
                 default:
-                    Log.Publish(MessageLevel.Warning, "Failed to load file.", "Version Not Recognized.", fileName);
-                    SourceFiles.Clear();
+                    Log.Publish(MessageLevel.Warning, "Failed to load file.", "Version Not Recognized.");
+                    FilesToDelete.Clear();
                     return;
             }
         }
         catch (Exception ex)
         {
-            Log.Publish(MessageLevel.Warning, "Failed to load file.", "Unexpected Error", fileName, ex);
-            SourceFiles.Clear();
+            Log.Publish(MessageLevel.Warning, "Failed to load file.", "Unexpected Error", null, ex);
+            FilesToDelete.Clear();
         }
     }
 
     /// <summary>
-    /// Recovers this rollover during an application crash.
+    /// Saves to the disk
     /// </summary>
-    /// <param name="list"></param>
-    public void Recover(ArchiveListOfT list)
+    public void Save(string fileName)
     {
-        using (ArchiveListEditor edit = list.AcquireEditLock())
+        MemoryStream stream = new MemoryStream();
+        stream.Write(Header);
+        stream.Write((byte)1);
+        stream.Write(FilesToDelete.Count);
+        foreach (Guid file in FilesToDelete)
         {
-            //If the destination file exists, the rollover is complete. Therefore remove any source file.
-            if (edit.Contains(DestinationFile))
-            {
-                foreach (Guid source in SourceFiles)
-                {
-                    if (edit.Contains(source))
-                        edit.TryRemoveAndDelete(source);
-                }
-            }
-            //Otherwise, delete the destination file (which is allow the ~d2 cleanup to occur).
+            stream.Write(file);
         }
-        Delete();
+        using (SHA1 sha = Cipher.CreateSHA1())
+        {
+            stream.Write(sha.ComputeHash(stream.ToArray()));
+        }
+        File.WriteAllBytes(fileName, stream.ToArray());
+        FileName = fileName;
     }
 
     /// <summary>
@@ -187,18 +179,22 @@ public class RolloverLogFile
     {
         try
         {
-            if (File.Exists(FileName))
+            FilesToDelete.Clear();
+            IsValid = false;
+            if (FileName != string.Empty)
                 File.Delete(FileName);
+            FileName = string.Empty;
         }
         catch (Exception ex)
         {
-            Log.Publish(MessageLevel.Error, "Error Deleting File", "Could not delete file: " + FileName, null, ex);
+            Log.Publish(MessageLevel.Error, "Could not delete file", "Could not delete file: " + FileName, null, ex);
         }
     }
 
     private static readonly byte[] Header;
-    static RolloverLogFile()
+    static ArchiveListLogFile()
     {
-        Header = System.Text.Encoding.UTF8.GetBytes("Historian 2.0 Rollover Log");
+        Header = System.Text.Encoding.UTF8.GetBytes("openHistorian 2.0 Archive List Log");
     }
+
 }

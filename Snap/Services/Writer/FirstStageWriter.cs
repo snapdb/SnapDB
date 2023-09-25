@@ -60,7 +60,7 @@ public class FirstStageWriter<TKey, TValue>
     private readonly ScheduledTask m_rolloverTask;
     private readonly object m_syncRoot;
     private readonly SafeManualResetEvent m_rolloverComplete;
-    private readonly ArchiveList<TKey, TValue> m_list;
+    private readonly ArchiveListOfT<TKey, TValue> m_list;
     private List<SortedTreeTable<TKey, TValue>> m_pendingTables1;
     private List<SortedTreeTable<TKey, TValue>> m_pendingTables2;
     private List<SortedTreeTable<TKey, TValue>> m_pendingTables3;
@@ -69,7 +69,7 @@ public class FirstStageWriter<TKey, TValue>
     /// <summary>
     /// Creates a stage writer.
     /// </summary>
-    public FirstStageWriter(FirstStageWriterSettings settings, ArchiveList<TKey, TValue> list)
+    public FirstStageWriter(FirstStageWriterSettings settings, ArchiveListOfT<TKey, TValue> list)
         : base(MessageClass.Framework)
     {
         if (settings is null)

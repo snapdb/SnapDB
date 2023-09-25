@@ -61,7 +61,7 @@ internal class SequentialReaderStream<TKey, TValue>
     private WorkerThreadSynchronization m_workerThreadSynchronization;
     private readonly bool m_ownsWorkerThreadSynchronization;
 
-    public SequentialReaderStream(ArchiveList<TKey, TValue> archiveList,
+    public SequentialReaderStream(ArchiveListOfT<TKey, TValue> archiveList,
         SortedTreeEngineReaderOptions readerOptions = null,
         SeekFilterBase<TKey> keySeekFilter = null,
         MatchFilterBase<TKey, TValue> keyMatchFilter = null,

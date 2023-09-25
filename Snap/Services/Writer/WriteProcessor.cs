@@ -52,7 +52,7 @@ public class WriteProcessor<TKey, TValue>
     /// <param name="list">the master list of archive files</param>
     /// <param name="settings">the settings</param>
     /// <param name="rolloverLog">the rollover log value</param>
-    public WriteProcessor(ArchiveList<TKey, TValue> list, WriteProcessorSettings settings, RolloverLog rolloverLog)
+    public WriteProcessor(ArchiveListOfT<TKey, TValue> list, WriteProcessorSettings settings, RolloverLog rolloverLog)
         : base(MessageClass.Framework)
     {
         m_settings = settings.CloneReadonly();

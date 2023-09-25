@@ -47,7 +47,7 @@ public class CombineFiles<TKey, TValue>
     private readonly CombineFilesSettings m_settings;
 
     private readonly SimplifiedArchiveInitializer<TKey, TValue> m_createNextStageFile;
-    private readonly ArchiveList<TKey, TValue> m_archiveList;
+    private readonly ArchiveListOfT<TKey, TValue> m_archiveList;
     private readonly RolloverLog m_rolloverLog;
 
     /// <summary>
@@ -56,7 +56,7 @@ public class CombineFiles<TKey, TValue>
     /// <param name="settings">the settings for this stage</param>
     /// <param name="archiveList">the archive list</param>
     /// <param name="rolloverLog">the rollover log</param>
-    public CombineFiles(CombineFilesSettings settings, ArchiveList<TKey, TValue> archiveList, RolloverLog rolloverLog)
+    public CombineFiles(CombineFilesSettings settings, ArchiveListOfT<TKey, TValue> archiveList, RolloverLog rolloverLog)
             : base(MessageClass.Framework)
     {
         m_settings = settings.CloneReadonly();
