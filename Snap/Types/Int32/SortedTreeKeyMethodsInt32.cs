@@ -35,16 +35,16 @@ public class SnapCustomMethodsInt32
         int lastFoundIndex = LastFoundIndex;
         int key = key2.Value;
 
-        //shortcut for sequentially adding. 
+        // Shortcut for sequentially adding. 
         if (lastFoundIndex == recordCount - 1)
         {
-            if (key > *(int*)(pointer + keyValueSize * lastFoundIndex)) //Key > CompareKey
+            if (key > *(int*)(pointer + keyValueSize * lastFoundIndex)) // Key > CompareKey
             {
                 LastFoundIndex++;
                 return ~recordCount;
             }
         }
-        //Shortcut for sequentially getting  
+        // Shortcut for sequentially getting.
         else if (lastFoundIndex < recordCount)
         {
             if (key == *(int*)(pointer + keyValueSize * (lastFoundIndex + 1)))
@@ -62,12 +62,12 @@ public class SnapCustomMethodsInt32
 
             int compareKey = *(int*)(pointer + keyValueSize * currentTestIndex);
 
-            if (key == compareKey) //Are Equal
+            if (key == compareKey) // Are Equal.
             {
                 LastFoundIndex = currentTestIndex;
                 return currentTestIndex;
             }
-            if (key > compareKey) //Key > CompareKey
+            if (key > compareKey) // Key > CompareKey
                 searchLowerBoundsIndex = currentTestIndex + 1;
             else
                 searchHigherBoundsIndex = currentTestIndex - 1;
