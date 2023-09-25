@@ -1042,4 +1042,3 @@ public abstract unsafe class BinaryStreamBase
         }
     }
 
-}
