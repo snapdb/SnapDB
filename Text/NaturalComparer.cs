@@ -16,7 +16,7 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  1/11/2013 - Steven E. Chisholm
+//  01/11/2013 - Steven E. Chisholm
 //       Generated original version of source code. 
 //
 //  09/25/2023 - Lillian Gensolin
@@ -33,7 +33,7 @@ using System.Text.RegularExpressions;
 namespace SnapDB.Text;
 
 /// <summary>
-/// Does a sort on a string that is natual to how humans look at it. 
+/// Does a sort on a string that is natural to how humans look at it. 
 /// Such as sorting numbers.
 /// </summary>
 public class NaturalComparer
@@ -42,7 +42,7 @@ public class NaturalComparer
     private readonly Dictionary<string, string[]> m_table;
 
     /// <summary>
-    /// Creates a new <see cref="NaturalComparer"/>
+    /// Creates a new <see cref="NaturalComparer"/>.
     /// </summary>
     public NaturalComparer()
     {
@@ -53,7 +53,9 @@ public class NaturalComparer
     /// When overridden in a derived class, performs a comparison of two objects of the same type and returns a value indicating whether one object is less than, equal to, or greater than the other.
     /// </summary>
     /// <returns>
-    /// A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, as shown in the following table.Value Meaning Less than zero <paramref name="x"/> is less than <paramref name="y"/>.Zero <paramref name="x"/> equals <paramref name="y"/>.Greater than zero <paramref name="x"/> is greater than <paramref name="y"/>.
+    /// A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, 
+    /// as shown in the following table. Value meaning less than zero <paramref name="x"/> is less than <paramref name="y"/>.
+    /// Zero <paramref name="x"/> equals <paramref name="y"/>. Greater than zero <paramref name="x"/> is greater than <paramref name="y"/>.
     /// </returns>
     /// <param name="x">The first object to compare.</param>
     /// <param name="y">The second object to compare.</param>
