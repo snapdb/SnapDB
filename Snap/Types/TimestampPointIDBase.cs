@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  TimestampPointIDBase'1.cs - Gbtc
+//  TimestampPointIDBase.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -19,7 +19,7 @@
 //  04/12/2013 - Steven E. Chisholm
 //       Generated original version of source code. 
 //
-// 09/25/2023 - Lillian Gensolin
+//  09/25/2023 - Lillian Gensolin
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
@@ -37,7 +37,7 @@ public abstract class TimestampPointIDBase<TKey>
     where TKey : SnapTypeBase<TKey>, new()
 {
     /// <summary>
-    /// The id number of the point.
+    /// The ID number of the point.
     /// </summary>
     public ulong PointID;
 
