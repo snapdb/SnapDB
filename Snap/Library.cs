@@ -30,6 +30,7 @@ using SnapDB.Snap.Tree;
 using SnapDB.Snap.Encoding;
 using SnapDB.Snap.Filters;
 using SnapDB.Snap.Definitions;
+using SnapDB.Snap.Streaming;
 
 namespace SnapDB.Snap;
 
@@ -228,8 +229,8 @@ public static class Library
     /// <typeparam name="TValue"></typeparam>
     /// <returns></returns>
     public static KeyValueMethods<TKey, TValue> GetKeyValueMethods<TKey, TValue>()
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         Tuple<Type, Type> t = Tuple.Create(typeof(TKey), typeof(TValue));
         lock (SyncRoot)
@@ -250,15 +251,15 @@ public static class Library
     /// <param name="encodingMethod">the encoding method</param>
     /// <returns></returns>
     internal static StreamEncodingBase<TKey, TValue> CreateStreamEncoding<TKey, TValue>(EncodingDefinition encodingMethod)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         return new StreamEncodingGeneric<TKey, TValue>(encodingMethod);
     }
 
     internal static SortedTreeNodeBase<TKey, TValue> CreateTreeNode<TKey, TValue>(EncodingDefinition encodingMethod, byte level)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         if (encodingMethod is null)
             throw new ArgumentNullException("encodingMethod");
