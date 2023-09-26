@@ -24,24 +24,20 @@
 //
 //******************************************************************************************************
 
-#if SQLCLR
-using System.Security.Principal;
-#else
 using Gemstone.Identity;
-#endif
 
 namespace SnapDB.Security.Authentication;
 
 
 /// <summary>
-/// An individual server side user credential
+/// An individual server side user credential.
 /// </summary>
 public class CertificateUserCredential
 {
     public string UserID;
 
     /// <summary>
-    /// Creates user credentials
+    /// Creates user credentials.
     /// </summary>
     /// <param name="username"></param>
     public CertificateUserCredential(string username)
