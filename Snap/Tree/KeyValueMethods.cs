@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  KeyValueMethods`2.cs - Gbtc
+//  KeyValueMethods.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -34,16 +34,15 @@ public abstract class KeyValueMethods
 {
     internal KeyValueMethods()
     {
-
     }
 
     /// <summary>
-    /// The type of the key
+    /// The type of the key.
     /// </summary>
     public abstract Type KeyType { get; }
 
     /// <summary>
-    /// The type of the value
+    /// The type of the value.
     /// </summary>
     public abstract Type ValueType { get; }
 }
@@ -54,11 +53,11 @@ public abstract class KeyValueMethods
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-public class <TKey, TValue>
+public class KeyValueMethods<TKey, TValue>
     : KeyValueMethods
     where TKey : SnapTypeBaseOfT<TKey>, new()
     where TValue : SnapTypeBaseOfT<TValue>, new()
-
+{
     /// <summary>
     /// Copies the source values to the destination.
     /// </summary>
@@ -73,12 +72,12 @@ public class <TKey, TValue>
     }
 
     /// <summary>
-    /// The type of the key
+    /// The type of the key.
     /// </summary>
     public override Type KeyType => typeof(TKey);
 
     /// <summary>
-    /// The type of the value
+    /// The type of the value.
     /// </summary>
     public override Type ValueType => typeof(TValue);
 }

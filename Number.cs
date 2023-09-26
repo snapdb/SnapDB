@@ -20,6 +20,7 @@ public static class Number
             str[0] = 'n';
             str[1] = 'a';
             str[2] = 'n';
+
             return 3;
         }
         if (Single.IsNegativeInfinity(value))
@@ -27,6 +28,7 @@ public static class Number
             str[0] = 'n';
             str[1] = 'a';
             str[2] = 'n';
+
             return 3;
         }
         if (Single.IsPositiveInfinity(value))
@@ -34,12 +36,14 @@ public static class Number
             str[0] = 'n';
             str[1] = 'a';
             str[2] = 'n';
+
             return 3;
         }
 
         if (value == 0)
         {
             str[0] = '0';
+            
             return 1;
         }
 
@@ -59,6 +63,7 @@ public static class Number
             {
                 str[pos + x] = T[pos + x];
             }
+
             return T.Length;
         }
 
@@ -146,6 +151,7 @@ public static class Number
             {
                 if (value >= Digits10)
                     return 10;
+
                 if (value >= Digits9)
                     return 9;
                 return 8;
@@ -153,8 +159,10 @@ public static class Number
 
             if (value >= Digits7)
                 return 7;
+
             if (value >= Digits6)
                 return 6;
+
             return 5;
         }
 
@@ -162,11 +170,13 @@ public static class Number
         {
             if (value >= Digits4)
                 return 4;
+            
             return 3;
         }
 
         if (value >= Digits2)
             return 2;
+
         return 1;
     }
 
@@ -191,8 +201,10 @@ public static class Number
             {
                 if (value >= Digits10)
                     digits = 10;
+
                 else if (value >= Digits9)
                     digits = 9;
+
                 else
                     digits = 8;
             }
@@ -200,8 +212,10 @@ public static class Number
             {
                 if (value >= Digits7)
                     digits = 7;
+
                 else if (value >= Digits6)
                     digits = 6;
+
                 else
                     digits = 5;
             }
@@ -212,6 +226,7 @@ public static class Number
             {
                 if (value >= Digits4)
                     digits = 4;
+
                 else
                     digits = 3;
             }
@@ -219,6 +234,7 @@ public static class Number
             {
                 if (value >= Digits2)
                     digits = 2;
+
                 else
                     digits = 1;
             }

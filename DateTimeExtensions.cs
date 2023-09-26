@@ -16,7 +16,7 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  8/29/2014 - Steven E. Chisholm
+//  08/29/2014 - Steven E. Chisholm
 //       Generated original version of source code. 
 //
 //  09/25/2023 - Lillian Gensolin
@@ -24,63 +24,60 @@
 //
 //******************************************************************************************************
 
-using System;
+namespace SnapDB;
 
-namespace GSF
+/// <summary>
+/// Helper methods for type <see cref="DateTime"/>
+/// </summary>
+public static class DateTimeExtensions
 {
     /// <summary>
-    /// Helper methods for type <see cref="DateTime"/>
+    /// Rounds the supplied datetime down to the nearest day.
     /// </summary>
-    public static class DateTimeExtensions
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static DateTime RoundDownToNearestDay(this DateTime value)
     {
-        /// <summary>
-        /// Rounds the supplied datetime down to the nearest day.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static DateTime RoundDownToNearestDay(this DateTime value)
-        {
-            return new DateTime(value.Ticks - value.Ticks % TimeSpan.TicksPerDay, value.Kind);
-        }
+        return new DateTime(value.Ticks - value.Ticks % TimeSpan.TicksPerDay, value.Kind);
+    }
 
-        /// <summary>
-        /// Rounds the supplied datetime down to the nearest hour.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static DateTime RoundDownToNearestHour(this DateTime value)
-        {
-            return new DateTime(value.Ticks - value.Ticks % TimeSpan.TicksPerHour, value.Kind);
-        }
+    /// <summary>
+    /// Rounds the supplied datetime down to the nearest hour.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static DateTime RoundDownToNearestHour(this DateTime value)
+    {
+        return new DateTime(value.Ticks - value.Ticks % TimeSpan.TicksPerHour, value.Kind);
+    }
 
-        /// <summary>
-        /// Rounds the supplied datetime down to the nearest minute.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static DateTime RoundDownToNearestMinute(this DateTime value)
-        {
-            return new DateTime(value.Ticks - value.Ticks % TimeSpan.TicksPerMinute, value.Kind);
-        }
+    /// <summary>
+    /// Rounds the supplied datetime down to the nearest minute.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static DateTime RoundDownToNearestMinute(this DateTime value)
+    {
+        return new DateTime(value.Ticks - value.Ticks % TimeSpan.TicksPerMinute, value.Kind);
+    }
 
-        /// <summary>
-        /// Rounds the supplied datetime down to the nearest second.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static DateTime RoundDownToNearestSecond(this DateTime value)
-        {
-            return new DateTime(value.Ticks - value.Ticks % TimeSpan.TicksPerSecond, value.Kind);
-        }
+    /// <summary>
+    /// Rounds the supplied datetime down to the nearest second.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static DateTime RoundDownToNearestSecond(this DateTime value)
+    {
+        return new DateTime(value.Ticks - value.Ticks % TimeSpan.TicksPerSecond, value.Kind);
+    }
 
-        /// <summary>
-        /// Rounds the supplied datetime down to the nearest millisecond.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static DateTime RoundDownToNearestMillisecond(this DateTime value)
-        {
-            return new DateTime(value.Ticks - value.Ticks % TimeSpan.TicksPerMillisecond, value.Kind);
-        }
+    /// <summary>
+    /// Rounds the supplied datetime down to the nearest millisecond.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static DateTime RoundDownToNearestMillisecond(this DateTime value)
+    {
+        return new DateTime(value.Ticks - value.Ticks % TimeSpan.TicksPerMillisecond, value.Kind);
     }
 }

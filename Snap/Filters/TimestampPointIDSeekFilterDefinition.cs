@@ -58,6 +58,7 @@ public class TimestampPointIDSeekFilterDefinition
         MethodInfo method = typeof(TimestampPointIDSeekFilter).GetMethod("CreateFromStream", BindingFlags.NonPublic | BindingFlags.Static);
         MethodInfo generic = method.MakeGenericMethod(typeof(TKey));
         object rv = generic.Invoke(null, new[] { stream });
+
         return (SeekFilterBase<TKey>)rv;
     }
 }

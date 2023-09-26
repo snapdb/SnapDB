@@ -96,6 +96,7 @@ public class IsolatedQueue<T>
             m_blocks[m_tail] = default(T);
             // No memory barrier here since .NET 2.0 ensures that writes will not be reordered.
             m_tail = m_tail + 1;
+
             return item;
         }
     }

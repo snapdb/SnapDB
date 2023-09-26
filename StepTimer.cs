@@ -58,9 +58,8 @@ public static class StepTimer
     public static ITimer Start(string name, bool runGC = false)
     {
         if (!AllStopwatches.ContainsKey(name))
-        {
             AllStopwatches.Add(name, new RunCount());
-        }
+
         if (runGC)
         {
             GC.Collect();
@@ -68,6 +67,7 @@ public static class StepTimer
         }
         RunCount sw = AllStopwatches[name];
         sw.SW.Restart();
+        
         return sw;
     }
 
@@ -80,6 +80,7 @@ public static class StepTimer
     {
         RunCount kvp = AllStopwatches[Name];
         kvp.RunResults.Sort();
+
         return kvp.RunResults[kvp.RunResults.Count >> 1];
     }
 
@@ -87,6 +88,7 @@ public static class StepTimer
     {
         RunCount kvp = AllStopwatches[Name];
         kvp.RunResults.Sort();
+
         return kvp.RunResults[kvp.RunResults.Count >> 1] * 1000000000.0 / loopCount;
     }
 
@@ -94,6 +96,7 @@ public static class StepTimer
     {
         RunCount kvp = AllStopwatches[Name];
         kvp.RunResults.Sort();
+
         return kvp.RunResults[(int)(kvp.RunResults.Count * 0.9)];
     }
 
@@ -106,6 +109,7 @@ public static class StepTimer
             double rate = kvp.Value.RunResults[kvp.Value.RunResults.Count >> 1];
             sb.Append(kvp.Key + '\t' + (rate / 1000000).ToString("0.00"));
         }
+
         return sb.ToString();
     }
 
@@ -115,18 +119,16 @@ public static class StepTimer
 
         int innerLoopCount = 1;
 
-        //prime loop
+        // Primary loop.
         del();
         Thread.Sleep(1);
         del();
         Thread.Sleep(1);
         del();
 
-        //Build an inner loop that takes at least 3 ms to complete.
+        // Build an inner loop that takes at least 3 ms to complete.
         while (TimeLoop(sw, del, innerLoopCount) < 3)
-        {
             innerLoopCount *= 2;
-        }
 
         List<double> list = new List<double>();
 
@@ -138,6 +140,7 @@ public static class StepTimer
         }
 
         list.Sort();
+
         return (list[list.Count >> 2] * 1000000.0 / innerLoopCount / internalLoopCount).ToString("0.0");
     }
 
@@ -146,11 +149,10 @@ public static class StepTimer
         sw.Restart();
 
         for (int x = 0; x < loopCount; x++)
-        {
             del();
-        }
 
         sw.Stop();
+
         return sw.Elapsed.TotalMilliseconds;
     }
 
@@ -160,18 +162,16 @@ public static class StepTimer
 
         int innerLoopCount = 1;
 
-        //prime loop
+        // Primary loop
         del(sw);
         Thread.Sleep(1);
         del(sw);
         Thread.Sleep(1);
         del(sw);
 
-        //Build an inner loop that takes at least 3 ms to complete.
+        // Build an inner loop that takes at least 3 ms to complete.
         while (TimeLoop(sw, del, innerLoopCount) < 3)
-        {
             innerLoopCount *= 2;
-        }
 
         List<double> list = new List<double>();
 
@@ -183,6 +183,7 @@ public static class StepTimer
         }
 
         list.Sort();
+
         return (list[list.Count >> 2] * 1000000.0 / innerLoopCount / internalLoopCount).ToString("0.0");
     }
 
@@ -191,9 +192,7 @@ public static class StepTimer
         sw.Reset();
 
         for (int x = 0; x < loopCount; x++)
-        {
             del(sw);
-        }
 
         return sw.Elapsed.TotalMilliseconds;
     }

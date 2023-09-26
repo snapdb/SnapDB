@@ -50,7 +50,6 @@ public abstract class SnapTypeBase
     /// <summary>
     /// Gets the size of this class when serialized
     /// </summary>
-    /// <returns></returns>
     public abstract int Size { get; }
 
     /// <summary>
@@ -108,7 +107,7 @@ public abstract class SnapTypeBase
     }
 
     /// <summary>
-    /// Writes the key to the stream
+    /// Writes the key to the stream.
     /// </summary>
     /// <param name="stream"></param>
     public virtual unsafe void Write(byte* stream)
