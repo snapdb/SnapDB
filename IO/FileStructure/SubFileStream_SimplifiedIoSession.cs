@@ -32,7 +32,7 @@ namespace SnapDB.IO.FileStructure;
 public partial class SubFileStream
 {
     /// <summary>
-    /// An IoSession for the sub file stream.
+    /// An IO Session for the sub file stream.
     /// </summary>
     private unsafe class SimplifiedIoSession
         : BinaryStreamIoSessionBase

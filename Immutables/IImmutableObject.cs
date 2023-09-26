@@ -33,7 +33,7 @@ public interface IImmutableObject
     : ICloneable
 {
     /// <summary>
-    /// Gets or sets if a class is "read only". Once it has been set as "read only", it is immutable and must be cloned to be modified.
+    /// Gets or Sets if a class is "read only". Once it has been set as "read only", it is immutable and must be cloned to be modified.
     /// </summary>
     bool IsReadOnly { get; set; }
 

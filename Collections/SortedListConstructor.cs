@@ -57,8 +57,8 @@ public static class SortedListConstructor
             Keys = keys;
             Values = values;
         }
-        // Converts the dictionary to a sorted list and returns it.
 
+        // Converts the dictionary to a sorted list and returns it.
         public SortedList<TKey, TValue> ToSortedList()
         {
             return new SortedList<TKey, TValue>(this);

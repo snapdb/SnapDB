@@ -54,7 +54,7 @@ public class NullableLargeArray<T> : IEnumerable<T?>
     /// <param name="index"></param>
     public bool HasValue(int index)
     {
-        // Bounds checking is done in BitArray
+        // Bounds checking is done in BitArray.
         return m_isUsed[index];
     }
 
@@ -63,7 +63,7 @@ public class NullableLargeArray<T> : IEnumerable<T?>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
-    /// <returns><c>True</c> if the item exists; otherwise, <c>false</c> if null.</returns>
+    /// <returns><c>true</c> if the item exists; otherwise, <c>false</c>.</returns>
     public bool TryGetValue(int index, out T? value)
     {
         if (HasValue(index))

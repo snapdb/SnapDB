@@ -91,7 +91,7 @@ public unsafe abstract class BinaryStreamPointerBase
     public override bool CanSeek => true;
 
     /// <summary>
-    /// Gets or Sets the current position for the stream.
+    /// Gets or sets the current position for the stream.
     /// </summary>
     /// <remarks>
     /// It is important to use this to Get or Set the position from the underlying stream since 

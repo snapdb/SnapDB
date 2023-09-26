@@ -31,7 +31,7 @@ namespace SnapDB.Collections;
 /// <summary>
 /// Provides a specialized, thread-safe queue that acts as a quazi buffer pool. 
 /// </summary>
-/// <typeparam name="T">The type of resources managed by the queue (must be a reference type)</typeparam>
+/// <typeparam name="T">The type of resources managed by the queue (must be a reference type).</typeparam>
 public class ResourceQueue<T>
     where T : class
 {

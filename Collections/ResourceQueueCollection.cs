@@ -95,14 +95,12 @@ public class ResourceQueueCollection<TKey, TResource>
     /// Gets the resource queue for a key of <c>this</c>.
     /// </summary>
     /// <param name="key">The key identifying the resource queue to pull from.</param>
-    /// <returns></returns>
     public ResourceQueue<TResource>? this[TKey key] => GetResourceQueue(key);
 
     /// <summary>
     /// Gets the resource queue for a key of this.
     /// </summary>
     /// <param name="key">The key identifying the resource queue to pull from</param>
-    /// <returns></returns>
     public ResourceQueue<TResource>? GetResourceQueue(TKey key)
     {
         ResourceQueue<TResource>? resourceQueue;

@@ -16,10 +16,10 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  6/8/2012 - Steven E. Chisholm
+//  06/08/2012 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
-// 09/21/2023 - Lillian Gensolin
+//  09/21/2023 - Lillian Gensolin
 //       Converted code to .NET core.
 //
 //******************************************************************************************************

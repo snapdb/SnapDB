@@ -105,7 +105,7 @@ public sealed class BitArray
     #region [ Properties ]
 
     /// <summary>
-    /// Gets or sets individual bits in this array.
+    /// Gets or Sets individual bits in this array.
     /// </summary>
     /// <param name="index">Bit position to access.</param>
     /// <returns>Bit at specified <paramref name="index"/>.</returns>
@@ -233,7 +233,7 @@ public sealed class BitArray
         int element = index >> BitsPerElementShift;
         int value = m_array[element];
 
-        if ((value & subBit) != 0) //if bit is set
+        if ((value & subBit) != 0) // If bit is set
         {
             m_lastFoundClearedIndex = 0;
             m_setCount--;
@@ -241,6 +241,7 @@ public sealed class BitArray
 
             return true;
         }
+
         return false;
     }
 
@@ -475,7 +476,7 @@ public sealed class BitArray
         // Iterate through the elements of the bit array.
         for (int x = 0; x < count; x++)
         {
-            // If all bits are cleared, this entire section can be skipped
+            // If all bits are cleared, this entire section can be skipped.
             if (m_array[x] != -1)
             {
                 int end = Math.Min(x * BitsPerElement + BitsPerElement, m_count);

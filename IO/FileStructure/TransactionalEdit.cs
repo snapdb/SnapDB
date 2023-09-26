@@ -33,7 +33,7 @@ namespace SnapDB.IO.FileStructure;
 /// <summary>
 /// Provides the state information for a transaction on the file system.
 /// </summary>
-/// <remarks>Failing to call Commit or Rollback will inhibit additional transactions to be aquired.</remarks>
+/// <remarks>Failing to call Commit or Rollback will inhibit additional transactions to be acquired.</remarks>
 public sealed class TransactionalEdit
     : IDisposable
 {
@@ -44,14 +44,14 @@ public sealed class TransactionalEdit
     /// <summary>
     /// This delegate is called when the Commit function is called and all the data has been written to the underlying file system.
     /// the purpose of this delegate is to notify the calling class that this transaction is concluded since
-    /// only one write transaction can be aquired at a time.
+    /// only one write transaction can be acquired at a time.
     /// </summary>
     private Action m_delHasBeenCommitted;
 
     /// <summary>
     /// This delegate is called when the RollBack function is called. This also occurs when the object is disposed.
     /// the purpose of this delegate is to notify the calling class that this transaction is concluded since
-    /// only one write transaction can be aquired at a time.
+    /// only one write transaction can be acquired at a time.
     /// </summary>
     private Action m_delHasBeenRolledBack;
 

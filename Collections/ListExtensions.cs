@@ -53,6 +53,7 @@ public static class ListExtensions
                 continue;
             
             list[x] = item;
+
             return x;
         }
 
@@ -65,9 +66,9 @@ public static class ListExtensions
     /// Parses through the provided list and assigns <see cref="item"/> to the first null field. 
     /// Otherwise, it will be added to the end of the list.
     /// </summary>
-    /// <param name="list">the list to iterate through</param>
-    /// <param name="item">the item to add</param>
-    /// <returns>the index of the added item</returns>
+    /// <param name="list">The list to iterate through.</param>
+    /// <param name="item">The item to add.</param>
+    /// <returns>Th index of the added item.</returns>
     public static int ReplaceFirstNullOrAdd<T>(this List<T?> list, T item)
        where T : class
     {
@@ -80,6 +81,7 @@ public static class ListExtensions
                 continue;
             
             list[x] = item;
+
             return x;
         }
 
