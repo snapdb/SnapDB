@@ -117,8 +117,8 @@ public class ArchiveDetails
     /// Creates a <see cref="ArchiveDetails"/> from a specific <see cref="ArchiveTableSummary{TKey,TValue}"/>
     /// </summary>
     public static ArchiveDetails Create<TKey, TValue>(ArchiveTableSummary<TKey, TValue> table)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         ArchiveDetails details = new ArchiveDetails
         {

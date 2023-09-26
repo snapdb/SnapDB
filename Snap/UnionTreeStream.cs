@@ -34,8 +34,8 @@ namespace SnapDB.Snap;
 /// <typeparam name="TValue"></typeparam>
 public partial class UnionTreeStream<TKey, TValue>
     : TreeStream<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TValue : SnapTypeBaseOfT<TValue>, new()
 {
     private BufferedTreeStream[] m_tablesOrigList;
     private readonly UnionTreeStreamSortHelper m_sortedArchiveStreams;

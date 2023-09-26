@@ -50,5 +50,5 @@ public abstract class IndividualEncodingDefinitionBase
     /// The encoding method
     /// </returns>
     public abstract IndividualEncodingBase<T> Create<T>()
-        where T : SnapTypeBase<T>, new();
+        where T : SnapTypeBaseOfT<T>, new();
 }

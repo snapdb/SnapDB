@@ -73,8 +73,8 @@ public class FilterLibrary
     }
 
     public MatchFilterBase<TKey, TValue> GetMatchFilter<TKey, TValue>(Guid filter, BinaryStreamBase stream)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         try
         {
@@ -96,7 +96,7 @@ public class FilterLibrary
     }
 
     public SeekFilterBase<TKey> GetSeekFilter<TKey>(Guid filter, BinaryStreamBase stream)
-        where TKey : SnapTypeBase<TKey>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
     {
         try
         {

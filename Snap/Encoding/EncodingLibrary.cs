@@ -29,7 +29,7 @@ using SnapDB.Snap.Definitions;
 namespace SnapDB.Snap.Encoding;
 
 /// <summary>
-/// Contains all of the fundamental encoding methods. Types implementing <see cref="SnapTypeBase{T}"/>
+/// Contains all of the fundamental encoding methods. Types implementing <see cref="SnapTypeBaseOfT{T}"/>
 /// will automatically register when passed to one of the child methods. 
 /// </summary>
 public class EncodingLibrary

@@ -37,8 +37,8 @@ namespace SnapDB.Snap.Services.Reader;
 /// <typeparam name="TValue"></typeparam>
 public class ArchiveTreeStreamWrapper<TKey, TValue>
     : TreeStream<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TValue : SnapTypeBaseOfT<TValue>, new()
 {
     private readonly ArchiveTableSummary<TKey, TValue> m_table;
     private SortedTreeTableReadSnapshot<TKey, TValue> m_snapshot;

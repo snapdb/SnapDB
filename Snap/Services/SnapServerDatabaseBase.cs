@@ -92,8 +92,8 @@ public abstract class SnapServerDatabaseBase
     //Called through reflection. Its the only way to call a generic function only knowing the Types
     [MethodImpl(MethodImplOptions.NoOptimization)] //Prevents removing this method as it may appear unused.
     private static SnapServerDatabaseBase CreateDatabase<TKey, TValue>(ServerDatabaseSettings databaseConfig)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         return new SnapServerDatabase<TKey, TValue>(databaseConfig);
     }

@@ -35,8 +35,8 @@ namespace SnapDB.Snap.Services.Reader;
 
 internal class SequentialReaderStream<TKey, TValue>
     : TreeStream<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TValue : SnapTypeBaseOfT<TValue>, new()
 {
     private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(SequentialReaderStream<TKey, TValue>), MessageClass.Framework);
 

@@ -35,8 +35,8 @@ namespace SnapDB.Snap.Services.Writer;
 /// <typeparam name="TValue"></typeparam>
 public class WriteProcessor<TKey, TValue>
     : DisposableLoggingClassBase
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TValue : SnapTypeBaseOfT<TValue>, new()
 {
     private readonly bool m_isMemoryOnly;
     private bool m_disposed;

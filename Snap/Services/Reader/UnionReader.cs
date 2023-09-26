@@ -31,8 +31,8 @@ namespace SnapDB.Snap.Services.Reader;
 
 internal class UnionReader<TKey, TValue>
     : TreeStream<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TValue : SnapTypeBaseOfT<TValue>, new()
 {
 
     private List<BufferedArchiveStream<TKey, TValue>> m_tablesOrigList;

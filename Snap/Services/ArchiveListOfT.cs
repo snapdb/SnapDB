@@ -40,7 +40,7 @@ namespace SnapDB.Snap.Services;
 /// associated reading and writing that goes along with it.
 /// </summary>
 public partial class ArchiveListOfT<TKey, TValue>
-    : ArchiveListOfT
+    : ArchiveList
     where TKey : SnapTypeBaseOfT<TKey>, new()
     where TValue : SnapTypeBaseOfT<TValue>, new()
 {

@@ -37,8 +37,8 @@ namespace SnapDB.Snap.Services.Writer;
 /// </summary>
 public class CombineFiles<TKey, TValue>
     : DisposableLoggingClassBase
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TValue : SnapTypeBaseOfT<TValue>, new()
 {
     private readonly object m_syncRoot;
     private bool m_disposed;

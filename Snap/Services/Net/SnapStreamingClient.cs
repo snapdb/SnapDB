@@ -169,8 +169,8 @@ public class SnapStreamingClient
     //Called through reflection. Its the only way to call a generic function only knowing the Types
     [MethodImpl(MethodImplOptions.NoOptimization)] //Prevents removing this method as it may appear unused.
     private ClientDatabaseBase<TKey, TValue> InternalGetDatabase<TKey, TValue>(string databaseName)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         return GetDatabase<TKey, TValue>(databaseName, null);
     }
@@ -205,8 +205,8 @@ public class SnapStreamingClient
     /// <param name="encodingMethod"></param>
     /// <returns><see cref="StreamingClientDatabase{TKey,TValue}"/> for given <paramref name="databaseName"/>.</returns>
     private StreamingClientDatabase<TKey, TValue> GetDatabase<TKey, TValue>(string databaseName, EncodingDefinition encodingMethod)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         DatabaseInfo dbInfo = m_databaseInfos[databaseName.ToUpper()];
 

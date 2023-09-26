@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  SnapTypeBase`1.cs - Gbtc
+//  SnapTypeBaseOfT.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -23,8 +23,6 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
-
-using SnapDB.Snap;
 
 namespace SnapDB.Snap;
 

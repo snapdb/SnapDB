@@ -44,8 +44,8 @@ namespace SnapDB.Snap.Services.Writer;
 /// </remarks>
 public class PrebufferWriter<TKey, TValue>
     : DisposableLoggingClassBase
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TValue : SnapTypeBaseOfT<TValue>, new()
 {
     /// <summary>
     /// Specifies that this class has been disposed.

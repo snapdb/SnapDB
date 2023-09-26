@@ -34,8 +34,8 @@ namespace SnapDB.Snap.Services.Writer;
 /// Creates new archive files based on user settings.
 /// </summary>
 public class ArchiveInitializer<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TValue : SnapTypeBaseOfT<TValue>, new()
 {
     private ArchiveInitializerSettings m_settings;
     private readonly ReaderWriterLockEasy m_lock;

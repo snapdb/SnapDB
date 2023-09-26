@@ -58,7 +58,7 @@ public class <TKey, TValue>
     : KeyValueMethods
     where TKey : SnapTypeBaseOfT<TKey>, new()
     where TValue : SnapTypeBaseOfT<TValue>, new()
-{
+
     /// <summary>
     /// Copies the source values to the destination.
     /// </summary>

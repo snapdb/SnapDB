@@ -36,8 +36,8 @@ namespace SnapDB.Snap.Services;
 /// </summary>
 public abstract class ArchiveListEditor<TKey, TValue>
     : ArchiveListEditor
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TValue : SnapTypeBaseOfT<TValue>, new()
 {
 
     /// <summary>

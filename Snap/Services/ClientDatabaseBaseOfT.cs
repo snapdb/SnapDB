@@ -34,8 +34,8 @@ namespace SnapDB.Snap.Services;
 /// </summary>
 public abstract class ClientDatabaseBase<TKey, TValue>
     : ClientDatabaseBase, IDatabaseReader<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TValue : SnapTypeBaseOfT<TValue>, new()
 {
     /// <summary>
     /// Reads data from the SortedTreeEngine with the provided read options and server side filters.

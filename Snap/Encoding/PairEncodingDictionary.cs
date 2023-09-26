@@ -90,8 +90,8 @@ internal class PairEncodingDictionary
     /// <param name="encoding">an output if the encoding method exists.</param>
     /// <returns>True if the encoding value was found, false otherwise.</returns>
     public bool TryGetEncodingMethod<TKey, TValue>(EncodingDefinition encodingMethod, out PairEncodingDefinitionBase encoding)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+        where TKey : SnapTypeBaseOfT<TKey>, new()
+        where TValue : SnapTypeBaseOfT<TValue>, new()
     {
         if (encodingMethod is null)
             throw new ArgumentNullException("encodingMethod");

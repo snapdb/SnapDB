@@ -33,8 +33,8 @@ namespace SnapDB.Snap.Services.Writer;
 /// <typeparam name="TKey">The key</typeparam>
 /// <typeparam name="TValue">The value</typeparam>
 public class PrebufferRolloverArgs<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TValue : SnapTypeBaseOfT<TValue>, new()
 {
 
     /// <summary>
