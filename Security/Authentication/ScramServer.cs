@@ -25,7 +25,6 @@
 //******************************************************************************************************
 
 using Gemstone.IO.StreamExtensions;
-using SnapDB.Security;
 
 namespace SnapDB.Security.Authentication;
 
