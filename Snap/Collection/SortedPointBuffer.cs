@@ -35,8 +35,8 @@ namespace SnapDB.Snap.Collection;
 /// A temporary point buffer that is designed to write unsorted data to it, 
 /// then read the data back out sorted. 
 /// </summary>
-/// <typeparam name="TKey">The key type to use</typeparam>
-/// <typeparam name="TValue">The value type to use</typeparam>
+/// <typeparam name="TKey">The key type to use.</typeparam>
+/// <typeparam name="TValue">The value type to use.</typeparam>
 /// <remarks>
 /// This class is not thread safe. 
 /// </remarks>
@@ -109,7 +109,7 @@ public class SortedPointBuffer<TKey, TValue>
     /// Creates a <see cref="SortedPointBuffer{TKey,TValue}"/> that can hold only exactly the specified <see cref="capacity"/>
     /// using the specified duplicate handler.
     /// </summary>
-    /// <param name="capacity">The maximum number of items that can be stored in this class</param>
+    /// <param name="capacity">The maximum number of items that can be stored in this class.</param>
     /// <param name="duplicateHandler">Function that will handle encountered duplicates.</param>
     protected SortedPointBuffer(int capacity, Action<TKey, TKey> duplicateHandler)
         : this(capacity, duplicateHandler is null)
@@ -118,13 +118,13 @@ public class SortedPointBuffer<TKey, TValue>
     }
 
     /// <summary>
-    /// Gets if the stream will never return duplicate keys. Do not return true unless it is Guaranteed that 
+    /// Gets if the stream will never return duplicate keys. Do not return <c>true</c> unless it is guaranteed that 
     /// the data read from this stream will never contain duplicates.
     /// </summary>
     public override bool NeverContainsDuplicates => m_removeDuplicates || (object)m_duplicateHandler != null;
 
     /// <summary>
-    /// Gets if the stream is always in sequential order. Do not return true unless it is Guaranteed that 
+    /// Gets if the stream is always in sequential order. Do not return <c>true</c> unless it is guaranteed that 
     /// the data read from this stream is sequential.
     /// </summary>
     public override bool IsAlwaysSequential => true;
@@ -146,7 +146,7 @@ public class SortedPointBuffer<TKey, TValue>
     public bool IsFull => m_capacity == m_enqueueIndex;
 
     /// <summary>
-    /// Gets/Sets the current mode of the point buffer.
+    /// Gets or sets the current mode of the point buffer.
     /// </summary>
     /// <remarks>
     /// This class is not designed to be read from and written to at the same time.
@@ -210,10 +210,10 @@ public class SortedPointBuffer<TKey, TValue>
     /// <summary>
     /// Attempts to enqueue the provided item to the list.
     /// </summary>
-    /// <param name="key">the key to add</param>
-    /// <param name="value">the value to add</param>
-    /// <returns>true if the item was successfully enqueued. False if the queue is full.</returns>
-    /// <exception cref="InvalidOperationException">Occurs if <see cref="IsReadingMode"/> is set to true</exception>
+    /// <param name="key">The key to add.</param>
+    /// <param name="value">The value to add.</param>
+    /// <returns><c>true</c> if the item was successfully enqueued; <c>false</c> if the queue is full.</returns>
+    /// <exception cref="InvalidOperationException">Occurs if <see cref="IsReadingMode"/> is set to <c>true</c></exception>
     public bool TryEnqueue(TKey key, TValue value)
     {
         if (m_isReadingMode)
@@ -229,8 +229,8 @@ public class SortedPointBuffer<TKey, TValue>
     /// Advances the stream to the next value. 
     /// If before the beginning of the stream, advances to the first value
     /// </summary>
-    /// <returns>True if the advance was successful. False if the end of the stream was reached.</returns>
-    /// <exception cref="InvalidOperationException">Occurs if <see cref="IsReadingMode"/> is set to false</exception>
+    /// <returns><c>true</c> if the advance was successful; <c>false</c> if the end of the stream was reached.</returns>
+    /// <exception cref="InvalidOperationException">Occurs if <see cref="IsReadingMode"/> is set to <c>false</c></exception>
     protected override bool ReadNext(TKey key, TValue value)
     {
         if (!m_isReadingMode)
@@ -238,7 +238,7 @@ public class SortedPointBuffer<TKey, TValue>
         if (IsEmpty)
             return false;
 
-        //Since this class is fixed in size. Bounds checks are not necessary as they will always be valid.
+        // Since this class is fixed in size. Bounds checks are not necessary as they will always be valid.
         int index = m_sortingBlocks1[m_dequeueIndex];
         m_methods.Copy(m_keyData[index], m_valueData[index], key, value);
 
@@ -257,14 +257,14 @@ public class SortedPointBuffer<TKey, TValue>
     /// <summary>
     /// Reads the specified item from the sorted list.
     /// </summary>
-    /// <param name="index">the index of the item to read. Note: Bounds checking is not done.</param>
-    /// <param name="key">the key to write to</param>
-    /// <param name="value">the value to write to</param>
+    /// <param name="index">The index of the item to read. Note: Bounds checking is not done.</param>
+    /// <param name="key">The key to write to.</param>
+    /// <param name="value">The value to write to.</param>
     internal void ReadSorted(int index, TKey key, TValue value)
     {
         if (!m_isReadingMode)
             throw new InvalidOperationException("Cannot read from a list that is not in ReadMode");
-        //Since this class is fixed in size. Bounds checks are not necessary as they will always be valid.
+        // Since this class is fixed in size. Bounds checks are not necessary as they will always be valid.
         m_keyData[m_sortingBlocks1[index]].CopyTo(key);
         m_valueData[m_sortingBlocks1[index]].CopyTo(value);
     }
@@ -274,12 +274,12 @@ public class SortedPointBuffer<TKey, TValue>
     /// </summary>
     private unsafe void Sort()
     {
-        //InitialSort
+        // InitialSort.
         int count = Count;
 
         for (int x = 0; x < count; x += 2)
         {
-            //Can't sort the last entry if not
+            // Can't sort the last entry if not.
             if (x + 1 == count)
             {
                 m_sortingBlocks1[x] = x;
@@ -330,11 +330,11 @@ public class SortedPointBuffer<TKey, TValue>
     /// <summary>
     /// Does a merge sort on the provided level.
     /// </summary>
-    /// <param name="srcIndex">where the current indexes exist</param>
-    /// <param name="dstIndex">where the final indexes should go</param>
-    /// <param name="ptr">the data</param>
-    /// <param name="count">the number of entries at this level</param>
-    /// <param name="stride">the number of compares per level</param>
+    /// <param name="srcIndex">Where the current indexes exist.</param>
+    /// <param name="dstIndex">Where the final indexes should go.</param>
+    /// <param name="ptr">The data.</param>
+    /// <param name="count">The number of entries at this level.</param>
+    /// <param name="stride">The number of compares per level.</param>
     private unsafe void SortLevel(int* srcIndex, int* dstIndex, TKey[] ptr, int count, int stride)
     {
         for (int xStart = 0; xStart < count; xStart += stride + stride)
@@ -348,7 +348,7 @@ public class SortedPointBuffer<TKey, TValue>
 
             if (d != dEnd && i1 != i1End && i2 != i2End)
             {
-                //Check to see if already in order, then I can shortcut
+                // Check to see if already in order, then I can shortcut.
                 if (ptr[srcIndex[i1End - 1]].IsLessThanOrEqualTo(ptr[srcIndex[i2]]))
                 {
                     for (int i = d; i < dEnd; i++)
@@ -414,7 +414,7 @@ public class SortedPointBuffer<TKey, TValue>
         TKey left, right;
         bool keysManipulated = false;
 
-        // Handle any encountered duplicates using derived class handler
+        // Handle any encountered duplicates using derived class handler.
         for (int x = 0; x < m_enqueueIndex - 1; x++)
         {
             left = m_keyData[m_sortingBlocks1[x]];
@@ -427,16 +427,16 @@ public class SortedPointBuffer<TKey, TValue>
             }
         }
 
-        // Validate that duplicates were properly handled
+        // Validate that duplicates were properly handled.
         if (keysManipulated)
         {
             // Since derived class function manipulated keys to manage duplicates we have
             // to re-sort for safety - if keys were managed properly the tree should still
-            // be sorted so this second sort will be fast
+            // be sorted so this second sort will be fast.
             Sort();
 
             // We cannot corrupt the tree so we remove any unhandled duplicates - if derived
-            // class duplicate handler did its job, nothing will be removed
+            // class duplicate handler did its job, nothing will be removed.
             RemoveDuplicates();
         }
     }

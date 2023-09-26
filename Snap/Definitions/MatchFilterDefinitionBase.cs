@@ -25,6 +25,7 @@
 //******************************************************************************************************
 
 using SnapDB.IO;
+using SnapDB.Snap.Filters;
 
 namespace SnapDB.Snap.Definitions;
 
@@ -34,14 +35,13 @@ namespace SnapDB.Snap.Definitions;
 public abstract class MatchFilterDefinitionBase
 {
     /// <summary>
-    /// The filter guid 
+    /// The filter GUID. 
     /// </summary>
     public abstract Guid FilterType { get; }
 
     /// <summary>
-    /// Determines if a Key/Value is contained in the filter
+    /// Determines if a key-value pair is contained in the filter.
     /// </summary>
-    /// <param name="stream">the value to check</param>
-    /// <returns></returns>
+    /// <param name="stream">The value to check.</param>
     public abstract MatchFilterBase<TKey, TValue> Create<TKey, TValue>(BinaryStreamBase stream);
 }

@@ -33,7 +33,7 @@ namespace SnapDB.Snap.Definitions;
 public abstract class IndividualEncodingDefinitionBase
 {
     /// <summary>
-    /// The type supported by the encoded method. Can be null if the encoding is not type specific.
+    /// The type supported by the encoded method. Can be <c>null</c> if the encoding is not type specific.
     /// </summary>
     public abstract Type TypeIfNotGeneric { get; }
 
@@ -45,9 +45,9 @@ public abstract class IndividualEncodingDefinitionBase
     /// <summary>
     /// Constructs a new class based on this encoding method. 
     /// </summary>
-    /// <typeparam name="T">The type of this base class</typeparam>
+    /// <typeparam name="T">The type of this base class.</typeparam>
     /// <returns>
-    /// The encoding method
+    /// The encoding method.
     /// </returns>
     public abstract IndividualEncodingBase<T> Create<T>()
         where T : SnapTypeBaseOfT<T>, new();

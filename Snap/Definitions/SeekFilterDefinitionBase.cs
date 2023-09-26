@@ -25,6 +25,7 @@
 //******************************************************************************************************
 
 using SnapDB.IO;
+using SnapDB.Snap.Filters;
 
 namespace SnapDB.Snap.Definitions;
 

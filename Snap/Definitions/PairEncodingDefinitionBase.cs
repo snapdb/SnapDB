@@ -24,6 +24,8 @@
 //
 //******************************************************************************************************
 
+using SnapDB.Snap.Encoding;
+
 namespace SnapDB.Snap.Definitions;
 
 /// <summary>
@@ -32,12 +34,12 @@ namespace SnapDB.Snap.Definitions;
 public abstract class PairEncodingDefinitionBase
 {
     /// <summary>
-    /// The key type supported by the encoded method. Can be null if the encoding is not type specific.
+    /// The key type supported by the encoded method. Can be <c>null</c> if the encoding is not type specific.
     /// </summary>
     public abstract Type KeyTypeIfNotGeneric { get; }
 
     /// <summary>
-    /// The value type supported by the encoded method. Can be null if the encoding is not type specific.
+    /// The value type supported by the encoded method. Can be <c>null</c> if the encoding is not type specific.
     /// </summary>
     public abstract Type ValueTypeIfNotGeneric { get; }
 
@@ -49,9 +51,9 @@ public abstract class PairEncodingDefinitionBase
     /// <summary>
     /// Constructs a new class based on this encoding method. 
     /// </summary>
-    /// <typeparam name="TKey">The key for this encoding method</typeparam>
-    /// <typeparam name="TValue">The value for this encoding method</typeparam>
-    /// <returns>The encoding method</returns>
+    /// <typeparam name="TKey">The key for this encoding method.</typeparam>
+    /// <typeparam name="TValue">The value for this encoding method.</typeparam>
+    /// <returns>The encoding method.</returns>
     public abstract PairEncodingBase<TKey, TValue> Create<TKey, TValue>()
         where TKey : SnapTypeBaseOfT<TKey>, new()
         where TValue : SnapTypeBaseOfT<TValue>, new();
