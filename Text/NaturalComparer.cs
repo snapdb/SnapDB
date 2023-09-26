@@ -90,13 +90,11 @@ public class NaturalComparer
             }
         }
         if (y1.Length > x1.Length)
-        {
             return 1;
-        }
-        else if (x1.Length > y1.Length)
-        {
+
+        if (x1.Length > y1.Length)
             return -1;
-        }
+
         else
         {
             return 0;
