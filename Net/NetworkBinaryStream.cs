@@ -30,11 +30,21 @@ using SnapDB.Threading;
 
 namespace SnapDB.Net;
 
+/// <summary>
+/// Represents a binary stream over a network connection.
+/// </summary>
 public class NetworkBinaryStream
     : RemoteBinaryStream
 {
     private Socket m_socket;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NetworkBinaryStream"/> class.
+    /// </summary>
+    /// <param name="socket">The underlying socket to use for communication.</param>
+    /// <param name="timeout">The socket timeout in milliseconds.</param>
+    /// <param name="workerThreadSynchronization">Optional worker thread synchronization object.</param>
+    /// <exception cref="Exception"></exception>
     public NetworkBinaryStream(Socket socket, int timeout = -1, WorkerThreadSynchronization? workerThreadSynchronization = null)
         : base(new NetworkStream(socket), workerThreadSynchronization)
     {
@@ -46,8 +56,14 @@ public class NetworkBinaryStream
         m_socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
     }
 
+    /// <summary>
+    /// Gets the underlying socket used for communication.
+    /// </summary>
     public Socket Socket => m_socket;
 
+    /// <summary>
+    /// Gets or sets the socket timeout in milliseconds.
+    /// </summary>
     public int Timeout
     {
         get => m_socket.ReceiveTimeout;
@@ -58,18 +74,28 @@ public class NetworkBinaryStream
         }
     }
 
+    /// <summary>
+    /// Gets a value indicating whether or not the socket is connected.
+    /// </summary>
     public bool Connected => m_socket is not null && m_socket.Connected;
 
+    /// <summary>
+    /// Gets the number of available bytes to read from the stream.
+    /// </summary>
     public int AvailableReadBytes
     {
         get
         {
             WorkerThreadSynchronization.PulseSafeToCallback();
-            // TODO: Don't call m_socket.Available since it's a windows API Call and terribly slow.
+
             return ReceiveBufferAvailable + m_socket.Available;
         }
     }
 
+    /// <summary>
+    /// Disposes of the <see cref="NetworkBinaryStream"/> instance, disconnecting the socket if necessary.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> if called from <see cref="Dispose"/>, <c>false</c> if called from the finalizer.</param>
     protected override void Dispose(bool disposing)
     {
         if (disposing)
@@ -79,7 +105,7 @@ public class NetworkBinaryStream
     }
 
     /// <summary>
-    /// Disconnects the socket. Does not throw an exception.
+    /// Disconnects the socket.
     /// </summary>
     public void Disconnect()
     {
