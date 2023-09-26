@@ -28,7 +28,6 @@
 //******************************************************************************************************
 
 using System.Data;
-using System.Text;
 using Gemstone.GuidExtensions;
 using Gemstone.IO.StreamExtensions;
 using Gemstone;

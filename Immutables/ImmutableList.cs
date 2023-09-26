@@ -251,13 +251,9 @@ public class ImmutableList<T>
         {
             TestForEditable();
             if (m_formatter is null)
-            {
                 m_list[index] = value;
-            }
             else
-            {
                 m_list[index] = m_formatter(value);
-            }
         }
     }
 }
