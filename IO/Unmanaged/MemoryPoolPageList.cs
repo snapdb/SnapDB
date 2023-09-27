@@ -35,7 +35,7 @@ namespace SnapDB.IO.Unmanaged;
 /// Maintains a list of all of the memory allocations for the buffer pool.
 /// </summary>
 /// <remarks>
-/// This class is not thread safe.
+/// This class is not thread-safe.
 /// </remarks>
 internal class MemoryPoolPageList
     : IDisposable
@@ -51,12 +51,12 @@ internal class MemoryPoolPageList
 
     /// <summary>
     /// A bit array that references each page and determines if the page is free.
-    /// Set means page is free, cleared means page is either being used, or was never allocated from windows.
+    /// Set means page is free, cleared means page is either being used, or was never allocated from Windows.
     /// </summary>
     private readonly BitArray m_isPageFree;
 
     /// <summary>
-    /// The number of pages that exist within a windows API allocation.
+    /// The number of pages that exist within a Windows API allocation.
     /// </summary>
     private readonly int m_pagesPerMemoryBlock;
     private readonly int m_pagesPerMemoryBlockShiftBits;
@@ -86,7 +86,7 @@ internal class MemoryPoolPageList
 
     /// <summary>
     /// The maximum supported number of bytes that can be allocated based
-    /// on the amount of RAM in the system. This is not user configurable.
+    /// on the amount of RAM in the system. This is not user-configurable.
     /// </summary>
     public readonly long MemoryPoolCeiling;
 
@@ -102,7 +102,7 @@ internal class MemoryPoolPageList
     /// <param name="pageSize">The desired page size. Must be between 4KB and 256KB.</param>
     /// <param name="maximumBufferSize">
     /// The desired maximum size of the allocation. Note: could be less if there is not enough system memory.
-    /// A value of -1 will default based on available system memory
+    /// A value of -1 will default based on available system memory.
     /// </param>
     public MemoryPoolPageList(int pageSize, long maximumBufferSize)
     {
@@ -187,7 +187,7 @@ internal class MemoryPoolPageList
     /// Gets if there is any free space.
     /// </summary>
     public long FreeSpaceBytes =>
-        //In case a race condition yields a negative value
+        // In case a race condition yields a negative value
         Math.Max(CurrentCapacity - CurrentAllocatedSize, 0);
 
     /// <summary>
@@ -217,6 +217,7 @@ internal class MemoryPoolPageList
             {
                 index = -1;
                 addressPointer = IntPtr.Zero;
+
                 return false;
             }
 
@@ -240,6 +241,7 @@ internal class MemoryPoolPageList
             addressPointer = block.Address + blockOffset * PageSize;
 
             index++;
+
             return true;
         }
     }
@@ -311,7 +313,7 @@ internal class MemoryPoolPageList
     /// <summary>
     /// Changes the allowable buffer size.
     /// </summary>
-    /// <param name="value">the number of bytes to set.</param>
+    /// <param name="value">The number of bytes to set.</param>
     public long SetMaximumPoolSize(long value)
     {
         lock (m_syncRoot)
@@ -320,6 +322,7 @@ internal class MemoryPoolPageList
                 throw new ObjectDisposedException(GetType().FullName);
 
             MaximumPoolSize = Math.Max(Math.Min(MemoryPoolCeiling, value), MemoryPool.MinimumTestedSupportedMemoryFloor);
+
             return MaximumPoolSize;
         }
     }
@@ -339,6 +342,7 @@ internal class MemoryPoolPageList
             sizeBefore = CurrentCapacity;
 
             size = Math.Min(size, MaximumPoolSize);
+
             while (CurrentCapacity < size)
             {
                 Memory memory = new(m_memoryBlockSize);
@@ -374,6 +378,7 @@ internal class MemoryPoolPageList
                     m_isPageFree.ClearAll();
                     m_memoryBlocks.Clear();
                 }
+
                 finally
                 {
                     m_disposed = true; // Prevent duplicate dispose.
@@ -387,20 +392,26 @@ internal class MemoryPoolPageList
     #region [ Static ]
 
     /// <summary>
-    /// Computes the ceiling of the buffer pool.
+    /// Calculates the memory pool ceiling based on the memory block size and the total physical system memory.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="memoryBlockSize">The size of memory blocks used by the memory pool.</param>
+    /// <param name="systemTotalPhysicalMemory">The total physical memory available in the system, in bytes.</param>
+    /// <returns>The calculated memory pool ceiling, rounded down to the nearest allocation size.</returns>
     private static long CalculateMemoryPoolCeiling(int memoryBlockSize, long systemTotalPhysicalMemory)
     {
+        // Initialize the size with the maximum tested supported memory ceiling.
         long size = MemoryPool.MaximumTestedSupportedMemoryCeiling;
 
-        // Physical upper limit is the greater of 50% of memory or all but 8 GB of RAM.
+        // Calculate the physical upper limit, which is the greater of 50% of memory or all but 8 GB of RAM.
         long physicalUpperLimit = Math.Max(systemTotalPhysicalMemory / 2, systemTotalPhysicalMemory - 8 * 1024 * 1024 * 1024L);
 
+        // Limit the size to the calculated physical upper limit.
         size = Math.Min(size, physicalUpperLimit);
 
+        // Round down the size to the nearest allocation size (memory block size).
         size = size - size % memoryBlockSize; // Rounds down to the nearest allocation size.
 
+        // Return the calculated memory pool ceiling.
         return size;
     }
 
@@ -421,6 +432,7 @@ internal class MemoryPoolPageList
         targetMemoryBlockSize = targetMemoryBlockSize - targetMemoryBlockSize % pageSize;
         targetMemoryBlockSize = (int)Math.Max(targetMemoryBlockSize, pageSize);
         targetMemoryBlockSize = (int)BitMath.RoundUpToNearestPowerOfTwo((ulong)targetMemoryBlockSize);
+
         return (int)targetMemoryBlockSize;
     }
 
