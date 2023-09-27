@@ -96,7 +96,7 @@ public unsafe abstract class BinaryStreamPointerBase
     /// <remarks>
     /// It is important to use this to Get or Set the position from the underlying stream since 
     /// this class buffers the results of the query. Setting this field does not guarantee that
-    /// the underlying stream will get set. Call FlushToUnderlyingStream to acomplish this.
+    /// the underlying stream will get set. Call FlushToUnderlyingStream to accomplish this.
     /// </remarks>
     public override long Position
     {
@@ -154,7 +154,7 @@ public unsafe abstract class BinaryStreamPointerBase
     /// </summary>
     /// <param name="position"></param>
     /// <param name="length">The number of bytes valid for the writing.</param>
-    /// <remarks>This method will throw an exeption if the provided length cannot be provided.</remarks>
+    /// <remarks>This method will throw an exception if the provided length cannot be provided.</remarks>
     public byte* GetReadPointer(long position, int length)
     {
         Position = position;
@@ -174,7 +174,7 @@ public unsafe abstract class BinaryStreamPointerBase
     /// <param name="position"></param>
     /// <param name="length">The number of bytes valid for the writing.</param>
     /// <param name="supportsWriting">An output parameter detailing if writing to this block is supported.</param>
-    /// <remarks>This method will throw an exeption if the provided length cannot be provided.</remarks>
+    /// <remarks>This method will throw an exception if the provided length cannot be provided.</remarks>
     public byte* GetReadPointer(long position, int length, out bool supportsWriting)
     {
         Position = position;
@@ -190,9 +190,9 @@ public unsafe abstract class BinaryStreamPointerBase
     /// <summary>
     /// Copies a specified number of bytes to a new location.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="destination"></param>
-    /// <param name="length"></param>
+    /// <param name="source">The source position to start copying from.</param>
+    /// <param name="destination">The destination position to start copying to.</param>
+    /// <param name="length">The number of bytes to copy.</param>
     public override void Copy(long source, long destination, int length)
     {
         if (source < 0)

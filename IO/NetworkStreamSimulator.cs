@@ -106,16 +106,16 @@ public class NetworkStreamSimulator
     private readonly IsolatedQueue<byte> m_queueB;
 
     /// <summary>
-    /// The client's stream
+    /// The client's stream.
     /// </summary>
     public readonly Stream ClientStream;
     /// <summary>
-    /// The server's stream
+    /// The server's stream.
     /// </summary>
     public readonly Stream ServerStream;
 
     /// <summary>
-    /// Creates a new <see cref="NetworkStreamSimulator"/>
+    /// Creates a new <see cref="NetworkStreamSimulator"/>.
     /// </summary>
     public NetworkStreamSimulator()
     {

@@ -159,7 +159,9 @@ public class BinaryStreamStream
     /// <returns>
     /// A long value representing the length of the stream in bytes.
     /// </returns>
-    /// <exception cref="T:System.NotSupportedException">A class derived from Stream does not support seeking. </exception><exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception><filterpriority>1</filterpriority>
+    /// <exception cref="T:System.NotSupportedException">A class derived from Stream does not support seeking.</exception>
+    /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+    /// <filterpriority>1</filterpriority>
     public override long Length => BaseStream.Length;
 
     /// <summary>
@@ -168,7 +170,10 @@ public class BinaryStreamStream
     /// <returns>
     /// The current position within the stream.
     /// </returns>
-    /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception><exception cref="T:System.NotSupportedException">The stream does not support seeking. </exception><exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception><filterpriority>1</filterpriority>
+    /// <exception cref="T:System.IO.IOException">An I/O error occurs.</exception>
+    /// <exception cref="T:System.NotSupportedException">The stream does not support seeking.</exception>
+    /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+    /// <filterpriority>1</filterpriority>
     public override long Position
     {
         get => BaseStream.Position;

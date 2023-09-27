@@ -53,7 +53,7 @@ public class UltraStreamWriter
     /// <summary>
     /// Writes the provided character to the stream.
     /// </summary>
-    /// <param name="value">the character to write.</param>
+    /// <param name="value">The character to write.</param>
     public void Write(char value)
     {
         if (m_position < FlushSize)
@@ -65,7 +65,7 @@ public class UltraStreamWriter
     /// <summary>
     /// Writes the provided float to the stream.
     /// </summary>
-    /// <param name="value">the value to write.</param>
+    /// <param name="value">The value to write.</param>
     public void Write(float value)
     {
         if (m_position < FlushSize)

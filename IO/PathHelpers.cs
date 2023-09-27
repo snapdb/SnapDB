@@ -32,14 +32,14 @@ namespace SnapDB.IO;
 public static class PathHelpers
 {
     /// <summary>
-    /// ensures that the provided extension is in the provided format:  .exe
+    /// Ensures that the provided extension is in the provided format:  .exe
     /// </summary>
     /// <param name="extension">the extension to format. Can be *.exe, or .exe, or exe</param>
     /// <returns>
-    /// a vaild extension.
+    /// A vaild extension.
     /// </returns>
     /// <remarks>
-    /// throws a series of exceptions if the <see cref="extension"/> is invalid.
+    /// Throws a series of exceptions if the <see cref="extension"/> is invalid.
     /// </remarks>
     public static string FormatExtension(string extension)
     {
@@ -85,7 +85,7 @@ public static class PathHelpers
     /// <summary>
     /// Ensures the supplied path name is valid.
     /// </summary>
-    /// <param name="pathName">any path.</param>
+    /// <param name="pathName">Any path.</param>
     /// <remarks>
     /// Throws a series of exceptions if the <see cref="pathName"/> is invalid.
     /// </remarks>
