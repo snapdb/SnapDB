@@ -132,6 +132,7 @@ public sealed partial class SubFileStream
         {
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             return m_isReadOnly;
         }
     }
@@ -152,11 +153,14 @@ public sealed partial class SubFileStream
     {
         get
         {
+            int count = 0;
+
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
-            int count = 0;
+
             if (m_ioStream1 is null || m_ioStream1.IsDisposed)
                 count++;
+
             if (m_ioStream2 is null || m_ioStream2.IsDisposed)
                 count++;
             return count;
@@ -171,12 +175,14 @@ public sealed partial class SubFileStream
     {
         if (!m_fileHeaderBlock.IsSimplifiedFileFormat)
         {
-            if (m_ioStream1 is not null && !m_ioStream1.IsDisposed && m_ioStream1 is not caller)
-                (m_ioStream1 as IoSession).ClearIndexCache(mostRecentParser);
-            if (m_ioStream2 is not null && !m_ioStream2.IsDisposed && m_ioStream2 is not caller)
-                (m_ioStream2 as IoSession).ClearIndexCache(mostRecentParser);
+            if (m_ioStream1 != null && !m_ioStream1.IsDisposed && m_ioStream1 != caller)
+                ((IoSession)m_ioStream1).ClearIndexCache(mostRecentParser);
+
+            if (m_ioStream2 != null && !m_ioStream2.IsDisposed && m_ioStream2 != caller)
+                ((IoSession)m_ioStream2).ClearIndexCache(mostRecentParser);
         }
     }
+
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
