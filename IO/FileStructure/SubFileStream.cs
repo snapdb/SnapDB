@@ -146,8 +146,7 @@ public sealed partial class SubFileStream
     /// Gets the number of available simultaneous read/write sessions.
     /// </summary>
     /// <remarks>
-    /// This value is used to determine if a binary stream can be cloned
-    /// to improve read, write, and copy performance.
+    /// This value is used to determine if a binary stream can be cloned to improve read, write, and copy performance.
     /// </remarks>
     public int RemainingSupportedIoSessions
     {
@@ -199,12 +198,14 @@ public sealed partial class SubFileStream
                     m_ioStream1.Dispose();
                     m_ioStream1 = null;
                 }
+
                 if (m_ioStream2 is not null)
                 {
                     m_ioStream2.Dispose();
                     m_ioStream2 = null;
                 }
             }
+
             finally
             {
                 m_disposed = true; // Prevent duplicate dispose.
@@ -220,6 +221,7 @@ public sealed partial class SubFileStream
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         if (RemainingSupportedIoSessions == 0)
             throw new Exception("There are not any remaining IO Sessions");
 
@@ -228,18 +230,22 @@ public sealed partial class SubFileStream
         {
             session = new SimplifiedIoSession(this);
         }
+
         else
         {
             session = new IoSession(this);
         }
+
         if (m_ioStream1 is null || m_ioStream1.IsDisposed)
         {
             m_ioStream1 = session;
         }
+
         else
         {
             m_ioStream2 = session;
         }
+
         return session;
     }
 

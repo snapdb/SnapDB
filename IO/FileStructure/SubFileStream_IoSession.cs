@@ -77,6 +77,7 @@ public partial class SubFileStream
             {
                 m_parser = new IndexParser(m_ioSessions);
             }
+
             else
             {
                 m_pager = new ShadowCopyAllocator(m_ioSessions);
@@ -117,6 +118,7 @@ public partial class SubFileStream
                         // This will be done only when the object is disposed by calling Dispose().
                     }
                 }
+
                 finally
                 {
                     m_parser = null;
@@ -134,6 +136,7 @@ public partial class SubFileStream
         {
             if (IsDisposed || m_ioSessions.IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             m_ioSessions.Clear();
         }
 
@@ -141,6 +144,7 @@ public partial class SubFileStream
         {
             if (IsDisposed || m_ioSessions.IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             m_parser.ClearIndexCache(mostRecentParser);
         }
 
@@ -150,8 +154,10 @@ public partial class SubFileStream
             long pos = args.Position;
             if (IsDisposed || m_ioSessions.IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             if (pos < 0)
                 throw new ArgumentOutOfRangeException("position", "cannot be negative");
+
             if (pos >= blockDataLength * (uint.MaxValue - 1))
                 throw new ArgumentOutOfRangeException("position", "position reaches past the end of the file.");
 
@@ -160,6 +166,7 @@ public partial class SubFileStream
 
             if (pos <= uint.MaxValue) // 64-bit signed divide is twice as slow as 64-bit unsigned.
                 indexPosition = (uint)pos / (uint)blockDataLength;
+
             else
                 indexPosition = (uint)((ulong)pos / (ulong)blockDataLength); // 64-bit signed divide is twice as slow as 64-bit unsigned.
 
@@ -171,6 +178,7 @@ public partial class SubFileStream
                 // Writing
                 if (m_isReadOnly)
                     throw new Exception("File is read only");
+
                 physicalBlockIndex = m_pager.VirtualToShadowPagePhysical(indexPosition, out bool wasShadowPaged);
 
                 if (wasShadowPaged)
@@ -183,6 +191,7 @@ public partial class SubFileStream
                 args.FirstPointer = (IntPtr)DataIoSession.Pointer;
                 args.SupportsWriting = true;
             }
+
             else
             {
                 // Reading

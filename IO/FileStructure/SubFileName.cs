@@ -108,7 +108,7 @@ public class SubFileName
     /// <returns>
     /// <c>true</c> if the specified object  is equal to the current object; otherwise, <c>false</c>.
     /// </returns>
-    /// <param name="obj">The object to compare with the current object. </param>
+    /// <param name="obj">The object to compare with the current object.</param>
     /// <filterpriority>2</filterpriority>
     public override bool Equals(object obj)
     {
@@ -164,7 +164,7 @@ public class SubFileName
     /// <summary>
     /// Creates a <see cref="SubFileName"/> from the supplied data.
     /// </summary>
-    /// <param name="fileType">The type identifier of the file</param>
+    /// <param name="fileType">The type identifier of the file.</param>
     /// <param name="keyType">The GUID identifier of the type of the SortedTreeStore.</param>
     /// <param name="valueType">The GUID identifier of the value type of the SortedTreeStore.</param>
     public static unsafe SubFileName Create(Guid fileType, Guid keyType, Guid valueType)
@@ -184,7 +184,7 @@ public class SubFileName
     /// </summary>
     /// <param name="fileName">A name associated with the data.</param>
     /// <param name="keyType">The GUID identifier of the type of the <see cref="SortedTreeStore"/>.</param>
-    /// <param name="valueType">the GUID identifier of the value type of the <see cref="SortedTreeStore"/>.</param>
+    /// <param name="valueType">The GUID identifier of the value type of the <see cref="SortedTreeStore"/>.</param>
     /// <returns></returns>
     public static unsafe SubFileName Create(string fileName, Guid keyType, Guid valueType)
     {
@@ -219,7 +219,7 @@ public class SubFileName
     /// Loads the <see cref="SubFileName"/> from the supplied <see cref="reader"/>.
     /// </summary>
     /// <param name="reader">The reader to read from.</param>
-    /// <returns>The subfile's corresponding values.</returns>
+    /// <returns>The subFile's corresponding values.</returns>
     public static SubFileName Load(BinaryReader reader)
     {
         long value1 = reader.ReadInt64();

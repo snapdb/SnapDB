@@ -82,7 +82,7 @@ public sealed class TransactionalEdit
     /// <summary>
     /// Creates an editable copy of the transaction.
     /// </summary>
-    /// <param name="dataReader"> </param>
+    /// <param name="dataReader">The DiskIo instance to read data from.</param>
     /// <param name="delHasBeenRolledBack">The delegate to call when this transaction has been rolled back.</param>
     /// <param name="delHasBeenCommitted">The delegate to call when this transaction has been committed.</param>
     internal TransactionalEdit(DiskIo dataReader, Action? delHasBeenRolledBack = null, Action? delHasBeenCommitted = null)
@@ -163,7 +163,7 @@ public sealed class TransactionalEdit
     }
 
     /// <summary>
-    /// Opens a ArchiveFileStream that can be used to read/write to the file passed to this function.
+    /// Opens a ArchiveFileStream that can be used to read and write to the file passed to this function.
     /// </summary>
     public SubFileStream OpenFile(SubFileName fileName)
     {
@@ -223,12 +223,14 @@ public sealed class TransactionalEdit
             if (file is not null && !file.IsDisposed)
                 file.Dispose();
         }
+
         try
         {
             m_dataReader.RollbackChanges();
             if (m_delHasBeenRolledBack is not null)
                 m_delHasBeenRolledBack.Invoke();
         }
+
         finally
         {
             m_delHasBeenCommitted = null;

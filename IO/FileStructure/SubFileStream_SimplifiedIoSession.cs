@@ -96,7 +96,7 @@ public partial class SubFileStream
         }
 
         /// <summary>
-        /// Sets the current usage of the <see cref="BinaryStreamIoSessionBase"/> to null.
+        /// Sets the current usage of the <see cref="BinaryStreamIoSessionBase"/> to <c>null</c>.
         /// </summary>
         public override void Clear()
         {

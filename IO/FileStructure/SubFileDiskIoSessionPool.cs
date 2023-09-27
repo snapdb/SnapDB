@@ -99,10 +99,10 @@ internal class SubFileDiskIoSessionPool
     /// <summary>
     /// Creates this file with the following data.
     /// </summary>
-    /// <param name="diskIo"></param>
-    /// <param name="header"></param>
-    /// <param name="file"></param>
-    /// <param name="isReadOnly"></param>
+    /// <param name="diskIo">The DiskIo instance to use for I/O operations.</param>
+    /// <param name="header">The FileHeaderBlock for the file.</param>
+    /// <param name="file">The SubFileHeader for the file, if available; otherwise, <c>null</c>.</param>
+    /// <param name="isReadOnly">A boolean indicating whether the file is opened in read-only mode.</param>
     public SubFileDiskIoSessionPool(DiskIo diskIo, FileHeaderBlock header, SubFileHeader? file, bool isReadOnly)
     {
         LastReadonlyBlock = diskIo.LastCommittedHeader.LastAllocatedBlock;
@@ -111,6 +111,7 @@ internal class SubFileDiskIoSessionPool
         IsReadOnly = isReadOnly;
         SourceData = diskIo.CreateDiskIoSession(header, file);
         SourceIndex = diskIo.CreateDiskIoSession(header, file);
+
         if (!isReadOnly)
         {
             DestinationData = diskIo.CreateDiskIoSession(header, file);
@@ -132,6 +133,7 @@ internal class SubFileDiskIoSessionPool
     {
         if (IsReadOnly)
             throw new NotSupportedException("Not supported when in read only mode");
+
         DiskIoSession swap = SourceIndex;
         SourceIndex = DestinationIndex;
         DestinationIndex = swap;
@@ -156,10 +158,13 @@ internal class SubFileDiskIoSessionPool
     {
         if (SourceData is not null)
             SourceData.Clear();
+
         if (DestinationData is not null)
             DestinationData.Clear();
+
         if (SourceIndex is not null)
             SourceIndex.Clear();
+
         if (DestinationIndex is not null)
             DestinationIndex.Clear();
     }
@@ -172,21 +177,25 @@ internal class SubFileDiskIoSessionPool
     {
         GC.SuppressFinalize(this);
         IsDisposed = true;
+
         if (SourceData is not null)
         {
             SourceData.Dispose();
             SourceData = null;
         }
+
         if (DestinationData is not null)
         {
             DestinationData.Dispose();
             DestinationData = null;
         }
+
         if (SourceIndex is not null)
         {
             SourceIndex.Dispose();
             SourceIndex = null;
         }
+
         if (DestinationIndex is not null)
         {
             DestinationIndex.Dispose();
