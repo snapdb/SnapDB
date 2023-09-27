@@ -48,8 +48,8 @@ internal partial class BufferedFile
         /// <summary>
         /// Creates a new <see cref="IoSession"/>
         /// </summary>
-        /// <param name="stream">the base class</param>
-        /// <param name="pageReplacement">The page Replacement Algorithm</param>
+        /// <param name="stream">The base class.</param>
+        /// <param name="pageReplacement">The page replacement algorithm</param>
         internal IoSession(BufferedFile stream, PageReplacementAlgorithm pageReplacement)
             : base(pageReplacement)
         {
@@ -69,9 +69,9 @@ internal partial class BufferedFile
 #endif
 
         /// <summary>
-        /// Gets a block for the following Io session.
+        /// Gets a block for the following I/O session.
         /// </summary>
-        /// <param name="args">the <see cref="BlockArguments"/> to use to read and write to a block</param>
+        /// <param name="args">The <see cref="BlockArguments"/> to use to read and write to a block.</param>
         public override void GetBlock(BlockArguments args)
         {
             if (IsDisposed)

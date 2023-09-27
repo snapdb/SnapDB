@@ -44,6 +44,7 @@ public partial class MemoryPoolStream
         {
             if (stream is null)
                 throw new ArgumentNullException(nameof(stream));
+
             m_stream = stream;
         }
 

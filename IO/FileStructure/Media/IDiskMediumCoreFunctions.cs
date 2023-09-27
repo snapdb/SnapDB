@@ -37,7 +37,6 @@ internal interface IDiskMediumCoreFunctions
     /// <summary>
     /// Creates a <see cref="BinaryStreamIoSessionBase"/> that can be used to read from this disk medium.
     /// </summary>
-    /// <returns></returns>
     BinaryStreamIoSessionBase CreateIoSession();
 
     /// <summary>
@@ -58,19 +57,18 @@ internal interface IDiskMediumCoreFunctions
     /// Executes a commit of data. This will flush the data to the disk use the provided header data to properly
     /// execute this function.
     /// </summary>
-    /// <param name="header"></param>
     void CommitChanges(FileHeaderBlock header);
 
     /// <summary>
-    /// Rolls back all edits to the DiskMedium
+    /// Rolls back all edits to the DiskMedium.
     /// </summary>
     void RollbackChanges();
 
     /// <summary>
     /// Changes the extension of the current file.
     /// </summary>
-    /// <param name="extension">the new extension</param>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="extension">The new extension.</param>
+    /// <param name="isReadOnly">If the file should be reopened as read-only.</param>
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled);
 

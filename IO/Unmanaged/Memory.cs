@@ -34,7 +34,7 @@ namespace SnapDB.IO.Unmanaged;
 
 /// <summary>
 /// This class is used to allocate and free unmanaged memory.  
-/// To release memory allocated through this class, call the Dispose method of the return value.
+/// To release memory allocated through this class, call the Dispose() method of the return value.
 /// </summary>
 /// <remarks>
 /// .NET does not respond well when managing tens of GBs of ram.  If a very large buffer pool must be created,
@@ -171,6 +171,7 @@ public sealed class Memory
         {
             *(long*)(pointer + i) = 0;
         }
+
         for (; i < length; i++)
         {
             pointer[i] = 0;

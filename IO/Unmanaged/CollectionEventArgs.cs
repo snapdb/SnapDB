@@ -51,8 +51,15 @@ public enum MemoryPoolCollectionMode
 }
 
 /// <summary>
-/// This contains information about the collection that is requested from the system.
+/// Initializes a new instance of the <see cref="CollectionEventArgs"/> class.
 /// </summary>
+/// <param name="releasePage">The action to release a page.</param>
+/// <param name="collectionMode">The memory pool collection mode.</param>
+/// <param name="desiredPageReleaseCount">The desired number of pages to release during collection.</param>
+/// <remarks>
+/// This constructor initializes a new instance of the <see cref="CollectionEventArgs"/> class.
+/// It sets the desired page release count, the action to release a page, and the memory pool collection mode.
+/// </remarks>
 public class CollectionEventArgs : EventArgs
 {
     private readonly Action<int> m_releasePage;

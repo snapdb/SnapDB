@@ -187,7 +187,7 @@ internal class MemoryPoolPageList
     /// Gets if there is any free space.
     /// </summary>
     public long FreeSpaceBytes =>
-        // In case a race condition yields a negative value
+        // In case a race condition yields a negative value.
         Math.Max(CurrentCapacity - CurrentAllocatedSize, 0);
 
     /// <summary>
@@ -265,12 +265,14 @@ internal class MemoryPoolPageList
                     // IntPtr page = GetPageAddress(index);
                     // Memory.Clear(page,PageSize);
                     m_usedPageCount--;
+
                     return;
                 }
             }
         }
 
         Log.Publish(MessageLevel.Warning, MessageFlags.BugReport, "A page has been released twice. Some code somewhere could create memory corruption");
+
         throw new Exception("Cannot have duplicate calls to release pages.");
     }
 
@@ -280,7 +282,6 @@ internal class MemoryPoolPageList
     /// <param name="size">The size of the buffer pool.</param>
     /// <returns>The final size of the buffer pool.</returns>
     /// <remarks>The buffer pool shrinks to a size less than or equal to <see cref="size"/>.</remarks>
-    // ToDo: Expose this method and test it.
     public long ShrinkMemoryPool(long size)
     {
         lock (m_syncRoot)
@@ -301,6 +302,7 @@ internal class MemoryPoolPageList
                         m_memoryBlocks[x].Dispose();
                         m_memoryBlocks[x] = null;
                         m_memoryBlockAllocations--;
+
                         if (CurrentCapacity <= size)
                             return CurrentCapacity;
                     }

@@ -66,7 +66,7 @@ internal partial class PageReplacementAlgorithm
         public int CurrentPageIndex => m_currentPageIndex;
 
         /// <summary>
-        /// Releases a lock
+        /// Releases a lock.
         /// </summary>
         public override void Clear()
         {
@@ -97,30 +97,36 @@ internal partial class PageReplacementAlgorithm
         /// <summary>
         /// Attempts to get a sub page. 
         /// </summary>
-        /// <param name="position">the absolute position in the stream to get the page for.</param>
-        /// <param name="location">a pointer for the page</param>
-        /// <returns>False if the page does not exists and needs to be added.</returns>
+        /// <param name="position">The absolute position in the stream to get the page for.</param>
+        /// <param name="location">A pointer for the page.</param>
+        /// <returns><c>false</c> if the page does not exists and needs to be added.</returns>
         public bool TryGetSubPage(long position, out IntPtr location)
         {
             lock (m_parent.m_syncRoot)
             {
                 if (m_parent.m_disposed)
                     throw new ObjectDisposedException(GetType().FullName);
+
                 if (position < 0)
                     throw new ArgumentOutOfRangeException(nameof(position), "Cannot be negative");
+
                 if (position > m_parent.m_maxValidPosition)
                     throw new ArgumentOutOfRangeException(nameof(position), "Position index can no longer be specified as an Int32");
+
                 if ((position & m_parent.m_memoryPageSizeMask) != 0)
                     throw new ArgumentOutOfRangeException(nameof(position), "must lie on a page boundary");
 
                 int positionIndex = (int)(position >> m_parent.m_memoryPageSizeShiftBits);
+
                 if (m_parent.m_pageList.TryGetPageIndex(positionIndex, out int pageIndex))
                 {
                     m_currentPageIndex = pageIndex;
                     location = m_parent.m_pageList.GetPointerToPage(pageIndex, 1);
+
                     return true;
                 }
                 location = default;
+
                 return false;
             }
         }
@@ -130,11 +136,11 @@ internal partial class PageReplacementAlgorithm
         /// otherwise, returns the page already in the list.
         /// </summary>
         /// <param name="position">The position of the first byte in the page</param>
-        /// <param name="startOfMemoryPoolPage">the pointer acquired by the memory pool to this data.</param>
-        /// <param name="memoryPoolIndex">the memory pool index for this data</param>
+        /// <param name="startOfMemoryPoolPage">The pointer acquired by the memory pool to this data.</param>
+        /// <param name="memoryPoolIndex">The memory pool index for this data</param>
         /// <param name="wasPageAdded">Determines if the page provided was indeed added to the list.</param>
         /// <returns>The pointer to the page for this position</returns>
-        /// <remarks>If <see cref="wasPageAdded"/> is false, the calling function should 
+        /// <remarks>If <see cref="wasPageAdded"/> is <c>false</c>, the calling function should 
         /// return the page back to the memory pool.
         /// </remarks>
         public IntPtr GetOrAddPage(long position, IntPtr startOfMemoryPoolPage, int memoryPoolIndex, out bool wasPageAdded)
@@ -143,12 +149,16 @@ internal partial class PageReplacementAlgorithm
             {
                 if (m_parent.m_disposed)
                     throw new ObjectDisposedException(GetType().FullName);
+
                 if (position < 0)
                     throw new ArgumentOutOfRangeException(nameof(position), "Cannot be negative");
+
                 if (position > m_parent.m_maxValidPosition)
                     throw new ArgumentOutOfRangeException(nameof(position), "Position index can no longer be specified as an Int32");
+
                 if ((position & m_parent.m_memoryPageSizeMask) != 0)
                     throw new ArgumentOutOfRangeException(nameof(position), "must lie on a page boundary");
+
                 int positionIndex = (int)(position >> m_parent.m_memoryPageSizeShiftBits);
 
                 if (m_parent.m_pageList.TryGetPageIndex(positionIndex, out int pageIndex))
@@ -156,10 +166,13 @@ internal partial class PageReplacementAlgorithm
                     m_currentPageIndex = pageIndex;
                     IntPtr location = m_parent.m_pageList.GetPointerToPage(pageIndex, 1);
                     wasPageAdded = false;
+
                     return location;
                 }
+
                 m_currentPageIndex = m_parent.m_pageList.AddNewPage(positionIndex, startOfMemoryPoolPage, memoryPoolIndex);
                 wasPageAdded = true;
+
                 return startOfMemoryPoolPage;
             }
         }
@@ -168,9 +181,10 @@ internal partial class PageReplacementAlgorithm
         /// Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/>.
         /// </summary>
         /// <returns>
-        /// true if the specified object  is equal to the current object; otherwise, false.
+        /// <c>true</c> if the specified object  is equal to the current object; otherwise, <c>false</c>.
         /// </returns>
-        /// <param name="obj">The object to compare with the current object. </param><filterpriority>2</filterpriority>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <filterpriority>2</filterpriority>
         public override bool Equals(object obj)
         {
             return ReferenceEquals(this, obj);
@@ -180,7 +194,7 @@ internal partial class PageReplacementAlgorithm
         /// Indicates whether the current object is equal to another object of the same type.
         /// </summary>
         /// <returns>
-        /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+        /// <c>true</c> if the current object is equal to the <paramref name="other"/> parameter; otherwise, <c>false</c>.
         /// </returns>
         /// <param name="other">An object to compare with this object.</param>
         public bool Equals(PageLock other)

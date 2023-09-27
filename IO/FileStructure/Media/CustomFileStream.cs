@@ -61,6 +61,7 @@ internal sealed class CustomFileStream
     /// a synchronized fashion. 
     /// </summary>
     private readonly ReaderWriterLockEasy m_isUsingStream = new();
+
     /// <summary>
     /// Needed to properly synchronize Read/Write operations.
     /// </summary>
@@ -70,20 +71,23 @@ internal sealed class CustomFileStream
     /// <summary>
     /// Creates a new CustomFileStream
     /// </summary>
-    /// <param name="stream">The filestream to use as the base stream</param>
-    /// <param name="ioSize">The size of a buffer pool entry</param>
-    /// <param name="fileStructureBlockSize">The size of an individual block</param>
-    /// <param name="fileName">The filename</param>
-    /// <param name="isReadOnly">If the file is read only</param>
-    /// <param name="isSharingEnabled">if the file is exclusively opened</param>
+    /// <param name="stream">The filestream to use as the base stream.</param>
+    /// <param name="ioSize">The size of a buffer pool entry.</param>
+    /// <param name="fileStructureBlockSize">The size of an individual block.</param>
+    /// <param name="fileName">The filename.</param>
+    /// <param name="isReadOnly">If the file is read-only.</param>
+    /// <param name="isSharingEnabled">If the file is exclusively opened.</param>
     private CustomFileStream(int ioSize, int fileStructureBlockSize, string fileName, bool isReadOnly, bool isSharingEnabled)
     {
         if (ioSize < 4096)
             throw new ArgumentOutOfRangeException(nameof(ioSize), "Cannot be less than 4096");
+
         if (fileStructureBlockSize > ioSize)
             throw new ArgumentOutOfRangeException(nameof(fileStructureBlockSize), "Must not be greater than BufferPoolSize");
+
         if (!BitMath.IsPowerOfTwo(ioSize))
             throw new ArgumentException("Must be a power of 2", nameof(ioSize));
+
         if (!BitMath.IsPowerOfTwo(fileStructureBlockSize))
             throw new ArgumentException("Must be a power of 2", nameof(fileStructureBlockSize));
 
@@ -109,7 +113,7 @@ internal sealed class CustomFileStream
     #region [ Properties ]
 
     /// <summary>
-    /// Gets if the file was opened read only.
+    /// Gets if the file was opened read-only.
     /// </summary>
     public bool IsReadOnly => m_isReadOnly;
 
@@ -119,7 +123,7 @@ internal sealed class CustomFileStream
     public bool IsSharingEnabled => m_isSharingEnabled;
 
     /// <summary>
-    /// Gets the name of the file
+    /// Gets the name of the file.
     /// </summary>
     public string FileName => m_fileName;
 
@@ -129,7 +133,7 @@ internal sealed class CustomFileStream
     public int FileStructureBlockSize => m_fileStructureBlockSize;
 
     /// <summary>
-    /// Gets the number of bytes in each IO operation.
+    /// Gets the number of bytes in each I/O operation.
     /// </summary>
     public int IOSize => m_ioSize;
 
@@ -143,7 +147,7 @@ internal sealed class CustomFileStream
     #region [ Methods ]
 
     /// <summary>
-    /// Opens the underlying file stream
+    /// Opens the underlying file stream.
     /// </summary>
     public void Open()
     {
@@ -157,7 +161,7 @@ internal sealed class CustomFileStream
     }
 
     /// <summary>
-    /// Closes the underlying file stream
+    /// Closes the underlying file stream.
     /// </summary>
     public void Close()
     {
@@ -174,15 +178,16 @@ internal sealed class CustomFileStream
     }
 
     /// <summary>
-    /// Reads data from the disk
+    /// Reads data from the disk.
     /// </summary>
-    /// <param name="position">The starting position</param>
-    /// <param name="buffer">the byte buffer of data to read</param>
-    /// <param name="length">the number of bytes to read</param>
-    /// <returns>the number of bytes read</returns>
+    /// <param name="position">The starting position.</param>
+    /// <param name="buffer">The byte buffer of data to read.</param>
+    /// <param name="length">The number of bytes to read.</param>
+    /// <returns>The number of bytes read.</returns>
     public int ReadRaw(long position, byte[] buffer, int length)
     {
         bool needsOpen = m_stream is null;
+
         try
         {
             if (needsOpen)
@@ -204,15 +209,19 @@ internal sealed class CustomFileStream
                     len = results.Result;
                 }
                 totalLengthRead += len;
+
                 if (len == length)
                     return totalLengthRead;
+
                 if (len == 0 && position >= m_length)
-                    return totalLengthRead; //End of the stream has occurred
+                    return totalLengthRead; // End of the stream has occurred
+
                 if (len != 0)
                 {
                     position += len;
-                    length -= len; //Keep Reading
+                    length -= len; // Keep Reading
                 }
+
                 else
                 {
                     Log.Publish(MessageLevel.Warning, "File Read Error", $"The OS has closed the following file {m_stream.Name}. Attempting to reopen.");
@@ -222,6 +231,7 @@ internal sealed class CustomFileStream
 
             return length;
         }
+
         finally
         {
             if (needsOpen)
@@ -230,15 +240,16 @@ internal sealed class CustomFileStream
     }
 
     /// <summary>
-    /// Writes data to the disk
+    /// Writes data to the disk.
     /// </summary>
-    /// <param name="position">The starting position</param>
-    /// <param name="buffer">the byte buffer of data to write</param>
-    /// <param name="length">the number of bytes to write</param>
+    /// <param name="position">The starting position.</param>
+    /// <param name="buffer">The byte buffer of data to write.</param>
+    /// <param name="length">The number of bytes to write.</param>
     public void WriteRaw(long position, byte[] buffer, int length)
     {
         bool needsOpen = m_stream is null;
         try
+
         {
             if (needsOpen)
                 Open();
@@ -251,10 +262,12 @@ internal sealed class CustomFileStream
                     m_stream.Position = position;
                     results = m_stream.WriteAsync(buffer, 0, length);
                 }
+
                 results.Wait();
                 m_length.Value = m_stream.Length;
             }
         }
+
         finally
         {
             if (needsOpen)
@@ -271,6 +284,7 @@ internal sealed class CustomFileStream
     {
         byte[] buffer = m_bufferQueue.Dequeue();
         int bytesRead = ReadRaw(position, buffer, buffer.Length);
+
         if (bytesRead < buffer.Length)
             Array.Clear(buffer, bytesRead, buffer.Length - bytesRead);
 
@@ -286,7 +300,7 @@ internal sealed class CustomFileStream
     /// Writes all of the dirty blocks passed onto the disk subsystem. Also computes the checksum for the data.
     /// </summary>
     /// <param name="currentEndOfCommitPosition">the last valid byte of the file system where this data will be appended to.</param>
-    /// <param name="stream">the source of the data to dump to the disk</param>
+    /// <param name="stream">the source of the data to dump to the disk.</param>
     /// <param name="length">The number by bytes to write to the file system.</param>
     /// <param name="waitForWriteToDisk">True to wait for a complete commit to disk before returning from this function.</param>
     public void Write(long currentEndOfCommitPosition, MemoryPoolStreamCore stream, long length, bool waitForWriteToDisk)
@@ -318,6 +332,7 @@ internal sealed class CustomFileStream
             {
                 FlushFileBuffers();
             }
+
             else
             {
                 using (m_isUsingStream.EnterReadLock())
@@ -326,6 +341,7 @@ internal sealed class CustomFileStream
                 }
             }
         }
+
         finally
         {
             if (needsOpen)
@@ -355,8 +371,8 @@ internal sealed class CustomFileStream
     /// <summary>
     /// Changes the extension of the current file.
     /// </summary>
-    /// <param name="extension">the new extension</param>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="extension">The new extension.</param>
+    /// <param name="isReadOnly">If the file should be reopened as read-only.</param>
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     public void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled)
     {
@@ -364,6 +380,7 @@ internal sealed class CustomFileStream
         {
             string oldFileName = m_fileName;
             string newFileName = Path.ChangeExtension(oldFileName, extension);
+
             if (File.Exists(newFileName))
                 throw new Exception("New file already exists with this extension");
 
@@ -371,6 +388,7 @@ internal sealed class CustomFileStream
             m_stream?.Dispose();
             m_stream = null;
             File.Move(oldFileName, newFileName);
+
             if (openStream)
                 m_stream = new FileStream(newFileName, FileMode.Open, isReadOnly ? FileAccess.Read : FileAccess.ReadWrite, isSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
             m_fileName = newFileName;
@@ -390,6 +408,7 @@ internal sealed class CustomFileStream
                 m_stream.Dispose();
                 m_stream = null;
             }
+
             catch (Exception e)
             {
                 Log.Publish(MessageLevel.Info, "Error when disposing stream", null, null, e);
@@ -401,7 +420,7 @@ internal sealed class CustomFileStream
     /// <summary>
     /// Reopens the file with different permissions.
     /// </summary>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="isReadOnly">If the file should be reopened as read-only.</param>
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     public void ChangeShareMode(bool isReadOnly, bool isSharingEnabled)
     {
@@ -446,26 +465,26 @@ internal sealed class CustomFileStream
 
 
     /// <summary>
-    /// Creates a file with the supplied name
+    /// Creates a file with the supplied name.
     /// </summary>
-    /// <param name="fileName">the name of the file</param>
-    /// <param name="ioBlockSize">the number of bytes to do all io with</param>
-    /// <param name="fileStructureBlockSize">the number of bytes in the file structure so checksums can be properly computed.</param>
-    /// <returns></returns>
+    /// <param name="fileName">The name of the file.</param>
+    /// <param name="ioBlockSize">The number of bytes to do all io with.</param>
+    /// <param name="fileStructureBlockSize">The number of bytes in the file structure so checksums can be properly computed.</param>
+    /// <returns>A new <see cref="CustomFileStream"/> instance representing the specified file.</returns>
     public static CustomFileStream CreateFile(string fileName, int ioBlockSize, int fileStructureBlockSize)
     {
         return new CustomFileStream(ioBlockSize, fileStructureBlockSize, fileName, false, false);
     }
 
     /// <summary>
-    /// Opens a file
+    /// Opens a file.
     /// </summary>
-    /// <param name="fileName">the name of the file.</param>
-    /// <param name="ioBlockSize">the number of bytes to do all of the io</param>
-    /// <param name="fileStructureBlockSize">The number of bytes in the file structure</param>
-    /// <param name="isReadOnly">if the file should be opened in read only</param>
-    /// <param name="isSharingEnabled">if the file should be opened with read sharing permissions.</param>
-    /// <returns></returns>
+    /// <param name="fileName">The name of the file to open or create.</param>
+    /// <param name="ioBlockSize">The I/O block size to use for the file.</param>
+    /// <param name="fileStructureBlockSize">The file structure block size found in the file header.</param>
+    /// <param name="isReadOnly">A boolean indicating whether the file is opened in read-only mode.</param>
+    /// <param name="isSharingEnabled">A boolean indicating whether file sharing is enabled.</param>
+    /// <returns>A new or existing <see cref="CustomFileStream"/> instance representing the specified file.</returns>
     public static CustomFileStream OpenFile(string fileName, int ioBlockSize, out int fileStructureBlockSize, bool isReadOnly, bool isSharingEnabled)
     {
         using (FileStream fileStream = new(fileName, FileMode.Open, isReadOnly ? FileAccess.Read : FileAccess.ReadWrite, isSharingEnabled ? FileShare.Read : FileShare.None, 2048, true))

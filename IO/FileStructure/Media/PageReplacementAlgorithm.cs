@@ -67,17 +67,30 @@ internal partial class PageReplacementAlgorithm
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates a new instance of <see cref="PageReplacementAlgorithm"/>.
+    /// Performs memory pool collection, releasing unused pages based on the specified collection parameters.
     /// </summary>
-    /// <param name="pool">The memory pool that blocks will be allocated from.</param>
+    /// <param name="shiftLevel">The number of bits to shift the reference count right before evaluating for collection.</param>
+    /// <param name="excludedList">
+    /// A set of page indices to exclude from collection. Pages in this set will not be released, even if their reference count is zero.
+    /// </param>
+    /// <param name="e">The collection event arguments containing collection mode and desired release count.</param>
+    /// <returns>The number of pages actually collected and released.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the cache is disposed.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="shiftLevel"/> is negative.</exception>
+    /// <remarks>
+    /// This method performs memory pool collection by iterating through cached pages, shifting their reference counts right by <paramref name="shiftLevel"/> bits,
+    /// and releasing pages whose reference count becomes zero, excluding those in <paramref name="excludedList"/>.
+    /// The number of pages collected is limited by <paramref name="e"/>.DesiredPageReleaseCount if the collection mode is Emergency or Critical.
+    /// </remarks>
     public PageReplacementAlgorithm(MemoryPool pool)
     {
         if (pool.PageSize < 4096)
             throw new ArgumentOutOfRangeException("PageSize Must be greater than 4096", "pool");
+
         if (!BitMath.IsPowerOfTwo(pool.PageSize))
             throw new ArgumentException("PageSize Must be a power of 2", nameof(pool));
 
-        m_maxValidPosition = (int.MaxValue - 1) * (long)pool.PageSize; //Max position 
+        m_maxValidPosition = (int.MaxValue - 1) * (long)pool.PageSize; // Max position 
 
         m_syncRoot = new object();
         m_memoryPageSizeMask = pool.PageSize - 1;
@@ -92,23 +105,23 @@ internal partial class PageReplacementAlgorithm
     ~PageReplacementAlgorithm()
     {
         Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
-        //Don't dispose since only the page list contains data that must be released.
+        // Don't dispose since only the page list contains data that must be released.
     }
 #endif
 
     #region [ Methods ]
 
-    //Two Methods Exist in PageLock subclass:
-    //TryGetSubPage
-    //GetOrAddPage
+    // Two Methods Exist in PageLock subclass:
+    // TryGetSubPage
+    // GetOrAddPage
 
     /// <summary>
     /// Attempts to add the page to this <see cref="PageReplacementAlgorithm"/>. 
     /// Fails if the page already exists.
     /// </summary>
-    /// <param name="position">the absolute position that the page references</param>
-    /// <param name="locationOfPage">the pointer to the page</param>
-    /// <param name="memoryPoolIndex">the index value of the memory pool page so it can be released back to the memory pool</param>
+    /// <param name="position">The absolute position that the page references</param>
+    /// <param name="locationOfPage">The pointer to the page</param>
+    /// <param name="memoryPoolIndex">The index value of the memory pool page so it can be released back to the memory pool.</param>
     /// <returns>True if the page was added to the class. False if the page already exists and the data was not replaced.</returns>
     public bool TryAddPage(long position, IntPtr locationOfPage, int memoryPoolIndex)
     {
@@ -116,27 +129,43 @@ internal partial class PageReplacementAlgorithm
         {
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             if (position < 0)
                 throw new ArgumentOutOfRangeException(nameof(position), "Cannot be negative");
+
             if (position > m_maxValidPosition)
                 throw new ArgumentOutOfRangeException(nameof(position), "Position index can no longer be specified as an Int32");
+
             if ((position & m_memoryPageSizeMask) != 0)
                 throw new ArgumentOutOfRangeException(nameof(position), "must lie on a page boundary");
+
             int positionIndex = (int)(position >> m_memoryPageSizeShiftBits);
 
             if (m_pageList.TryGetPageIndex(positionIndex, out int pageIndex))
-            {
                 return false;
-            }
+
             m_pageList.AddNewPage(positionIndex, locationOfPage, memoryPoolIndex);
+
             return true;
         }
     }
 
     /// <summary>
-    /// Executes a collection cycle of the pages that are unused.
+    /// Performs memory pool collection, releasing unused pages based on the specified collection parameters.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="shiftLevel">The number of bits to shift the reference count right before evaluating for collection.</param>
+    /// <param name="excludedList">
+    /// A set of page indices to exclude from collection. Pages in this set will not be released, even if their reference count is zero.
+    /// </param>
+    /// <param name="e">The collection event arguments containing collection mode and desired release count.</param>
+    /// <returns>The number of pages actually collected and released.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the cache is disposed.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="shiftLevel"/> is negative.</exception>
+    /// <remarks>
+    /// This method performs memory pool collection by iterating through cached pages, shifting their reference counts right by <paramref name="shiftLevel"/> bits,
+    /// and releasing pages whose reference count becomes zero, excluding those in <paramref name="excludedList"/>.
+    /// The number of pages collected is limited by <paramref name="e"/>.DesiredPageReleaseCount if the collection mode is Emergency or Critical.
+    /// </remarks>
     public int DoCollection(CollectionEventArgs e)
     {
         lock (m_syncRoot)
@@ -163,6 +192,7 @@ internal partial class PageReplacementAlgorithm
                 {
                     m_pageList.Dispose();
                 }
+
                 finally
                 {
                     GC.SuppressFinalize(this);

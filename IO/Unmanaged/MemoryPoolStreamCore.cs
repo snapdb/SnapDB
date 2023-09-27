@@ -375,9 +375,9 @@ public class MemoryPoolStreamCore : IDisposable
     /// Reads from the underlying stream the requested set of data. 
     /// This function is more user friendly than calling GetBlock().
     /// </summary>
-    /// <param name="position">the starting position of the read</param>
-    /// <param name="pointer">an output pointer to <see cref="position"/>.</param>
-    /// <param name="validLength">the number of bytes that are valid after this position.</param>
+    /// <param name="position">The starting position of the read.</param>
+    /// <param name="pointer">Ann output pointer to <see cref="position"/>.</param>
+    /// <param name="validLength">The number of bytes that are valid after this position.</param>
     public void ReadBlock(long position, out IntPtr pointer, out int validLength)
     {
         if (m_disposed)

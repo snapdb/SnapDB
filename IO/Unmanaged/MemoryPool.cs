@@ -118,8 +118,7 @@ public class MemoryPool
     public readonly int PageSize;
 
     /// <summary>
-    /// Provides a mask that the user can apply that can 
-    /// be used to get the offset position of a page.
+    /// Provides a mask that the user can apply that can be used to get the offset position of a page.
     /// </summary>
     public readonly int PageMask;
 
@@ -137,8 +136,6 @@ public class MemoryPool
     /// IMPORTANT NOTICE: Do not call <see cref="AllocatePage"/> via the thread
     /// that raises this event. Also, be careful about entering a lock via this thread
     /// because a potential deadlock might occur. 
-    /// </remarks>
-    /// <remarks>
     /// Also, Do not remove a handler from within a lock context as the remove
     /// blocks until all events have been called. A potential for another deadlock.
     /// </remarks>
@@ -241,11 +238,10 @@ public class MemoryPool
     /// <remarks>
     /// IMPORTANT NOTICE: Be careful when calling this method as the calling thread
     /// will block if no memory is available to have a background collection to occur.
-    /// 
     /// There is a possiblity for a deadlock if calling this method from within a lock.
-    /// 
     /// The page allocated will not be initialized, 
-    /// so assume that the data is garbage.</remarks>
+    /// so assume that the data is garbage.
+    /// </remarks>
     public void AllocatePage(out int index, out IntPtr addressPointer)
     {
         if (m_pageList.TryGetNextPage(out index, out addressPointer))
@@ -370,6 +366,7 @@ public class MemoryPool
         sb.AppendLine("Collection Cycle Started");
 
         Monitor.Enter(m_syncRoot); var lockTaken = true;
+
         try
         {
             long size = CurrentCapacity;
@@ -563,10 +560,18 @@ public class MemoryPool
     }
 
     /// <summary>
-    /// Calculates at what point a collection cycle will cease prematurely.
+    /// Calculates the limit at which memory pool shrinking should stop.
     /// </summary>
-    /// <param name="size">the current size.</param>
-    /// <returns></returns>
+    /// <param name="size">The current size of the memory pool.</param>
+    /// <returns>
+    /// The limit at which memory pool shrinking should stop, ensuring it's at least 5% of the maximum pool size
+    /// or 15% less than the current size, whichever is greater.
+    /// </returns>
+    /// <remarks>
+    /// This method calculates the limit at which memory pool shrinking should stop based on the current size.
+    /// The stop limit is set to be at least 5% of the maximum pool size or 15% less than the current size,
+    /// whichever is greater.
+    /// </remarks>
     private long CalculateStopShrinkingLimit(long size)
     {
         // Once the size has been reduced by 15% of Memory but no less than 5% of memory.

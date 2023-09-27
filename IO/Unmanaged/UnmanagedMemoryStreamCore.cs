@@ -288,11 +288,18 @@ public class UnmanagedMemoryStreamCore : IDisposable
     #region [ Helper Methods ]
 
     /// <summary>
-    /// Returns the page that corresponds to the absolute position.  
-    /// This function will also autogrow the stream.
+    /// Retrieves the memory page associated with the specified position.
     /// </summary>
-    /// <param name="position">The position to use to calculate the page to retrieve</param>
-    /// <returns></returns>
+    /// <param name="position">The position for which to retrieve the memory page.</param>
+    /// <returns>
+    /// A pointer to the memory page that corresponds to the given position.
+    /// </returns>
+    /// <remarks>
+    /// This method retrieves the memory page from the memory pool associated with the specified position.
+    /// If the requested page does not exist, it may increase the page count to accommodate the position.
+    /// </remarks>
+    /// <param name="position">The position for which to retrieve the memory page.</param>
+    /// <returns>A pointer to the memory page corresponding to the specified position.</returns>
     private IntPtr GetPage(long position)
     {
         Settings settings = m_settings;
@@ -309,10 +316,16 @@ public class UnmanagedMemoryStreamCore : IDisposable
     }
 
     /// <summary>
-    /// Increases the size of the Memory Stream and updated the settings if needed
+    /// Increases the page count of the memory pool to accommodate the specified number of pages.
     /// </summary>
-    /// <param name="pageCount"></param>
-    private void IncreasePageCount(int pageCount)
+    /// <param name="pageCount">The desired number of pages to be accommodated.</param>
+    /// <remarks>
+    /// This method increases the page count of the memory pool to ensure it can accommodate the specified number of pages.
+    /// If the current settings require cloning, a clone of the settings is made before adding new pages.
+    /// Each new page is allocated in memory and initialized with zeroes.
+    /// </remarks>
+    /// <param name="pageCount">The desired number of pages to be accommodated.</param>
+        private void IncreasePageCount(int pageCount)
     {
         lock (m_syncRoot)
         {
@@ -325,7 +338,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
                 settings = settings.Clone();
             }
 
-            //If there are not enough pages in the stream, add enough.
+            // If there are not enough pages in the stream, add enough.
             while (pageCount > settings.PageCount)
             {
                 Memory block = new(m_pageSize);
@@ -337,7 +350,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
 
             if (cloned)
             {
-                Thread.MemoryBarrier(); // make sure that all of the settings are saved before assigning
+                Thread.MemoryBarrier(); // Make sure that all of the settings are saved before assigning.
                 m_settings = settings;
             }
         }

@@ -58,7 +58,7 @@ internal sealed unsafe class PageList
         public int MemoryPoolIndex;
 
         /// <summary>
-        /// The number of times this page has been referenced
+        /// The number of times this page has been referenced.
         /// </summary>
         public int ReferencedCount;
     }
@@ -73,7 +73,6 @@ internal sealed unsafe class PageList
     /// Contains all of the pages that are cached for the file stream.
     /// Map is PositionIndex,PageIndex
     /// </summary>
-    /// ToDO: Change this to something faster than a sorted list.
     private readonly GenericSortedList<int, int> m_pageIndexLookupByPositionIndex;
 
     /// <summary>
@@ -117,79 +116,113 @@ internal sealed unsafe class PageList
     /// </summary>
     /// <param name="positionIndex">the position divided by the page size.</param>
     /// <param name="pageIndex">the page index</param>
-    /// <returns>true if found, false if not found</returns>
+    /// <returns><c>true</c> if found, <c>false</c> if not found.</returns>
     public bool TryGetPageIndex(int positionIndex, out int pageIndex)
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         return m_pageIndexLookupByPositionIndex.TryGetValue(positionIndex, out pageIndex);
     }
 
     /// <summary>
-    /// Finds the next unused cache page index. Marks it as used.
-    /// Assigns the page information that comes from the memory pool.
+    /// Adds a new page to the cache and associates it with the specified position index.
     /// </summary>
-    /// <returns>The Page Index</returns>
+    /// <param name="positionIndex">The position index to associate with the new page.</param>
+    /// <param name="locationOfPage">A pointer to the location of the new page in memory.</param>
+    /// <param name="memoryPoolIndex">The memory pool index to which the page belongs.</param>
+    /// <returns>The index of the newly added page in the cache.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the cache is disposed.</exception>
+    /// <remarks>
+    /// This method adds a new page to the cache and associates it with the specified
+    /// <paramref name="positionIndex"/>. It also tracks the memory pool index and the
+    /// location of the page in memory. The method returns the index of the newly added
+    /// page in the cache.
+    /// </remarks>
     public int AddNewPage(int positionIndex, IntPtr locationOfPage, int memoryPoolIndex)
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         InternalPageMetaData cachePage;
         cachePage.MemoryPoolIndex = memoryPoolIndex;
         cachePage.LocationOfPage = (byte*)locationOfPage;
         cachePage.ReferencedCount = 0;
         int pageIndex = m_listOfPages.AddValue(cachePage);
         m_pageIndexLookupByPositionIndex.Add(positionIndex, pageIndex);
+
         return pageIndex;
     }
 
 
     /// <summary>
-    /// Returns the pointer for the provided page index. 
+    /// Gets a pointer to the memory location of a cached page and optionally increments its reference count.
     /// </summary>
-    /// <param name="pageIndex">the index of the page that has been looked up for the position.</param>
-    /// <param name="incrementReferencedCount">the value to increment the referenced count.</param>
-    /// <returns></returns>
+    /// <param name="pageIndex">The index of the cached page.</param>
+    /// <param name="incrementReferencedCount">
+    /// The value by which to increment the reference count of the cached page. Use 0 to retrieve the pointer without incrementing.
+    /// </param>
+    /// <returns>
+    /// A pointer to the memory location of the cached page.
+    /// </returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the cache is disposed.</exception>
+    /// <remarks>
+    /// This method retrieves a pointer to the memory location of a cached page identified by its <paramref name="pageIndex"/>.
+    /// Optionally, you can specify <paramref name="incrementReferencedCount"/> to increment the reference count of the page.
+    /// If the reference count exceeds <see cref="int.MaxValue"/> or goes below 0, it's clamped to the respective boundary.
+    /// </remarks>
     public IntPtr GetPointerToPage(int pageIndex, int incrementReferencedCount)
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         InternalPageMetaData metaData = m_listOfPages.GetValue(pageIndex);
         if (incrementReferencedCount > 0)
         {
             long newValue = metaData.ReferencedCount + (long)incrementReferencedCount;
+
             if (newValue > int.MaxValue)
             {
                 metaData.ReferencedCount = int.MaxValue;
             }
+
             else if (newValue < 0)
             {
                 metaData.ReferencedCount = 0;
             }
+
             else
             {
                 metaData.ReferencedCount = (int)newValue;
             }
+
             m_listOfPages.OverwriteValue(pageIndex, metaData);
         }
+
         return (IntPtr)metaData.LocationOfPage;
     }
 
     /// <summary>
-    /// Executes a collection cycle on the pages in this list.
+    /// Performs memory pool collection, releasing unused pages based on the specified collection parameters.
     /// </summary>
-    /// <param name="shiftLevel">the number of bits to shift the referenced counter by.
-    /// Value may be zero but cannot be negative</param>
-    /// <param name="excludedList">A set of values to exclude from the collection process</param>
-    /// <param name="e">Arguments for the collection.</param>
-    /// <returns>The number of pages returned to the memory pool</returns>
-    /// <remarks>If the collection mode is Emergency or Critical, it will only release the required number of pages and no more</remarks>
-    // TODO: Since i'll be parsing the entire list, rebuilding a new sorted tree may be quicker than removing individual blocks and copying.
-    // TODO: Also, I should probably change the ShouldCollect callback to an IEnumerable<int>.
+    /// <param name="shiftLevel">The number of bits to shift the reference count right before evaluating for collection.</param>
+    /// <param name="excludedList">
+    /// A set of page indices to exclude from collection. Pages in this set will not be released, even if their reference count is zero.
+    /// </param>
+    /// <param name="e">The collection event arguments containing collection mode and desired release count.</param>
+    /// <returns>The number of pages actually collected and released.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the cache is disposed.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="shiftLevel"/> is negative.</exception>
+    /// <remarks>
+    /// This method performs memory pool collection by iterating through cached pages, shifting their reference counts right by <paramref name="shiftLevel"/> bits,
+    /// and releasing pages whose reference count becomes zero, excluding those in <paramref name="excludedList"/>.
+    /// The number of pages collected is limited by <paramref name="e"/>.DesiredPageReleaseCount if the collection mode is Emergency or Critical.
+    /// </remarks>
     public int DoCollection(int shiftLevel, HashSet<int> excludedList, CollectionEventArgs e)
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         if (shiftLevel < 0)
             throw new ArgumentOutOfRangeException(nameof(shiftLevel), "must be non negative");
 
@@ -222,6 +255,7 @@ internal sealed unsafe class PageList
                 }
             }
         }
+
         return collectionCount;
     }
 
@@ -240,10 +274,12 @@ internal sealed unsafe class PageList
                     m_listOfPages = null;
                 }
             }
+
             catch (Exception ex)
             {
                 Log.Publish(MessageLevel.Critical, "Unhandled exception when returning resources to the memory pool", null, null, ex);
             }
+
             finally
             {
                 GC.SuppressFinalize(this);

@@ -45,12 +45,23 @@ internal partial class MemoryPoolFile
         /// <summary>
         /// Creates a new <see cref="IoSession"/>
         /// </summary>
-        /// <param name="file">the base file</param>
+        /// <param name="file">The base file.</param>
         public IoSession(MemoryPoolFile file)
         {
             m_file = file;
         }
 
+        /// <summary>
+        /// Retrieves a data block based on the provided <see cref="BlockArguments"/>.
+        /// </summary>
+        /// <param name="args">The <see cref="BlockArguments"/> that specify the block to retrieve.</param>
+        /// <exception cref="ReadOnlyException">Thrown if an attempt to write to a read-only file system is made.</exception>
+        /// <remarks>
+        /// This method retrieves a data block specified by the <paramref name="args"/> parameter. It checks whether the file system is
+        /// read-only and whether the requested operation involves writing. If the file system is read-only and a write operation is
+        /// requested, a <see cref="ReadOnlyException"/> is thrown. Otherwise, it delegates the block retrieval operation to the underlying file.
+        /// </remarks>
+        /// <param name="args">The <see cref="BlockArguments"/> that specify the block to retrieve.</param>
         public override void GetBlock(BlockArguments args)
         {
             if (args.IsWriting && m_file.m_isReadOnly)

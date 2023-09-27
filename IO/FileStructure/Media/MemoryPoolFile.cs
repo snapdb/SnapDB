@@ -38,7 +38,7 @@ internal partial class MemoryPoolFile
 
 
     /// <summary>
-    /// A Reusable I/O session for all BinaryStreams
+    /// A Reusable I/O session for all BinaryStreams.
     /// </summary>
     private readonly IoSession m_ioSession;
 
@@ -49,7 +49,7 @@ internal partial class MemoryPoolFile
     #region [ Constructors ]
 
     /// <summary>
-    /// Create a new <see cref="MemoryPoolFile"/>
+    /// Create a new <see cref="MemoryPoolFile"/>.
     /// </summary>
     public MemoryPoolFile(MemoryPool pool)
         : base(pool)
@@ -60,30 +60,42 @@ internal partial class MemoryPoolFile
 
     #endregion
 
-    #region [ Properties ]
-
-    #endregion
-
     #region [ Methods ]
 
     /// <summary>
-    /// Creates a <see cref="BinaryStreamIoSessionBase"/> that can be used to read from this disk medium.
+    /// Creates an <see cref="BinaryStreamIoSessionBase"/> for the current <see cref="MemoryStream"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A new instance of <see cref="BinaryStreamIoSessionBase"/> for the current <see cref="MemoryStream"/>.
+    /// </returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the <see cref="MemoryStream"/> has been disposed and cannot create a new session.</exception>
+    /// <remarks>
+    /// This method creates and returns a new <see cref="BinaryStreamIoSessionBase"/> instance associated with the current
+    /// <see cref="MemoryStream"/>. If the <see cref="MemoryStream"/> has been disposed (IsDisposed is <c>true</c>), it throws an
+    /// <see cref="ObjectDisposedException"/> indicating that the stream has been disposed and cannot create a new session.
+    /// </remarks>
     public BinaryStreamIoSessionBase CreateIoSession()
     {
         if (IsDisposed)
             throw new ObjectDisposedException("MemoryStream");
+
         return m_ioSession;
     }
 
     public string FileName => string.Empty;
 
     /// <summary>
-    /// Executes a commit of data. This will flush the data to the disk use the provided header data to properly
-    /// execute this function.
+    /// Commits changes made to the <see cref="MemoryStream"/> to a <see cref="FileHeaderBlock"/>.
     /// </summary>
-    /// <param name="headerBlock"></param>
+    /// <param name="headerBlock">The <see cref="FileHeaderBlock"/> to which the changes are committed.</param>
+    /// <exception cref="ObjectDisposedException">
+    /// Thrown if the <see cref="MemoryStream"/> has been disposed and cannot commit changes.
+    /// </exception>
+    /// <remarks>
+    /// This method commits any changes made to the current <see cref="MemoryStream"/> to the specified
+    /// <see cref="FileHeaderBlock"/>. If the <see cref="MemoryStream"/> has been disposed (IsDisposed is true),
+    /// it throws an <see cref="ObjectDisposedException"/> indicating that the stream has been disposed and cannot commit changes.
+    /// </remarks>
     public void CommitChanges(FileHeaderBlock headerBlock)
     {
         if (IsDisposed)
@@ -91,8 +103,16 @@ internal partial class MemoryPoolFile
     }
 
     /// <summary>
-    /// Rolls back all edits to the DiskMedium
+    /// Rolls back any changes made to the <see cref="MemoryStream"/>.
     /// </summary>
+    /// <exception cref="ObjectDisposedException">
+    /// Thrown if the <see cref="MemoryStream"/> has been disposed and cannot perform a rollback.
+    /// </exception>
+    /// <remarks>
+    /// This method rolls back any changes made to the current <see cref="MemoryStream"/>. If the <see cref="MemoryStream"/> 
+    /// has been disposed (IsDisposed is <c>true</c>), it throws an <see cref="ObjectDisposedException"/> indicating that the 
+    /// stream has been disposed and cannot perform a rollback.
+    /// </remarks>
     public void RollbackChanges()
     {
         if (IsDisposed)
@@ -100,21 +120,32 @@ internal partial class MemoryPoolFile
     }
 
     /// <summary>
-    /// Changes the extension of the current file.
+    /// Changes the extension of the current file or resource.
     /// </summary>
-    /// <param name="extension">the new extension</param>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
-    /// <param name="isSharingEnabled">If the file should share read privileges.</param>
+    /// <param name="extension">The new file extension to set.</param>
+    /// <param name="isReadOnly">Specifies whether the file/resource should be treated as read-only.</param>
+    /// <param name="isSharingEnabled">Specifies whether sharing of the file or resource should be enabled.</param>
+    /// <remarks>
+    /// This method changes the extension of the current file or resource to the specified <paramref name="extension"/>.
+    /// It allows you to modify read-only and sharing settings by providing the <paramref name="isReadOnly"/> and
+    /// <paramref name="isSharingEnabled"/> parameters. However, the actual implementation of this method should be added.
+    /// </remarks>
     public void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled)
     {
         m_isReadOnly = isReadOnly;
     }
 
     /// <summary>
-    /// Reopens the file with different permissions.
+    /// Changes the sharing mode of the current file or resource.
     /// </summary>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
-    /// <param name="isSharingEnabled">If the file should share read privileges.</param>
+    /// <param name="isReadOnly">Specifies whether the file/resource should be treated as read-only.</param>
+    /// <param name="isSharingEnabled">Specifies whether sharing of the file/resource should be enabled.</param>
+    /// <remarks>
+    /// This method allows you to modify read-only and sharing settings for the current file or resource.
+    /// By providing the <paramref name="isReadOnly"/> and <paramref name="isSharingEnabled"/> parameters,
+    /// you can control how the file or resource is accessed and shared. However, the actual implementation
+    /// of this method should be added.
+    /// </remarks>
     public void ChangeShareMode(bool isReadOnly, bool isSharingEnabled)
     {
         m_isReadOnly = isReadOnly;

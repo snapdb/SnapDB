@@ -54,6 +54,7 @@ internal sealed class DiskIo : IDisposable
     {
         if (stream is null)
             throw new ArgumentNullException(nameof(stream));
+
         m_isReadOnly = isReadOnly;
         m_blockSize = stream.BlockSize;
         m_stream = stream;
@@ -84,6 +85,7 @@ internal sealed class DiskIo : IDisposable
         {
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             return m_isReadOnly;
         }
     }
@@ -102,12 +104,13 @@ internal sealed class DiskIo : IDisposable
         {
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             return m_stream.Length;
         }
     }
 
     /// <summary>
-    /// Returns the last block that is readonly.
+    /// Returns the last block that is read-only.
     /// </summary>
     public uint LastReadonlyBlock
     {
@@ -115,6 +118,7 @@ internal sealed class DiskIo : IDisposable
         {
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             return m_stream.Header.LastAllocatedBlock;
         }
     }
@@ -128,6 +132,7 @@ internal sealed class DiskIo : IDisposable
         {
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             return m_stream.Header;
         }
     }
@@ -146,34 +151,42 @@ internal sealed class DiskIo : IDisposable
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         if (m_isReadOnly)
             throw new ReadOnlyException();
         m_stream.RollbackChanges();
     }
 
     /// <summary>
-    /// Occurs when committing the following data to the disk.
-    /// This will copy any pending data to the disk in a manner that
-    /// will protect against corruption.
+    /// Does a safe copy of data from one location to another. 
+    /// A safe copy allows for the source and destination to overlap.
     /// </summary>
-    /// <param name="header"></param>
+    /// <param name="src">A pointer to the source data to be copied.</param>
+    /// <param name="dest">A pointer to the destination where the data will be copied.</param>
+    /// <param name="count">The number of bytes to copy from the source to the destination.</param>
     public void CommitChanges(FileHeaderBlock header)
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         if (m_isReadOnly)
             throw new ReadOnlyException();
+
         m_stream.CommitChanges(header);
     }
 
     /// <summary>
-    /// Creates a <see cref="DiskIoSession"/> that can be used to perform basic read/write functions.
+    /// Creates a new <see cref="DiskIoSession"/> for performing disk I/O operations.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="header">The file header block associated with the session.</param>
+    /// <param name="file">The optional subfile header associated with the session, or <c>null</c> if not applicable.</param>
+    /// <returns>A <see cref="DiskIoSession"/> instance for performing disk I/O operations.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the <see cref="DiskIo"/> instance is disposed.</exception>
     public DiskIoSession CreateDiskIoSession(FileHeaderBlock header, SubFileHeader? file)
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         return new DiskIoSession(this, m_stream.CreateIoSession(), header, file);
     }
 
@@ -191,7 +204,7 @@ internal sealed class DiskIo : IDisposable
     /// <summary>
     /// Reopens the file with different permissions.
     /// </summary>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="isReadOnly">If the file should be reopened as read-only.</param>
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     public void ChangeShareMode(bool isReadOnly, bool isSharingEnabled)
     {
@@ -212,6 +225,7 @@ internal sealed class DiskIo : IDisposable
                     m_stream.Dispose();
                 }
             }
+
             finally
             {
                 GC.SuppressFinalize(this);
@@ -226,6 +240,7 @@ internal sealed class DiskIo : IDisposable
     public static DiskIo CreateMemoryFile(MemoryPool pool, int fileStructureBlockSize, params Guid[] flags)
     {
         DiskMedium disk = DiskMedium.CreateMemoryFile(pool, fileStructureBlockSize, flags);
+
         return new DiskIo(disk, false);
     }
 
@@ -234,6 +249,7 @@ internal sealed class DiskIo : IDisposable
         //Exclusive opening to prevent duplicate opening.
         CustomFileStream fileStream = CustomFileStream.CreateFile(fileName, pool.PageSize, fileStructureBlockSize);
         DiskMedium disk = DiskMedium.CreateFile(fileStream, pool, fileStructureBlockSize, flags);
+
         return new DiskIo(disk, false);
     }
 
@@ -241,6 +257,7 @@ internal sealed class DiskIo : IDisposable
     {
         CustomFileStream fileStream = CustomFileStream.OpenFile(fileName, pool.PageSize, out int fileStructureBlockSize, isReadOnly, true);
         DiskMedium disk = DiskMedium.OpenFile(fileStream, pool, fileStructureBlockSize);
+
         return new DiskIo(disk, isReadOnly);
     }
 }

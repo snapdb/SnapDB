@@ -83,7 +83,7 @@ public partial class UnmanagedMemoryStream
     }
 
     /// <summary>
-    /// Creates a new binary from an IO session
+    /// Creates a new binary from an IO session.
     /// </summary>
     /// <returns>A new <see cref="BinaryStreamBase"/> instance of type <see cref="BinaryStream"/>.</returns>
     public BinaryStreamBase CreateBinaryStream()

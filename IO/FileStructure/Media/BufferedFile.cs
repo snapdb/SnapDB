@@ -77,7 +77,7 @@ internal partial class BufferedFile
 
     /// <summary>
     /// Location to store cached memory pages.
-    /// This class is thread safe.
+    /// This class is thread-safe.
     /// </summary>
     private PageReplacementAlgorithm m_pageReplacementAlgorithm;
 
@@ -110,11 +110,13 @@ internal partial class BufferedFile
     /// <summary>
     /// Creates a file backed memory stream.
     /// </summary>
-    /// <param name="stream">The <see cref="CustomFileStream"/> to buffer</param>
-    /// <param name="pool">The <see cref="MemoryPool"/> to allocate memory from</param>
-    /// <param name="header">The <see cref="FileHeaderBlock"/> to be managed when modifications occur</param>
-    /// <param name="isNewFile">Tells if this is a newly created file. This will make sure that the 
-    /// first 10 pages have the header data copied to it.</param>
+    /// <param name="stream">The <see cref="CustomFileStream"/> to buffer.</param>
+    /// <param name="pool">The <see cref="MemoryPool"/> to allocate memory from.</param>
+    /// <param name="header">The <see cref="FileHeaderBlock"/> to be managed when modifications occur.</param>
+    /// <param name="isNewFile">
+    /// Tells if this is a newly created file. This will make sure that the 
+    /// first 10 pages have the header data copied to it.
+    /// </param>
     public BufferedFile(CustomFileStream stream, MemoryPool pool, FileHeaderBlock header, bool isNewFile)
     {
         m_fileStructureBlockSize = header.BlockSize;
@@ -144,11 +146,13 @@ internal partial class BufferedFile
                     m_queue.WriteRaw(0, headerBytes, headerBytes.Length);
                 }
             }
+
             finally
             {
                 m_queue.Close();
             }
         }
+
         m_lengthOfCommittedData = (header.LastAllocatedBlock + 1) * header.BlockSize;
         m_writeBuffer.ConfigureAlignment(m_lengthOfCommittedData, pool.PageSize);
     }
@@ -188,21 +192,22 @@ internal partial class BufferedFile
     {
         using (IoSession pageLock = new(this, m_pageReplacementAlgorithm))
         {
-            //Determine how much committed data to write
+            // Determine how much committed data to write
             long lengthOfAllData = (header.LastAllocatedBlock + 1) * m_fileStructureBlockSize;
             long copyLength = lengthOfAllData - m_lengthOfCommittedData;
 
-            //Write the uncommitted data.
+            // Write the uncommitted data.
             m_queue.Write(m_lengthOfCommittedData, m_writeBuffer, copyLength, waitForWriteToDisk: true);
 
             byte[] bytes = header.GetBytes();
             if (header.HeaderBlockCount == 10)
             {
-                //Update the new header to position 0, position 1, and one of position 2-9
+                // Update the new header to position 0, position 1, and one of position 2-9.
                 m_queue.WriteRaw(0, bytes, m_fileStructureBlockSize);
                 m_queue.WriteRaw(m_fileStructureBlockSize, bytes, m_fileStructureBlockSize);
                 m_queue.WriteRaw(m_fileStructureBlockSize * ((header.SnapshotSequenceNumber & 7) + 2), bytes, m_fileStructureBlockSize);
             }
+
             else
             {
                 for (int x = 0; x < header.HeaderBlockCount; x++)
@@ -215,11 +220,11 @@ internal partial class BufferedFile
 
             long startPos;
 
-            //Copy recently committed data to the buffer pool
+            // Copy recently committed data to the buffer pool
             if ((m_lengthOfCommittedData & m_diskBlockSize - 1) != 0) //Only if there is a split page.
             {
                 startPos = m_lengthOfCommittedData & ~(m_diskBlockSize - 1);
-                //Finish filling up the split page in the buffer.
+                // Finish filling up the split page in the buffer.
 
                 if (pageLock.TryGetSubPage(startPos, out nint ptrDest))
                 {
@@ -230,6 +235,7 @@ internal partial class BufferedFile
                 }
                 startPos += m_diskBlockSize;
             }
+
             else
             {
                 startPos = m_lengthOfCommittedData;
@@ -255,7 +261,7 @@ internal partial class BufferedFile
     /// <summary>
     /// Creates a <see cref="BinaryStreamIoSessionBase"/> that can be used to read from this disk medium.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A new BinaryStreamIoSessionBase instance.</returns>
     public BinaryStreamIoSessionBase CreateIoSession()
     {
         return new IoSession(this, m_pageReplacementAlgorithm);
@@ -274,8 +280,8 @@ internal partial class BufferedFile
     /// <summary>
     /// Changes the extension of the current file.
     /// </summary>
-    /// <param name="extension">the new extension</param>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="extension">The new extension.</param>
+    /// <param name="isReadOnly">If the file should be reopened as read-only.</param>
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     public void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled)
     {
@@ -285,7 +291,7 @@ internal partial class BufferedFile
     /// <summary>
     /// Reopens the file with different permissions.
     /// </summary>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="isReadOnly">If the file should be reopened as read-only.</param>
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     public void ChangeShareMode(bool isReadOnly, bool isSharingEnabled)
     {
@@ -303,8 +309,8 @@ internal partial class BufferedFile
             try
             {
                 m_disposed = true;
-                //Unregistering from this event gaurentees that a collection will no longer
-                //be called since this class utilizes custom code to garentee this.
+                // Unregistering from this event gaurentees that a collection will no longer
+                // be called since this class utilizes custom code to guarantee this.
                 m_pool.RequestCollection -= m_pool_RequestCollection;
 
                 lock (m_syncRoot)
@@ -339,38 +345,44 @@ internal partial class BufferedFile
     /// This function will block if needing to retrieve data from the disk.
     /// </summary>
     /// <param name="pageLock">The reusable lock information about what this block is currently using.</param>
-    /// <param name="args">Contains what block needs to be read and when this function returns, 
-    /// it will contain the proper pointer information for this block.</param>
+    /// <param name="args">
+    /// Contains what block needs to be read and when this function returns, 
+    /// it will contain the proper pointer information for this block.
+    /// </param>
     private void GetBlock(PageReplacementAlgorithm.PageLock pageLock, BlockArguments args)
     {
         pageLock.Clear();
-        //Determines where the block is located.
+
+        // Determines where the block is located.
         if (args.Position >= m_lengthOfCommittedData)
         {
-            //If the block is in the uncommitted space, it is stored in the 
-            //MemoryPoolStreamCore.
+            // If the block is in the uncommitted space, it is stored in the 
+            // MemoryPoolStreamCore.
             args.SupportsWriting = true;
             m_writeBuffer.GetBlock(args);
         }
+
         else if (args.Position < m_lengthOfHeader)
         {
-            //If the block is in the header, error because this area of the file is not designed to be accessed.
+            // If the block is in the header, error because this area of the file is not designed to be accessed.
             throw new ArgumentOutOfRangeException(nameof(args), "Cannot use this function to modify the file header.");
         }
+
         else
         {
-            //If it is between the file header and uncommitted space, 
-            //it is in the committed space, which this space by design is never to be modified. 
+            // If it is between the file header and uncommitted space, 
+            // it is in the committed space, which this space by design is never to be modified. 
             if (args.IsWriting)
                 throw new ArgumentException("Cannot write to committed data space", nameof(args));
+
             args.SupportsWriting = false;
             args.Length = m_diskBlockSize;
-            //rounds to the beginning of the block to be looked up.
+            // Rounds to the beginning of the block to be looked up.
             args.FirstPosition = args.Position & ~m_pool.PageMask;
 
             GetBlockFromCommittedSpace(pageLock, args.FirstPosition, out args.FirstPointer);
 
-            //Make sure the block does not go beyond the end of the uncommitted space.
+            // Make sure the block does not go beyond the end of the uncommitted space.
             if (args.FirstPosition + args.Length > m_lengthOfCommittedData)
                 args.Length = (int)(m_lengthOfCommittedData - args.FirstPosition);
         }
@@ -379,25 +391,27 @@ internal partial class BufferedFile
     /// <summary>
     /// Processes the GetBlock from the committed area.
     /// </summary>
-    /// <param name="pageLock"></param>
-    /// <param name="position"></param>
+    /// <param name="pageLock">The page lock used for page management.</param>
+    /// <param name="position">The position of the block.</param>
+    /// <param name="pointer">An output parameter that contains the pointer to the block.</param>
     /// <param name="pointer">an output parameter that contains the pointer for the provided position</param>
     /// <remarks>The valid length is at least the size of the buffer pools page size.</remarks>
     private void GetBlockFromCommittedSpace(PageReplacementAlgorithm.PageLock pageLock, long position, out nint pointer)
     {
-        //If the page is in the buffer, we can return and don't have to read it.
+        // If the page is in the buffer, we can return and don't have to read it.
         if (pageLock.TryGetSubPage(position, out pointer))
             return;
 
-        //If the address doesn't exist in the current list. Read it from the disk.
+        // If the address doesn't exist in the current list. Read it from the disk.
         m_pool.AllocatePage(out int poolPageIndex, out nint poolAddress);
 
         m_queue.Read(position, poolAddress);
 
-        //Since a race condition exists, I need to check the buffer to make sure that 
-        //the most recently read page already exists in the PageReplacementAlgorithm.
+        // Since a race condition exists, I need to check the buffer to make sure that 
+        // the most recently read page already exists in the PageReplacementAlgorithm.
         pointer = pageLock.GetOrAddPage(position, poolAddress, poolPageIndex, out bool wasPageAdded);
-        //If I lost on the race condition, I need to re-release this page.
+
+        // If I lost on the race condition, I need to re-release this page.
         if (!wasPageAdded)
             m_pool.ReleasePage(poolPageIndex);
     }
@@ -405,8 +419,8 @@ internal partial class BufferedFile
     /// <summary>
     /// Handles the <see cref="MemoryPool.RequestCollection"/> event.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param name="sender">The sender of the event.</param>
+    /// <param name="e">The collection event arguments.</param>
     private void m_pool_RequestCollection(object sender, CollectionEventArgs e)
     {
         if (m_disposed)
@@ -416,7 +430,6 @@ internal partial class BufferedFile
 
         if (e.CollectionMode == MemoryPoolCollectionMode.Critical)
         {
-            // TODO: actually do something differently if collection level reaches critical
             m_pageReplacementAlgorithm.DoCollection(e);
         }
     }

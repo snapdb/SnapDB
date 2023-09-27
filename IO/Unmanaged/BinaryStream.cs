@@ -74,7 +74,7 @@ public unsafe class BinaryStream
     /// <summary>
     /// Creates a <see cref="BinaryStream"/> that is in memory only.
     /// </summary>
-    /// <param name="allocatesOwnMemory">true to allocate its own memory rather than using the <see cref="MemoryPool"/>.</param>
+    /// <param name="allocatesOwnMemory"><c>true</c> to allocate its own memory rather than using the <see cref="MemoryPool"/>.</param>
     public BinaryStream(bool allocatesOwnMemory)
         : this(CreatePool(allocatesOwnMemory), false)
     {
@@ -86,6 +86,7 @@ public unsafe class BinaryStream
     {
         if (allocatesOwnMemory)
             return new UnmanagedMemoryStream();
+
         return new MemoryPoolStream();
     }
 
@@ -94,8 +95,7 @@ public unsafe class BinaryStream
     /// </summary>
     /// <param name="stream">The base stream to use.</param>
     /// <param name="leaveOpen">
-    /// Determines if the underlying stream will automatically be 
-    /// disposed of when this class has it's dispose method called.
+    /// Determines if the underlying stream will automatically be disposed of when this class has it's dispose method called.
     /// </param>
     public BinaryStream(ISupportsBinaryStream stream, bool leaveOpen = true)
     {
@@ -107,8 +107,10 @@ public unsafe class BinaryStream
         First = null;
         LastRead = null;
         LastWrite = null;
+
         if (stream.RemainingSupportedIoSessions < 1)
             throw new Exception("Stream has run out of read sessions");
+
         m_mainIoSession = stream.CreateIoSession();
     }
 
@@ -142,6 +144,7 @@ public unsafe class BinaryStream
 
         if (m_mainIoSession is not null)
             m_mainIoSession.Clear();
+
         if (m_secondaryIoSession is not null)
             m_secondaryIoSession.Clear();
     }
@@ -198,6 +201,7 @@ public unsafe class BinaryStream
                     m_stream.Dispose();
             }
             finally
+
             {
                 // Reset various fields and properties to release references.
                 FirstPosition = 0;

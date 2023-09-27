@@ -56,19 +56,25 @@ internal unsafe class DiskIoSession : IDisposable
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates a new DiskIoSession that can be used to read from the disk subsystem.
+    /// Initializes a new instance of the <see cref="DiskIoSession"/> class for disk I/O operations.
     /// </summary>
-    /// <param name="diskIo">owner of the disk</param>
-    /// <param name="ioSession">the base ioSession to use for this io session</param>
-    /// <param name="file">The file that will be read from this diskIoSession</param>
+    /// <param name="diskIo">The parent <see cref="DiskIo"/> instance associated with this session.</param>
+    /// <param name="ioSession">The underlying binary stream I/O session used for reading and writing data.</param>
+    /// <param name="header">The file header block associated with this session.</param>
+    /// <param name="file">The subfile header associated with this session.</param>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="diskIo"/>, <paramref name="ioSession"/>, or <paramref name="file"/> is <c>null</c>.</exception>
+    /// <exception cref="ObjectDisposedException">Thrown if the <paramref name="diskIo"/> instance is disposed.</exception>
     public DiskIoSession(DiskIo diskIo, BinaryStreamIoSessionBase ioSession, FileHeaderBlock header, SubFileHeader? file)
     {
         if (diskIo is null)
             throw new ArgumentNullException(nameof(diskIo));
+
         if (diskIo.IsDisposed)
             throw new ObjectDisposedException(diskIo.GetType().FullName);
+
         if (ioSession is null)
             throw new ArgumentNullException(nameof(ioSession));
+
         if (file is null)
             throw new ArgumentNullException(nameof(file));
 
@@ -96,7 +102,7 @@ internal unsafe class DiskIoSession : IDisposable
     #region [ Properties ]
 
     /// <summary>
-    /// Returns true if this class is disposed
+    /// Returns <c>true</c> if this class is disposed.
     /// </summary>
     public bool IsDisposed
     {
@@ -132,7 +138,7 @@ internal unsafe class DiskIoSession : IDisposable
     }
 
     /// <summary>
-    /// Gets a pointer to the block
+    /// Gets a pointer to the block.
     /// </summary>
     public byte* Pointer
     {
@@ -160,9 +166,9 @@ internal unsafe class DiskIoSession : IDisposable
     /// Navigates to a block that will be written to. 
     /// This class does not check if overwriting an existing block. So be careful not to corrupt the file.
     /// </summary>
-    /// <param name="blockIndex">the index value of this block</param>
+    /// <param name="blockIndex">the index value of this block.</param>
     /// <param name="blockType">the type of this block.</param>
-    /// <param name="indexValue">a value put in the footer of the block designating the index of this block</param>
+    /// <param name="indexValue">a value put in the footer of the block designating the index of this block.</param>
     /// <remarks>This function will increase the size of the file if the block excedes the current size of the file.</remarks>
     public void WriteToNewBlock(uint blockIndex, BlockType blockType, uint indexValue)
     {
@@ -172,12 +178,16 @@ internal unsafe class DiskIoSession : IDisposable
 
         WriteCount++;
         ReadCount++;
+
         if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         if (m_diskIo.IsDisposed)
             throw new ObjectDisposedException(typeof(DiskIo).FullName);
+
         if (m_isReadOnly)
             throw new ReadOnlyException("The subfile used for this io session is read only.");
+
         if (blockIndex > 10 && blockIndex <= m_lastReadonlyBlock)
             throw new ArgumentOutOfRangeException(nameof(blockIndex), "Cannot write to committed blocks");
 
@@ -190,14 +200,15 @@ internal unsafe class DiskIoSession : IDisposable
     }
 
     /// <summary>
-    /// Navigates to a block that will be written to.
-    /// This block must currently exist and have the correct parameters passed to this function
-    /// In order to allow this block to be modified.
+    /// Writes data to an existing block with the specified block index, block type, and index value.
     /// </summary>
-    /// <param name="blockIndex">the index value of this block</param>
-    /// <param name="blockType">the type of this block.</param>
-    /// <param name="indexValue">a value put in the footer of the block designating the index of this block</param>
-    /// <returns></returns>
+    /// <param name="blockIndex">The index of the block to write data to.</param>
+    /// <param name="blockType">The type of the block to write.</param>
+    /// <param name="indexValue">The index value associated with the block.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if this <see cref="DiskIoSession"/> instance or its parent <see cref="DiskIo"/> instance is disposed.</exception>
+    /// <exception cref="ReadOnlyException">Thrown if the subfile used for this I/O session is read-only.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="blockIndex"/> is greater than 10 and less than or equal to the last committed block.</exception>
+    /// <exception cref="Exception">Thrown if there is a read error or the read state is not valid.</exception>
     public void WriteToExistingBlock(uint blockIndex, BlockType blockType, uint indexValue)
     {
         BlockIndex = blockIndex;
@@ -208,10 +219,13 @@ internal unsafe class DiskIoSession : IDisposable
         ReadCount++;
         if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         if (m_diskIo.IsDisposed)
             throw new ObjectDisposedException(typeof(DiskIo).FullName);
+
         if (m_isReadOnly)
             throw new ReadOnlyException("The subfile used for this io session is read only.");
+
         if (blockIndex > 10 && blockIndex <= m_lastReadonlyBlock)
             throw new ArgumentOutOfRangeException(nameof(blockIndex), "Cannot write to committed blocks");
 
@@ -223,17 +237,19 @@ internal unsafe class DiskIoSession : IDisposable
         if (readState != IoReadState.Valid)
         {
             IsValid = false;
+
             throw new Exception("Read Error: " + readState.ToString());
         }
     }
 
     /// <summary>
-    /// Navigates to a block that will be only read and not modified.
+    /// Reads data from a block with the specified block index, block type, and index value.
     /// </summary>
-    /// <param name="blockIndex"></param>
-    /// <param name="blockType">the type of this block.</param>
-    /// <param name="indexValue">a value put in the footer of the block designating the index of this block</param>
-    /// <returns></returns>
+    /// <param name="blockIndex">The index of the block to read data from.</param>
+    /// <param name="blockType">The type of the block to read.</param>
+    /// <param name="indexValue">The index value associated with the block.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if this <see cref="DiskIoSession"/> instance or its parent <see cref="DiskIo"/> instance is disposed.</exception>
+    /// <exception cref="Exception">Thrown if there is a read error or the read state is not valid.</exception>
     public void Read(uint blockIndex, BlockType blockType, uint indexValue)
     {
         BlockIndex = blockIndex;
@@ -243,6 +259,7 @@ internal unsafe class DiskIoSession : IDisposable
         ReadCount++;
         if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         if (m_diskIo.IsDisposed)
             throw new ObjectDisposedException(typeof(DiskIo).FullName);
 
@@ -251,6 +268,7 @@ internal unsafe class DiskIoSession : IDisposable
         ReadBlock(false);
 
         IoReadState readState = IsFooterValid();
+
         if (readState != IoReadState.Valid)
         {
             IsValid = false;
@@ -259,12 +277,13 @@ internal unsafe class DiskIoSession : IDisposable
     }
 
     /// <summary>
-    /// Navigates to a block that will be only read and not modified.
+    /// Reads data from an old block with the specified block index, block type, and index value.
     /// </summary>
-    /// <param name="blockIndex"></param>
-    /// <param name="blockType">the type of this block.</param>
-    /// <param name="indexValue">a value put in the footer of the block designating the index of this block</param>
-    /// <returns></returns>
+    /// <param name="blockIndex">The index of the old block to read data from.</param>
+    /// <param name="blockType">The type of the old block to read.</param>
+    /// <param name="indexValue">The index value associated with the old block.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if this <see cref="DiskIoSession"/> instance or its parent <see cref="DiskIo"/> instance is disposed.</exception>
+    /// <exception cref="Exception">Thrown if there is a read error or the read state is not valid.</exception>
     public void ReadOld(uint blockIndex, BlockType blockType, uint indexValue)
     {
         BlockIndex = blockIndex;
@@ -274,6 +293,7 @@ internal unsafe class DiskIoSession : IDisposable
         ReadCount++;
         if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         if (m_diskIo.IsDisposed)
             throw new ObjectDisposedException(typeof(DiskIo).FullName);
 
@@ -282,6 +302,7 @@ internal unsafe class DiskIoSession : IDisposable
         ReadBlock(false);
 
         IoReadState readState = IsFooterValidFromOldBlock();
+
         if (readState != IoReadState.Valid)
         {
             IsValid = false;
@@ -305,6 +326,7 @@ internal unsafe class DiskIoSession : IDisposable
                 }
                 m_diskIo = null;
             }
+
             finally
             {
                 GC.SuppressFinalize(this);
@@ -314,14 +336,21 @@ internal unsafe class DiskIoSession : IDisposable
         }
     }
 
+    /// <summary>
+    /// Clears the data in the current <see cref="DiskIoSession"/> instance.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if this <see cref="DiskIoSession"/> instance, its parent <see cref="DiskIo"/> instance, or the underlying <see cref="DiskMediumIoSession"/> instance is disposed.</exception>
     public void Clear()
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         if (m_diskIo.IsDisposed)
             throw new ObjectDisposedException(typeof(DiskIo).FullName);
+
         m_args.Length = 0;
         IsValid = false;
         m_diskMediumIoSession.Clear();
@@ -332,9 +361,9 @@ internal unsafe class DiskIoSession : IDisposable
     #region [ Helper Methods ]
 
     /// <summary>
-    /// Tries to read data from the following file
+    /// Tries to read data from the following file.
     /// </summary>
-    /// <param name="requestWriteAccess">true if reading data from this block for the purpose of writing to it later</param>
+    /// <param name="requestWriteAccess"><c>true</c> if reading data from this block for the purpose of writing to it later.</param>
     private void ReadBlock(bool requestWriteAccess)
     {
         long position = BlockIndex * m_blockSize;
@@ -344,6 +373,7 @@ internal unsafe class DiskIoSession : IDisposable
             Pointer = (byte*)m_args.FirstPointer;
             CachedLookups++;
         }
+
         else
         {
             m_args.Position = position;
@@ -354,6 +384,7 @@ internal unsafe class DiskIoSession : IDisposable
         }
 
         int offsetOfPosition = (int)(position - m_args.FirstPosition);
+
         if (m_args.Length - offsetOfPosition < m_blockSize)
             throw new Exception("stream is not lining up on page boundries");
 
@@ -365,16 +396,21 @@ internal unsafe class DiskIoSession : IDisposable
     {
         byte* lpdata = Pointer + m_blockSize - 32;
         int checksumState = lpdata[28];
+
         if (checksumState == Footer.ChecksumIsNotValid)
             return IoReadState.ChecksumInvalid;
+
         if (checksumState is Footer.ChecksumIsValid or Footer.ChecksumMustBeRecomputed)
         {
             if (lpdata[0] != BlockType)
                 return IoReadState.BlockTypeMismatch;
+
             if (*(uint*)(lpdata + 4) != IndexValue)
                 return IoReadState.IndexNumberMissmatch;
+
             if (*(uint*)(lpdata + 8) >= m_snapshotSequenceNumber)
                 return IoReadState.PageNewerThanSnapshotSequenceNumber;
+
             if (*(ushort*)(lpdata + 2) != m_fileIdNumber)
                 return IoReadState.FileIdNumberDidNotMatch;
             return IoReadState.Valid;
@@ -388,18 +424,24 @@ internal unsafe class DiskIoSession : IDisposable
         int checksumState = lpdata[28];
         if (checksumState == Footer.ChecksumIsNotValid)
             return IoReadState.ChecksumInvalid;
+
         if (checksumState is Footer.ChecksumIsValid or Footer.ChecksumMustBeRecomputed)
         {
             if (lpdata[0] != BlockType)
                 return IoReadState.BlockTypeMismatch;
+
             if (*(uint*)(lpdata + 4) != IndexValue)
                 return IoReadState.IndexNumberMissmatch;
+
             if (*(uint*)(lpdata + 8) > m_snapshotSequenceNumber)
                 return IoReadState.PageNewerThanSnapshotSequenceNumber;
+
             if (*(ushort*)(lpdata + 2) != m_fileIdNumber)
                 return IoReadState.FileIdNumberDidNotMatch;
+
             return IoReadState.Valid;
         }
+
         throw new Exception("Checksum was not computed properly.");
     }
 
@@ -409,18 +451,24 @@ internal unsafe class DiskIoSession : IDisposable
         int checksumState = lpdata[28];
         if (checksumState == Footer.ChecksumIsNotValid)
             return IoReadState.ChecksumInvalid;
+
         if (checksumState is Footer.ChecksumIsValid or Footer.ChecksumMustBeRecomputed)
         {
             if (lpdata[0] != BlockType)
                 return IoReadState.BlockTypeMismatch;
+
             if (*(uint*)(lpdata + 4) != IndexValue)
                 return IoReadState.IndexNumberMissmatch;
+
             if (*(uint*)(lpdata + 8) != m_snapshotSequenceNumber)
                 return IoReadState.PageNewerThanSnapshotSequenceNumber;
+
             if (*(ushort*)(lpdata + 2) != m_fileIdNumber)
                 return IoReadState.FileIdNumberDidNotMatch;
+
             return IoReadState.Valid;
         }
+
         throw new Exception("Checksum was not computed properly.");
     }
 
@@ -441,7 +489,7 @@ internal unsafe class DiskIoSession : IDisposable
         ptr[0] = 0;
         ptr[1] = 0;
         ptr[2] = 0;
-        ptr[3] = 0; // TODO: Consider if this should not be done. This will clear the footer status page.
+        ptr[3] = 0; 
     }
 
     #endregion

@@ -30,7 +30,7 @@ using Gemstone.Diagnostics;
 namespace SnapDB.IO.FileStructure.Media;
 
 /// <summary>
-/// Provides read/write access to all of the different types of disk types
+/// Provides read and write access to all of the different types of disk types
 /// to use to store the file structure.
 /// </summary>
 internal class DiskMedium
@@ -42,11 +42,11 @@ internal class DiskMedium
     #region [ Members ]
 
     /// <summary>
-    /// The file block header
+    /// The file block header.
     /// </summary>
     private FileHeaderBlock m_header;
     /// <summary>
-    /// The underlying disk implementation
+    /// The underlying disk implementation.
     /// </summary>
     private IDiskMediumCoreFunctions m_disk;
     /// <summary>
@@ -65,8 +65,8 @@ internal class DiskMedium
     /// <summary>
     /// Class is created through static methods of this class.
     /// </summary>
-    /// <param name="disk">the underlying disk medium</param>
-    /// <param name="header">the header data to use.</param>
+    /// <param name="disk">The underlying disk medium.</param>
+    /// <param name="header">The header data to use.</param>
     private DiskMedium(IDiskMediumCoreFunctions disk, FileHeaderBlock header)
     {
         m_header = header;
@@ -143,7 +143,7 @@ internal class DiskMedium
     /// Changes the extension of the current file.
     /// </summary>
     /// <param name="extension">the new extension</param>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="isReadOnly">If the file should be reopened as read-only.</param>
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     public void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled)
     {
@@ -153,7 +153,7 @@ internal class DiskMedium
     /// <summary>
     /// Reopens the file with different permissions.
     /// </summary>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="isReadOnly">If the file should be reopened as read-only.</param>
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     public void ChangeShareMode(bool isReadOnly, bool isSharingEnabled)
     {
@@ -180,56 +180,77 @@ internal class DiskMedium
     #region [ Static ]
 
     /// <summary>
-    /// Creates a <see cref="DiskMedium"/> that is entirely based in memory.
+    /// Creates a new in-memory disk medium with the specified settings.
     /// </summary>
-    /// <param name="pool">the <see cref="MemoryPool"/> to allocate data from</param>
-    /// <param name="fileStructureBlockSize">the block size of the file structure. Usually 4kb.</param>
-    /// <param name="flags">Flags to write to the file</param>
-    /// <returns></returns>
+    /// <param name="pool">The memory pool to use for storage.</param>
+    /// <param name="fileStructureBlockSize">The block size for the file's structure.</param>
+    /// <param name="flags">An optional array of GUIDs representing flags to apply to the file header.</param>
+    /// <returns>A <see cref="DiskMedium"/> instance representing the newly created in-memory disk medium.</returns>
+    /// <remarks>
+    /// This method creates a new in-memory disk medium using the provided <paramref name="pool"/> for storage.
+    /// The <paramref name="fileStructureBlockSize"/> parameter specifies the block size for the file's structure.
+    /// Additionally, optional flags can be passed as an array of <paramref name="flags"/> to apply to the file header.
+    /// </remarks>
+    /// <param name="pool">The memory pool to use for storage.</param>
+    /// <param name="fileStructureBlockSize">The block size for the file's structure.</param>
+    /// <param name="flags">An optional array of GUIDs representing flags to apply to the file header.</param>
     public static DiskMedium CreateMemoryFile(MemoryPool pool, int fileStructureBlockSize, params Guid[] flags)
     {
         FileHeaderBlock header = FileHeaderBlock.CreateNew(fileStructureBlockSize, flags);
         MemoryPoolFile disk = new(pool);
+
         return new DiskMedium(disk, header);
     }
 
     /// <summary>
-    /// Creates a <see cref="DiskMedium"/> from a <see cref="stream"/>. 
-    /// This will initialize the <see cref="stream"/> as an empty file structure.
+    /// Creates a new disk medium backed by a custom file stream with the specified settings.
     /// </summary>
-    /// <param name="stream">An open <see cref="FileStream"/> to use. The <see cref="DiskMedium"/>
-    ///     will assume ownership of this <see cref="FileStream"/>.</param>
-    /// <param name="pool">the <see cref="MemoryPool"/> to allocate data from</param>
-    /// <param name="fileStructureBlockSize">the block size of the file structure. Usually 4kb.</param>
-    /// <param name="flags">Flags to write to the file</param>
-    /// <returns></returns>
+    /// <param name="stream">The custom file stream to use as the underlying storage.</param>
+    /// <param name="pool">The memory pool to use for caching.</param>
+    /// <param name="fileStructureBlockSize">The block size for the file's structure.</param>
+    /// <param name="flags">An optional array of GUIDs representing flags to apply to the file header.</param>
+    /// <returns>A <see cref="DiskMedium"/> instance representing the newly created disk medium.</returns>
     /// <remarks>
-    /// This will not check if the file is truely a new file. If calling this with an existing
-    /// archive file, it will overwrite the table of contents, corrupting the file.
+    /// This method creates a new disk medium that uses a custom file stream <paramref name="stream"/>
+    /// as the underlying storage. The <paramref name="pool"/> parameter specifies the memory pool to use for caching.
+    /// The <paramref name="fileStructureBlockSize"/> parameter specifies the block size for the file's structure.
+    /// Additionally, optional flags can be passed as an array of <paramref name="flags"/> to apply to the file header.
     /// </remarks>
+    /// <param name="stream">The custom file stream to use as the underlying storage.</param>
+    /// <param name="pool">The memory pool to use for caching.</param>
+    /// <param name="fileStructureBlockSize">The block size for the file's structure.</param>
+    /// <param name="flags">An optional array of GUIDs representing flags to apply to the file header.</param>
     public static DiskMedium CreateFile(CustomFileStream stream, MemoryPool pool, int fileStructureBlockSize, params Guid[] flags)
     {
         FileHeaderBlock header = FileHeaderBlock.CreateNew(fileStructureBlockSize, flags);
-
         BufferedFile disk = new(stream, pool, header, isNewFile: true);
+
         return new DiskMedium(disk, header);
     }
 
     /// <summary>
-    /// Creates a <see cref="DiskMedium"/> from a <see cref="stream"/>. 
-    /// This will read the existing header from the <see cref="stream"/>.
+    /// Opens an existing disk medium using a custom file stream and specified settings.
     /// </summary>
-    /// <param name="stream">An open <see cref="FileStream"/> to use. The <see cref="DiskMedium"/>
-    /// will assume ownership of this <see cref="FileStream"/>.</param>
-    /// <param name="pool">The <see cref="MemoryPool"/> to allocate data from.</param>
-    /// <param name="fileStructureBlockSize">the block size of the file structure. Usually 4kb.</param>
-    /// <returns></returns>
+    /// <param name="stream">The custom file stream representing the existing disk storage.</param>
+    /// <param name="pool">The memory pool to use for caching.</param>
+    /// <param name="fileStructureBlockSize">The block size for the file's structure.</param>
+    /// <returns>A <see cref="DiskMedium"/> instance representing the opened disk medium.</returns>
+    /// <remarks>
+    /// This method opens an existing disk medium by reading the file header from the provided
+    /// custom file stream <paramref name="stream"/> and using it to initialize the disk medium.
+    /// The <paramref name="pool"/> parameter specifies the memory pool to use for caching, and
+    /// <paramref name="fileStructureBlockSize"/> specifies the block size for the file's structure.
+    /// </remarks>
+    /// <param name="stream">The custom file stream representing the existing disk storage.</param>
+    /// <param name="pool">The memory pool to use for caching.</param>
+    /// <param name="fileStructureBlockSize">The block size for the file's structure.</param>
     public static DiskMedium OpenFile(CustomFileStream stream, MemoryPool pool, int fileStructureBlockSize)
     {
         byte[] buffer = new byte[fileStructureBlockSize];
         stream.ReadRaw(0, buffer, fileStructureBlockSize);
         FileHeaderBlock header = FileHeaderBlock.Open(buffer);
         BufferedFile disk = new(stream, pool, header, isNewFile: false);
+
         return new DiskMedium(disk, header);
     }
 

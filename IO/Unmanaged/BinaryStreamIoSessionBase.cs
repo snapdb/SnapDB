@@ -42,11 +42,11 @@ public abstract class BinaryStreamIoSessionBase
     /// <summary>
     /// Gets a block for the following I/O session.
     /// </summary>
-    /// <param name="args">The block request that needs to be fulfilled by this IoSession.</param>
+    /// <param name="args">The block request that needs to be fulfilled by this IOSession.</param>
     public abstract void GetBlock(BlockArguments args);
 
     /// <summary>
-    /// Sets the current usage of the <see cref="BinaryStreamIoSessionBase"/> to null.
+    /// Sets the current usage of the <see cref="BinaryStreamIoSessionBase"/> to <c>null</c>.
     /// </summary>
     public abstract void Clear();
 
@@ -62,7 +62,7 @@ public abstract class BinaryStreamIoSessionBase
     /// <summary>
     /// Releases the unmanaged resources used by the <see cref="BinaryStreamIoSessionBase"/> object and optionally releases the managed resources.
     /// </summary>
-    /// <param name="disposing">true releases both managed and unmanaged resources; false releases only unmanaged resources.</param>
+    /// <param name="disposing"><c>true</c> releases both managed and unmanaged resources; <c>false</c> releases only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
         if (!m_disposed)
