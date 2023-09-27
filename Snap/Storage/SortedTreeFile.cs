@@ -55,7 +55,7 @@ public class SortedTreeFile
     private bool m_disposed;
 
     private TransactionalFileStructure m_fileStructure;
-    private readonly SortedList<SubFileName, IDisposable> m_openedFiles;
+    private readonly GenericSortedList<SubFileName, IDisposable> m_openedFiles;
 
     #endregion
 
@@ -63,7 +63,7 @@ public class SortedTreeFile
 
     private SortedTreeFile()
     {
-        m_openedFiles = new SortedList<SubFileName, IDisposable>();
+        m_openedFiles = new GenericSortedList<SubFileName, IDisposable>();
     }
 
     /// <summary>

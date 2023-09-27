@@ -102,7 +102,7 @@ public partial class ArchiveList<TKey, TValue>
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
-            SortedList<Guid, ArchiveTableSummary<TKey, TValue>> partitions = m_list.m_fileSummaries;
+            GenericSortedList<Guid, ArchiveTableSummary<TKey, TValue>> partitions = m_list.m_fileSummaries;
             if (!partitions.ContainsKey(archiveId))
             {
                 return false;
@@ -125,7 +125,7 @@ public partial class ArchiveList<TKey, TValue>
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
-            SortedList<Guid, ArchiveTableSummary<TKey, TValue>> partitions = m_list.m_fileSummaries;
+            GenericSortedList<Guid, ArchiveTableSummary<TKey, TValue>> partitions = m_list.m_fileSummaries;
             if (!partitions.ContainsKey(archiveId))
             {
                 return false;

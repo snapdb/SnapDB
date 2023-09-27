@@ -74,7 +74,7 @@ internal sealed unsafe class PageList
     /// Map is PositionIndex,PageIndex
     /// </summary>
     /// ToDO: Change this to something faster than a sorted list.
-    private readonly SortedList<int, int> m_pageIndexLookupByPositionIndex;
+    private readonly GenericSortedList<int, int> m_pageIndexLookupByPositionIndex;
 
     /// <summary>
     /// A list of all pages that have been cached.
@@ -95,7 +95,7 @@ internal sealed unsafe class PageList
     {
         m_memoryPool = memoryPool;
         m_listOfPages = new NullableLargeArray<InternalPageMetaData>();
-        m_pageIndexLookupByPositionIndex = new SortedList<int, int>();
+        m_pageIndexLookupByPositionIndex = new GenericSortedList<int, int>();
     }
 
     ~PageList()

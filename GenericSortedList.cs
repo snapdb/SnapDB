@@ -106,7 +106,7 @@ namespace System.Collections.Generic
                 }
             }
 
-            internal Enumerator(SortedList<TKey, TValue> sortedList, int getEnumeratorRetType)
+            internal Enumerator(GenericSortedList<TKey, TValue> sortedList, int getEnumeratorRetType)
             {
                 _sortedList = sortedList;
                 index = 0;
@@ -160,7 +160,7 @@ namespace System.Collections.Generic
         [Serializable]
         private sealed class SortedListKeyEnumerator : IEnumerator<TKey>, IDisposable, IEnumerator
         {
-            private SortedList<TKey, TValue> _sortedList;
+            private GenericSortedList<TKey, TValue> _sortedList;
 
             private int index;
 
@@ -183,7 +183,7 @@ namespace System.Collections.Generic
                 }
             }
 
-            internal SortedListKeyEnumerator(SortedList<TKey, TValue> sortedList)
+            internal SortedListKeyEnumerator(GenericSortedList<TKey, TValue> sortedList)
             {
                 _sortedList = sortedList;
                 version = sortedList.version;
@@ -229,7 +229,7 @@ namespace System.Collections.Generic
         [Serializable]
         private sealed class SortedListValueEnumerator : IEnumerator<TValue>, IDisposable, IEnumerator
         {
-            private SortedList<TKey, TValue> _sortedList;
+            private GenericSortedList<TKey, TValue> _sortedList;
 
             private int index;
 
@@ -252,7 +252,7 @@ namespace System.Collections.Generic
                 }
             }
 
-            internal SortedListValueEnumerator(SortedList<TKey, TValue> sortedList)
+            internal SortedListValueEnumerator(GenericSortedList<TKey, TValue> sortedList)
             {
                 _sortedList = sortedList;
                 version = sortedList.version;
@@ -300,7 +300,7 @@ namespace System.Collections.Generic
         [DebuggerDisplay("Count = {Count}")]
         private sealed class KeyList : IList<TKey>, ICollection<TKey>, IEnumerable<TKey>, IEnumerable, ICollection
         {
-            private SortedList<TKey, TValue> _dict;
+            private GenericSortedList<TKey, TValue> _dict;
 
             public int Count => _dict._size;
 
@@ -322,7 +322,7 @@ namespace System.Collections.Generic
                 }
             }
 
-            internal KeyList(SortedList<TKey, TValue> dictionary)
+            internal KeyList(GenericSortedList<TKey, TValue> dictionary)
             {
                 _dict = dictionary;
             }
@@ -412,7 +412,7 @@ namespace System.Collections.Generic
         [DebuggerDisplay("Count = {Count}")]
         private sealed class ValueList : IList<TValue>, ICollection<TValue>, IEnumerable<TValue>, IEnumerable, ICollection
         {
-            private SortedList<TKey, TValue> _dict;
+            private GenericSortedList<TKey, TValue> _dict;
 
             public int Count => _dict._size;
 
@@ -434,7 +434,7 @@ namespace System.Collections.Generic
                 }
             }
 
-            internal ValueList(SortedList<TKey, TValue> dictionary)
+            internal ValueList(GenericSortedList<TKey, TValue> dictionary)
             {
                 _dict = dictionary;
             }
@@ -941,7 +941,7 @@ namespace System.Collections.Generic
         //     Initializes a new instance of the System.Collections.Generic.SortedList`2 class
         //     that is empty, has the default initial capacity, and uses the default System.Collections.Generic.IComparer`1.
         [__DynamicallyInvokable]
-        public SortedList()
+        public GenericSortedList()
         {
             keys = emptyKeys;
             values = emptyValues;
@@ -963,7 +963,7 @@ namespace System.Collections.Generic
         //   T:System.ArgumentOutOfRangeException:
         //     capacity is less than zero.
         [__DynamicallyInvokable]
-        public SortedList(int capacity)
+        public GenericSortedList(int capacity)
         {
             if (capacity < 0)
             {
@@ -986,7 +986,7 @@ namespace System.Collections.Generic
         //     keys.-or-null to use the default System.Collections.Generic.Comparer`1 for the
         //     type of the key.
         [__DynamicallyInvokable]
-        public SortedList(IComparer<TKey> comparer)
+        public GenericSortedList(IComparer<TKey> comparer)
             : this()
         {
             if (comparer != null)
@@ -1014,7 +1014,7 @@ namespace System.Collections.Generic
         //   T:System.ArgumentOutOfRangeException:
         //     capacity is less than zero.
         [__DynamicallyInvokable]
-        public SortedList(int capacity, IComparer<TKey> comparer)
+        public GenericSortedList(int capacity, IComparer<TKey> comparer)
             : this(comparer)
         {
             Capacity = capacity;
@@ -1039,7 +1039,7 @@ namespace System.Collections.Generic
         //   T:System.ArgumentException:
         //     dictionary contains one or more duplicate keys.
         [__DynamicallyInvokable]
-        public SortedList(IDictionary<TKey, TValue> dictionary)
+        public GenericSortedList(IDictionary<TKey, TValue> dictionary)
             : this(dictionary, (IComparer<TKey>)null)
         {
         }
@@ -1068,7 +1068,7 @@ namespace System.Collections.Generic
         //   T:System.ArgumentException:
         //     dictionary contains one or more duplicate keys.
         [__DynamicallyInvokable]
-        public SortedList(IDictionary<TKey, TValue> dictionary, IComparer<TKey> comparer)
+        public GenericSortedList(IDictionary<TKey, TValue> dictionary, IComparer<TKey> comparer)
             : this(dictionary?.Count ?? 0, comparer)
         {
             if (dictionary == null)
@@ -1687,7 +1687,7 @@ namespace System.Collections.Generic
             return key is TKey;
         }
 
-        public static implicit operator GenericSortedList<TKey, TValue>(SortedList<Guid, ArchiveTableSummary<TKey, TValue>> v)
+        public static implicit operator GenericSortedList<TKey, TValue>(GenericSortedList<Guid, ArchiveTableSummary<TKey, TValue>> v)
         {
             throw new NotImplementedException();
         }
