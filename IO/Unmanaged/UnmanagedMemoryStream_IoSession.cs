@@ -27,7 +27,7 @@
 namespace SnapDB.IO.Unmanaged;
 
 /// <summary>
-/// Provides a in memory stream that allocates its own unmanaged memory.
+/// Provides an in-memory stream that allocates its own unmanaged memory.
 /// </summary>
 public partial class UnmanagedMemoryStream
 {

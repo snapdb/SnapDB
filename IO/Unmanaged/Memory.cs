@@ -58,7 +58,7 @@ public sealed class Memory
     /// Allocates unmanaged memory. The block is uninitialized.
     /// </summary>
     /// <param name="requestedSize">The desired number of bytes to allocate. 
-    /// Be sure to check the actual size in the return class. </param>
+    /// Be sure to check the actual size in the return class.</param>
     /// <returns>The allocated memory.</returns>
     public Memory(int requestedSize)
     {
@@ -139,9 +139,9 @@ public sealed class Memory
     /// Does a safe copy of data from one location to another. 
     /// A safe copy allows for the source and destination to overlap.
     /// </summary>
-    /// <param name="src"></param>
-    /// <param name="dest"></param>
-    /// <param name="count"></param>
+    /// <param name="src">A pointer to the source location from which data will be copied.</param>
+    /// <param name="dest">A pointer to the destination location where data will be copied to.</param>
+    /// <param name="count">The number of bytes to copy from the source to the destination.</param>
     public static unsafe void Copy(byte* src, byte* dest, int count)
     {
         WinApi.MoveMemory(dest, src, count);
@@ -151,9 +151,9 @@ public sealed class Memory
     /// Does a safe copy of data from one location to another. 
     /// A safe copy allows for the source and destination to overlap.
     /// </summary>
-    /// <param name="src"></param>
-    /// <param name="dest"></param>
-    /// <param name="count"></param>
+    /// <param name="src">A pointer to the source location from which data will be copied.</param>
+    /// <param name="dest">A pointer to the destination location where data will be copied to.</param>
+    /// <param name="count">The number of bytes to copy from the source to the destination.</param>
     public static unsafe void Copy(IntPtr src, IntPtr dest, int count)
     {
         WinApi.MoveMemory((byte*)dest, (byte*)src, count);
@@ -162,8 +162,8 @@ public sealed class Memory
     /// <summary>
     /// Sets the data in this buffer to all zeroes.
     /// </summary>
-    /// <param name="pointer">the starting position.</param>
-    /// <param name="length">the number of bytes to clear.</param>
+    /// <param name="pointer">The starting position.</param>
+    /// <param name="length">The number of bytes to clear.</param>
     public static unsafe void Clear(byte* pointer, int length)
     {
         int i;
@@ -180,8 +180,8 @@ public sealed class Memory
     /// <summary>
     /// Sets the data in this buffer to all zeroes.
     /// </summary>
-    /// <param name="pointer">the starting position.</param>
-    /// <param name="length">the number of bytes to clear.</param>
+    /// <param name="pointer">The starting position.</param>
+    /// <param name="length">The number of bytes to clear.</param>
     public static unsafe void Clear(IntPtr pointer, int length)
     {
         Clear((byte*)pointer, length);

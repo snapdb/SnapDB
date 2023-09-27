@@ -29,7 +29,7 @@ using Gemstone;
 namespace SnapDB.IO.Unmanaged;
 
 /// <summary>
-/// Provides a dynamically sizing sequence of unmanaged data.
+/// Represents settings and storage for managing IntPtr arrays used for memory management.
 /// </summary>
 public class UnmanagedMemoryStreamCore : IDisposable
 {
@@ -38,33 +38,50 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// </summary>
     private class Settings
     {
+        // Constants used for array manipulation.
         private const int Mask = 63;
         private const int ElementsPerRow = 64;
         private const int ShiftBits = 6;
 
+        /// <summary>
+        /// Gets the total number of pages stored in the memory manager.
+        /// </summary>
         public int PageCount
         {
             get;
             private set;
         }
 
+        // Array to store IntPtr pointers for memory management.
         private IntPtr[][] m_pagePointer;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Settings"/> class.
+        /// </summary>
         public Settings()
         {
             m_pagePointer = new IntPtr[4][];
             PageCount = 0;
         }
 
+        /// <summary>
+        /// Gets the IntPtr pointer at the specified page index.
+        /// </summary>
+        /// <param name="page">The index of the page.</param>
+        /// <returns>The IntPtr pointer at the specified page index.</returns>
         public IntPtr GetPointer(int page)
         {
             return m_pagePointer[page >> ShiftBits][page & Mask];
         }
 
-
-
+        /// <summary>
+        /// Determines if adding a new page requires cloning the array to increase capacity.
+        /// </summary>
         public bool AddingRequiresClone => m_pagePointer.Length * ElementsPerRow == PageCount;
 
+        /// <summary>
+        /// Ensures the array capacity is sufficient to add a new page.
+        /// </summary>
         private void EnsureCapacity()
         {
             if (AddingRequiresClone)
@@ -82,6 +99,10 @@ public class UnmanagedMemoryStreamCore : IDisposable
             }
         }
 
+        /// <summary>
+        /// Adds a new page represented by an IntPtr pointer to the memory manager.
+        /// </summary>
+        /// <param name="pagePointer">The IntPtr pointer of the new page.</param>
         public void AddNewPage(IntPtr pagePointer)
         {
             EnsureCapacity();
@@ -93,6 +114,10 @@ public class UnmanagedMemoryStreamCore : IDisposable
             PageCount++;
         }
 
+        /// <summary>
+        /// Creates a shallow clone of the <see cref="Settings"/> instance.
+        /// </summary>
+        /// <returns>A shallow clone of the <see cref="Settings"/> instance.</returns>
         public Settings Clone()
         {
             return (Settings)MemberwiseClone();
@@ -293,6 +318,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
         {
             bool cloned = false;
             Settings settings = m_settings;
+
             if (settings.AddingRequiresClone)
             {
                 cloned = true;
@@ -319,14 +345,13 @@ public class UnmanagedMemoryStreamCore : IDisposable
 
     #endregion
 
-    // TODO: Consider removing these methods
     /// <summary>
     /// Reads from the underlying stream the requested set of data. 
     /// This function is more user friendly than calling GetBlock().
     /// </summary>
-    /// <param name="position">the starting position of the read.</param>
-    /// <param name="pointer">an output pointer to <see cref="position"/>.</param>
-    /// <param name="validLength">the number of bytes that are valid after this position.</param>
+    /// <param name="position">The starting position of the read.</param>
+    /// <param name="pointer">An output pointer to <see cref="position"/>.</param>
+    /// <param name="validLength">The number of bytes that are valid after this position.</param>
     public void ReadBlock(long position, out IntPtr pointer, out int validLength)
     {
         if (m_disposed)

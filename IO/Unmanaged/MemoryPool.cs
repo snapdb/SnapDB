@@ -60,8 +60,7 @@ public enum TargetUtilizationLevels
 /// <remarks>
 /// Be careful how this class is referenced. Deadlocks can occur
 /// when registering to event <see cref="RequestCollection"/> and
-/// when calling <see cref="AllocatePage"/>. See comments for these methods
-/// for considerations.
+/// when calling <see cref="AllocatePage"/>.
 /// </remarks>
 public class MemoryPool
     : IDisposable

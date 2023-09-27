@@ -27,7 +27,7 @@
 namespace SnapDB.IO.Unmanaged;
 
 /// <summary>
-/// Provides a in memory stream that allocates its own unmanaged memory
+/// Provides a in memory stream that allocates its own unmanaged memory.
 /// </summary>
 public partial class UnmanagedMemoryStream
     : UnmanagedMemoryStreamCore, ISupportsBinaryStream
@@ -62,10 +62,12 @@ public partial class UnmanagedMemoryStream
     public bool IsReadOnly => false;
 
     /// <summary>
-    /// Gets the number of available simultaneous read/write sessions.
+    /// Gets the number of available simultaneous read and write sessions.
     /// </summary>
-    /// <remarks>This value is used to determine if a binary stream can be cloned
-    /// to improve read/write/copy performance.</remarks>
+    /// <remarks>
+    /// This value is used to determine if a binary stream can be cloned
+    /// to improve read, write, and copy performance.
+    /// </remarks>
     int ISupportsBinaryStream.RemainingSupportedIoSessions => int.MaxValue;
 
     #endregion
@@ -73,7 +75,7 @@ public partial class UnmanagedMemoryStream
     #region [ Methods ]
 
     /// <summary>
-    /// Aquire an IO Session.
+    /// Acquire an IO Session.
     /// </summary>
     public BinaryStreamIoSessionBase CreateIoSession()
     {
@@ -83,7 +85,7 @@ public partial class UnmanagedMemoryStream
     /// <summary>
     /// Creates a new binary from an IO session
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A new <see cref="BinaryStreamBase"/> instance of type <see cref="BinaryStream"/>.</returns>
     public BinaryStreamBase CreateBinaryStream()
     {
         return new BinaryStream(this);
