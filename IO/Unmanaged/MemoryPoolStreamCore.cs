@@ -74,7 +74,6 @@ public class MemoryPoolStreamCore : IDisposable
             {
                 int[][] oldIndex = m_pageIndex;
                 IntPtr[][] oldPointer = m_pagePointer;
-
                 m_pageIndex = new int[m_pageIndex.Length * 2][];
                 m_pagePointer = new IntPtr[m_pagePointer.Length * 2][];
                 oldIndex.CopyTo(m_pageIndex, 0);
@@ -184,7 +183,7 @@ public class MemoryPoolStreamCore : IDisposable
     }
 
     /// <summary>
-    /// Create a new <see cref="MemoryPoolStreamCore"/>
+    /// Create a new <see cref="MemoryPoolStreamCore"/>.
     /// </summary>
     public MemoryPoolStreamCore(MemoryPool pool)
     {
@@ -234,19 +233,22 @@ public class MemoryPoolStreamCore : IDisposable
     /// <summary>
     /// Configure the natural alignment of the data.
     /// </summary>
-    /// <param name="startPosition">The first addressable position</param>
+    /// <param name="startPosition">The first addressable position.</param>
     /// <param name="alignment">
     /// Forces alignment on this boundary.
-    /// Alignment must be a factor of the BufferPool's page boudary.
+    /// Alignment must be a factor of the BufferPool's page boundary.
     /// </param>
     public void ConfigureAlignment(long startPosition, int alignment)
     {
         if (startPosition < 0)
             throw new ArgumentOutOfRangeException(nameof(startPosition), "Cannot be negative");
+
         if (alignment <= 0)
             throw new ArgumentOutOfRangeException(nameof(alignment), "Must be a positive factor of the buffer pool's page size.");
+
         if (alignment > m_pageSize)
             throw new ArgumentOutOfRangeException(nameof(alignment), "Cannot be greater than the buffer pool's page size.");
+
         if (m_pageSize % alignment != 0)
             throw new ArgumentException("Must be an even factor of the buffer pool's page size", nameof(alignment));
 
@@ -261,6 +263,7 @@ public class MemoryPoolStreamCore : IDisposable
     {
         if (m_disposed)
             throw new ObjectDisposedException("MemoryStream");
+
         if (args.Position < m_firstValidPosition)
             throw new ArgumentOutOfRangeException("position", "position is before the beginning of the stream");
 
@@ -297,9 +300,7 @@ public class MemoryPoolStreamCore : IDisposable
             try
             {
                 if (!m_pool.IsDisposed)
-                {
                     m_pool.ReleasePages(m_settings.GetAllPageIndexes());
-                }
             }
             finally
             {
@@ -381,6 +382,7 @@ public class MemoryPoolStreamCore : IDisposable
     {
         if (m_disposed)
             throw new ObjectDisposedException("MemoryStream");
+
         if (position < m_firstValidPosition)
             throw new ArgumentOutOfRangeException(nameof(position), "position is before the beginning of the stream");
 
@@ -411,6 +413,7 @@ public class MemoryPoolStreamCore : IDisposable
             length -= validLength;
             dest += validLength;
             position += validLength;
+
             goto TryAgain;
         }
         Memory.Copy(src, dest, length);
