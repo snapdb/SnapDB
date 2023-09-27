@@ -49,8 +49,8 @@ public class RemoteBinaryStream
     /// <summary>
     /// Creates a <see cref="RemoteBinaryStream"/>
     /// </summary>
-    /// <param name="stream">the underlying stream to wrap</param>
-    /// <param name="workerThreadSynchronization">the synchronization object</param>
+    /// <param name="stream">The underlying stream to wrap</param>
+    /// <param name="workerThreadSynchronization">The synchronization object</param>
     public RemoteBinaryStream(Stream stream, WorkerThreadSynchronization? workerThreadSynchronization = null)
     {
         if (!BitConverter.IsLittleEndian)
@@ -157,11 +157,14 @@ public class RemoteBinaryStream
 
                 if (receiveBufferLength == 0)
                     throw new EndOfStreamException();
+
                 offset += receiveBufferLength;
                 count -= receiveBufferLength;
             }
+
             return origionalCount;
         }
+
         else
         {
             // With fewer than 100 bytes requested, 
@@ -219,6 +222,7 @@ public class RemoteBinaryStream
             {
                 *(long*)(lp + m_sendLength) = value;
                 m_sendLength += 8;
+
                 return;
             }
         }
@@ -233,6 +237,7 @@ public class RemoteBinaryStream
             {
                 *(int*)(lp + m_sendLength) = value;
                 m_sendLength += 4;
+
                 return;
             }
         }
@@ -251,60 +256,83 @@ public class RemoteBinaryStream
                 {
                     stream[0] = (byte)value;
                     m_sendLength += 1;
+
                     return;
                 }
+
                 stream[0] = (byte)(value | 128);
+
                 if (value < 128 * 128)
                 {
                     stream[1] = (byte)(value >> 7);
                     m_sendLength += 2;
+
                     return;
                 }
+
                 stream[1] = (byte)((value >> 7) | 128);
+
                 if (value < 128 * 128 * 128)
                 {
                     stream[2] = (byte)(value >> 14);
                     m_sendLength += 3;
+
                     return;
                 }
+
                 stream[2] = (byte)((value >> 14) | 128);
+
                 if (value < 128 * 128 * 128 * 128)
                 {
                     stream[3] = (byte)(value >> 21);
                     m_sendLength += 4;
+
                     return;
                 }
+
                 stream[3] = (byte)((value >> (7 + 7 + 7)) | 128);
+
                 if (value < 128L * 128 * 128 * 128 * 128)
                 {
                     stream[4] = (byte)(value >> (7 + 7 + 7 + 7));
                     m_sendLength += 5;
+
                     return;
                 }
+
                 stream[4] = (byte)((value >> (7 + 7 + 7 + 7)) | 128);
+
                 if (value < 128L * 128 * 128 * 128 * 128 * 128)
                 {
                     stream[5] = (byte)(value >> (7 + 7 + 7 + 7 + 7));
                     m_sendLength += 6;
+
                     return;
                 }
                 stream[5] = (byte)((value >> (7 + 7 + 7 + 7 + 7)) | 128);
+
                 if (value < 128L * 128 * 128 * 128 * 128 * 128 * 128)
                 {
                     stream[6] = (byte)(value >> (7 + 7 + 7 + 7 + 7 + 7));
                     m_sendLength += 7;
+
                     return;
                 }
+
                 stream[6] = (byte)((value >> (7 + 7 + 7 + 7 + 7 + 7)) | 128);
+
                 if (value < 128L * 128 * 128 * 128 * 128 * 128 * 128 * 128)
                 {
                     stream[7] = (byte)(value >> (7 + 7 + 7 + 7 + 7 + 7 + 7));
                     m_sendLength += 8;
+
                     return;
                 }
+
                 stream[7] = (byte)(value >> (7 + 7 + 7 + 7 + 7 + 7 + 7) | 128);
                 stream[8] = (byte)(value >> (7 + 7 + 7 + 7 + 7 + 7 + 7 + 7));
                 m_sendLength += 9;
+
                 return;
             }
 
@@ -318,6 +346,7 @@ public class RemoteBinaryStream
         {
             byte value = m_receiveBuffer[m_receivePosition];
             m_receivePosition++;
+
             return value;
         }
         return base.ReadUInt8();
@@ -331,6 +360,7 @@ public class RemoteBinaryStream
             {
                 int value = *(int*)(lp + m_receivePosition);
                 m_receivePosition += 4;
+
                 return value;
             }
         }
@@ -345,9 +375,11 @@ public class RemoteBinaryStream
             {
                 long value = *(long*)(lp + m_receivePosition);
                 m_receivePosition += 8;
+
                 return value;
             }
         }
+
         return base.ReadInt64();
     }
 
@@ -359,58 +391,83 @@ public class RemoteBinaryStream
             {
                 byte* stream = lp + m_receivePosition;
                 ulong value11 = stream[0];
+
                 if (value11 < 128)
                 {
                     m_receivePosition += 1;
+
                     return value11;
                 }
+
                 value11 ^= (ulong)stream[1] << 7;
+
                 if (value11 < 128 * 128)
                 {
                     m_receivePosition += 2;
+
                     return value11 ^ 0x80;
                 }
+
                 value11 ^= (ulong)stream[2] << (7 + 7);
+
                 if (value11 < 128 * 128 * 128)
                 {
                     m_receivePosition += 3;
+
                     return value11 ^ 0x4080;
                 }
+
                 value11 ^= (ulong)stream[3] << (7 + 7 + 7);
+
                 if (value11 < 128 * 128 * 128 * 128)
                 {
                     m_receivePosition += 4;
+
                     return value11 ^ 0x204080;
                 }
+
                 value11 ^= (ulong)stream[4] << (7 + 7 + 7 + 7);
+
                 if (value11 < 128L * 128 * 128 * 128 * 128)
                 {
                     m_receivePosition += 5;
+
                     return value11 ^ 0x10204080L;
                 }
+
                 value11 ^= (ulong)stream[5] << (7 + 7 + 7 + 7 + 7);
+
                 if (value11 < 128L * 128 * 128 * 128 * 128 * 128)
                 {
                     m_receivePosition += 6;
+
                     return value11 ^ 0x810204080L;
                 }
                 value11 ^= (ulong)stream[6] << (7 + 7 + 7 + 7 + 7 + 7);
+
                 if (value11 < 128L * 128 * 128 * 128 * 128 * 128 * 128)
                 {
                     m_receivePosition += 7;
+
                     return value11 ^ 0x40810204080L;
                 }
+
                 value11 ^= (ulong)stream[7] << (7 + 7 + 7 + 7 + 7 + 7 + 7);
+
                 if (value11 < 128L * 128 * 128 * 128 * 128 * 128 * 128 * 128)
                 {
                     m_receivePosition += 8;
+
                     return value11 ^ 0x2040810204080L;
                 }
+
                 value11 ^= (ulong)stream[8] << (7 + 7 + 7 + 7 + 7 + 7 + 7 + 7);
                 m_receivePosition += 9;
+
                 return value11 ^ 0x102040810204080L;
             }
         }
+
         return base.Read7BitUInt64();
     }
 
@@ -432,6 +489,7 @@ public class RemoteBinaryStream
                 m_workerThreadSynchronization.EndSafeToCallbackRegion();
             }
         }
+
         else
         {
             Array.Copy(buffer, offset, m_sendBuffer, m_sendLength, count);
