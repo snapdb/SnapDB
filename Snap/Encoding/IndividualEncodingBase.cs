@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  IndividualEncodingBase`1.cs - Gbtc
+//  IndividualEncodingBase.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -30,101 +30,84 @@ using SnapDB.IO;
 namespace SnapDB.Snap.Encoding;
 
 /// <summary>
-/// Base Class that allows compressing of a single value
+/// Represents the base class for individual value encoding strategies that allow compressing of a single value.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">The type of values to encode.</typeparam>
 public abstract class IndividualEncodingBase<T>
 {
     /// <summary>
-    /// Gets if the stream supports a symbol that 
-    /// represents that the end of the stream has been encountered.
+    /// Gets a value indicating whether this encoding contains an end-of-stream symbol.
     /// </summary>
-    /// <remarks>
-    /// An example of a symbol would be the byte code 0xFF.
-    /// In this case, if the first byte of the
-    /// word is 0xFF, the encoding has specifically
-    /// designated this as the end of the stream. Therefore, calls to
-    /// Decompress will result in an end of stream exception.
-    /// 
-    /// Failing to reserve a code as the end of stream will mean that
-    /// streaming points will include its own symbol to represent the end of the
-    /// stream, taking 1 extra byte per point encoded.
-    /// </remarks>
     public abstract bool ContainsEndOfStreamSymbol { get; }
 
     /// <summary>
-    /// The byte code to use as the end of stream symbol.
-    /// May throw NotSupportedException if <see cref="ContainsEndOfStreamSymbol"/> is false.
+    /// Gets the byte value representing the end-of-stream symbol if applicable.
+    /// May throw NotSupportedException if <see cref="ContainsEndOfStreamSymbol"/> is <c>false</c>.
     /// </summary>
     public abstract byte EndOfStreamSymbol { get; }
 
     /// <summary>
-    /// Gets if the previous value will need to be presented to the encoding algorithms to
-    /// property encode the next sample. Returning false will cause nulls to be passed
-    /// in a parameters to the encoding.
+    /// Gets a value indicating whether this encoding strategy uses the previous value for encoding.
     /// </summary>
     public abstract bool UsesPreviousValue { get; }
 
     /// <summary>
-    /// Gets the maximum amount of space that is required for the compression algorithm. This
-    /// prevents lower levels from having overflows on the underlying streams. It is critical
-    /// that this value be correct. Error on the side of too large of a value as a value
-    /// too small will corrupt data and be next to impossible to track down the point of corruption
+    /// Gets the maximum amount of space required by the compression algorithm. 
     /// </summary>
     public abstract int MaxCompressionSize { get; }
 
     /// <summary>
-    /// Encodes <see cref="value"/> to the provided <see cref="stream"/>.
+    /// Encodes <see cref="value"/> and writes it to the specified binary <see cref="stream"/>.
     /// </summary>
-    /// <param name="stream">where to write the data</param>
-    /// <param name="prevValue">the previous value if required by <see cref="UsesPreviousValue"/>. Otherwise null.</param>
-    /// <param name="value">the value to encode</param>
-    /// <returns>the number of bytes necessary to encode this key/value.</returns>
+    /// <param name="stream">The binary stream to write to.</param>
+    /// <param name="prevValue">The previous value for encoding reference, if required by <see cref="UsesPreviousValue"/>; otherwise, <c>null</c>.</param>
+    /// <param name="value">The value to encode.</param>
+    /// <returns>The number of bytes necessary to encode this key-value pair.</returns>
     public abstract void Encode(BinaryStreamBase stream, T prevValue, T value);
 
     /// <summary>
-    /// Decodes <see cref="value"/> from the provided <see cref="stream"/>.
+    /// Decodes <see cref="value"/> from the specified binary <see cref="stream"/>.
     /// </summary>
-    /// <param name="stream">where to read the data</param>
-    /// <param name="prevValue">the previous value if required by <see cref="UsesPreviousValue"/>. Otherwise null.</param>
-    /// <param name="value">the place to store the decoded value</param>
-    /// <param name="isEndOfStream">outputs true if the end of the stream symbol is detected. Not all encoding methods have an end of stream symbol and therefore will always return false.</param>
-    /// <returns>the number of bytes necessary to decode the next key/value.</returns>
+    /// <param name="stream">The binary stream to read from.</param>
+    /// <param name="prevValue">The previous value used for decoding reference, if required by <see cref="UsesPreviousValue"/>; otherwise, <c>null</c>.</param>
+    /// <param name="value">The decoded value.</param>
+    /// <param name="isEndOfStream">Indicates whether the end of the stream has been reached by returning <c>true</c>. If there is no end-of-stream symbol, always returns <c>false</c>.</param>
+    /// <returns>The number of bytes necessary to decode the next key-value pair.</returns>
     public abstract void Decode(BinaryStreamBase stream, T prevValue, T value, out bool isEndOfStream);
 
     /// <summary>
-    /// Encodes <see cref="value"/> to the provided <see cref="stream"/>.
+    /// Encodes <see cref="value"/> and writes it to the specified memory <see cref="stream"/>, returning the encoded data length.
     /// </summary>
-    /// <param name="stream">where to write the data</param>
-    /// <param name="prevValue">the previous value if required by <see cref="UsesPreviousValue"/>. Otherwise null.</param>
-    /// <param name="value">the value to encode</param>
-    /// <returns>the number of bytes necessary to encode this key/value.</returns>
+    /// <param name="stream">A pointer to the memory stream.</param>
+    /// <param name="prevValue">The previous value for encoding reference, if required by <see cref="UsesPreviousValue"/>; otherwise, <c>null</c>.</param>
+    /// <param name="value">The value to encode.</param>
+    /// <returns>The length required to encode the key-value pair in bytes.</returns>
     public unsafe virtual int Encode(byte* stream, T prevValue, T value)
     {
-        BinaryStreamPointerWrapper bs = new BinaryStreamPointerWrapper(stream, MaxCompressionSize);
+        BinaryStreamPointerWrapper bs = new(stream, MaxCompressionSize);
         Encode(bs, prevValue, value);
         return (int)bs.Position;
     }
 
     /// <summary>
-    /// Decodes <see cref="value"/> from the provided <see cref="stream"/>.
+    /// Decodes <see cref="value"/> from the specified memory <see cref="stream"/>, returning the decoded data length.
     /// </summary>
-    /// <param name="stream">where to read the data</param>
-    /// <param name="prevValue">the previous value if required by <see cref="UsesPreviousValue"/>. Otherwise null.</param>
-    /// <param name="value">the place to store the decoded value</param>
-    /// <param name="isEndOfStream">outputs true if the end of the stream symbol is detected. Not all encoding methods have an end of stream symbol and therefore will always return false.</param>
-    /// <returns>the number of bytes necessary to decode the next key/value.</returns>
+    /// <param name="stream">A pointer to the memory stream.</param>
+    /// <param name="prevValue">The previous value used for decoding reference, if required by <see cref="UsesPreviousValue"/>; otherwise, <c>null</c>.</param>
+    /// <param name="value">The decoded value.</param>
+    /// <param name="isEndOfStream">Indicates whether the end of the stream has been reached by returning <c>true</c>. If there is not end-of-stream symbol, always returns <c>false</c>.</param>
     public unsafe virtual int Decode(byte* stream, T prevValue, T value, out bool isEndOfStream)
     {
-        BinaryStreamPointerWrapper bs = new BinaryStreamPointerWrapper(stream, MaxCompressionSize);
+        BinaryStreamPointerWrapper bs = new(stream, MaxCompressionSize);
         Decode(bs, prevValue, value, out isEndOfStream);
+
         return (int)bs.Position;
     }
 
     /// <summary>
     /// Clones this encoding method.
     /// </summary>
-    /// <returns>A clone</returns>
+    /// <returns>A clone.</returns>
     public abstract IndividualEncodingBase<T> Clone();
 
 }
