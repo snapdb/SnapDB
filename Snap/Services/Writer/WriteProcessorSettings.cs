@@ -25,12 +25,13 @@
 //******************************************************************************************************
 
 using Gemstone.IO.StreamExtensions;
+using SnapDB.Immutables;
 using System.Data;
 
 namespace SnapDB.Snap.Services.Writer;
 
 /// <summary>
-/// The settings for the Write Processor
+/// The settings for the write processor.
 /// </summary>
 public class WriteProcessorSettings
     : SettingsBase<WriteProcessorSettings>
@@ -41,7 +42,7 @@ public class WriteProcessorSettings
     private readonly ImmutableList<CombineFilesSettings> m_stagingRollovers;
 
     /// <summary>
-    /// The default write processor settings
+    /// The default write processor settings.
     /// </summary>
     public WriteProcessorSettings()
     {
@@ -52,6 +53,7 @@ public class WriteProcessorSettings
         {
             if (x is null)
                 throw new ArgumentNullException("value", "cannot be null");
+
             return x;
         });
     }
@@ -72,7 +74,7 @@ public class WriteProcessorSettings
     public ImmutableList<CombineFilesSettings> StagingRollovers => m_stagingRollovers;
 
     /// <summary>
-    /// Gets/Sets if writing will be enabled
+    /// Gets or sets if writing will be enabled.
     /// </summary>
     public bool IsEnabled
     {
@@ -91,16 +93,16 @@ public class WriteProcessorSettings
         m_prebufferWriter.Save(stream);
         m_firstStageWriter.Save(stream);
         stream.Write(m_stagingRollovers.Count);
+
         foreach (CombineFilesSettings stage in m_stagingRollovers)
-        {
             stage.Save(stream);
-        }
     }
 
     public override void Load(Stream stream)
     {
         TestForEditable();
         byte version = stream.ReadNextByte();
+
         switch (version)
         {
             case 1:
@@ -109,6 +111,7 @@ public class WriteProcessorSettings
                 m_firstStageWriter.Load(stream);
                 int cnt = stream.ReadInt32();
                 m_stagingRollovers.Clear();
+
                 while (cnt > 0)
                 {
                     cnt--;
@@ -116,7 +119,9 @@ public class WriteProcessorSettings
                     cfs.Load(stream);
                     m_stagingRollovers.Add(cfs);
                 }
+
                 break;
+
             default:
                 throw new VersionNotFoundException("Unknown Version Code: " + version);
         }
@@ -128,6 +133,7 @@ public class WriteProcessorSettings
         {
             m_prebufferWriter.Validate();
             m_firstStageWriter.Validate();
+
             foreach (CombineFilesSettings stage in m_stagingRollovers)
             {
                 stage.Validate();
