@@ -33,8 +33,8 @@ namespace SnapDB.Snap.Tree;
 /// <summary>
 /// Base class for reading from a node that is encoded and must be read sequentially through the node.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TKey">The type of keys stored in the sorted tree.</typeparam>
+/// <typeparam name="TValue">The type of values associated with the keys in the sorted tree.</typeparam>
 public unsafe class GenericEncodedNodeScanner<TKey, TValue>
         : SortedTreeScannerBase<TKey, TValue>
     where TKey : SnapTypeBaseOfT<TKey>, new()
@@ -48,12 +48,12 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
     private readonly TValue m_tmpValue;
 
     /// <summary>
-    /// Creates a new class
+    /// Creates a new class.
     /// </summary>
-    /// <param name="level"></param>
-    /// <param name="blockSize"></param>
-    /// <param name="stream"></param>
-    /// <param name="lookupKey"></param>
+    /// <param name="level">The level of the fixed-size node in the sorted tree.</param>
+    /// <param name="blockSize">The size of the block containing the fixed-size node.</param>
+    /// <param name="stream">The binary stream pointer for navigating the tree structure.</param>
+    /// <param name="lookupKey">A delegate function for looking up keys in the tree.</param>
     public GenericEncodedNodeScanner(PairEncodingBase<TKey, TValue> encoding, byte level, int blockSize, BinaryStreamPointerBase stream, Func<TKey, byte, uint> lookupKey)
         : base(level, blockSize, stream, lookupKey)
     {
@@ -83,7 +83,7 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
         IndexOfNextKeyValue++;
     }
 
-    protected override bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue> filter)
+    protected bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue> filter)
     {
     TryAgain:
         byte* stream = Pointer + m_nextOffset;
@@ -95,6 +95,7 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
 
         if (filter.Contains(key, value))
             return true;
+
         if (IndexOfNextKeyValue >= RecordCount)
             return false;
 
@@ -112,12 +113,13 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
             value.CopyTo(m_prevValue);
             m_nextOffset += length;
             IndexOfNextKeyValue++;
+
             return true;
         }
         return false;
     }
 
-    protected override bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue> filter)
+    protected bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue> filter)
     {
     TryAgain:
 
@@ -133,8 +135,10 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
 
             if (filter.Contains(key, value))
                 return true;
+
             if (IndexOfNextKeyValue >= RecordCount)
                 return false;
+
             goto TryAgain;
         }
         return false;

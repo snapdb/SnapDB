@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  FixedSizeNodeScanner`2.cs - Gbtc
+//  FixedSizeNodeScanner.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -32,8 +32,8 @@ namespace SnapDB.Snap.Tree;
 /// <summary>
 /// The treescanner for a fixed size node.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TKey">The type of keys in the tree.</typeparam>
+/// <typeparam name="TValue">The type of values associated with keys in the tree.</typeparam>
 public class FixedSizeNodeScanner<TKey, TValue>
     : SortedTreeScannerBase<TKey, TValue>
     where TKey : SnapTypeBaseOfT<TKey>, new()
@@ -44,10 +44,10 @@ public class FixedSizeNodeScanner<TKey, TValue>
     /// <summary>
     /// creates a new class
     /// </summary>
-    /// <param name="level"></param>
-    /// <param name="blockSize"></param>
-    /// <param name="stream"></param>
-    /// <param name="lookupKey"></param>
+    /// <param name="level">The level of the fixed-size node in the sorted tree.</param>
+    /// <param name="blockSize">The size of the block containing the fixed-size node.</param>
+    /// <param name="stream">The binary stream pointer for navigating the tree structure.</param>
+    /// <param name="lookupKey">A delegate function for looking up keys in the tree.</param>
     public FixedSizeNodeScanner(byte level, int blockSize, BinaryStreamPointerBase stream, Func<TKey, byte, uint> lookupKey)
         : base(level, blockSize, stream, lookupKey)
     {
@@ -63,17 +63,20 @@ public class FixedSizeNodeScanner<TKey, TValue>
         IndexOfNextKeyValue++;
     }
 
-    protected override unsafe bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue> filter)
+    protected unsafe bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue> filter)
     {
     TryAgain:
         byte* ptr = Pointer + IndexOfNextKeyValue * m_keyValueSize;
         key.Read(ptr);
         value.Read(ptr + KeySize);
         IndexOfNextKeyValue++;
+
         if (filter.Contains(key, value))
             return true;
+
         if (IndexOfNextKeyValue >= RecordCount)
             return false;
+
         goto TryAgain;
     }
 
@@ -85,7 +88,7 @@ public class FixedSizeNodeScanner<TKey, TValue>
     }
 
     /// <summary>
-    /// Using <see cref="SortedTreeScannerBase{TKey,TValue}.Pointer"/> advance to the next KeyValue
+    /// Using <see cref="SortedTreeScannerBase{TKey,TValue}.Pointer"/> to advance to the next KeyValue.
     /// </summary>
     protected override unsafe bool InternalReadWhile(TKey key, TValue value, TKey upperBounds)
     {
@@ -95,41 +98,50 @@ public class FixedSizeNodeScanner<TKey, TValue>
         if (key.IsLessThan(upperBounds))
         {
             IndexOfNextKeyValue++;
+
             return true;
         }
+
         return false;
     }
 
     /// <summary>
-    /// Using <see cref="SortedTreeScannerBase{TKey,TValue}.Pointer"/> advance to the next KeyValue
+    /// Using <see cref="SortedTreeScannerBase{TKey,TValue}.Pointer"/> to advance to the next KeyValue.
     /// </summary>
-    protected override unsafe bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue> filter)
+    protected unsafe bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue> filter)
     {
     TryAgain:
         byte* ptr = Pointer + IndexOfNextKeyValue * m_keyValueSize;
         key.Read(ptr);
         value.Read(ptr + KeySize);
+
         if (key.IsLessThan(upperBounds))
         {
             IndexOfNextKeyValue++;
+
             if (filter.Contains(key, value))
                 return true;
+
             if (IndexOfNextKeyValue >= RecordCount)
                 return false;
+
             goto TryAgain;
         }
+
         return false;
     }
 
     /// <summary>
-    /// Using <see cref="SortedTreeScannerBase{TKey,TValue}.Pointer"/> advance to the search location of the provided <see cref="key"/>
+    /// Using <see cref="SortedTreeScannerBase{TKey,TValue}.Pointer"/> to advance to the search location of the provided <see cref="key"/>.
     /// </summary>
-    /// <param name="key">the key to advance to</param>
+    /// <param name="key">The key to advance to.</param>
     protected override unsafe void FindKey(TKey key)
     {
         int offset = KeyMethods.BinarySearch(Pointer, key, RecordCount, m_keyValueSize);
+
         if (offset < 0)
             offset = ~offset;
+
         IndexOfNextKeyValue = offset;
     }
 }
