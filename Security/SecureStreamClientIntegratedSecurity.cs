@@ -24,6 +24,8 @@
 //
 //******************************************************************************************************
 
+using SnapDB.Security.Authentication;
+
 namespace SnapDB.Security;
 
 /// <summary>
