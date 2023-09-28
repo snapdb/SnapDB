@@ -28,6 +28,7 @@
 //******************************************************************************************************
 
 using Gemstone.IO.StreamExtensions;
+using SnapDB.Immutables;
 using System.Data;
 using System.Net;
 
