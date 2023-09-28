@@ -28,11 +28,12 @@ using Gemstone.IO.StreamExtensions;
 using SnapDB.IO;
 using System.Data;
 using System.Globalization;
+using SnapDB.Immutables;
 
 namespace SnapDB.Snap.Services;
 
 /// <summary>
-/// Settings for <see cref="ArchiveList{TKey,TValue}"/>
+/// Settings for <see cref="ArchiveList{TKey,TValue}"/>.
 /// </summary>
 public class ArchiveListSettings
     : SettingsBase<ArchiveListSettings>
@@ -42,13 +43,14 @@ public class ArchiveListSettings
     private readonly ArchiveListLogSettings m_logSettings;
 
     /// <summary>
-    /// Creates a new instance of <see cref="ArchiveListSettings"/>
+    /// Creates a new instance of <see cref="ArchiveListSettings"/>.
     /// </summary>
     public ArchiveListSettings()
     {
         m_importPaths = new ImmutableList<string>(x =>
         {
             PathHelpers.ValidatePathName(x);
+
             return x;
         });
         m_importExtensions = new ImmutableList<string>(PathHelpers.FormatExtension);
@@ -76,15 +78,14 @@ public class ArchiveListSettings
     /// <summary>
     /// Adds the supplied path to the list.
     /// </summary>
-    /// <param name="path">the path to add.</param>
+    /// <param name="path">The path to add.</param>
     public void AddPath(string path)
     {
         TestForEditable();
         PathHelpers.ValidatePathName(path);
+
         if (!m_importPaths.Contains(path, StringComparer.Create(CultureInfo.CurrentCulture, true)))
-        {
             m_importPaths.Add(path);
-        }
     }
 
     /// <summary>
@@ -94,10 +95,9 @@ public class ArchiveListSettings
     public void AddPaths(IEnumerable<string> paths)
     {
         TestForEditable();
+
         foreach (string p in paths)
-        {
             AddPath(p);
-        }
     }
 
     /// <summary>
@@ -108,25 +108,23 @@ public class ArchiveListSettings
     {
         TestForEditable();
         extension = PathHelpers.FormatExtension(extension);
-        if (!m_importExtensions.Contains(extension, StringComparer.Create(CultureInfo.CurrentCulture, true)))
-        {
+
             m_importExtensions.Add(extension);
-        }
     }
 
     public override void Save(Stream stream)
     {
         stream.Write((byte)1);
         stream.Write(m_importPaths.Count);
+
         foreach (string path in m_importPaths)
-        {
             stream.Write(path);
-        }
+
         stream.Write(m_importExtensions.Count);
+
         foreach (string extensions in m_importExtensions)
-        {
             stream.Write(extensions);
-        }
+
         m_logSettings.Save(stream);
     }
 
@@ -134,25 +132,32 @@ public class ArchiveListSettings
     {
         TestForEditable();
         byte version = stream.ReadNextByte();
+
         switch (version)
         {
             case 1:
                 int cnt = stream.ReadInt32();
                 m_importPaths.Clear();
+
                 while (cnt > 0)
                 {
                     cnt--;
                     m_importPaths.Add(stream.ReadString());
                 }
+
                 cnt = stream.ReadInt32();
                 m_importPaths.Clear();
+
                 while (cnt > 0)
                 {
                     cnt--;
                     m_importPaths.Add(stream.ReadString());
                 }
+
                 m_logSettings.Load(stream);
+
                 break;
+
             default:
                 throw new VersionNotFoundException("Unknown Version Code: " + version);
 
@@ -163,8 +168,7 @@ public class ArchiveListSettings
     {
         if (m_importPaths.Count > 0 && m_importExtensions.Count == 0)
             throw new Exception("Path specified but no extension specified.");
+
         m_logSettings.Validate();
-
-
     }
 }
