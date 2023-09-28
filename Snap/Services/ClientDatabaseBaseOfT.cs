@@ -40,23 +40,23 @@ public abstract class ClientDatabaseBase<TKey, TValue>
     /// <summary>
     /// Reads data from the SortedTreeEngine with the provided read options and server side filters.
     /// </summary>
-    /// <param name="readerOptions">read options supplied to the reader. Can be null.</param>
-    /// <param name="keySeekFilter">a seek based filter to follow. Can be null.</param>
-    /// <param name="keyMatchFilter">a match based filer to follow. Can be null.</param>
+    /// <param name="readerOptions">Read options supplied to the reader. Can be <c>null</c>.</param>
+    /// <param name="keySeekFilter">A seek based filter to follow. Can be <c>null</c>.</param>
+    /// <param name="keyMatchFilter">A match based filter to follow. Can be <c>null</c>.</param>
     /// <returns>A stream that will read the specified data.</returns>
     public abstract TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions readerOptions, SeekFilterBase<TKey> keySeekFilter, MatchFilterBase<TKey, TValue> keyMatchFilter);
 
     /// <summary>
     /// Writes the tree stream to the database. 
     /// </summary>
-    /// <param name="stream">all of the key/value pairs to add to the database.</param>
+    /// <param name="stream">All of the key-value pairs to add to the database.</param>
     public abstract void Write(TreeStream<TKey, TValue> stream);
 
     /// <summary>
     /// Writes an individual key/value to the sorted tree store.
     /// </summary>
-    /// <param name="key"></param>
-    /// <param name="value"></param>
+    /// <param name="key">The key to write.</param>
+    /// <param name="value">The value associated with the key to write.</param>
     public abstract void Write(TKey key, TValue value);
 
 }
