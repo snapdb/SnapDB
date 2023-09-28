@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  StreamingServerDatabase`2.cs - Gbtc
+//  StreamingServerDatabase.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -25,9 +25,9 @@
 //******************************************************************************************************
 
 using SnapDB.IO;
-using SnapDB.Snap;
+using SnapDB.Snap.Streaming;
 using SnapDB.Snap.Filters;
-using SortedTreeEngineReaderOptions = GSF.Snap.Services.Reader.SortedTreeEngineReaderOptions;
+using SortedTreeEngineReaderOptions = SnapDB.Snap.Services.Reader.SortedTreeEngineReaderOptions;
 
 namespace SnapDB.Snap.Services.Net;
 
@@ -53,9 +53,9 @@ internal class StreamingServerDatabase<TKey, TValue>
     }
 
     /// <summary>
-    /// This function will verify the connection, create all necessary streams, set timeouts, and catch any exceptions and terminate the connection
+    /// This function will verify the connection, create all necessary streams, set timeouts, and catch any exceptions and terminate the connection.
     /// </summary>
-    /// <returns>True if successful, false if needing to exit the socket.</returns>
+    /// <returns><c>true</c> if successful; <c>false</c> if needing to exit the socket.</returns>
     public bool RunDatabaseLevel()
     {
         while (true)
@@ -69,29 +69,38 @@ internal class StreamingServerDatabase<TKey, TValue>
                         m_encodingMethod = Library.CreateStreamEncoding<TKey, TValue>(new EncodingDefinition(m_stream));
                     }
                     catch
+
                     {
                         m_stream.Write((byte)ServerResponse.UnknownEncodingMethod);
                         m_stream.Flush();
+
                         return false;
                     }
+
                     m_stream.Write((byte)ServerResponse.EncodingMethodAccepted);
                     m_stream.Flush();
                     break;
+
                 case ServerCommand.Read:
                     if (!ProcessRead())
                         return false;
+
                     break;
+
                 case ServerCommand.DisconnectDatabase:
                     m_sortedTreeEngine.Dispose();
                     m_sortedTreeEngine = null;
                     m_stream.Write((byte)ServerResponse.DatabaseDisconnected);
                     m_stream.Flush();
                     return true;
+
                 case ServerCommand.Write:
                     ProcessWrite();
                     break;
+
                 case ServerCommand.CancelRead:
                     break;
+
                 default:
                     m_stream.Write((byte)ServerResponse.UnknownDatabaseCommand);
                     m_stream.Write((byte)command);
@@ -117,6 +126,7 @@ internal class StreamingServerDatabase<TKey, TValue>
             {
                 m_stream.Write((byte)ServerResponse.UnknownOrCorruptSeekFilter);
                 m_stream.Flush();
+
                 return false;
             }
         }
@@ -130,6 +140,7 @@ internal class StreamingServerDatabase<TKey, TValue>
             {
                 m_stream.Write((byte)ServerResponse.UnknownOrCorruptMatchFilter);
                 m_stream.Flush();
+
                 return false;
             }
         }
@@ -143,6 +154,7 @@ internal class StreamingServerDatabase<TKey, TValue>
             {
                 m_stream.Write((byte)ServerResponse.UnknownOrCorruptReaderOptions);
                 m_stream.Flush();
+
                 return false;
             }
         }
@@ -155,11 +167,7 @@ internal class StreamingServerDatabase<TKey, TValue>
             {
                 m_stream.Write((byte)ServerResponse.SerializingPoints);
 
-
                 m_encodingMethod.ResetEncoder();
-                //if (m_encodingMethod.SupportsPointerSerialization)
-                //    ProcessReadWithPointers(scanner);
-                //else
 
                 needToFinishStream = true;
                 bool wasCanceled = !ProcessRead(scanner);
@@ -168,19 +176,25 @@ internal class StreamingServerDatabase<TKey, TValue>
 
                 if (wasCanceled)
                     m_stream.Write((byte)ServerResponse.CanceledRead);
+
                 else
                     m_stream.Write((byte)ServerResponse.ReadComplete);
+
                 m_stream.Flush();
+
                 return true;
             }
         }
+
         catch (Exception ex)
         {
             if (needToFinishStream)
-                m_encodingMethod.WriteEndOfStream(m_stream);
+
+            m_encodingMethod.WriteEndOfStream(m_stream);
             m_stream.Write((byte)ServerResponse.ErrorWhileReading);
             m_stream.Write(ex.ToString());
             m_stream.Flush();
+
             return false;
         }
     }
@@ -189,72 +203,21 @@ internal class StreamingServerDatabase<TKey, TValue>
     {
         TKey key = new TKey();
         TValue value = new TValue();
-        //int loop = 0;
+
         while (scanner.Read(key, value))
-        {
             m_encodingMethod.Encode(m_stream, key, value);
-            //ToDo: Incorporate some way to cancel a stream.
-            //loop++;
-            //if (loop > 1000)
-            //{
-            //    loop = 0;
-            //    if (m_stream.AvailableReadBytes > 0)
-            //    {
-            //        return false;
-            //    }
-            //}
-        }
+
         return true;
     }
-
-    //unsafe private void ProcessReadWithPointers(TreeStream<TKey, TValue> scanner)
-    //{
-    //    int bytesForSerialization = m_encodingMethod.MaxCompressedSize;
-    //    byte[] buffer;
-    //    int position;
-    //    int bufferSize;
-    //    int origPosition;
-    //    m_stream.UnsafeGetInternalSendBuffer(out buffer, out position, out bufferSize);
-    //    origPosition = position;
-    //    fixed (byte* lp = buffer)
-    //    {
-    //        TKey key = new TKey();
-    //        TValue value = new TValue();
-    //        int loop = 0;
-    //        while (scanner.Read(key, value))
-    //        {
-    //            if (bufferSize - position < bytesForSerialization)
-    //            {
-    //                m_stream.UnsafeAdvanceSendPosition(position - origPosition);
-    //                m_stream.Flush();
-    //                position = 0;
-    //                origPosition = 0;
-    //            }
-    //            position += m_encodingMethod.Encode(lp + position, key, value);
-    //            loop++;
-    //            if (loop > 1000)
-    //            {
-    //                loop = 0;
-    //                if (m_stream.AvailableReadBytes > 0)
-    //                {
-    //                    m_stream.UnsafeAdvanceSendPosition(position - origPosition);
-    //                    return;
-    //                }
-    //            }
-    //        }
-    //    }
-    //    m_stream.UnsafeAdvanceSendPosition(position - origPosition);
-    //}
 
     private void ProcessWrite()
     {
         TKey key = new TKey();
         TValue value = new TValue();
         m_encodingMethod.ResetEncoder();
+
         while (m_encodingMethod.TryDecode(m_stream, key, value))
-        {
             m_sortedTreeEngine.Write(key, value);
-        }
     }
 
 }
