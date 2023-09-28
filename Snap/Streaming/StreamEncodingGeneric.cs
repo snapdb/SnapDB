@@ -71,17 +71,16 @@ where TValue : SnapTypeBaseOfT<TValue>, new()
     }
 
     /// <summary>
-    /// Encodes the current key/value to the stream.
+    /// Encodes the current key-value pair to the stream.
     /// </summary>
-    /// <param name="stream">the stream to write to</param>
-    /// <param name="currentKey">the key to write</param>
-    /// <param name="currentValue">the value to write</param>
+    /// <param name="stream">The stream to write to.</param>
+    /// <param name="currentKey">The key to write.</param>
+    /// <param name="currentValue">The value to write.</param>
     public override void Encode(BinaryStreamBase stream, TKey currentKey, TValue currentValue)
     {
         if (!m_encoding.ContainsEndOfStreamSymbol)
-        {
             stream.Write((byte)1);
-        }
+
         m_encoding.Encode(stream, m_prevKey, m_prevValue, currentKey, currentValue);
         currentKey.CopyTo(m_prevKey);
         currentValue.CopyTo(m_prevValue);
@@ -90,17 +89,15 @@ where TValue : SnapTypeBaseOfT<TValue>, new()
     /// <summary>
     /// Attempts to read the next point from the stream. 
     /// </summary>
-    /// <param name="stream">The stream to read from</param>
-    /// <param name="key">the key to store the value to</param>
-    /// <param name="value">the value to store to</param>
-    /// <returns>True if successful. False if end of the stream has been reached.</returns>
+    /// <param name="stream">The stream to read from.</param>
+    /// <param name="key">The key to store the value to.</param>
+    /// <param name="value">The value to store to.</param>
+    /// <returns><c>true</c> if successful; <c>false</c> if end of the stream has been reached.</returns>
     public override bool TryDecode(BinaryStreamBase stream, TKey key, TValue value)
     {
         if (!m_encoding.ContainsEndOfStreamSymbol)
-        {
             if (stream.ReadUInt8() == 0)
                 return false;
-        }
 
         m_encoding.Decode(stream, m_prevKey, m_prevValue, key, value, out bool endOfStream);
         key.CopyTo(m_prevKey);

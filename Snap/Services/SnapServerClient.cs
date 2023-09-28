@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  Server_Client.cs - Gbtc
+//  SnapServerClient.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -44,11 +44,12 @@ public partial class SnapServer
         /// <summary>
         /// Creates a <see cref="Client"/>
         /// </summary>
-        /// <param name="server">the collection to wrap</param>
+        /// <param name="server">The collection to wrap.</param>
         public Client(SnapServer server)
         {
             if (server is null)
                 throw new ArgumentNullException("server");
+
             m_syncRoot = new object();
             m_connectedDatabases = new Dictionary<string, ClientDatabaseBase>();
             m_server = server;
@@ -56,10 +57,10 @@ public partial class SnapServer
         }
 
         /// <summary>
-        /// Gets the database that matches <see cref="databaseName"/>
+        /// Gets the database that matches <see cref="databaseName"/>.
         /// </summary>
-        /// <param name="databaseName">the case insensitive name of the databse</param>
-        /// <returns></returns>
+        /// <param name="databaseName">The case insensitive name of the database.</param>
+        /// <returns>The database that matches <see cref="databaseName"/>.</returns>
         public override ClientDatabaseBase GetDatabase(string databaseName)
         {
             if (m_disposed)
@@ -93,29 +94,34 @@ public partial class SnapServer
         /// Determines if <see cref="databaseName"/> is contained in the database.
         /// </summary>
         /// <param name="databaseName">Name of database instance to access.</param>
-        /// <returns></returns>
+        /// <returns>
+        ///   <c>true</c> if the database with the specified name exists within the server; otherwise, <c>false</c>.
+        /// </returns>
         public override bool Contains(string databaseName)
         {
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             return m_server.Contains(databaseName);
         }
 
         /// <summary>
         /// Gets basic information for every database connected to the server.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A list of <see cref="DatabaseInfo"/> objects representing database information.</returns>
+        /// <exception cref="ObjectDisposedException">Thrown if the server settings object has been disposed.</exception>
         public override List<DatabaseInfo> GetDatabaseInfo()
         {
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             return m_server.GetDatabaseInfo();
         }
 
         /// <summary>
         /// Unregisters a client database.
         /// </summary>
-        /// <param name="client">the client database to unregister</param>
+        /// <param name="client">The client database to unregister.</param>
         private void Unregister(ClientDatabaseBase client)
         {
             lock (m_syncRoot)
@@ -132,13 +138,11 @@ public partial class SnapServer
                 {
                     lock (m_syncRoot)
                     {
-                        //Must include .ToArray because calling dispose will remove the item
-                        //from the m_coonectionDatabase via a callback.
+                        // Must include .ToArray because calling dispose will remove the item from the m_coonectionDatabase via a callback.
                         foreach (ClientDatabaseBase db in m_connectedDatabases.Values.ToArray())
-                        {
                             db.Dispose();
-                        }
                     }
+
                     m_server.UnRegisterClient(this);
                     m_server = null;
                     m_disposed = true;
