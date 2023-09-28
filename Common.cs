@@ -120,7 +120,7 @@ public static class Common
         {
             try
             {
-                s_osPlatformID = (Command.Execute("uname").StandardOutput.StartsWith("Darwin", StringComparison.OrdinalIgnoreCase) ? PlatformID.MacOSX : PlatformID.Unix);
+                s_osPlatformID = Command.Execute("uname").StandardOutput.StartsWith("Darwin", StringComparison.OrdinalIgnoreCase) ? PlatformID.MacOSX : PlatformID.Unix;
             }
             catch
             {
@@ -155,7 +155,7 @@ public static class Common
                 Dictionary<string, string> dictionary = Command.Execute("sw_vers").StandardOutput.ParseKeyValuePairs('\n', ':');
                 if (dictionary.Count > 0)
                 {
-                    s_osPlatformName = dictionary.Values.Select((string val) => val.Trim()).ToDelimitedString(" ");
+                    s_osPlatformName = dictionary.Values.Select((val) => val.Trim()).ToDelimitedString(" ");
                 }
             }
             catch
@@ -255,7 +255,7 @@ public static class Common
 
                 if (double.TryParse(array[1].Trim(), out var result))
                 {
-                    return (long)Math.Round(result / 100.0 * (double)totalPhysicalMemory);
+                    return (long)Math.Round(result / 100.0 * totalPhysicalMemory);
                 }
 
                 return workingSet;
@@ -783,7 +783,7 @@ public static class Common
                     case TypeCode.Char:
                         return (char)item == '\0';
                     case TypeCode.DateTime:
-                        return (DateTime)item == default(DateTime);
+                        return (DateTime)item == default;
                 }
             }
             catch (InvalidCastException)

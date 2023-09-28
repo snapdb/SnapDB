@@ -47,7 +47,7 @@ public partial class ThreadSafeList<T>
         }
     }
 
-    private readonly GenericSortedList<long, Wrapper> m_list;
+    private readonly SortedList<long, Wrapper> m_list;
     private long m_sequenceNumber;
     private readonly object m_syncRoot;
     private long m_version;
@@ -58,7 +58,7 @@ public partial class ThreadSafeList<T>
     public ThreadSafeList()
     {
         m_syncRoot = new object();
-        m_list = new GenericSortedList<long, Wrapper>();
+        m_list = new SortedList<long, Wrapper>();
         m_sequenceNumber = 0;
         m_version = 0;
     }

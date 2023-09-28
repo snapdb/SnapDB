@@ -26,6 +26,7 @@
 
 using SnapDB.IO.FileStructure;
 using SnapDB.IO.Unmanaged;
+using SnapDB.Snap.Tree;
 
 namespace SnapDB.Snap.Storage;
 

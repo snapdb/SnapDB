@@ -27,6 +27,7 @@
 using Gemstone;
 using Gemstone.Diagnostics;
 using Gemstone.Threading;
+using SnapDB.Snap.Services.Reader;
 using SnapDB.Snap.Storage;
 
 namespace SnapDB.Snap.Services.Writer;
@@ -197,7 +198,7 @@ public class CombineFiles<TKey, TValue>
     /// <summary>
     /// Releases the unmanaged resources used by the <see cref="LogSourceBase"/> object and optionally releases the managed resources.
     /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected override void Dispose(bool disposing)
     {
         if (!m_disposed)

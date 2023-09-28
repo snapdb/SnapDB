@@ -26,6 +26,7 @@
 
 using SnapDB.IO.FileStructure;
 using SnapDB.IO.Unmanaged;
+using SnapDB.Snap.Tree;
 
 namespace SnapDB.Snap.Storage;
 
@@ -156,6 +157,7 @@ public partial class SortedTreeTable<TKey, TValue>
         {
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             return m_tree.CreateTreeScanner();
         }
 

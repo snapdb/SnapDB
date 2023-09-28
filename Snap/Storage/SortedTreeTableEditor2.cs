@@ -23,6 +23,7 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
+using SnapDB.Snap.Tree;
 
 namespace SnapDB.Snap.Storage;
 

@@ -50,7 +50,7 @@ public partial class ArchiveListOfT<TKey, TValue>
     /// <summary>
     /// Contains the list of all archives.
     /// </summary>
-    private readonly GenericSortedList<Guid, ArchiveTableSummary<TKey, TValue>> m_fileSummaries;
+    private readonly SortedList<Guid, ArchiveTableSummary<TKey, TValue>> m_fileSummaries;
 
     /// <summary>
     /// Contains all of the active snapshots of the archive lists
@@ -84,7 +84,7 @@ public partial class ArchiveListOfT<TKey, TValue>
         m_settings.Validate();
 
         m_syncRoot = new object();
-        m_fileSummaries = new GenericSortedList<Guid, ArchiveTableSummary<TKey, TValue>>();
+        m_fileSummaries = new SortedList<Guid, ArchiveTableSummary<TKey, TValue>>();
         m_allSnapshots = new WeakList<ArchiveListSnapshot<TKey, TValue>>();
         m_listLog = new ArchiveListLog(m_settings.LogSettings);
         m_filesToDelete = new List<SortedTreeTable<TKey, TValue>>();

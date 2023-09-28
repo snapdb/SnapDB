@@ -26,6 +26,8 @@
 
 using SnapDB.IO.FileStructure;
 using SnapDB.IO.Unmanaged;
+using SnapDB.Snap.Tree;
+using System.Collections;
 
 namespace SnapDB.Snap.Storage;
 
@@ -55,7 +57,7 @@ public class SortedTreeFile
     private bool m_disposed;
 
     private TransactionalFileStructure m_fileStructure;
-    private readonly GenericSortedList<SubFileName, IDisposable> m_openedFiles;
+    private readonly SortedList<SubFileName, IDisposable> m_openedFiles;
 
     #endregion
 
@@ -63,7 +65,7 @@ public class SortedTreeFile
 
     private SortedTreeFile()
     {
-        m_openedFiles = new GenericSortedList<SubFileName, IDisposable>();
+        m_openedFiles = new SortedList<SubFileName, IDisposable>();
     }
 
     /// <summary>
@@ -366,7 +368,7 @@ public class SortedTreeFile
     public void Delete()
     {
         Dispose();
-        if (m_filePath is not string.Empty)
+        if (m_filePath != string.Empty)
         {
             File.Delete(m_filePath);
         }

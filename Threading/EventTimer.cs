@@ -24,9 +24,9 @@
 //
 //*****************************************************************************************************
 
+using Gemstone;
 using Gemstone.Diagnostics;
 using Gemstone.Threading;
-using Gemstone;
 
 namespace SnapDB.Threading;
 

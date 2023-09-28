@@ -48,11 +48,11 @@ public static class StepTimer
         }
     }
 
-    private static readonly GenericSortedList<string, RunCount> AllStopwatches;
+    private static readonly SortedList<string, RunCount> AllStopwatches;
 
     static StepTimer()
     {
-        AllStopwatches = new GenericSortedList<string, RunCount>();
+        AllStopwatches = new SortedList<string, RunCount>();
     }
 
     public static ITimer Start(string name, bool runGC = false)

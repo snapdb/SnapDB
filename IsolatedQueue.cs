@@ -93,7 +93,7 @@ public class IsolatedQueue<T>
         public T Dequeue()
         {
             T item = m_blocks[m_tail];
-            m_blocks[m_tail] = default(T);
+            m_blocks[m_tail] = default;
             // No memory barrier here since .NET 2.0 ensures that writes will not be reordered.
             m_tail = m_tail + 1;
 
@@ -200,7 +200,7 @@ public class IsolatedQueue<T>
         {
             if (!m_blocks.TryDequeue(out m_currentTail))
             {
-                item = default(T);
+                item = default;
                 return false;
             }
         }
@@ -208,7 +208,7 @@ public class IsolatedQueue<T>
         {
             if (!m_blocks.TryDequeue(out m_currentTail))
             {
-                item = default(T);
+                item = default;
                 return false;
             }
         }
@@ -218,7 +218,7 @@ public class IsolatedQueue<T>
             m_dequeueCount++;
             return true;
         }
-        item = default(T);
+        item = default;
         return false;
     }
 
