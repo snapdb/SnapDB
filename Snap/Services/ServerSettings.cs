@@ -24,26 +24,23 @@
 //
 //******************************************************************************************************
 
+using Gemstone.IO.StreamExtensions;
+using SnapDB.Immutables;
+using SnapDB.Snap.Services.Net;
+using SnapDB.Snap.Tree;
 using System;
 using System.Data;
-using GSF.IO;
-using System.IO;
-using GSF.Immutable;
-using GSF.Snap.Services.Net;
-using Gemstone.IO.StreamExtensions;
-using SnapDB.Snap.Services.Net;
-using SnapDB.Snap.Services;
 
 namespace SnapDB.Snap.Services;
 
 /// <summary>
-/// Settings for <see cref="SnapServer"/>
+/// Settings for <see cref="SnapServer"/>.
 /// </summary>
 public class ServerSettings
     : SettingsBase<ServerSettings>, IToServerSettings
 {
     /// <summary>
-    /// Lists all of the databases that are part of the server
+    /// Lists all of the databases that are part of the server.
     /// </summary>
     private readonly ImmutableList<ServerDatabaseSettings> m_databases;
 
@@ -53,7 +50,7 @@ public class ServerSettings
     private readonly ImmutableList<SnapSocketListenerSettings> m_listeners;
 
     /// <summary>
-    /// Creates a new instance of <see cref="ServerSettings"/>
+    /// Creates a new instance of <see cref="ServerSettings"/>.
     /// </summary>
     public ServerSettings()
     {
@@ -61,82 +58,115 @@ public class ServerSettings
         {
             if (x is null)
                 throw new ArgumentNullException("value");
+
             return x;
         });
         m_listeners = new ImmutableList<SnapSocketListenerSettings>(x =>
         {
             if (x is null)
                 throw new ArgumentNullException("value");
+
             return x;
         });
     }
 
     /// <summary>
-    /// Lists all of the databases that are part of the server
+    /// Lists all of the databases that are part of the server.
     /// </summary>
     public ImmutableList<ServerDatabaseSettings> Databases => m_databases;
 
     /// <summary>
-    /// All of the socket based listeners for the database.
+    /// Lists all of the socket based listeners for the database.
     /// </summary>
     public ImmutableList<SnapSocketListenerSettings> Listeners => m_listeners;
 
     /// <summary>
-    /// Creates a <see cref="ServerSettings"/> configuration that can be used for <see cref="SnapServer"/>
+    /// Converts an instance of <see cref="ServerSettings"/> to its interface representation <see cref="IToServerSettings"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// An instance of <see cref="ServerSettings"/> as an interface <see cref="IToServerSettings"/>.
+    /// </returns>
+    /// <remarks>
+    /// This method allows the <see cref="ServerSettings"/> to be cast as an interface <see cref="IToServerSettings"/>.
+    /// </remarks>
     ServerSettings IToServerSettings.ToServerSettings()
     {
         return this;
     }
 
+    /// <summary>
+    /// Saves the current <see cref="ServerSettings"/> instance to a provided <see cref="Stream"/>.
+    /// </summary>
+    /// <param name="stream">The <see cref="Stream"/> to which the settings will be saved.</param>
+    /// <remarks>
+    /// This method serializes the <see cref="ServerSettings"/> instance and writes it to the specified <paramref name="stream"/>.
+    /// It includes information about databases and listeners within the server settings.
+    /// </remarks>
     public override void Save(Stream stream)
     {
         stream.Write((byte)1);
         stream.Write(m_databases.Count);
+
         foreach (ServerDatabaseSettings databaseSettings in m_databases)
-        {
             databaseSettings.Save(stream);
-        }
+
         stream.Write(m_listeners.Count);
+
         foreach (SnapSocketListenerSettings listenerSettings in m_listeners)
-        {
             listenerSettings.Save(stream);
-        }
     }
 
+    /// <summary>
+    /// Loads server settings from a given <see cref="Stream"/>.
+    /// </summary>
+    /// <param name="stream">The <see cref="Stream"/> containing the server settings to load.</param>
+    /// <remarks>
+    /// This method deserializes server settings from the provided <paramref name="stream"/> and updates the current instance.
+    /// The method handles different versions of serialized data.
+    /// </remarks>
     public override void Load(Stream stream)
     {
         TestForEditable();
         byte version = stream.ReadNextByte();
+
         switch (version)
         {
             case 1:
-                int cnt = stream.ReadInt32();
+                int databaseCount = stream.ReadInt32();
                 m_databases.Clear();
-                while (cnt > 0)
+
+                while (databaseCount > 0)
                 {
-                    cnt--;
+                    databaseCount--;
                     ServerDatabaseSettings database = new ServerDatabaseSettings();
                     database.Load(stream);
                     m_databases.Add(database);
                 }
-                cnt = stream.ReadInt32();
+
+                int listenerCount = stream.ReadInt32();
                 m_listeners.Clear();
-                while (cnt > 0)
+
+                while (listenerCount > 0)
                 {
-                    cnt--;
+                    listenerCount--;
                     SnapSocketListenerSettings listener = new SnapSocketListenerSettings();
                     listener.Load(stream);
                     m_listeners.Add(listener);
                 }
                 break;
+
             default:
                 throw new VersionNotFoundException("Unknown Version Code: " + version);
-
         }
     }
 
+    /// <summary>
+    /// Validates the server settings by validating each contained database and listener settings.
+    /// </summary>
+    /// <remarks>
+    /// This method iterates through the databases and listener settings within the server settings
+    /// and validates each of them by calling their respective <c>Validate</c> methods.
+    /// </remarks>
     public override void Validate()
     {
         foreach (ServerDatabaseSettings db in m_databases)
