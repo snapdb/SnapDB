@@ -27,14 +27,27 @@
 //
 //******************************************************************************************************
 
-using SnapDB.Snap;
+using SnapDB.Snap.Types;
 using SnapDB.Snap.Filters;
 
 namespace SnapDB.Snap.Services.Reader;
 
+/// <summary>
+/// Provides extension methods for <see cref="IDatabaseReader{TKey, TValue}"/> to simplify reading from a sorted tree.
+/// </summary>
 public static class SortedTreeEngineReaderBaseExtensionMethods
 {
     private static readonly SortedTreeEngineReaderOptions s_singleValueOptions = new SortedTreeEngineReaderOptions(maxReturnedCount: 1);
+
+    /// <summary>
+    /// Reads a single value from the sorted tree based on the provided timestamp and point ID.
+    /// </summary>
+    /// <typeparam name="TKey">The type of keys in the sorted tree.</typeparam>
+    /// <typeparam name="TValue">The type of values in the sorted tree.</typeparam>
+    /// <param name="reader">The database reader.</param>
+    /// <param name="timestamp">The timestamp for the desired value.</param>
+    /// <param name="pointID">The point ID for the desired value.</param>
+    /// <returns>A <see cref="TreeStream{TKey, TValue}"/> containing the single value found.</returns>
 
     public static TreeStream<TKey, TValue> ReadSingleValue<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader, ulong timestamp, ulong pointID)
         where TKey : TimestampPointIDBase<TKey>, new()

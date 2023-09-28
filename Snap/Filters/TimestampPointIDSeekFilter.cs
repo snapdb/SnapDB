@@ -25,6 +25,7 @@
 //******************************************************************************************************
 
 using System.Runtime.CompilerServices;
+using SnapDB.Snap.Types;
 using SnapDB.IO;
 
 namespace SnapDB.Snap.Filters;
@@ -49,7 +50,7 @@ public static class TimestampPointIDSeekFilter
     /// <summary>
     /// Loads a <see cref="SeekFilterBase{TKey}"/> from the provided <see cref="stream"/>.
     /// </summary>
-    /// <param name="stream">The stream to load the filter from</param>
+    /// <param name="stream">The stream to load the filter from.</param>
     /// <returns>Seek filter to find specific key.</returns>
     [MethodImpl(MethodImplOptions.NoOptimization)]
     private static SeekFilterBase<TKey> CreateFromStream<TKey>(BinaryStreamBase stream)
@@ -77,7 +78,7 @@ public static class TimestampPointIDSeekFilter
         /// <summary>
         /// Creates a filter by reading from the stream.
         /// </summary>
-        /// <param name="stream">the stream to read from</param>
+        /// <param name="stream">The stream to read from.</param>
         public SeekToKey(BinaryStreamBase stream)
             : this()
         {
@@ -104,13 +105,14 @@ public static class TimestampPointIDSeekFilter
         /// <summary>
         /// Gets the next search window.
         /// </summary>
-        /// <returns>true if window exists, false if finished.</returns>
+        /// <returns><c>true</c> if window exists, <c>false</c> if finished.</returns>
         public override bool NextWindow()
         {
             if (m_isEndReached)
                 return false;
 
             m_isEndReached = true;
+
             return true;
         }
 
@@ -123,9 +125,9 @@ public static class TimestampPointIDSeekFilter
         }
 
         /// <summary>
-        /// Serializes the filter to a stream
+        /// Serializes the filter to a stream.
         /// </summary>
-        /// <param name="stream">the stream to write to</param>
+        /// <param name="stream">The stream to write to.</param>
         public override void Save(BinaryStreamBase stream)
         {
             stream.Write(m_keyToFind.Timestamp);

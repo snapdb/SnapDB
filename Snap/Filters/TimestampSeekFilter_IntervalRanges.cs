@@ -25,7 +25,7 @@
 //******************************************************************************************************
 
 using SnapDB.IO;
-using SnapDB.Snap.Filters;
+using SnapDB.Snap.Types;
 
 namespace SnapDB.Snap.Filters;
 
@@ -56,7 +56,7 @@ public partial class TimestampSeekFilter
         /// <summary>
         /// Creates a filter by reading from the stream.
         /// </summary>
-        /// <param name="stream">the stream to read from</param>
+        /// <param name="stream">The stream to read from.</param>
         public IntervalRanges(BinaryStreamBase stream)
             : this()
         {
@@ -69,14 +69,14 @@ public partial class TimestampSeekFilter
         }
 
         /// <summary>
-        /// Creates a filter over a set of date ranges (Similiar to downsampled queries)
+        /// Creates a filter over a set of date ranges (Similiar to downsampled queries).
         /// </summary>
-        /// <param name="firstTime">the first time if the query (inclusive)</param>
-        /// <param name="lastTime">the last time of the query (inclusive if contained in the intervals)</param>
-        /// <param name="mainInterval">the smallest interval that is exact</param>
-        /// <param name="subInterval">the interval that will be parsed. Possible to be rounded</param>
-        /// <param name="tolerance">the width of every window</param>
-        /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing</returns>
+        /// <param name="firstTime">The starting timestamp of the time range query (inclusive).</param>
+        /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
+        /// <param name="mainInterval">The smallest interval that is exact.</param>
+        /// <param name="subInterval">The interval that will be parsed. Possible to be rounded.</param>
+        /// <param name="tolerance">The width of every window.</param>
+        /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing.</returns>
         /// <remarks>
         /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013. 
         ///               MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
@@ -116,7 +116,7 @@ public partial class TimestampSeekFilter
         /// <summary>
         /// Gets the next search window.
         /// </summary>
-        /// <returns>true if window exists, false if finished.</returns>
+        /// <returns><c>true</c> if window exists, <c>false</c> if finished.</returns>
         public override bool NextWindow()
         {
             checked
@@ -179,12 +179,12 @@ public partial class TimestampSeekFilter
         }
 
         /// <summary>
-        /// Serializes the filter to a stream
+        /// Serializes the filter to a stream.
         /// </summary>
-        /// <param name="stream">the stream to write to</param>
+        /// <param name="stream">The stream to write to.</param>
         public override void Save(BinaryStreamBase stream)
         {
-            stream.Write((byte)2); //Stored with interval data
+            stream.Write((byte)2); // Stored with interval data.
             stream.Write(m_start);
             stream.Write(m_stop);
             stream.Write(m_mainInterval);

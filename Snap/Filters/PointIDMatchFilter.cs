@@ -29,7 +29,10 @@
 
 
 using System.Data;
+using SnapDB.Snap.Types;
 using System.Runtime.CompilerServices;
+using static SnapDB.Snap.Filters.PointIdMatchFilter_BitArray;
+using SnapDB.IO;
 
 namespace SnapDB.Snap.Filters;
 
@@ -52,38 +55,51 @@ public partial class PointIdMatchFilter
     }
 
     /// <summary>
-    /// Creates a filter from the list of points provided.
+    /// Creates a match filter that filters keys based on a list of point IDs.
     /// </summary>
-    /// <param name="listOfPointIDs">contains the list of pointIDs to include in the filter. List must support multiple enumerations</param>
-    /// <returns></returns>
+    /// <typeparam name="TKey">The type of keys in the match filter.</typeparam>
+    /// <typeparam name="TValue">The type of values in the match filter.</typeparam>
+    /// <param name="listOfPointIDs">An enumerable collection of point IDs to filter by.</param>
+    /// <returns>A <see cref="MatchFilterBase{TKey, TValue}"/> that filters keys based on the specified list of point IDs.</returns>
+    /// <remarks>
+    /// The match filter includes keys whose point IDs match any of the point IDs in the <paramref name="listOfPointIDs"/> collection.
+    /// The appropriate filter type is chosen based on the maximum point ID value in the list.
+    /// </remarks>
     public static MatchFilterBase<TKey, TValue> CreateFromList<TKey, TValue>(IEnumerable<ulong> listOfPointIDs)
         where TKey : TimestampPointIDBase<TKey>, new()
     {
         MatchFilterBase<TKey, TValue> filter;
         ulong maxValue = 0;
+
         if (listOfPointIDs.Any())
             maxValue = listOfPointIDs.Max();
 
-        if (maxValue < 8 * 1024 * 64) //64KB of space, 524288
-        {
+        if (maxValue < 8 * 1024 * 64) // 64KB of space, 524288
             filter = new BitArrayFilter<TKey, TValue>(listOfPointIDs, maxValue);
-        }
-        else if (maxValue <= uint.MaxValue)
-        {
+
+        if (maxValue <= uint.MaxValue)
             filter = new UIntHashSet<TKey, TValue>(listOfPointIDs, maxValue);
-        }
+
         else
-        {
             filter = new ULongHashSet<TKey, TValue>(listOfPointIDs, maxValue);
-        }
+
         return filter;
     }
 
     /// <summary>
-    /// Loads a <see cref="QueryFilterPointId"/> from the provided <see cref="stream"/>.
+    /// Creates a match filter from a binary stream.
     /// </summary>
-    /// <param name="stream">The stream to load the filter from</param>
-    /// <returns></returns>
+    /// <typeparam name="TKey">The type of keys in the match filter.</typeparam>
+    /// <typeparam name="TValue">The type of values in the match filter.</typeparam>
+    /// <param name="stream">The binary stream containing match filter data.</param>
+    /// <returns>
+    /// A <see cref="MatchFilterBase{TKey, TValue}"/> created from the data in the specified <paramref name="stream"/>,
+    /// or <c>null</c> if the stream contains no filter data.
+    /// </returns>
+    /// <exception cref="VersionNotFoundException">Thrown if the binary stream contains data with an unknown version.</exception>
+    /// <remarks>
+    /// The match filter is deserialized from the binary stream based on its version and data format.
+    /// </remarks>
     [MethodImpl(MethodImplOptions.NoOptimization)]
     private static MatchFilterBase<TKey, TValue> CreateFromStream<TKey, TValue>(BinaryStreamBase stream)
         where TKey : TimestampPointIDBase<TKey>, new()
@@ -92,27 +108,31 @@ public partial class PointIdMatchFilter
         byte version = stream.ReadUInt8();
         ulong maxValue;
         int count;
+
         switch (version)
         {
             case 0:
                 return null;
+
             case 1:
                 maxValue = stream.ReadUInt64();
                 count = stream.ReadInt32();
-                if (maxValue < 8 * 1024 * 64) //64KB of space, 524288
-                {
+
+                if (maxValue < 8 * 1024 * 64) // 64KB of space, 524288
                     filter = new BitArrayFilter<TKey, TValue>(stream, count, maxValue);
-                }
+
                 else
-                {
                     filter = new UIntHashSet<TKey, TValue>(stream, count, maxValue);
-                }
+
                 break;
+
             case 2:
                 maxValue = stream.ReadUInt64();
                 count = stream.ReadInt32();
                 filter = new ULongHashSet<TKey, TValue>(stream, count, maxValue);
+
                 break;
+
             default:
                 throw new VersionNotFoundException("Unknown Version");
         }

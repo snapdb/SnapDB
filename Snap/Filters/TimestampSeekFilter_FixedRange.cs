@@ -25,7 +25,7 @@
 //******************************************************************************************************
 
 using SnapDB.IO;
-using SnapDB.Snap.Filters;
+using SnapDB.Snap.Types;
 
 namespace SnapDB.Snap.Filters;
 
@@ -51,7 +51,7 @@ public partial class TimestampSeekFilter
         /// <summary>
         /// Creates a filter by reading from the stream.
         /// </summary>
-        /// <param name="stream">the stream to read from</param>
+        /// <param name="stream">The stream to read from.</param>
         public FixedRange(BinaryStreamBase stream)
             : this()
         {
@@ -64,10 +64,10 @@ public partial class TimestampSeekFilter
         }
 
         /// <summary>
-        /// Creates a filter from the boundary
+        /// Creates a filter from the boundary.
         /// </summary>
-        /// <param name="firstTime">the start of the only window.</param>
-        /// <param name="lastTime">the stop of the only window.</param>
+        /// <param name="firstTime">The start of the only window.</param>
+        /// <param name="lastTime">The end of the only window.</param>
         public FixedRange(ulong firstTime, ulong lastTime)
             : this()
         {
@@ -82,7 +82,7 @@ public partial class TimestampSeekFilter
         /// <summary>
         /// Gets the next search window.
         /// </summary>
-        /// <returns>true if window exists, false if finished.</returns>
+        /// <returns><c>true</c> if window exists, <c>false</c> if finished.</returns>
         public override bool NextWindow()
         {
             if (m_isEndReached)
@@ -114,12 +114,12 @@ public partial class TimestampSeekFilter
         }
 
         /// <summary>
-        /// Serializes the filter to a stream
+        /// Serializes the filter to a stream.
         /// </summary>
-        /// <param name="stream">the stream to write to</param>
+        /// <param name="stream">The stream to write to.</param>
         public override void Save(BinaryStreamBase stream)
         {
-            stream.Write((byte)1); //stored as start/stop
+            stream.Write((byte)1); // Stored as start/stop.
             stream.Write(m_start);
             stream.Write(m_stop);
         }

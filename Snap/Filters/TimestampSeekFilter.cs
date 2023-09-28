@@ -24,22 +24,26 @@
 //
 //******************************************************************************************************
 
+using SnapDB.IO;
+using SnapDB.Snap.Types;
 using System.Data;
 using System.Runtime.CompilerServices;
-using SnapDB.IO;
-using SnapDB.Snap.Filters;
 
 namespace SnapDB.Snap.Filters;
 
 public partial class TimestampSeekFilter
 {
-
     /// <summary>
-    /// Creates a filter over a single date range. (Inclusive list)
+    /// Creates a seek filter that filters keys falling within a specified time range.
     /// </summary>
-    /// <param name="firstTime">the first time if the query (inclusive)</param>
-    /// <param name="lastTime">the last time of the query (inclusive)</param>
-    /// <returns></returns>
+    /// <typeparam name="TKey">The type of keys in the seek filter.</typeparam>
+    /// <param name="firstTime">The starting timestamp of the time range query (inclusive).</param>
+    /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
+    /// <returns>A <see cref="SeekFilterBase{TKey}"/> that filters keys within the specified time range.</returns>
+    /// <remarks>
+    /// The seek filter includes keys with timestamps greater than or equal to <paramref name="firstTime"/> and
+    /// less than or equal to <paramref name="lastTime"/>. It effectively filters keys within the time range.
+    /// </remarks>
     public static SeekFilterBase<TKey> CreateFromRange<TKey>(DateTime firstTime, DateTime lastTime)
         where TKey : TimestampPointIDBase<TKey>, new()
     {
@@ -47,11 +51,10 @@ public partial class TimestampSeekFilter
     }
 
     /// <summary>
-    /// Creates a filter over a single date range. (Inclusive list)
+    /// Creates a seek filter that filters keys falling within a specified time range.
     /// </summary>
-    /// <param name="firstTime">the first time if the query (inclusive)</param>
-    /// <param name="lastTime">the last time of the query (inclusive)</param>
-    /// <returns></returns>
+    /// <param name="firstTime">The starting timestamp of the time range query (inclusive).</param>
+    /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
     public static SeekFilterBase<TKey> CreateFromRange<TKey>(ulong firstTime, ulong lastTime)
         where TKey : TimestampPointIDBase<TKey>, new()
     {
@@ -59,14 +62,14 @@ public partial class TimestampSeekFilter
     }
 
     /// <summary>
-    /// Creates a filter over a set of date ranges (Similar to down sampled queries)
+    /// Creates a seek filter that filters keys falling within a specified time range.
     /// </summary>
-    /// <param name="firstTime">the first time if the query (inclusive)</param>
-    /// <param name="lastTime">the last time of the query (inclusive if contained in the intervals)</param>
-    /// <param name="mainInterval">the smallest interval that is exact</param>
-    /// <param name="subInterval">the interval that will be parsed. Possible to be rounded</param>
-    /// <param name="tolerance">the width of every window</param>
-    /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing</returns>
+    /// <param name="firstTime">The starting timestamp of the time range query (inclusive).</param>
+    /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
+    /// <param name="mainInterval">The smallest interval that is exact.</param>
+    /// <param name="subInterval">The interval that will be parsed. Possible to be rounded.</param>
+    /// <param name="tolerance">The width of every window.</param>
+    /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing.</returns>
     /// <remarks>
     /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013. 
     ///               MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
@@ -79,13 +82,13 @@ public partial class TimestampSeekFilter
     }
 
     /// <summary>
-    /// Creates a filter over a set of date ranges (Similar to down sampled queries)
+    /// Creates a seek filter that filters keys falling within a specified time range.
     /// </summary>
-    /// <param name="firstTime">the first time if the query (inclusive)</param>
-    /// <param name="lastTime">the last time of the query (inclusive if contained in the intervals)</param>
-    /// <param name="interval">the exact interval</param>
-    /// <param name="tolerance">the width of every window</param>
-    /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing</returns>
+    /// <param name="firstTime">The starting timestamp of the time range query (inclusive).</param>
+    /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
+    /// <param name="interval">The exact interval.</param>
+    /// <param name="tolerance">The width of every window</param>
+    /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing.</returns>
     /// <remarks>
     /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013. 
     ///               MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
@@ -98,14 +101,14 @@ public partial class TimestampSeekFilter
     }
 
     /// <summary>
-    /// Creates a filter over a single date range. (Inclusive list)
+    /// Creates a seek filter that filters keys falling within a specified time range.
     /// </summary>
-    /// <param name="firstTime">the first time if the query (inclusive)</param>
-    /// <param name="lastTime">the last time of the query (inclusive)</param>
-    /// <param name="mainInterval">the smallest interval that is exact</param>
-    /// <param name="subInterval">the interval that will be parsed. Possible to be rounded</param>
-    /// <param name="tolerance">the width of every window</param>
-    /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing</returns>
+    /// <param name="firstTime">The starting timestamp of the time range query (inclusive).</param>
+    /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
+    /// <param name="mainInterval">The smallest interval that is exact.</param>
+    /// <param name="subInterval">The interval that will be parsed. Possible to be rounded.</param>
+    /// <param name="tolerance">The width of every window.</param>
+    /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing.</returns>
     /// <remarks>
     /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013. 
     ///               MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
@@ -118,13 +121,13 @@ public partial class TimestampSeekFilter
     }
 
     /// <summary>
-    /// Creates a filter over a single date range. (Inclusive list)
+    /// Creates a seek filter that filters keys falling within a specified time range.
     /// </summary>
-    /// <param name="firstTime">the first time if the query (inclusive)</param>
-    /// <param name="lastTime">the last time of the query (inclusive)</param>
-    /// <param name="interval">the exact interval to do the scan</param>
-    /// <param name="tolerance">the width of every window</param>
-    /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing</returns>
+    /// <param name="firstTime">The starting timestamp of the time range query (inclusive).</param>
+    /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
+    /// <param name="interval">The exact interval to do the scan.</param>
+    /// <param name="tolerance">The width of every window.</param>
+    /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing.</returns>
     /// <remarks>
     /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013. 
     ///               Interval = 0.1 seconds.
@@ -139,21 +142,24 @@ public partial class TimestampSeekFilter
     /// <summary>
     /// Loads a <see cref="KeySeekFilterBase{TKey}"/> from the provided <see cref="stream"/>.
     /// </summary>
-    /// <param name="stream">The stream to load the filter from</param>
-    /// <returns></returns>
+    /// <param name="stream">The stream to load the filter from.</param>
     [MethodImpl(MethodImplOptions.NoOptimization)]
     private static SeekFilterBase<TKey> CreateFromStream<TKey>(BinaryStreamBase stream)
         where TKey : TimestampPointIDBase<TKey>, new()
     {
         byte version = stream.ReadUInt8();
+
         switch (version)
         {
             case 0:
                 return null;
+
             case 1:
                 return new FixedRange<TKey>(stream);
+
             case 2:
                 return new IntervalRanges<TKey>(stream);
+
             default:
                 throw new VersionNotFoundException("Unknown Version");
         }

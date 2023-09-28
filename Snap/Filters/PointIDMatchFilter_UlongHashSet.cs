@@ -25,13 +25,14 @@
 //******************************************************************************************************
 
 using SnapDB.IO;
+using SnapDB.Snap.Types;
 
 namespace SnapDB.Snap.Filters;
 
 public partial class PointIdMatchFilter
 {
     /// <summary>
-    /// A filter that uses a <see cref="BitArray"/> to set true and false values
+    /// A filter that uses a <see cref="BitArray"/> to set <c>true</c> and <c>false</c> values.
     /// </summary>
     private class ULongHashSet<TKey, TValue>
         : MatchFilterBase<TKey, TValue>
@@ -44,13 +45,14 @@ public partial class PointIdMatchFilter
         /// <summary>
         /// Creates a new filter backed by a <see cref="BitArray"/>.
         /// </summary>
-        /// <param name="stream">The the stream to load from.</param>
-        /// <param name="pointCount">the number of points in the stream.</param>
-        /// <param name="maxValue">the maximum value stored in the bit array. Cannot be larger than int.MaxValue-1</param>
+        /// <param name="stream">The stream to load from.</param>
+        /// <param name="pointCount">The number of points in the stream.</param>
+        /// <param name="maxValue">The maximum value stored in the bit array. Cannot be larger than <c>int.MaxValue-1</c>.</param>
         public ULongHashSet(BinaryStreamBase stream, int pointCount, ulong maxValue)
         {
             m_maxValue = maxValue;
             m_points = new HashSet<ulong>();
+
             while (pointCount > 0)
             {
                 m_points.Add(stream.ReadUInt64());
@@ -59,10 +61,10 @@ public partial class PointIdMatchFilter
         }
 
         /// <summary>
-        /// Creates a bit array filter from <see cref="points"/>
+        /// Creates a bit array filter from <see cref="points"/>.
         /// </summary>
-        /// <param name="points">the points to use.</param>
-        /// <param name="maxValue">the maximum value stored in the bit array. Cannot be larger than int.MaxValue-1</param>
+        /// <param name="points">The points to use.</param>
+        /// <param name="maxValue">The maximum value stored in the bit array. Cannot be larger than <c>int.MaxValue-1</c>.</param>
         public ULongHashSet(IEnumerable<ulong> points, ulong maxValue)
         {
             m_maxValue = maxValue;
@@ -73,13 +75,12 @@ public partial class PointIdMatchFilter
 
         public override void Save(BinaryStreamBase stream)
         {
-            stream.Write((byte)2); //Stored as array of ulong[]
+            stream.Write((byte)2); // Stored as array of ULong[]
             stream.Write(m_maxValue);
             stream.Write(m_points.Count);
+
             foreach (ulong x in m_points)
-            {
                 stream.Write(x);
-            }
         }
 
         public override bool Contains(TKey key, TValue value)
