@@ -41,7 +41,7 @@ public static class SortedListConstructor
     /// <param name="keys">A collection of keys to be used in the sorted list.</param>
     /// <param name="values">A collection of values to be associated with the keys in the sorted list.</param>
     /// <returns>A sorted list containing the specified keys and values.</returns>
-    public static GenericSortedList<TKey, TValue> Create<TKey, TValue>(ICollection<TKey> keys, ICollection<TValue> values) where TKey : notnull
+    public static SortedList<TKey, TValue> Create<TKey, TValue>(ICollection<TKey> keys, ICollection<TValue> values) where TKey : notnull
     {
         // Creates a sorted list from the keys and values using a helper class.
         return new DictionaryWrapper<TKey, TValue>(keys, values).ToSortedList();
@@ -59,9 +59,9 @@ public static class SortedListConstructor
         }
 
         // Converts the dictionary to a sorted list and returns it.
-        public GenericSortedList<TKey, TValue> ToSortedList()
+        public SortedList<TKey, TValue> ToSortedList()
         {
-            return new GenericSortedList<TKey, TValue>(this);
+            return new SortedList<TKey, TValue>(this);
         }
 
         // Returns an enumerator that iterates through the key-value pairs in the dictionary.

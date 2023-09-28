@@ -35,7 +35,7 @@ public class ResourceQueueCollection<TKey, TResource>
     where TResource : class where TKey : notnull
 {
     
-    private readonly GenericSortedList<TKey, ResourceQueue<TResource>?> m_list;
+    private readonly SortedList<TKey, ResourceQueue<TResource>?> m_list;
     private readonly Func<TKey, Func<TResource>> m_instanceObject;
     private readonly Func<TKey, int> m_maximumCount;
     private readonly Func<TKey, int> m_initialCount;
@@ -88,7 +88,7 @@ public class ResourceQueueCollection<TKey, TResource>
         m_instanceObject = instance;
         m_initialCount = initialCount;
         m_maximumCount = maximumCount;
-        m_list = new GenericSortedList<TKey, ResourceQueue<TResource>?>();
+        m_list = new SortedList<TKey, ResourceQueue<TResource>?>();
     }
 
     /// <summary>
