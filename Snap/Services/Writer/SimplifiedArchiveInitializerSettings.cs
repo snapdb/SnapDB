@@ -25,6 +25,7 @@
 //******************************************************************************************************
 
 using Gemstone.IO.StreamExtensions;
+using SnapDB.Immutables;
 using SnapDB.IO;
 using System.Data;
 
@@ -46,7 +47,7 @@ public class SimplifiedArchiveInitializerSettings
     private ImmutableList<Guid> m_flags;
 
     /// <summary>
-    /// Creates a new <see cref="ArchiveInitializerSettings"/>
+    /// Creates a new <see cref="ArchiveInitializerSettings"/>.
     /// </summary>
     public SimplifiedArchiveInitializerSettings()
     {
@@ -64,6 +65,7 @@ public class SimplifiedArchiveInitializerSettings
         m_writePath = new ImmutableList<string>((x) =>
         {
             PathHelpers.ValidatePathName(x);
+
             return x;
         });
         m_flags = new ImmutableList<Guid>();
@@ -83,7 +85,7 @@ public class SimplifiedArchiveInitializerSettings
     }
 
     /// <summary>
-    /// Gets/Sets the file prefix. Can be String.Empty for no prefix.
+    /// Gets or sets the file prefix. Can be String.Empty for no prefix.
     /// </summary>
     public string Prefix
     {
@@ -94,16 +96,19 @@ public class SimplifiedArchiveInitializerSettings
             if (string.IsNullOrWhiteSpace(value))
             {
                 m_prefix = string.Empty;
+
                 return;
             }
+
             if (value.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
                 throw new ArgumentException("filename has invalid characters.", "value");
+
             m_prefix = value;
         }
     }
 
     /// <summary>
-    /// The list of all available paths to write files to
+    /// The list of all available paths to write files to.
     /// </summary>
     public ImmutableList<string> WritePath => m_writePath;
 
@@ -148,8 +153,10 @@ public class SimplifiedArchiveInitializerSettings
         set
         {
             TestForEditable();
+
             if (value is null)
                 throw new ArgumentNullException("value");
+
             m_encodingMethod = value;
         }
     }
@@ -159,7 +166,7 @@ public class SimplifiedArchiveInitializerSettings
     /// Otherwise, pick a different directory or throw an out of disk space exception.
     /// </summary>
     /// <remarks>
-    /// Value must be between 100MB and 1TB
+    /// Value must be between 100MB and 1TB.
     /// </remarks>
     public long DesiredRemainingSpace
     {
@@ -168,17 +175,13 @@ public class SimplifiedArchiveInitializerSettings
         {
             TestForEditable();
             if (value < 100 * 1024L * 1024L)
-            {
                 m_desiredRemainingSpace = 100 * 1024L * 1024L;
-            }
-            else if (value > 1024 * 1024L * 1024L * 1024L)
-            {
+
+            if (value > 1024 * 1024L * 1024L * 1024L)
                 m_desiredRemainingSpace = 1024 * 1024L * 1024L * 1024L;
-            }
+
             else
-            {
                 m_desiredRemainingSpace = value;
-            }
         }
     }
 
@@ -186,15 +189,14 @@ public class SimplifiedArchiveInitializerSettings
     /// <summary>
     /// Creates a <see cref="ArchiveInitializer{TKey,TValue}"/> that will reside on the disk.
     /// </summary>
-    /// <param name="paths">the paths to place the files.</param>
+    /// <param name="paths">The paths to place the files.</param>
     /// <param name="desiredRemainingSpace">The desired free space to leave on the disk before moving to another disk.</param>
-    /// <param name="directoryMethod">the method for storing files in a directory.</param>
-    /// <param name="encodingMethod">the encoding method to use for the archive file.</param>
-    /// <param name="prefix">the prefix to affix to the files created.</param>
-    /// <param name="pendingExtension">the extension file name</param>
-    /// <param name="finalExtension">the final extension to specify</param>
-    /// <param name="flags">flags to include in the archive that is created.</param>
-    /// <returns></returns>
+    /// <param name="directoryMethod">The method for storing files in a directory.</param>
+    /// <param name="encodingMethod">The encoding method to use for the archive file.</param>
+    /// <param name="prefix">The prefix to affix to the files created.</param>
+    /// <param name="pendingExtension">The extension file name.</param>
+    /// <param name="finalExtension">The final extension to specify.</param>
+    /// <param name="flags">Flags to include in the archive that is created.</param>
     public void ConfigureOnDisk(IEnumerable<string> paths, long desiredRemainingSpace, ArchiveDirectoryMethod directoryMethod, EncodingDefinition encodingMethod, string prefix, string pendingExtension, string finalExtension, params Guid[] flags)
     {
         TestForEditable();
@@ -219,21 +221,21 @@ public class SimplifiedArchiveInitializerSettings
         stream.Write(m_desiredRemainingSpace);
         m_encodingMethod.Save(stream);
         stream.Write(m_writePath.Count);
+
         foreach (string path in m_writePath)
-        {
             stream.Write(path);
-        }
+
         stream.Write(m_flags.Count);
+
         foreach (Guid flag in m_flags)
-        {
             stream.Write(flag);
-        }
     }
 
     public override void Load(Stream stream)
     {
         TestForEditable();
         byte version = stream.ReadNextByte();
+
         switch (version)
         {
             case 1:
@@ -245,22 +247,26 @@ public class SimplifiedArchiveInitializerSettings
                 m_encodingMethod = new EncodingDefinition(stream);
                 int cnt = stream.ReadInt32();
                 m_writePath.Clear();
+
                 while (cnt > 0)
                 {
                     cnt--;
                     m_writePath.Add(stream.ReadString());
                 }
+
                 cnt = stream.ReadInt32();
                 m_flags.Clear();
+
                 while (cnt > 0)
                 {
                     cnt--;
                     m_flags.Add(stream.ReadGuid());
                 }
+
                 break;
+
             default:
                 throw new VersionNotFoundException("Unknown Version Code: " + version);
-
         }
     }
 
