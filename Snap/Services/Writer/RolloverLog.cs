@@ -50,13 +50,11 @@ public class RolloverLog
             {
                 RolloverLogFile log = new RolloverLogFile(logFile);
                 if (log.IsValid)
-                {
                     log.Recover(list);
-                }
+
                 else
-                {
                     log.Delete();
-                }
+
             }
         }
     }
