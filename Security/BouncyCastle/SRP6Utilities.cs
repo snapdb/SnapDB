@@ -22,7 +22,7 @@
 
 using System.Numerics;
 
-namespace Org.BouncyCastle.Crypto.Agreement.Srp;
+namespace SnapDB;
 
 internal static class Srp6Utilities
 {

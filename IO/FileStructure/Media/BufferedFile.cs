@@ -211,9 +211,7 @@ internal partial class BufferedFile
             else
             {
                 for (int x = 0; x < header.HeaderBlockCount; x++)
-                {
                     m_queue.WriteRaw(x * m_fileStructureBlockSize, bytes, m_fileStructureBlockSize);
-                }
             }
 
             m_queue.FlushFileBuffers();
@@ -274,6 +272,7 @@ internal partial class BufferedFile
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().ToString());
+
         ReleaseWriteBufferSpace();
     }
 
@@ -317,12 +316,15 @@ internal partial class BufferedFile
                 {
                     if (m_pageReplacementAlgorithm is not null)
                         m_pageReplacementAlgorithm.Dispose();
+
                     if (m_queue is not null)
                         m_queue.Dispose();
+
                     if (m_writeBuffer is not null)
                         m_writeBuffer.Dispose();
                 }
             }
+
             finally
             {
                 m_queue = null;
@@ -362,7 +364,7 @@ internal partial class BufferedFile
             m_writeBuffer.GetBlock(args);
         }
 
-        else if (args.Position < m_lengthOfHeader)
+        if (args.Position < m_lengthOfHeader)
         {
             // If the block is in the header, error because this area of the file is not designed to be accessed.
             throw new ArgumentOutOfRangeException(nameof(args), "Cannot use this function to modify the file header.");
@@ -394,7 +396,7 @@ internal partial class BufferedFile
     /// <param name="pageLock">The page lock used for page management.</param>
     /// <param name="position">The position of the block.</param>
     /// <param name="pointer">An output parameter that contains the pointer to the block.</param>
-    /// <param name="pointer">an output parameter that contains the pointer for the provided position</param>
+    /// <param name="pointer">an output parameter that contains the pointer for the provided position.</param>
     /// <remarks>The valid length is at least the size of the buffer pools page size.</remarks>
     private void GetBlockFromCommittedSpace(PageReplacementAlgorithm.PageLock pageLock, long position, out nint pointer)
     {

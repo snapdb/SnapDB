@@ -24,9 +24,9 @@
 //
 //******************************************************************************************************
 
+using Gemstone.Diagnostics;
 using SnapDB.Collections;
 using SnapDB.IO.Unmanaged;
-using Gemstone.Diagnostics;
 
 namespace SnapDB.IO.FileStructure.Media;
 
@@ -73,7 +73,7 @@ internal sealed unsafe class PageList
     /// Contains all of the pages that are cached for the file stream.
     /// Map is PositionIndex,PageIndex
     /// </summary>
-    private readonly GenericSortedList<int, int> m_pageIndexLookupByPositionIndex;
+    private readonly SortedList<int, int> m_pageIndexLookupByPositionIndex;
 
     /// <summary>
     /// A list of all pages that have been cached.
@@ -94,7 +94,7 @@ internal sealed unsafe class PageList
     {
         m_memoryPool = memoryPool;
         m_listOfPages = new NullableLargeArray<InternalPageMetaData>();
-        m_pageIndexLookupByPositionIndex = new GenericSortedList<int, int>();
+        m_pageIndexLookupByPositionIndex = new SortedList<int, int>();
     }
 
     ~PageList()
