@@ -26,12 +26,13 @@
 
 using Gemstone.IO.StreamExtensions;
 using SnapDB.Snap.Services.Writer;
+using SnapDB.Immutables;
 using System.Data;
 
 namespace SnapDB.Snap.Services;
 
 /// <summary>
-/// The settings for a <see cref="SnapServerDatabase{TKey,TValue}"/>
+/// The settings for a <see cref="SnapServerDatabase{TKey,TValue}"/>.
 /// </summary>
 public class ServerDatabaseSettings
     : SettingsBase<ServerDatabaseSettings>, IToServerDatabaseSettings
@@ -46,7 +47,7 @@ public class ServerDatabaseSettings
     private bool m_supportsWriting;
 
     /// <summary>
-    /// Creates a new <see cref="ServerDatabaseSettings"/>
+    /// Creates a new <see cref="ServerDatabaseSettings"/>.
     /// </summary>
     public ServerDatabaseSettings()
     {
@@ -60,12 +61,13 @@ public class ServerDatabaseSettings
         {
             if (x is null)
                 throw new ArgumentNullException("value");
+
             return x;
         });
     }
 
     /// <summary>
-    /// Gets the type of the key componenet
+    /// Gets the type of the key component.
     /// </summary>
     public Guid KeyType
     {
@@ -78,7 +80,7 @@ public class ServerDatabaseSettings
     }
 
     /// <summary>
-    /// Gets the type of the value componenent.
+    /// Gets the type of the value component.
     /// </summary>
     public Guid ValueType
     {
@@ -114,7 +116,7 @@ public class ServerDatabaseSettings
     public ArchiveListSettings ArchiveList => m_archiveList;
 
     /// <summary>
-    /// Settings for the writer. Null if the server does not support writing.
+    /// Settings for the writer -- <c>null</c> if the server does not support writing.
     /// </summary>
     public WriteProcessorSettings WriteProcessor => m_writeProcessor;
 
@@ -148,10 +150,10 @@ public class ServerDatabaseSettings
         stream.Write(m_valueType);
         stream.Write(m_databaseName);
         stream.Write(m_streamingEncodingMethods.Count);
+
         foreach (EncodingDefinition path in m_streamingEncodingMethods)
-        {
             path.Save(stream);
-        }
+
         m_archiveList.Save(stream);
         m_writeProcessor.Save(stream);
         m_rolloverLog.Save(stream);
@@ -161,6 +163,7 @@ public class ServerDatabaseSettings
     {
         TestForEditable();
         byte version = stream.ReadNextByte();
+
         switch (version)
         {
             case 1:
@@ -169,18 +172,21 @@ public class ServerDatabaseSettings
                 m_databaseName = stream.ReadString();
                 int cnt = stream.ReadInt32();
                 m_streamingEncodingMethods.Clear();
+
                 while (cnt > 0)
                 {
                     cnt--;
                     m_streamingEncodingMethods.Add(new EncodingDefinition(stream));
                 }
+
                 m_archiveList.Load(stream);
                 m_writeProcessor.Load(stream);
                 m_rolloverLog.Load(stream);
+
                 break;
+
             default:
                 throw new VersionNotFoundException("Unknown Version Code: " + version);
-
         }
     }
 
@@ -188,8 +194,10 @@ public class ServerDatabaseSettings
     {
         m_archiveList.Validate();
         m_rolloverLog.Validate();
+
         if (m_supportsWriting)
             m_writeProcessor.Validate();
+
         if (StreamingEncodingMethods.Count == 0)
             throw new Exception("Must specify a streaming method");
     }

@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  GenericEncodedNodeScanner`2.cs - Gbtc
+//  GenericEncodedNodeScanner.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -18,8 +18,8 @@
 //  ----------------------------------------------------------------------------------------------------
 //  05/07/2013 - Steven E. Chisholm
 //       Generated original version of source code. 
-//
-//  09/25/2023 - Lillian Gensolin
+//     
+//  09/22/2023 - Lillian Gensolin
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
@@ -48,12 +48,12 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
     private readonly TValue m_tmpValue;
 
     /// <summary>
-    /// Creates a new class.
+    /// Creates a new class
     /// </summary>
-    /// <param name="level">The level of the fixed-size node in the sorted tree.</param>
-    /// <param name="blockSize">The size of the block containing the fixed-size node.</param>
-    /// <param name="stream">The binary stream pointer for navigating the tree structure.</param>
-    /// <param name="lookupKey">A delegate function for looking up keys in the tree.</param>
+    /// <param name="level"></param>
+    /// <param name="blockSize"></param>
+    /// <param name="stream"></param>
+    /// <param name="lookupKey"></param>
     public GenericEncodedNodeScanner(PairEncodingBase<TKey, TValue> encoding, byte level, int blockSize, BinaryStreamPointerBase stream, Func<TKey, byte, uint> lookupKey)
         : base(level, blockSize, stream, lookupKey)
     {
@@ -141,6 +141,7 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
 
             goto TryAgain;
         }
+
         return false;
     }
 
