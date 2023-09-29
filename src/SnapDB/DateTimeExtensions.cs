@@ -32,10 +32,13 @@ namespace SnapDB;
 public static class DateTimeExtensions
 {
     /// <summary>
-    /// Rounds the supplied datetime down to the nearest day.
+    /// Rounds down a <see cref="DateTime"/> value to the nearest day.
     /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
+    /// <param name="value">The <see cref="DateTime"/> value to round down.</param>
+    /// <returns>The rounded-down <see cref="DateTime"/> value.</returns>
+    /// <remarks>
+    /// This method rounds down the input <paramref name="value"/> to the nearest day by removing the time component.
+    /// </remarks>
     public static DateTime RoundDownToNearestDay(this DateTime value)
     {
         return new DateTime(value.Ticks - value.Ticks % TimeSpan.TicksPerDay, value.Kind);

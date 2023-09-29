@@ -24,13 +24,10 @@
 //
 //******************************************************************************************************
 
-
-using SnapDB.Snap;
-
 namespace SnapDB.Snap;
 
 /// <summary>
-/// 
+/// Provides extension methods for <see cref="TreeStream{TKey, TValue}"/>.
 /// </summary>
 public static class TreeStreamExtensions
 {
