@@ -36,8 +36,8 @@ namespace SnapDB.Snap.Tree;
 /// <typeparam name="TValue">The type of values associated with keys in the tree.</typeparam>
 public class FixedSizeNodeScanner<TKey, TValue>
     : SortedTreeScannerBase<TKey, TValue>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     private readonly int m_keyValueSize;
 
@@ -63,7 +63,7 @@ public class FixedSizeNodeScanner<TKey, TValue>
         IndexOfNextKeyValue++;
     }
 
-    protected unsafe bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue> filter)
+    protected override unsafe bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue> filter)
     {
     TryAgain:
         byte* ptr = Pointer + IndexOfNextKeyValue * m_keyValueSize;
@@ -108,7 +108,7 @@ public class FixedSizeNodeScanner<TKey, TValue>
     /// <summary>
     /// Using <see cref="SortedTreeScannerBase{TKey,TValue}.Pointer"/> to advance to the next KeyValue.
     /// </summary>
-    protected unsafe bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue> filter)
+    protected override unsafe bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue> filter)
     {
     TryAgain:
         byte* ptr = Pointer + IndexOfNextKeyValue * m_keyValueSize;

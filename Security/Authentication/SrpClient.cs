@@ -24,8 +24,12 @@
 //
 //******************************************************************************************************
 
+using Gemstone.ArrayExtensions;
 using Gemstone.IO.StreamExtensions;
-using System.Numerics;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Agreement.Srp;
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Math;
 
 namespace SnapDB.Security.Authentication;
 

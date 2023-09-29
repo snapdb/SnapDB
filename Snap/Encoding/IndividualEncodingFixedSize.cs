@@ -33,7 +33,7 @@ namespace SnapDB.Snap.Encoding;
 /// </summary>
 internal class IndividualEncodingFixedSize<T>
     : IndividualEncodingBase<T>
-    where T : SnapTypeBaseOfT<T>, new()
+    where T : SnapTypeBase<T>, new()
 {
     private readonly int m_size;
 

@@ -36,8 +36,8 @@ namespace SnapDB.Snap;
 /// <typeparam name="TKey">A key type supported by the SortedTreeStore</typeparam>
 /// <typeparam name="TValue">A value type supported by the SortedTreeStore</typeparam>
 public interface IDatabaseReader<TKey, TValue> : IDisposable
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     /// <summary>
     /// Reads data from the SortedTreeEngine with the provided read options and server side filters.

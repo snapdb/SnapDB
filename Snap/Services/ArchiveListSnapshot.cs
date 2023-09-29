@@ -30,8 +30,8 @@ namespace SnapDB.Snap.Services;
 /// Provides a list of resources that each system transaction could be using.
 /// </summary>
 public class ArchiveListSnapshot<TKey, TValue> : IDisposable
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     /// <summary>
     /// Signals that a disposal of this object has been requested. 

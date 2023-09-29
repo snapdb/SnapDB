@@ -193,8 +193,8 @@ internal sealed class DiskIo : IDisposable
     /// <summary>
     /// Changes the extension of the current file.
     /// </summary>
-    /// <param name="extension">the new extension</param>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="extension">The new extension.</param>
+    /// <param name="isReadOnly">If the file should be reopened as read-only.</param>
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     public void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled)
     {

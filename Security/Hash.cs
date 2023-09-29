@@ -25,6 +25,8 @@
 //
 //******************************************************************************************************
 
+using Org.BouncyCastle.Crypto;
+
 namespace SnapDB.Security;
 
 public static class Hash

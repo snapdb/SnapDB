@@ -35,7 +35,7 @@ namespace SnapDB.Snap;
 public abstract class SnapTypeBase
 {
     /// <summary>
-    /// Ensures that only <see cref="SnapTypeBaseOfT{T}"/> inherits from this class.
+    /// Ensures that only <see cref="SnapTypeBase{T}"/> inherits from this class.
     /// </summary>
     internal protected SnapTypeBase()
     {

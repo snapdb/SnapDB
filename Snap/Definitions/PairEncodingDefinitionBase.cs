@@ -55,6 +55,6 @@ public abstract class PairEncodingDefinitionBase
     /// <typeparam name="TValue">The value for this encoding method.</typeparam>
     /// <returns>The encoding method.</returns>
     public abstract PairEncodingBase<TKey, TValue> Create<TKey, TValue>()
-        where TKey : SnapTypeBaseOfT<TKey>, new()
-        where TValue : SnapTypeBaseOfT<TValue>, new();
+        where TKey : SnapTypeBase<TKey>, new()
+        where TValue : SnapTypeBase<TValue>, new();
 }

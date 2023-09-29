@@ -20,9 +20,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System.Numerics;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Utilities;
 
-namespace SnapDB;
+namespace Org.BouncyCastle.Crypto.Agreement.Srp;
 
 internal static class Srp6Utilities
 {

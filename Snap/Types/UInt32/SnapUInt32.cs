@@ -29,7 +29,7 @@ using SnapDB.IO;
 namespace SnapDB.Snap.Types;
 
 public class SnapUInt32
-    : SnapTypeBaseOfT<SnapUInt32>
+    : SnapTypeBase<SnapUInt32>
 {
 
     public uint Value;

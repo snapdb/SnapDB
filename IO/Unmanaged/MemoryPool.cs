@@ -28,6 +28,7 @@ using System.Diagnostics;
 using System.Text;
 using Gemstone;
 using Gemstone.Diagnostics;
+using Gemstone.Threading;
 using SnapDB.Threading;
 
 namespace SnapDB.IO.Unmanaged;
@@ -84,7 +85,7 @@ public class MemoryPool
     /// in a later version, some sort of concurrent garbage collection may be implemented
     /// which means more control will need to be with the Event.
     /// </summary>
-    private readonly ThreadSafeList<WeakAction<CollectionEventArgs>> m_requestCollectionEvent;
+    private readonly ThreadSafeList<WeakEventHandler<CollectionEventArgs>> m_requestCollectionEvent;
     private long m_levelNone;
     private long m_levelLow;
     private long m_levelNormal;
@@ -178,7 +179,7 @@ public class MemoryPool
         PageShiftBits = BitMath.CountBitsSet((uint)PageMask);
 
         m_pageList = new MemoryPoolPageList(PageSize, maximumBufferSize);
-        m_requestCollectionEvent = new ThreadSafeList<WeakAction<CollectionEventArgs>>();
+        m_requestCollectionEvent = new ThreadSafeList<WeakEventHandler<CollectionEventArgs>>();
         SetTargetUtilizationLevel(utilizationLevel);
     }
 
@@ -387,7 +388,7 @@ public class MemoryPool
                 CollectionEventArgs eventArgs = new(ReleasePage, MemoryPoolCollectionMode.Normal, 0);
                 Monitor.Exit(m_syncRoot); lockTaken = false;
 
-                foreach (WeakAction<CollectionEventArgs> c in m_requestCollectionEvent)
+                foreach (WeakEventHandler<CollectionEventArgs> c in m_requestCollectionEvent)
                 {
                     c.TryInvoke(this, eventArgs);
                 }
@@ -422,7 +423,7 @@ public class MemoryPool
 
                 Monitor.Exit(m_syncRoot); lockTaken = false;
 
-                foreach (WeakAction<CollectionEventArgs> c in m_requestCollectionEvent)
+                foreach (WeakEventHandler<CollectionEventArgs> c in m_requestCollectionEvent)
                 {
                     if (eventArgs.DesiredPageReleaseCount == 0)
                         break;
@@ -442,7 +443,7 @@ public class MemoryPool
 
                     Monitor.Exit(m_syncRoot); lockTaken = false;
 
-                    foreach (WeakAction<CollectionEventArgs> c in m_requestCollectionEvent)
+                    foreach (WeakEventHandler<CollectionEventArgs> c in m_requestCollectionEvent)
                     {
                         if (eventArgs.DesiredPageReleaseCount == 0)
                             break;

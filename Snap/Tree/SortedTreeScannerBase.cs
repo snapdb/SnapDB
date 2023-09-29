@@ -37,8 +37,8 @@ namespace SnapDB.Snap.Tree;
 /// <typeparam name="TValue"></typeparam>
 public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     : SeekableTreeStream<TKey, TValue>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     private const int OffsetOfVersion = 0;
     private const int OffsetOfNodeLevel = OffsetOfVersion + sizeof(byte);

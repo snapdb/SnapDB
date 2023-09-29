@@ -35,8 +35,8 @@ namespace SnapDB.Snap.Services.Reader;
 
 internal class SequentialReaderStream<TKey, TValue>
     : TreeStream<TKey, TValue>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(SequentialReaderStream<TKey, TValue>), MessageClass.Framework);
 
@@ -61,7 +61,7 @@ internal class SequentialReaderStream<TKey, TValue>
     private WorkerThreadSynchronization m_workerThreadSynchronization;
     private readonly bool m_ownsWorkerThreadSynchronization;
 
-    public SequentialReaderStream(ArchiveListOfT<TKey, TValue> archiveList,
+    public SequentialReaderStream(ArchiveList<TKey, TValue> archiveList,
         SortedTreeEngineReaderOptions readerOptions = null,
         SeekFilterBase<TKey> keySeekFilter = null,
         MatchFilterBase<TKey, TValue> keyMatchFilter = null,

@@ -30,8 +30,8 @@ namespace SnapDB.Snap.Tree;
 
 
 public class InsertStreamHelper<TKey, TValue>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     public bool IsStillSequential;
     public bool IsValid;

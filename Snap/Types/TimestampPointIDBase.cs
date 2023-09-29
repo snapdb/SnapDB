@@ -34,7 +34,7 @@ namespace SnapDB.Snap.Types;
 /// <typeparam name="TKey"></typeparam>
 public abstract class TimestampPointIDBase<TKey>
     : TimestampBase<TKey>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TKey : SnapTypeBase<TKey>, new()
 {
     /// <summary>
     /// The ID number of the point.

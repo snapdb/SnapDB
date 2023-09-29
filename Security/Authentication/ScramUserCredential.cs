@@ -24,6 +24,9 @@
 //
 //******************************************************************************************************
 
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Macs;
+using Org.BouncyCastle.Crypto.Parameters;
 using System.Text;
 
 namespace SnapDB.Security.Authentication;

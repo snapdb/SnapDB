@@ -75,7 +75,7 @@ internal interface IDiskMediumCoreFunctions
     /// <summary>
     /// Reopens the file with different permissions.
     /// </summary>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="isReadOnly">If the file should be reopened as read-only</param>
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     void ChangeShareMode(bool isReadOnly, bool isSharingEnabled);
 

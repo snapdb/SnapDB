@@ -35,8 +35,8 @@ namespace SnapDB.Snap.Streaming;
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
     public abstract class StreamEncodingBase<TKey, TValue>
-        where TKey : SnapTypeBaseOfT<TKey>, new()
-        where TValue : SnapTypeBaseOfT<TValue>, new()
+        where TKey : SnapTypeBase<TKey>, new()
+        where TValue : SnapTypeBase<TValue>, new()
     {
 
         /// <summary>

@@ -29,6 +29,8 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using Gemstone.Diagnostics;
 using Gemstone.IO.StreamExtensions;
+using Org.BouncyCastle.Crypto;
+using SnapDB.Security.Authentication;
 
 namespace SnapDB.Security;
 

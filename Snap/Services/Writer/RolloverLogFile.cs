@@ -82,7 +82,7 @@ public class RolloverLogFile
             stream.Write(file);
         }
         stream.Write(destinationFile);
-        using (SHA1 sha = Cipher.CreateSHA1())
+        using (SHA1 sha = SHA1.Create())
         {
             stream.Write(sha.ComputeHash(stream.ToArray()));
         }
@@ -118,7 +118,7 @@ public class RolloverLogFile
 
             byte[] hash = new byte[20];
             Array.Copy(data, data.Length - 20, hash, 0, 20);
-            using (SHA1 sha = Cipher.CreateSHA1())
+            using (SHA1 sha = SHA1.Create())
             {
                 byte[] checksum = sha.ComputeHash(data, 0, data.Length - 20);
                 if (!hash.SequenceEqual(checksum))
@@ -162,7 +162,7 @@ public class RolloverLogFile
     /// Recovers this rollover during an application crash.
     /// </summary>
     /// <param name="list"></param>
-    public void Recover(ArchiveListOfT list)
+    public void Recover(ArchiveList list)
     {
         using (ArchiveListEditor edit = list.AcquireEditLock())
         {

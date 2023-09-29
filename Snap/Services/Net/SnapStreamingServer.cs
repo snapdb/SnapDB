@@ -207,8 +207,8 @@ public class SnapStreamingServer
     //Called through reflection. Its the only way to call a generic function only knowing the Types
     [MethodImpl(MethodImplOptions.NoOptimization)] //Prevents removing this method as it may appear unused.
     private bool ConnectToDatabase<TKey, TValue>(SnapServerDatabase<TKey, TValue>.ClientDatabase database)
-        where TKey : SnapTypeBaseOfT<TKey>, new()
-        where TValue : SnapTypeBaseOfT<TValue>, new()
+        where TKey : SnapTypeBase<TKey>, new()
+        where TValue : SnapTypeBase<TValue>, new()
     {
         m_stream.Write((byte)ServerResponse.SuccessfullyConnectedToDatabase);
         m_stream.Flush();

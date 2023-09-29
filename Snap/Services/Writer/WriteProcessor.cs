@@ -35,8 +35,8 @@ namespace SnapDB.Snap.Services.Writer;
 /// <typeparam name="TValue"></typeparam>
 public class WriteProcessor<TKey, TValue>
     : DisposableLoggingClassBase
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     private readonly bool m_isMemoryOnly;
     private bool m_disposed;
@@ -52,7 +52,7 @@ public class WriteProcessor<TKey, TValue>
     /// <param name="list">the master list of archive files</param>
     /// <param name="settings">the settings</param>
     /// <param name="rolloverLog">the rollover log value</param>
-    public WriteProcessor(ArchiveListOfT<TKey, TValue> list, WriteProcessorSettings settings, RolloverLog rolloverLog)
+    public WriteProcessor(ArchiveList<TKey, TValue> list, WriteProcessorSettings settings, RolloverLog rolloverLog)
         : base(MessageClass.Framework)
     {
         m_settings = settings.CloneReadonly();

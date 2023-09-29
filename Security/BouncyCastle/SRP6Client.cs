@@ -20,8 +20,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Security;
 using SnapDB.Security.Authentication;
-using System.Numerics;
 
 namespace Org.BouncyCastle.Crypto.Agreement.Srp;
 

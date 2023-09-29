@@ -33,8 +33,8 @@ namespace SnapDB.Snap.Types;
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 public abstract class TimestampBase<TKey>
-    : SnapTypeBaseOfT<TKey>, IHasTimestampField
-    where TKey : SnapTypeBaseOfT<TKey>, new()
+    : SnapTypeBase<TKey>, IHasTimestampField
+    where TKey : SnapTypeBase<TKey>, new()
 {
     /// <summary>
     /// The timestamp stored as native ticks. 

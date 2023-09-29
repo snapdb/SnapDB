@@ -37,8 +37,8 @@ namespace SnapDB.Snap.Services.Writer;
 /// Realistically a therotical peak would be 200 million transactions per second (An Interlocked.Increment).
 /// </remarks>
 public class TransactionTracker<TKey, TValue>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
 
     /// <summary>

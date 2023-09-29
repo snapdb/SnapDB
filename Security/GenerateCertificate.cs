@@ -26,8 +26,16 @@
 //
 //******************************************************************************************************
 
-using System.Numerics;
 using System.Security.Cryptography.X509Certificates;
+using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Prng;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Pkcs;
+using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Utilities;
+using Org.BouncyCastle.X509;
 
 namespace SnapDB.Security;
 
@@ -94,32 +102,40 @@ public static class GenerateCertificate
         // The Certificate Generator
         X509V3CertificateGenerator certificateGenerator = new X509V3CertificateGenerator();
         certificateGenerator.SetSerialNumber(BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(Int64.MaxValue), random));
-        certificateGenerator.SetSignatureAlgorithm(signatureAlgorithm);
+        
+        // TODO: JRC - check to see what has changed here and if this is necessary
+        //certificateGenerator.SetSignatureAlgorithm(signatureAlgorithm);
+
         certificateGenerator.SetIssuerDN(new X509Name(subjectDirName));
         certificateGenerator.SetSubjectDN(new X509Name(subjectDirName));
         certificateGenerator.SetNotBefore(startDate);
         certificateGenerator.SetNotAfter(endDate);
         certificateGenerator.SetPublicKey(encryptionKeys.Public);
 
+        // -- commented out due to Bouncy Castle changes --
         // self-sign certificate
-        Org.BouncyCastle.X509.X509Certificate certificate = certificateGenerator.Generate(encryptionKeys.Private, random);
+        //Org.BouncyCastle.X509.X509Certificate certificate = certificateGenerator.Generate(encryptionKeys.Private, random);
 
-        Pkcs12Store store = new Pkcs12Store();
-        string friendlyName = certificate.SubjectDN.ToString();
-        X509CertificateEntry certificateEntry = new X509CertificateEntry(certificate);
-        store.SetCertificateEntry(friendlyName, certificateEntry);
-        store.SetKeyEntry(friendlyName, new AsymmetricKeyEntry(encryptionKeys.Private), new[] { certificateEntry });
+        // -- commented out due to Bouncy Castle changes --
+        //Pkcs12Store store = new Pkcs12Store();
+        //string friendlyName = certificate.SubjectDN.ToString();
+        //X509CertificateEntry certificateEntry = new X509CertificateEntry(certificate);
+        //store.SetCertificateEntry(friendlyName, certificateEntry);
+        //store.SetKeyEntry(friendlyName, new AsymmetricKeyEntry(encryptionKeys.Private), new[] { certificateEntry });
 
-        MemoryStream stream = new();
-        store.Save(stream, password.ToCharArray(), random);
+        //MemoryStream stream = new();
+        //store.Save(stream, password.ToCharArray(), random);
 
+        // -- commented out due to Bouncy Castle changes --
         //Verify that the certificate is valid.
-        _ = new X509Certificate2(stream.ToArray(), password, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
+        //_ = new X509Certificate2(stream.ToArray(), password, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
 
+        // -- commented out due to Bouncy Castle changes --
         //Write the file.
-        File.WriteAllBytes(fileName, stream.ToArray());
+        //File.WriteAllBytes(fileName, stream.ToArray());
 
-        File.WriteAllBytes(Path.ChangeExtension(fileName, ".cer"), certificate.GetEncoded());
+        // -- commented out due to Bouncy Castle changes --
+        //File.WriteAllBytes(Path.ChangeExtension(fileName, ".cer"), certificate.GetEncoded());
     }
 
 
@@ -162,32 +178,36 @@ public static class GenerateCertificate
         keyPairGenerator.Init(keyGenerationParameters);
         AsymmetricCipherKeyPair encryptionKeys = keyPairGenerator.GenerateKeyPair();
 
-        // The Certificate Generator
-        X509V3CertificateGenerator certificateGenerator = new X509V3CertificateGenerator();
-        certificateGenerator.SetSerialNumber(BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(Int64.MaxValue), random));
-        certificateGenerator.SetSignatureAlgorithm(signatureAlgorithm);
-        certificateGenerator.SetIssuerDN(new X509Name(subjectDirName));
-        certificateGenerator.SetSubjectDN(new X509Name(subjectDirName));
-        certificateGenerator.SetNotBefore(startDate);
-        certificateGenerator.SetNotAfter(endDate);
-        certificateGenerator.SetPublicKey(encryptionKeys.Public);
+        // TODO: JRC - check to see what has changed here and if this is necessary (see above for the same)
 
-        // selfsign certificate
-        Org.BouncyCastle.X509.X509Certificate certificate = certificateGenerator.Generate(encryptionKeys.Private, random);
+        //// The Certificate Generator
+        //X509V3CertificateGenerator certificateGenerator = new X509V3CertificateGenerator();
+        //certificateGenerator.SetSerialNumber(BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(Int64.MaxValue), random));
+        //certificateGenerator.SetSignatureAlgorithm(signatureAlgorithm);
+        //certificateGenerator.SetIssuerDN(new X509Name(subjectDirName));
+        //certificateGenerator.SetSubjectDN(new X509Name(subjectDirName));
+        //certificateGenerator.SetNotBefore(startDate);
+        //certificateGenerator.SetNotAfter(endDate);
+        //certificateGenerator.SetPublicKey(encryptionKeys.Public);
 
-        Pkcs12Store store = new Pkcs12Store();
-        string friendlyName = certificate.SubjectDN.ToString();
-        X509CertificateEntry certificateEntry = new X509CertificateEntry(certificate);
-        store.SetCertificateEntry(friendlyName, certificateEntry);
-        store.SetKeyEntry(friendlyName, new AsymmetricKeyEntry(encryptionKeys.Private), new[] { certificateEntry });
+        //// selfsign certificate
+        //Org.BouncyCastle.X509.X509Certificate certificate = certificateGenerator.Generate(encryptionKeys.Private, random);
 
-        MemoryStream stream = new();
-        store.Save(stream, "".ToCharArray(), random);
+        //Pkcs12Store store = new Pkcs12Store();
+        //string friendlyName = certificate.SubjectDN.ToString();
+        //X509CertificateEntry certificateEntry = new X509CertificateEntry(certificate);
+        //store.SetCertificateEntry(friendlyName, certificateEntry);
+        //store.SetKeyEntry(friendlyName, new AsymmetricKeyEntry(encryptionKeys.Private), new[] { certificateEntry });
+
+        //MemoryStream stream = new();
+        //store.Save(stream, "".ToCharArray(), random);
 
         //Verify that the certificate is valid.
-        X509Certificate2 convertedCertificate = new(stream.ToArray(), "", X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
+        //X509Certificate2 convertedCertificate = new(stream.ToArray(), "", X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
 
-        return convertedCertificate;
+        //return convertedCertificate;
+        
+        return null;
     }
 
     //private static bool addCertToStore(X509Certificate2 cert, StoreName st, StoreLocation sl)

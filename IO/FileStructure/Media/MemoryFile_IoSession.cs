@@ -43,7 +43,7 @@ internal partial class MemoryPoolFile
         private readonly MemoryPoolFile m_file;
 
         /// <summary>
-        /// Creates a new <see cref="IoSession"/>
+        /// Creates a new <see cref="IoSession"/>.
         /// </summary>
         /// <param name="file">The base file.</param>
         public IoSession(MemoryPoolFile file)
@@ -71,7 +71,7 @@ internal partial class MemoryPoolFile
         }
 
         /// <summary>
-        /// Sets the current usage of the <see cref="BinaryStreamIoSessionBase"/> to null.
+        /// Sets the current usage of the <see cref="BinaryStreamIoSessionBase"/> to <c>null</c>.
         /// </summary>
         public override void Clear()
         {

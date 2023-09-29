@@ -26,6 +26,9 @@
 
 using System.Text;
 using Gemstone.IO.StreamExtensions;
+using Org.BouncyCastle.Crypto.Macs;
+using Org.BouncyCastle.Crypto.Parameters;
+
 namespace SnapDB.Security.Authentication;
 
 /// <summary>

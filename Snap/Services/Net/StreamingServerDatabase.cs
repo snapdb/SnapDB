@@ -37,8 +37,8 @@ namespace SnapDB.Snap.Services.Net;
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
 internal class StreamingServerDatabase<TKey, TValue>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 
 {
     private readonly RemoteBinaryStream m_stream;

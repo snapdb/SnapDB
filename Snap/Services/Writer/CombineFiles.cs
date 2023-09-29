@@ -38,8 +38,8 @@ namespace SnapDB.Snap.Services.Writer;
 /// </summary>
 public class CombineFiles<TKey, TValue>
     : DisposableLoggingClassBase
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     private readonly object m_syncRoot;
     private bool m_disposed;
@@ -48,7 +48,7 @@ public class CombineFiles<TKey, TValue>
     private readonly CombineFilesSettings m_settings;
 
     private readonly SimplifiedArchiveInitializer<TKey, TValue> m_createNextStageFile;
-    private readonly ArchiveListOfT<TKey, TValue> m_archiveList;
+    private readonly ArchiveList<TKey, TValue> m_archiveList;
     private readonly RolloverLog m_rolloverLog;
 
     /// <summary>
@@ -57,7 +57,7 @@ public class CombineFiles<TKey, TValue>
     /// <param name="settings">the settings for this stage</param>
     /// <param name="archiveList">the archive list</param>
     /// <param name="rolloverLog">the rollover log</param>
-    public CombineFiles(CombineFilesSettings settings, ArchiveListOfT<TKey, TValue> archiveList, RolloverLog rolloverLog)
+    public CombineFiles(CombineFilesSettings settings, ArchiveList<TKey, TValue> archiveList, RolloverLog rolloverLog)
             : base(MessageClass.Framework)
     {
         m_settings = settings.CloneReadonly();
@@ -69,14 +69,15 @@ public class CombineFiles<TKey, TValue>
         m_syncRoot = new object();
         m_rolloverTask = new ScheduledTask(ThreadingMode.DedicatedForeground, ThreadPriority.BelowNormal);
         m_rolloverTask.Running += OnExecute;
-        m_rolloverTask.UnhandledException += OnException;
+        //m_rolloverTask.UnhandledException += OnException;
         m_rolloverTask.Start(m_settings.ExecuteTimer);
     }
 
-    private void OnException(object sender, EventArgs<Exception> e)
-    {
-        Log.Publish(MessageLevel.Error, "Unexpected Error when rolling over a file", null, null, e.Argument);
-    }
+    // TODO: JRC - think about custom exception handling messages with SafeInvoke for missing UnhandledException above
+    //private void OnException(object sender, EventArgs<Exception> e)
+    //{
+    //    Log.Publish(MessageLevel.Error, "Unexpected Error when rolling over a file", null, null, e.Argument);
+    //}
 
     private void OnExecute(object sender, EventArgs<ScheduledTaskRunningReason> e)
     {

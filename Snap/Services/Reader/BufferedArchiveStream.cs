@@ -31,8 +31,8 @@ namespace SnapDB.Snap.Services.Reader;
 
 public class BufferedArchiveStream<TKey, TValue>
     : IDisposable
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     public SortedTreeScannerBase<TKey, TValue> Scanner;
     private readonly ArchiveTableSummary<TKey, TValue> m_table;

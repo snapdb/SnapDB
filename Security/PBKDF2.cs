@@ -27,6 +27,9 @@
 using System.Security.Cryptography;
 using Gemstone.ArrayExtensions;
 using Gemstone;
+using Org.BouncyCastle.Crypto.Macs;
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Parameters;
 
 namespace SnapDB.Security;
 

@@ -21,7 +21,8 @@
 //
 
 using SnapDB.Security.Authentication;
-using System.Numerics;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Security;
 
 namespace Org.BouncyCastle.Crypto.Agreement.Srp;
 
@@ -55,7 +56,10 @@ internal class Srp6Server
     {
         this.param = param;
         this.v = v;
+
+#pragma warning disable CS0436 // Type conflicts with imported type
         this.privB = Srp6Utilities.GeneratePrivateValue(param.N, new SecureRandom());
+#pragma warning restore CS0436 // Type conflicts with imported type
     }
 
     /**

@@ -39,8 +39,8 @@ namespace SnapDB.Snap.Services.Net;
 public class StreamingClientDatabase<TKey, TValue>
     : ClientDatabaseBase<TKey, TValue>
 
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     private BulkWriting m_writer;
     private readonly TKey m_tmpKey;
@@ -214,22 +214,22 @@ public class StreamingClientDatabase<TKey, TValue>
     }
 
 
-    public void AttachFilesOrPaths(IEnumerable<string> paths)
+    public override void AttachFilesOrPaths(IEnumerable<string> paths)
     {
         throw new NotImplementedException();
     }
 
-    public List<ArchiveDetails> GetAllAttachedFiles()
+    public override List<ArchiveDetails> GetAllAttachedFiles()
     {
         throw new NotImplementedException();
     }
 
-    public void DetatchFiles(List<Guid> files)
+    public override void DetatchFiles(List<Guid> files)
     {
         throw new NotImplementedException();
     }
 
-    public void DeleteFiles(List<Guid> files)
+    public override void DeleteFiles(List<Guid> files)
     {
         throw new NotImplementedException();
     }
@@ -237,12 +237,12 @@ public class StreamingClientDatabase<TKey, TValue>
     /// <summary>
     /// Gets if has been disposed.
     /// </summary>
-    public bool IsDisposed => m_disposed;
+    public override bool IsDisposed => m_disposed;
 
     /// <summary>
     /// Gets basic information about the current Database.
     /// </summary>
-    public DatabaseInfo Info => m_info;
+    public override DatabaseInfo Info => m_info;
 
     /// <summary>
     /// Forces a soft commit on the database. A soft commit 
@@ -250,7 +250,7 @@ public class StreamingClientDatabase<TKey, TValue>
     /// While soft committed, this data could be lost during an unexpected shutdown.
     /// Soft commits usually occur within microseconds. 
     /// </summary>
-    public void SoftCommit()
+    public override void SoftCommit()
     {
         //throw new NotImplementedException();
     }
@@ -261,7 +261,7 @@ public class StreamingClientDatabase<TKey, TValue>
     /// Hard commits can take 100ms or longer depending on how much data has to be committed. 
     /// This requires two consecutive hardware cache flushes.
     /// </summary>
-    public void HardCommit()
+    public override void HardCommit()
     {
         //throw new NotImplementedException();
     }
@@ -270,7 +270,7 @@ public class StreamingClientDatabase<TKey, TValue>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
     /// <filterpriority>2</filterpriority>
-    public void Dispose()
+    public override void Dispose()
     {
         if (!m_disposed)
         {

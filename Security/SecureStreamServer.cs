@@ -36,6 +36,8 @@ using Gemstone.Diagnostics;
 using Gemstone.GuidExtensions;
 using Gemstone.IO.StreamExtensions;
 using Gemstone.Security.Cryptography;
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto;
 #if !SQLCLR
 using SnapDB.IO.Unmanaged;
 #endif
@@ -435,7 +437,7 @@ public class SecureStreamServer<T>
 
             byte[] encryptedData = stream.ReadBytes(encryptedLength);
 
-            using Aes aes = Cipher.CreateAes();
+            using Aes aes = Aes.Create();
             aes.Key = state.ServerEncryptionkey;
             aes.IV = initializationVector;
             aes.Mode = CipherMode.CBC;
@@ -479,7 +481,7 @@ public class SecureStreamServer<T>
         userTokenBytes.CopyTo(dataToEncrypt, sessionSecret.Length);
         ticket = new byte[ticketSize];
 
-        using Aes aes = Cipher.CreateAes();
+        using Aes aes = Aes.Create();
         aes.Key = state.ServerEncryptionkey;
         aes.IV = initializationVector;
         aes.Mode = CipherMode.CBC;

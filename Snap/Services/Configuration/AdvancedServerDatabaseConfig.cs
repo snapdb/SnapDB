@@ -35,6 +35,7 @@ using Gemstone.StringExtensions;
 using Gemstone.Units;
 using SnapDB.Snap.Services.Writer;
 using SnapDB.IO;
+using SnapDB.Snap.Storage;
 
 namespace SnapDB.Snap.Services.Configuration;
 
@@ -43,8 +44,8 @@ namespace SnapDB.Snap.Services.Configuration;
 /// </summary>
 public class AdvancedServerDatabaseConfig<TKey, TValue>
     : IToServerDatabaseSettings
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     private readonly string m_mainPath;
     private string m_finalFileExtension;

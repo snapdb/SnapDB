@@ -28,6 +28,7 @@ using SnapDB.IO.FileStructure;
 using SnapDB.IO.Unmanaged;
 using SnapDB.Snap.Collection;
 using SnapDB.Snap.Services.Reader;
+using SnapDB.Snap.Tree.Specialized;
 
 namespace SnapDB.Snap.Storage;
 
@@ -37,8 +38,8 @@ namespace SnapDB.Snap.Storage;
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
 public static class SortedTreeFileSimpleWriter<TKey, TValue>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     /// <summary>
     /// Creates a new arhive file with the supplied data.

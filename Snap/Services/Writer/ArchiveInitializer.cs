@@ -26,6 +26,7 @@
 
 using Gemstone.IO;
 using SnapDB.Snap.Storage;
+using SnapDB.Snap.Types;
 using SnapDB.Threading;
 
 namespace SnapDB.Snap.Services.Writer;
@@ -34,8 +35,8 @@ namespace SnapDB.Snap.Services.Writer;
 /// Creates new archive files based on user settings.
 /// </summary>
 public class ArchiveInitializer<TKey, TValue>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     private ArchiveInitializerSettings m_settings;
     private readonly ReaderWriterLockEasy m_lock;

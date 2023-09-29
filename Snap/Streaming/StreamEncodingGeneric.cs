@@ -35,8 +35,8 @@ namespace SnapDB.Snap.Streaming;
 /// <typeparam name="TValue">The type of the value.</typeparam>
 internal class StreamEncodingGeneric<TKey, TValue>
 : StreamEncodingBase<TKey, TValue>
-where TKey : SnapTypeBaseOfT<TKey>, new()
-where TValue : SnapTypeBaseOfT<TValue>, new()
+where TKey : SnapTypeBase<TKey>, new()
+where TValue : SnapTypeBase<TValue>, new()
 {
     private readonly PairEncodingBase<TKey, TValue> m_encoding;
     private readonly TKey m_prevKey;

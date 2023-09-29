@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  WeakAction.cs - Gbtc
+//  WeakEventHandler.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -25,43 +25,6 @@
 //******************************************************************************************************
 
 namespace SnapDB.Threading;
-
-/// <summary>
-/// Provides a weak referenced action delegate. 
-/// </summary>
-public class WeakAction : WeakDelegateBase<Action>
-{
-    public WeakAction(Action target)
-        : base(target)
-    {
-    }
-
-    /// <summary>
-    /// Attempts to invoke the delegate to a weak reference object.
-    /// </summary>
-    /// <returns><c>true</c> if successful, <c>false</c> if not.</returns>
-    public bool TryInvoke()
-    {
-        return TryInvokeInternal(null);
-    }
-}
-
-/// <summary>
-/// Provides a weak referenced action delegate. 
-/// </summary>
-public class WeakAction<T> : WeakDelegateBase<Action<T>>
-{
-    public WeakAction(Action<T> target)
-        : base(target)
-    {
-    }
-
-    public bool TryInvoke(T obj)
-    {
-        return TryInvokeInternal(new object[] { obj });
-    }
-}
-
 
 /// <summary>
 /// Provides a weak referenced action delegate. 

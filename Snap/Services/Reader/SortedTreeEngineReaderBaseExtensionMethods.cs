@@ -51,56 +51,56 @@ public static class SortedTreeEngineReaderBaseExtensionMethods
 
     public static TreeStream<TKey, TValue> ReadSingleValue<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader, ulong timestamp, ulong pointID)
         where TKey : TimestampPointIDBase<TKey>, new()
-        where TValue : SnapTypeBaseOfT<TValue>, new()
+        where TValue : SnapTypeBase<TValue>, new()
     {
         return reader.Read(s_singleValueOptions, TimestampPointIDSeekFilter.FindKey<TKey>(timestamp, pointID), null);
     }
 
     public static TreeStream<TKey, TValue> Read<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader, ulong timestamp)
         where TKey : TimestampPointIDBase<TKey>, new()
-        where TValue : SnapTypeBaseOfT<TValue>, new()
+        where TValue : SnapTypeBase<TValue>, new()
     {
         return reader.Read(SortedTreeEngineReaderOptions.Default, TimestampSeekFilter.CreateFromRange<TKey>(timestamp, timestamp), null);
     }
 
     public static TreeStream<TKey, TValue> Read<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader, SeekFilterBase<TKey> timeFilter)
         where TKey : TimestampPointIDBase<TKey>, new()
-        where TValue : SnapTypeBaseOfT<TValue>, new()
+        where TValue : SnapTypeBase<TValue>, new()
     {
         return reader.Read(SortedTreeEngineReaderOptions.Default, timeFilter, null);
     }
 
     public static TreeStream<TKey, TValue> Read<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader)
         where TKey : TimestampPointIDBase<TKey>, new()
-        where TValue : SnapTypeBaseOfT<TValue>, new()
+        where TValue : SnapTypeBase<TValue>, new()
     {
         return reader.Read(SortedTreeEngineReaderOptions.Default, null, null);
     }
 
     public static TreeStream<TKey, TValue> Read<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader, ulong firstTime, ulong lastTime)
         where TKey : TimestampPointIDBase<TKey>, new()
-        where TValue : SnapTypeBaseOfT<TValue>, new()
+        where TValue : SnapTypeBase<TValue>, new()
     {
         return reader.Read(SortedTreeEngineReaderOptions.Default, TimestampSeekFilter.CreateFromRange<TKey>(firstTime, lastTime), null);
     }
 
     public static TreeStream<TKey, TValue> Read<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader, ulong firstTime, ulong lastTime, IEnumerable<ulong> pointIds)
         where TKey : TimestampPointIDBase<TKey>, new()
-        where TValue : SnapTypeBaseOfT<TValue>, new()
+        where TValue : SnapTypeBase<TValue>, new()
     {
         return reader.Read(SortedTreeEngineReaderOptions.Default, TimestampSeekFilter.CreateFromRange<TKey>(firstTime, lastTime), PointIdMatchFilter.CreateFromList<TKey, TValue>(pointIds.ToList()));
     }
 
     public static TreeStream<TKey, TValue> Read<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader, DateTime firstTime, DateTime lastTime, IEnumerable<ulong> pointIds)
         where TKey : TimestampPointIDBase<TKey>, new()
-        where TValue : SnapTypeBaseOfT<TValue>, new()
+        where TValue : SnapTypeBase<TValue>, new()
     {
         return reader.Read(SortedTreeEngineReaderOptions.Default, TimestampSeekFilter.CreateFromRange<TKey>(firstTime, lastTime), PointIdMatchFilter.CreateFromList<TKey, TValue>(pointIds.ToList()));
     }
 
     public static TreeStream<TKey, TValue> Read<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader, SeekFilterBase<TKey> key1, IEnumerable<ulong> pointIds)
         where TKey : TimestampPointIDBase<TKey>, new()
-        where TValue : SnapTypeBaseOfT<TValue>, new()
+        where TValue : SnapTypeBase<TValue>, new()
     {
         return reader.Read(SortedTreeEngineReaderOptions.Default, key1, PointIdMatchFilter.CreateFromList<TKey, TValue>(pointIds.ToList()));
     }

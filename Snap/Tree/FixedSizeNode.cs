@@ -37,8 +37,8 @@ namespace SnapDB.Snap.Tree;
 /// <typeparam name="TValue"></typeparam>
 public unsafe class FixedSizeNode<TKey, TValue>
     : SortedTreeNodeBase<TKey, TValue>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     private int m_maxRecordsPerNode;
     private readonly PairEncodingBase<TKey, TValue> m_encoding;

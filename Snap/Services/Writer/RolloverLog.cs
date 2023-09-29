@@ -39,7 +39,7 @@ public class RolloverLog
     /// </summary>
     /// <param name="settings">the settings</param>
     /// <param name="list">the list</param>
-    public RolloverLog(RolloverLogSettings settings, ArchiveListOfT list)
+    public RolloverLog(RolloverLogSettings settings, ArchiveList list)
     {
         m_settings = settings.CloneReadonly();
         m_settings.Validate();

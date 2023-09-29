@@ -111,7 +111,7 @@ internal unsafe class DiskIoSession : IDisposable
     }
 
     /// <summary>
-    /// Gets if the block in this IO Session is valid.
+    /// Gets if the block in this I/O Session is valid.
     /// </summary>
     public bool IsValid
     {
@@ -166,9 +166,9 @@ internal unsafe class DiskIoSession : IDisposable
     /// Navigates to a block that will be written to. 
     /// This class does not check if overwriting an existing block. So be careful not to corrupt the file.
     /// </summary>
-    /// <param name="blockIndex">the index value of this block.</param>
-    /// <param name="blockType">the type of this block.</param>
-    /// <param name="indexValue">a value put in the footer of the block designating the index of this block.</param>
+    /// <param name="blockIndex">The index value of this block.</param>
+    /// <param name="blockType">The type of this block.</param>
+    /// <param name="indexValue">A value put in the footer of the block designating the index of this block.</param>
     /// <remarks>This function will increase the size of the file if the block excedes the current size of the file.</remarks>
     public void WriteToNewBlock(uint blockIndex, BlockType blockType, uint indexValue)
     {

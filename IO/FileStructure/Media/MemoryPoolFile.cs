@@ -138,8 +138,8 @@ internal partial class MemoryPoolFile
     /// <summary>
     /// Changes the sharing mode of the current file or resource.
     /// </summary>
-    /// <param name="isReadOnly">Specifies whether the file/resource should be treated as read-only.</param>
-    /// <param name="isSharingEnabled">Specifies whether sharing of the file/resource should be enabled.</param>
+    /// <param name="isReadOnly">Specifies whether the file or resource should be treated as read-only.</param>
+    /// <param name="isSharingEnabled">Specifies whether sharing of the file or resource should be enabled.</param>
     /// <remarks>
     /// This method allows you to modify read-only and sharing settings for the current file or resource.
     /// By providing the <paramref name="isReadOnly"/> and <paramref name="isSharingEnabled"/> parameters,

@@ -58,7 +58,7 @@ internal partial class PageReplacementAlgorithm
     private readonly PageList m_pageList;
 
     /// <summary>
-    /// Contains the currently active IO sessions.
+    /// Contains the currently active I/O sessions.
     /// </summary>
     private readonly WeakList<PageLock> m_arrayIndexLocks;
 
@@ -122,7 +122,7 @@ internal partial class PageReplacementAlgorithm
     /// <param name="position">The absolute position that the page references</param>
     /// <param name="locationOfPage">The pointer to the page</param>
     /// <param name="memoryPoolIndex">The index value of the memory pool page so it can be released back to the memory pool.</param>
-    /// <returns>True if the page was added to the class. False if the page already exists and the data was not replaced.</returns>
+    /// <returns><c>true</c> if the page was added to the class; <c>false</c> if the page already exists and the data was not replaced.</returns>
     public bool TryAddPage(long position, IntPtr locationOfPage, int memoryPoolIndex)
     {
         lock (m_syncRoot)

@@ -36,8 +36,8 @@ namespace SnapDB.Snap.Encoding;
 /// <typeparam name="TValue"></typeparam>
 internal class PairEncodingGeneric<TKey, TValue>
     : PairEncodingBase<TKey, TValue>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     private readonly EncodingDefinition m_encodingMethod;
     private readonly IndividualEncodingBase<TKey> m_keyEncoding;

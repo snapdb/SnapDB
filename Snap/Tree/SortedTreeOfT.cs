@@ -39,8 +39,8 @@ namespace SnapDB.Snap.Tree;
 /// Trees cannot be cloned if the user plans to write to the tree.
 /// </remarks>
 public class SortedTree<TKey, TValue>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
 

@@ -39,10 +39,10 @@ namespace SnapDB.Snap.Services;
 /// Manages the complete list of archive resources and the 
 /// associated reading and writing that goes along with it.
 /// </summary>
-public partial class ArchiveListOfT<TKey, TValue>
+public partial class ArchiveList<TKey, TValue>
     : ArchiveList
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     private bool m_disposed;
     private readonly object m_syncRoot;
@@ -75,7 +75,7 @@ public partial class ArchiveListOfT<TKey, TValue>
     /// Creates an ArchiveList
     /// </summary>
     /// <param name="settings">The settings for the archive list. Null will revert to a default setting.</param>
-    public ArchiveListOfT(ArchiveListSettings settings = null)
+    public ArchiveList(ArchiveListSettings settings = null)
     {
         if (settings is null)
             settings = new ArchiveListSettings();
@@ -92,7 +92,7 @@ public partial class ArchiveListOfT<TKey, TValue>
         m_processRemovals = new ScheduledTask(ThreadingMode.DedicatedBackground);
         m_processRemovals.Running += ProcessRemovals_Running;
         m_processRemovals.Disposing += ProcessRemovals_Disposing;
-        m_processRemovals.UnhandledException += ProcessRemovals_UnhandledException;
+        //m_processRemovals.UnhandledException += ProcessRemovals_UnhandledException;
 
         AttachFileOrPath(m_settings.ImportPaths);
 
@@ -449,10 +449,11 @@ public partial class ArchiveListOfT<TKey, TValue>
         }
     }
 
-    private void ProcessRemovals_UnhandledException(object sender, EventArgs<Exception> e)
-    {
-        Log.Publish(MessageLevel.Error, "Unknown error encountered while removing archive files.", null, null, e.Argument);
-    }
+    // TODO: JRC - think about custom exception handling messages with SafeInvoke for missing UnhandledException above
+    //private void ProcessRemovals_UnhandledException(object sender, EventArgs<Exception> e)
+    //{
+    //    Log.Publish(MessageLevel.Error, "Unknown error encountered while removing archive files.", null, null, e.Argument);
+    //}
 
     /// <summary>
     /// Releases the unmanaged resources used by the <see cref="LogSourceBase"/> object and optionally releases the managed resources.

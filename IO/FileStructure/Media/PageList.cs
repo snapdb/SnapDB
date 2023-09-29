@@ -43,7 +43,7 @@ internal sealed unsafe class PageList
     #region [ Members ]
 
     /// <summary>
-    /// The internal data stored about each page. This is address information, Position information
+    /// The internal data stored about each page. This is address information and position information
     /// </summary>
     private struct InternalPageMetaData
     {
@@ -71,7 +71,7 @@ internal sealed unsafe class PageList
 
     /// <summary>
     /// Contains all of the pages that are cached for the file stream.
-    /// Map is PositionIndex,PageIndex
+    /// Map is PositionIndex and PageIndex
     /// </summary>
     private readonly SortedList<int, int> m_pageIndexLookupByPositionIndex;
 
@@ -182,19 +182,13 @@ internal sealed unsafe class PageList
             long newValue = metaData.ReferencedCount + (long)incrementReferencedCount;
 
             if (newValue > int.MaxValue)
-            {
                 metaData.ReferencedCount = int.MaxValue;
-            }
 
-            else if (newValue < 0)
-            {
+            if (newValue < 0)
                 metaData.ReferencedCount = 0;
-            }
 
             else
-            {
                 metaData.ReferencedCount = (int)newValue;
-            }
 
             m_listOfPages.OverwriteValue(pageIndex, metaData);
         }

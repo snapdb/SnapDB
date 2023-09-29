@@ -27,6 +27,7 @@
 using Gemstone;
 using Gemstone.Diagnostics;
 using Gemstone.Threading;
+using SnapDB.Snap.Services.Reader;
 using SnapDB.Snap.Storage;
 using SnapDB.Threading;
 
@@ -37,8 +38,8 @@ namespace SnapDB.Snap.Services.Writer;
 /// </summary>
 public class FirstStageWriter<TKey, TValue>
     : DisposableLoggingClassBase
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     /// <summary>
     /// Event that notifies that a certain sequence number has been committed.
@@ -60,7 +61,7 @@ public class FirstStageWriter<TKey, TValue>
     private readonly ScheduledTask m_rolloverTask;
     private readonly object m_syncRoot;
     private readonly SafeManualResetEvent m_rolloverComplete;
-    private readonly ArchiveListOfT<TKey, TValue> m_list;
+    private readonly ArchiveList<TKey, TValue> m_list;
     private List<SortedTreeTable<TKey, TValue>> m_pendingTables1;
     private List<SortedTreeTable<TKey, TValue>> m_pendingTables2;
     private List<SortedTreeTable<TKey, TValue>> m_pendingTables3;
@@ -69,7 +70,7 @@ public class FirstStageWriter<TKey, TValue>
     /// <summary>
     /// Creates a stage writer.
     /// </summary>
-    public FirstStageWriter(FirstStageWriterSettings settings, ArchiveListOfT<TKey, TValue> list)
+    public FirstStageWriter(FirstStageWriterSettings settings, ArchiveList<TKey, TValue> list)
         : base(MessageClass.Framework)
     {
         if (settings is null)
@@ -85,7 +86,7 @@ public class FirstStageWriter<TKey, TValue>
         m_syncRoot = new object();
         m_rolloverTask = new ScheduledTask(ThreadingMode.DedicatedForeground, ThreadPriority.Normal);
         m_rolloverTask.Running += RolloverTask_Running;
-        m_rolloverTask.UnhandledException += OnProcessException;
+        //m_rolloverTask.UnhandledException += OnProcessException;
     }
 
     /// <summary>
@@ -399,8 +400,9 @@ public class FirstStageWriter<TKey, TValue>
         }
     }
 
-    private void OnProcessException(object sender, EventArgs<Exception> e)
-    {
-        Log.Publish(MessageLevel.Critical, "Unhandled exception", "The worker thread threw an unhandled exception", null, e.Argument);
-    }
+    // TODO: JRC - think about custom exception handling messages with SafeInvoke for missing UnhandledException above
+    //private void OnProcessException(object sender, EventArgs<Exception> e)
+    //{
+    //    Log.Publish(MessageLevel.Critical, "Unhandled exception", "The worker thread threw an unhandled exception", null, e.Argument);
+    //}
 }

@@ -35,8 +35,8 @@ namespace SnapDB.Snap.Encoding;
 /// <typeparam name="TValue">The type to use as the value</typeparam>
 internal class PairEncodingFixedSize<TKey, TValue>
     : PairEncodingBase<TKey, TValue>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     private readonly int m_keySize;
     private readonly int m_valueSize;

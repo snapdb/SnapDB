@@ -33,12 +33,14 @@ namespace SnapDB.IO.FileStructure.Media;
 /// Since exceptions are very expensive, this enum will be returned for basic
 /// I/O operations to let the reader know what to do with the data.  
 /// </summary>
-/// <remarks>There two overarching conditions.  Valid or not Valid.  
+/// <remarks>
+/// There two overarching conditions.  Valid or not Valid.  
 /// If not valid, the reason why the page failed will be given.
 /// If a page is returned as valid, this does not mean that the 
 /// page being referenced is the correct page, it is up to the class
 /// to check the footer of the page to verify that the page being read
-/// is the correct page.</remarks>
+/// is the correct page.
+/// </remarks>
 internal enum IoReadState
 {
     /// <summary>
@@ -138,9 +140,7 @@ internal static unsafe class Footer
             throw new ArgumentException("Length is not a multiple of the block size", nameof(length));
 
         for (int offset = 0; offset < length; offset += blockSize)
-        {
             WriteChecksumResultsToFooter(data + offset, blockSize);
-        }
     }
 
     /// <summary>

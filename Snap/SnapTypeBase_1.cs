@@ -48,9 +48,9 @@ namespace SnapDB.Snap;
 /// <see cref="SnapTypeCustomMethods{T}"/> that overrides 
 /// the <see cref="SnapTypeCustomMethods{T}.BinarySearch"/> method.
 /// </remarks>
-public abstract class SnapTypeBaseOfT<T>
+public abstract class SnapTypeBase<T>
     : SnapTypeBase, IComparable<T>, IEquatable<T>, IComparer<T>
-    where T : SnapTypeBaseOfT<T>, new()
+    where T : SnapTypeBase<T>, new()
 {
     /// <summary>
     /// Copies the source to the destination

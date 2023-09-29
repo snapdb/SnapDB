@@ -33,7 +33,7 @@ namespace SnapDB.Snap.Tree;
 /// Contains information on how to parse the index nodes of the SortedTree
 /// </summary>
 public sealed class SparseIndex<TKey>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TKey : SnapTypeBase<TKey>, new()
 {
     #region [ Members ]
 

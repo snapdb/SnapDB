@@ -55,8 +55,8 @@ public abstract class KeyValueMethods
 /// <typeparam name="TValue"></typeparam>
 public class KeyValueMethods<TKey, TValue>
     : KeyValueMethods
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     /// <summary>
     /// Copies the source values to the destination.

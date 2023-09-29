@@ -37,8 +37,8 @@ namespace SnapDB.Snap.Tree;
 /// <typeparam name="TValue">The type of values associated with the keys in the sorted tree.</typeparam>
 public unsafe class GenericEncodedNodeScanner<TKey, TValue>
         : SortedTreeScannerBase<TKey, TValue>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     private readonly PairEncodingBase<TKey, TValue> m_encoding;
     private readonly TKey m_prevKey;
@@ -83,7 +83,7 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
         IndexOfNextKeyValue++;
     }
 
-    protected bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue> filter)
+    protected override bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue> filter)
     {
     TryAgain:
         byte* stream = Pointer + m_nextOffset;
@@ -119,7 +119,7 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
         return false;
     }
 
-    protected bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue> filter)
+    protected override bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue> filter)
     {
     TryAgain:
 

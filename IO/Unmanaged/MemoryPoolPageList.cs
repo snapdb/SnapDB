@@ -109,13 +109,12 @@ internal class MemoryPoolPageList
         m_syncRoot = new object();
         PageSize = pageSize;
 
-#if SQLCLR
+        // TODO: JRC - determine if these should be added to Gemstone core:
         long totalMemory = int.MaxValue;
         long availableMemory = int.MaxValue;
-#else
-        long totalMemory = (long)Common.GetTotalPhysicalMemory();
-        long availableMemory = (long)Common.GetAvailablePhysicalMemory();
-#endif
+
+        //long totalMemory = (long)Common.GetTotalPhysicalMemory();
+        //long availableMemory = (long)Common.GetAvailablePhysicalMemory();
 
         if (!Environment.Is64BitProcess)
         {

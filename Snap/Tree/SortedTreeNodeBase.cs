@@ -37,8 +37,8 @@ namespace SnapDB.Snap.Tree;
 /// <typeparam name="TValue"></typeparam>
 public abstract partial class SortedTreeNodeBase<TKey, TValue>
     : Node<TKey>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
-    where TValue : SnapTypeBaseOfT<TValue>, new()
+    where TKey : SnapTypeBase<TKey>, new()
+    where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
 

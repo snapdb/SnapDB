@@ -24,7 +24,8 @@
 //
 //******************************************************************************************************
 
-using System.Numerics;
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Math;
 using System.Text;
 
 namespace SnapDB.Security.Authentication;

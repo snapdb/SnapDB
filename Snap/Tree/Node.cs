@@ -33,7 +33,7 @@ namespace SnapDB.Snap.Tree;
 /// </summary>
 /// <typeparam name="TKey">The key that the SortedTree contains.</typeparam>
 public unsafe class Node<TKey>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TKey : SnapTypeBase<TKey>, new()
 {
     /// <summary>
     /// Occurs when the node index is changed or cleared.

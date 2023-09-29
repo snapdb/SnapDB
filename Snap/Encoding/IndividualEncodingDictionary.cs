@@ -74,7 +74,7 @@ internal class IndividualEncodingDictionary
     /// <param name="encoding">an output if the encoding method exists.</param>
     /// <returns>True if the encoding value was found, false otherwise.</returns>
     public bool TryGetEncodingMethod<TTree>(Guid encodingMethod, out IndividualEncodingDefinitionBase encoding)
-        where TTree : SnapTypeBaseOfT<TTree>, new()
+        where TTree : SnapTypeBase<TTree>, new()
     {
         Type keyType = typeof(TTree);
         lock (m_syncRoot)

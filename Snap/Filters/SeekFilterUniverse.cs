@@ -35,7 +35,7 @@ namespace SnapDB.Snap.Filters;
 /// <typeparam name="TKey"></typeparam>
 public class SeekFilterUniverse<TKey>
     : SeekFilterBase<TKey>
-    where TKey : SnapTypeBaseOfT<TKey>, new()
+    where TKey : SnapTypeBase<TKey>, new()
 {
     private bool m_isEndReached;
 

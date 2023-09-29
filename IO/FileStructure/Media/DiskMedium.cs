@@ -121,7 +121,7 @@ internal class DiskMedium
     /// This will copy any pending data to the disk in a manner that
     /// will protect against corruption.
     /// </summary>
-    /// <param name="header"></param>
+    /// <param name="header">The <see cref="FileHeaderBlock"/> containing the file header information.</param>
     public void CommitChanges(FileHeaderBlock header)
     {
         header.IsReadOnly = true;
@@ -133,7 +133,7 @@ internal class DiskMedium
     /// <summary>
     /// Creates a <see cref="BinaryStreamIoSessionBase"/> that can be used to read from this disk medium.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A <see cref="BinaryStreamIoSessionBase"/> representing the I/O session.</returns>
     public BinaryStreamIoSessionBase CreateIoSession()
     {
         return m_disk.CreateIoSession();
@@ -142,7 +142,7 @@ internal class DiskMedium
     /// <summary>
     /// Changes the extension of the current file.
     /// </summary>
-    /// <param name="extension">the new extension</param>
+    /// <param name="extension">The new extension.</param>
     /// <param name="isReadOnly">If the file should be reopened as read-only.</param>
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     public void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled)

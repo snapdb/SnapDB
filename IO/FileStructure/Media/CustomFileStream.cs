@@ -63,7 +63,7 @@ internal sealed class CustomFileStream
     private readonly ReaderWriterLockEasy m_isUsingStream = new();
 
     /// <summary>
-    /// Needed to properly synchronize Read/Write operations.
+    /// Needed to properly synchronize read and write operations.
     /// </summary>
     private readonly object m_syncRoot;
     private readonly AtomicInt64 m_length = new();
@@ -278,7 +278,7 @@ internal sealed class CustomFileStream
     /// <summary>
     /// Reads an entire page at the provided location. Also computes the checksum information.
     /// </summary>
-    /// <param name="position">The stream position. May be any position inside the desired block</param>
+    /// <param name="position">The stream position. May be any position inside the desired block.</param>
     /// <param name="locationToCopyData">The place where to write the data to.</param>
     public void Read(long position, IntPtr locationToCopyData)
     {
@@ -299,8 +299,8 @@ internal sealed class CustomFileStream
     /// <summary>
     /// Writes all of the dirty blocks passed onto the disk subsystem. Also computes the checksum for the data.
     /// </summary>
-    /// <param name="currentEndOfCommitPosition">the last valid byte of the file system where this data will be appended to.</param>
-    /// <param name="stream">the source of the data to dump to the disk.</param>
+    /// <param name="currentEndOfCommitPosition">The last valid byte of the file system where this data will be appended to.</param>
+    /// <param name="stream">The source of the data to dump to the disk.</param>
     /// <param name="length">The number by bytes to write to the file system.</param>
     /// <param name="waitForWriteToDisk">True to wait for a complete commit to disk before returning from this function.</param>
     public void Write(long currentEndOfCommitPosition, MemoryPoolStreamCore stream, long length, bool waitForWriteToDisk)
@@ -329,9 +329,7 @@ internal sealed class CustomFileStream
             m_bufferQueue.Enqueue(buffer);
 
             if (waitForWriteToDisk)
-            {
                 FlushFileBuffers();
-            }
 
             else
             {
@@ -356,8 +354,8 @@ internal sealed class CustomFileStream
     /// </summary>
     public void FlushFileBuffers()
     {
-        //.NET's stream.Flush(FlushToDisk:=true) actually doesn't do what it says. 
-        //Therefore WinApi must be called.
+        // .NET's stream.Flush(FlushToDisk:=true) actually doesn't do what it says. 
+        // Therefore WinApi must be called.
         using (m_isUsingStream.EnterReadLock())
         {
             if (m_stream is not null)

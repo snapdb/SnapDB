@@ -27,10 +27,13 @@
 //
 //******************************************************************************************************
 
+using Gemstone.ArrayExtensions;
 using Gemstone.IO.StreamExtensions;
-using Gemstone.Security.Cryptography;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Agreement.Srp;
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Math;
 using SnapDB.IO.Unmanaged;
-using System.Numerics;
 using System.Security.Cryptography;
 
 namespace SnapDB.Security.Authentication;
@@ -232,7 +235,7 @@ public class SrpServerSession
 
         byte[] ticket = new byte[1 + 16 + 8 + 16 + 2 + blockLen + 32];
 
-        using (Aes aes = Cipher.CreateAes())
+        using (Aes aes = Aes.Create())
         {
             aes.Key = user.ServerEncryptionkey;
             aes.IV = initializationVector;
@@ -320,7 +323,7 @@ public class SrpServerSession
 
             byte[] encryptedData = stream.ReadBytes(encryptedDataLength);
 
-            using (Aes aes = Cipher.CreateAes())
+            using (Aes aes = Aes.Create())
             {
                 aes.Key = user.ServerEncryptionkey;
                 aes.IV = initializationVector;

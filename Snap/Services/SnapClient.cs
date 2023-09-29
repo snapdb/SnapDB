@@ -56,8 +56,8 @@ public abstract class SnapClient
     /// <param name="databaseName">Name of database instance to access.</param>
     /// <returns><see cref="ClientDatabaseBase{TKey,TValue}"/> for given <paramref name="databaseName"/>.</returns>
     public abstract ClientDatabaseBase<TKey, TValue> GetDatabase<TKey, TValue>(string databaseName)
-        where TKey : SnapTypeBaseOfT<TKey>, new()
-        where TValue : SnapTypeBaseOfT<TValue>, new();
+        where TKey : SnapTypeBase<TKey>, new()
+        where TValue : SnapTypeBase<TValue>, new();
 
     /// <summary>
     /// Gets basic information for every database connected to the server.
