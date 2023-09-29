@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Topics>
+  <Topic id="About" visible="True" isDefault="true" isSelected="true" apiParentMode="InsertAfter" title="Gemstone GemTem Library Documentation" tocTitle="About" linkText="https://github.com/gemstone/gemtem">
+    <HelpKeywords>
+      <HelpKeyword index="K" term="welcome, getting started, root, gemstone" />
+    </HelpKeywords>
+  </Topic>
+</Topics>

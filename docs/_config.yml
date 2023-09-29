@@ -1,0 +1,9 @@
+theme: jekyll-theme-cayman
+title: Gemstone.GemTem
+description: GPA Gemstone GemTem Library
+github:
+  repository_name: gemstone/gemtem
+  owner_url: https://www.gridprotectionalliance.org
+  owner_name: Grid Protection Alliance
+plugins:
+  - jemoji

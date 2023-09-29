@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<content xml:space="preserve" xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <item id="AboutGemstoneSection"><!-- Do not make changes to this file in Gemstone Library projects, the content source is shared. -->
+<!-- The source for this file exists here: https://github.com/gemstone/shared-content  -->
+<!-- When content is updated in the shared-content repo, updates will be applied by build script. -->
+    <ddue:section xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+      <ddue:title>About the Gemstone Libraries</ddue:title>
+      <ddue:content>
+        <ddue:para>
+          The 
+          <ddue:externalLink>
+            <ddue:linkText>Gemstone Libraries</ddue:linkText>
+            <ddue:linkAlternateText>Gemstone Libraries</ddue:linkAlternateText>
+            <ddue:linkUri>https://github.com/gemstone/</ddue:linkUri>
+            <ddue:linkTarget>_blank</ddue:linkTarget>
+          </ddue:externalLink>, maintained by the 
+          <ddue:externalLink>
+            <ddue:linkText>Grid Protection Alliance</ddue:linkText>
+            <ddue:linkAlternateText>Grid Protection Alliance</ddue:linkAlternateText>
+            <ddue:linkUri>https://gridprotectionalliance.org/</ddue:linkUri>
+            <ddue:linkTarget>_blank</ddue:linkTarget>
+          </ddue:externalLink> (GPA), are a large collection of useful open source .NET code based on
+          <ddue:externalLink>
+            <ddue:linkText>continuous development since 2004</ddue:linkText>
+            <ddue:linkAlternateText>Grid Solutions Framework Contributions</ddue:linkAlternateText>
+            <ddue:linkUri>https://github.com/GridProtectionAlliance/gsf/graphs/contributors</ddue:linkUri>
+            <ddue:linkTarget>_blank</ddue:linkTarget>
+          </ddue:externalLink>.
+        </ddue:para>
+        <ddue:para>
+          These libraries represent a focused re-envisioning of the best code, i.e., the "gems", from the
+          <ddue:externalLink>
+            <ddue:linkText>Grid Solutions Framework</ddue:linkText>
+            <ddue:linkAlternateText>Grid Solutions Framework</ddue:linkAlternateText>
+            <ddue:linkUri>https://github.com/GridProtectionAlliance/gsf/</ddue:linkUri>
+            <ddue:linkTarget>_blank</ddue:linkTarget>
+          </ddue:externalLink>
+          (GSF), which has long been in use by various open source projects and electric power utilities worldwide.
+        </ddue:para>
+        <ddue:para>
+          The Gemstone Libraries contain a large variety of code useful for any .NET project with of hundreds of class libraries that extend or expand the functionality provided with .NET,
+          including many tools and protocol parsers that are useful for the electric power industry. Below are a few of the more commonly used Gemstone libraries:
+        </ddue:para>
+        <ddue:list class="bullet">
+          <ddue:listItem>
+            <ddue:para>
+              <ddue:legacyBold>
+                <ddue:externalLink>
+                  <ddue:linkText>Gemstone.Common</ddue:linkText>
+                  <ddue:linkAlternateText>Gemstone.Common</ddue:linkAlternateText>
+                  <ddue:linkUri>https://gemstone.github.io/common/</ddue:linkUri>
+                  <ddue:linkTarget>_blank</ddue:linkTarget>
+                </ddue:externalLink>               
+              </ddue:legacyBold>
+              organizes all Gemstone functionality for most any .NET coding.
+            </ddue:para>
+          </ddue:listItem>
+          <ddue:listItem>
+            <ddue:para>
+              <ddue:legacyBold>
+                <ddue:externalLink>
+                  <ddue:linkText>Gemstone.Communication</ddue:linkText>
+                  <ddue:linkAlternateText>Gemstone.Communication</ddue:linkAlternateText>
+                  <ddue:linkUri>https://gemstone.github.io/communication/</ddue:linkUri>
+                  <ddue:linkTarget>_blank</ddue:linkTarget>
+                </ddue:externalLink>               
+              </ddue:legacyBold>
+              organizes all Gemstone functionality related to communication functionality, e.g., sockets and serial ports.
+            </ddue:para>
+          </ddue:listItem>
+          <ddue:listItem>
+            <ddue:para>
+              <ddue:legacyBold>
+                <ddue:externalLink>
+                  <ddue:linkText>Gemstone.Configuration</ddue:linkText>
+                  <ddue:linkAlternateText>Gemstone.Configuration</ddue:linkAlternateText>
+                  <ddue:linkUri>https://gemstone.github.io/configuration/</ddue:linkUri>
+                  <ddue:linkTarget>_blank</ddue:linkTarget>
+                </ddue:externalLink>               
+              </ddue:legacyBold>
+              organizes all Gemstone functionality related to application configuration and settings.
+            </ddue:para>
+          </ddue:listItem>
+          <ddue:listItem>
+            <ddue:para>
+              <ddue:legacyBold>
+                <ddue:externalLink>
+                  <ddue:linkText>Gemstone.Data</ddue:linkText>
+                  <ddue:linkAlternateText>Gemstone.Data</ddue:linkAlternateText>
+                  <ddue:linkUri>https://gemstone.github.io/data/</ddue:linkUri>
+                  <ddue:linkTarget>_blank</ddue:linkTarget>
+                </ddue:externalLink>               
+              </ddue:legacyBold>
+              organizes all Gemstone functionality related to database operations.
+            </ddue:para>
+          </ddue:listItem>
+          <ddue:listItem>
+            <ddue:para>
+              <ddue:legacyBold>
+                <ddue:externalLink>
+                  <ddue:linkText>Gemstone.Diagnostics</ddue:linkText>
+                  <ddue:linkAlternateText>Gemstone.Diagnostics</ddue:linkAlternateText>
+                  <ddue:linkUri>https://gemstone.github.io/diagnostics/</ddue:linkUri>
+                  <ddue:linkTarget>_blank</ddue:linkTarget>
+                </ddue:externalLink>               
+              </ddue:legacyBold>
+              organizes all Gemstone functionality related to application diagnostics.
+            </ddue:para>
+          </ddue:listItem>
+          <ddue:listItem>
+            <ddue:para>
+              <ddue:legacyBold>
+                <ddue:externalLink>
+                  <ddue:linkText>Gemstone.Expressions</ddue:linkText>
+                  <ddue:linkAlternateText>Gemstone.Expressions</ddue:linkAlternateText>
+                  <ddue:linkUri>https://gemstone.github.io/expressions/</ddue:linkUri>
+                  <ddue:linkTarget>_blank</ddue:linkTarget>
+                </ddue:externalLink>
+              </ddue:legacyBold>
+              organizes all Gemstone functionality related to expressions and expression parsing.
+            </ddue:para>
+          </ddue:listItem>
+          <ddue:listItem>
+            <ddue:para>
+              <ddue:legacyBold>
+                <ddue:externalLink>
+                  <ddue:linkText>Gemstone.IO</ddue:linkText>
+                  <ddue:linkAlternateText>Gemstone.IO</ddue:linkAlternateText>
+                  <ddue:linkUri>https://gemstone.github.io/io/</ddue:linkUri>
+                  <ddue:linkTarget>_blank</ddue:linkTarget>
+                </ddue:externalLink>               
+              </ddue:legacyBold>
+              organizes all Gemstone functionality related to input and output (IO).
+            </ddue:para>
+          </ddue:listItem>          
+          <ddue:listItem>
+            <ddue:para>
+              <ddue:legacyBold>
+                <ddue:externalLink>
+                  <ddue:linkText>Gemstone.Numeric</ddue:linkText>
+                  <ddue:linkAlternateText>Gemstone.Numeric</ddue:linkAlternateText>
+                  <ddue:linkUri>https://gemstone.github.io/numeric/</ddue:linkUri>
+                  <ddue:linkTarget>_blank</ddue:linkTarget>
+                </ddue:externalLink>               
+              </ddue:legacyBold>
+              organizes all Gemstone functionality related to numeric functionality.
+            </ddue:para>
+          </ddue:listItem>
+          <ddue:listItem>
+            <ddue:para>
+              <ddue:legacyBold>
+                <ddue:externalLink>
+                  <ddue:linkText>Gemstone.Security</ddue:linkText>
+                  <ddue:linkAlternateText>Gemstone.Security</ddue:linkAlternateText>
+                  <ddue:linkUri>https://gemstone.github.io/security/</ddue:linkUri>
+                  <ddue:linkTarget>_blank</ddue:linkTarget>
+                </ddue:externalLink>               
+              </ddue:legacyBold>
+              organizes all Gemstone functionality related to security.
+            </ddue:para>
+          </ddue:listItem>
+          <ddue:listItem>
+            <ddue:para>
+              <ddue:legacyBold>
+                <ddue:externalLink>
+                  <ddue:linkText>Gemstone.Timeseries</ddue:linkText>
+                  <ddue:linkAlternateText>Gemstone.Timeseries</ddue:linkAlternateText>
+                  <ddue:linkUri>https://gemstone.github.io/timeseries/</ddue:linkUri>
+                  <ddue:linkTarget>_blank</ddue:linkTarget>
+                </ddue:externalLink>               
+              </ddue:legacyBold>
+              organizes all Gemstone functionality related to timeseries functionality.
+            </ddue:para>
+          </ddue:listItem>
+          <ddue:listItem>
+            <ddue:para>
+              <ddue:legacyBold>
+                <ddue:externalLink>
+                  <ddue:linkText>Gemstone.Web</ddue:linkText>
+                  <ddue:linkAlternateText>Gemstone.Web</ddue:linkAlternateText>
+                  <ddue:linkUri>https://gemstone.github.io/web/</ddue:linkUri>
+                  <ddue:linkTarget>_blank</ddue:linkTarget>
+                </ddue:externalLink>               
+              </ddue:legacyBold>
+              organizes all Gemstone functionality related to web operations.
+            </ddue:para>
+          </ddue:listItem>
+          <ddue:listItem>
+            <ddue:para>
+              <ddue:legacyBold>
+                <ddue:externalLink>
+                  <ddue:linkText>Gemstone.PhasorProtocols</ddue:linkText>
+                  <ddue:linkAlternateText>Gemstone.PhasorProtocols</ddue:linkAlternateText>
+                  <ddue:linkUri>https://gemstone.github.io/phasor-protocols/</ddue:linkUri>
+                  <ddue:linkTarget>_blank</ddue:linkTarget>
+                </ddue:externalLink>               
+              </ddue:legacyBold>
+              organizes all Gemstone functionality related to the parsing and generation of synchrophasor protocols.
+            </ddue:para>
+          </ddue:listItem>
+          <ddue:listItem>
+            <ddue:para>
+              <ddue:legacyBold>
+                <ddue:externalLink>
+                  <ddue:linkText>Gemstone.PQDIF</ddue:linkText>
+                  <ddue:linkAlternateText>Gemstone.PQDIF</ddue:linkAlternateText>
+                  <ddue:linkUri>https://gemstone.github.io/pqdif/</ddue:linkUri>
+                  <ddue:linkTarget>_blank</ddue:linkTarget>
+                </ddue:externalLink>               
+              </ddue:legacyBold>
+              organizes all Gemstone functionality related to the parsing of PQDIF files.
+            </ddue:para>
+          </ddue:listItem>
+          <ddue:listItem>
+            <ddue:para>
+              <ddue:legacyBold>
+                <ddue:externalLink>
+                  <ddue:linkText>Gemstone.COMTRADE</ddue:linkText>
+                  <ddue:linkAlternateText>Gemstone.COMTRADE</ddue:linkAlternateText>
+                  <ddue:linkUri>https://gemstone.github.io/comtrade/</ddue:linkUri>
+                  <ddue:linkTarget>_blank</ddue:linkTarget>
+                </ddue:externalLink>               
+              </ddue:legacyBold>
+              organizes all Gemstone functionality related to the parsing and generation of COMTRADE files.
+            </ddue:para>
+          </ddue:listItem>
+        </ddue:list>
+      </ddue:content>
+    </ddue:section></item>
+  <item id="SHFB"><ddue:externalLink xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+    <ddue:linkText>Sandcastle Help File Builder</ddue:linkText>
+    <ddue:linkUri>https://GitHub.com/EWSoftware/SHFB</ddue:linkUri>
+    </ddue:externalLink></item>
+</content>

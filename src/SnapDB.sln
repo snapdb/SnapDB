@@ -3,21 +3,60 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34024.191
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnapDB", "SnapDB.csproj", "{AB3102F3-053C-4505-928D-C90078B6FE03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapDB", "SnapDB\SnapDB.csproj", "{AB3102F3-053C-4505-928D-C90078B6FE03}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{5D08D933-6481-4890-80E9-DB8522DDE3B0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{FB2D68F7-E6B1-4A7E-8B90-9D472CEFB887}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\README.md = ..\docs\README.md
+	EndProjectSection
+EndProject
+Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "docgen", "DocGen\docgen.shfbproj", "{E0CCFF2A-C2DF-436C-B34C-A20215DA227A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit Tests", "Unit Tests", "{72BFFD41-57CE-46E7-A81B-9E5F605EF8BE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapDB.UnitTests", "UnitTests\SnapDB.UnitTests.csproj", "{AF7B7022-7F26-4EEE-AECA-81D3C9ECA505}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A6B5DDFD-6F58-43AA-B1FC-D5CCEC868A05}"
+	ProjectSection(SolutionItems) = preProject
+		..\.gitignore = ..\.gitignore
+		..\LICENSE = ..\LICENSE
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Development|Any CPU = Development|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{AB3102F3-053C-4505-928D-C90078B6FE03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AB3102F3-053C-4505-928D-C90078B6FE03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB3102F3-053C-4505-928D-C90078B6FE03}.Development|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB3102F3-053C-4505-928D-C90078B6FE03}.Development|Any CPU.Build.0 = Debug|Any CPU
 		{AB3102F3-053C-4505-928D-C90078B6FE03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB3102F3-053C-4505-928D-C90078B6FE03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0CCFF2A-C2DF-436C-B34C-A20215DA227A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0CCFF2A-C2DF-436C-B34C-A20215DA227A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0CCFF2A-C2DF-436C-B34C-A20215DA227A}.Development|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0CCFF2A-C2DF-436C-B34C-A20215DA227A}.Development|Any CPU.Build.0 = Debug|Any CPU
+		{E0CCFF2A-C2DF-436C-B34C-A20215DA227A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0CCFF2A-C2DF-436C-B34C-A20215DA227A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF7B7022-7F26-4EEE-AECA-81D3C9ECA505}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF7B7022-7F26-4EEE-AECA-81D3C9ECA505}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF7B7022-7F26-4EEE-AECA-81D3C9ECA505}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{AF7B7022-7F26-4EEE-AECA-81D3C9ECA505}.Development|Any CPU.Build.0 = Development|Any CPU
+		{AF7B7022-7F26-4EEE-AECA-81D3C9ECA505}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF7B7022-7F26-4EEE-AECA-81D3C9ECA505}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AB3102F3-053C-4505-928D-C90078B6FE03} = {5D08D933-6481-4890-80E9-DB8522DDE3B0}
+		{E0CCFF2A-C2DF-436C-B34C-A20215DA227A} = {FB2D68F7-E6B1-4A7E-8B90-9D472CEFB887}
+		{AF7B7022-7F26-4EEE-AECA-81D3C9ECA505} = {72BFFD41-57CE-46E7-A81B-9E5F605EF8BE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7E46A9C7-6A36-42E7-B47C-083F3F9F5373}
