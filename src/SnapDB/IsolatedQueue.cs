@@ -53,7 +53,7 @@ public class IsolatedQueue<T>
         /// <summary>
         /// Creates a <see cref="IsolatedNode"/>
         /// </summary>
-        /// <param name="count">the number of items in each node.</param>
+        /// <param name="count">The number of items in each node.</param>
         public IsolatedNode(int count)
         {
             m_tail = 0;
@@ -204,7 +204,7 @@ public class IsolatedQueue<T>
                 return false;
             }
         }
-        else if (m_currentTail.DequeueMustMoveToNextNode)
+        if (m_currentTail.DequeueMustMoveToNextNode)
         {
             if (!m_blocks.TryDequeue(out m_currentTail))
             {

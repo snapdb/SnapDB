@@ -29,7 +29,7 @@ using System.Collections;
 namespace SnapDB.Immutables;
 
 /// <summary>
-/// A list that can be modified until <see cref="ImmutableObjectBase{T}.IsReadOnly"/> is set to true. Once this occurs,
+/// A list that can be modified until <see cref="ImmutableObjectBase{T}.IsReadOnly"/> is set to <c>true</c>. Once this occurs,
 /// the list itself can no longer be modified.  Remember, this does not cause objects contained in this class to be Immutable 
 /// unless they implement <see cref="IImmutableObject"/>.
 /// </summary>
@@ -93,7 +93,7 @@ public class ImmutableList<T>
     /// </summary>
     /// <param name="collection">
     /// The collection whose elements should be added to the end of the <see cref="T:System.Collections.Generic.List`1"/>. 
-    /// The collection itself cannot be null, but it can contain elements that are null.
+    /// The collection itself cannot be <c>null</c>, but it can contain elements that are <c>null</c>.
     /// </param>
     public void AddRange(IEnumerable<T?> collection)
     {

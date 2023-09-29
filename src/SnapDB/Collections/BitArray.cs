@@ -67,8 +67,7 @@ public sealed class BitArray
     /// Initializes <see cref="BitArray"/>.
     /// </summary>
     /// <param name="initialState">
-    /// If this is set to <c>true</c>, all elements will be set. 
-    /// If it is set to <c>false</c>, all elements will be cleared.
+    /// If this is set to <c>true</c>, all elements will be set; if <c>false</c>, all elements will be cleared.
     /// </param>
     /// <param name="count">The number of bit positions to support.</param>
     public BitArray(bool initialState, int count = BitsPerElement)

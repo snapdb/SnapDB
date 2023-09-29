@@ -89,6 +89,7 @@ public static class Number
 
         // Do the rounding
         double fraction = scaled - number;
+
         if (fraction >= 0.5)
         {
             // Round
@@ -154,6 +155,7 @@ public static class Number
 
                 if (value >= Digits9)
                     return 9;
+
                 return 8;
             }
 
@@ -254,7 +256,8 @@ public static class Number
                 wstr--;
                 value = temp;
 
-            } while (value != 0);
+            } 
+            while (value != 0);
 
             return digits;
         }
