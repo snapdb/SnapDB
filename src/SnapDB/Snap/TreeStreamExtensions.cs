@@ -27,32 +27,31 @@
 
 using SnapDB.Snap;
 
-namespace GSF.Snap
+namespace SnapDB.Snap;
+
+/// <summary>
+/// 
+/// </summary>
+public static class TreeStreamExtensions
 {
     /// <summary>
-    /// 
+    /// Parses an entire stream to count the number of points. Notice, this will
+    /// enumerate the list and the list will have to be reset to be enumerated again.
     /// </summary>
-    public static class TreeStreamExtensions
+    /// <typeparam name="TKey">The key type</typeparam>
+    /// <typeparam name="TValue">The value type</typeparam>
+    /// <param name="stream">The stream to enumerate</param>
+    /// <returns>the number of items in the stream.</returns>
+    public static long Count<TKey, TValue>(this TreeStream<TKey, TValue> stream)
+        where TKey : class, new()
+        where TValue : class, new()
     {
-        /// <summary>
-        /// Parses an entire stream to count the number of points. Notice, this will
-        /// enumerate the list and the list will have to be reset to be enumerated again.
-        /// </summary>
-        /// <typeparam name="TKey">The key type</typeparam>
-        /// <typeparam name="TValue">The value type</typeparam>
-        /// <param name="stream">The stream to enumerate</param>
-        /// <returns>the number of items in the stream.</returns>
-        public static long Count<TKey, TValue>(this TreeStream<TKey, TValue> stream)
-            where TKey : class, new()
-            where TValue : class, new()
-        {
-            TKey key = new TKey();
-            TValue value = new TValue();
-            long cnt = 0;
-            while (stream.Read(key, value))
-                cnt++;
-            return cnt;
-        }
-
+        TKey key = new TKey();
+        TValue value = new TValue();
+        long cnt = 0;
+        while (stream.Read(key, value))
+            cnt++;
+        return cnt;
     }
+
 }
