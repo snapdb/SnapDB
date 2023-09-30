@@ -1,8 +1,8 @@
 theme: jekyll-theme-cayman
-title: Gemstone.GemTem
-description: GPA Gemstone GemTem Library
+title: SnapDB
+description: High-performance key/value pair archiving technology
 github:
-  repository_name: gemstone/gemtem
+  repository_name: snapdb/SnapDB
   owner_url: https://www.gridprotectionalliance.org
   owner_name: Grid Protection Alliance
 plugins:
