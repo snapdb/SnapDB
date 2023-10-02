@@ -189,7 +189,14 @@ public static class Number
         return 1;
     }
 
-    public static unsafe int WriteToChars2(this uint value, char[] destination, int position)
+    /// <summary>
+    /// Writes an unsigned integer value to a character array.
+    /// </summary>
+    /// <param name="value">The uint value to be written.</param>
+    /// <param name="destination">The character array where the value will be written.</param>
+    /// <param name="position">The starting position in the character array.</param>
+    /// <returns>The number of characters written to the array.</returns>
+        public static unsafe int WriteToChars2(this uint value, char[] destination, int position)
     {
         uint temp;
         int digits;
@@ -270,7 +277,6 @@ public static class Number
         }
     }
 
-
     private static unsafe void strreverse(char* begin, char* end)
     {
         char aux;
@@ -282,7 +288,13 @@ public static class Number
         }
     }
 
-
+    /// <summary>
+    /// Writes an unsigned integer value to a character array using optimized digit extraction.
+    /// </summary>
+    /// <param name="value">The uint value to be written.</param>
+    /// <param name="destination">The character array where the value will be written.</param>
+    /// <param name="position">The starting position in the character array.</param>
+    /// <returns>The number of characters written to the array.</returns>
     public static unsafe int WriteToChars(this uint value, char[] destination, int position)
     {
         const uint Digits1 = 1;
