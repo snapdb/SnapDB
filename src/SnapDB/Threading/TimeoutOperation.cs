@@ -36,6 +36,12 @@ public class TimeoutOperation
     private ManualResetEvent m_resetEvent;
     private Action m_callback;
 
+    /// <summary>
+    /// Registers a timeout callback to be executed at specified intervals.
+    /// </summary>
+    /// <param name="interval">The time interval between callback executions.</param>
+    /// <param name="callback">The callback action to be executed.</param>
+    /// <exception cref="Exception">Thrown if a duplicate registration is attempted.</exception>
     public void RegisterTimeout(TimeSpan interval, Action callback)
     {
         lock (m_syncRoot)
@@ -55,6 +61,7 @@ public class TimeoutOperation
         {
             if (m_registeredHandle is null)
                 return;
+            
             m_registeredHandle.Unregister(null);
             m_resetEvent.Dispose();
             m_callback();
@@ -64,6 +71,9 @@ public class TimeoutOperation
         }
     }
 
+    /// <summary>
+    /// Cancels a previously registered timeout callback.
+    /// </summary>
     public void Cancel()
     {
         lock (m_syncRoot)
