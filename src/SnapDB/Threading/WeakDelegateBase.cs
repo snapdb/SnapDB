@@ -28,11 +28,19 @@ using System.Reflection;
 
 namespace SnapDB.Threading;
 
+/// <summary>
+/// Represents a base class for weak delegate wrappers with a specified delegate type.
+/// </summary>
+/// <typeparam name="T">The type constraint for the delegate.</typeparam>
 public abstract class WeakDelegateBase<T> : WeakReference
     where T : class
 {
     private readonly MethodInfo m_method;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WeakDelegateBase{T}"/> class with the specified delegate target.
+    /// </summary>
+    /// <param name="target">The delegate target.</param>
     protected WeakDelegateBase(Delegate target)
         : base(target is null ? null : target.Target)
     {
@@ -40,15 +48,26 @@ public abstract class WeakDelegateBase<T> : WeakReference
             m_method = target.Method;
     }
 
+    /// <summary>
+    /// Tries to invoke the delegate associated with this weak reference object.
+    /// </summary>
+    /// <param name="parameters">An array of parameters to pass to the delegate.</param>
+    /// <returns><c>true</c> if successful, <c>false</c> if the delegate has been garbage collected.</returns>
     protected bool TryInvokeInternal(object[] parameters)
     {
         object target = base.Target;
         if (target is null)
             return false;
+        
         m_method.Invoke(target, parameters);
         return true;
     }
 
+    /// <summary>
+    /// Determines whether the current <see cref="WeakDelegateBase{T}"/> instance is equal to another object.
+    /// </summary>
+    /// <param name="obj">The object to compare with the current instance.</param>
+    /// <returns><c>true</c> if the objects are equal; otherwise, <c>false</c>.</returns>
     public override bool Equals(object obj)
     {
         if (ReferenceEquals(this, obj))
@@ -64,6 +83,11 @@ public abstract class WeakDelegateBase<T> : WeakReference
         return false;
     }
 
+    /// <summary>
+    /// Determines whether the current <see cref="WeakDelegateBase{T}"/> instance is equal to another <see cref="WeakDelegateBase{T}"/> instance.
+    /// </summary>
+    /// <param name="obj">The <see cref="WeakDelegateBase{T}"/> instance to compare with the current instance.</param>
+    /// <returns><c>true</c> if the instances are equal; otherwise, <c>false</c>.</returns>
     protected virtual bool Equals(WeakDelegateBase<T> obj)
     {
         if (obj is null)
