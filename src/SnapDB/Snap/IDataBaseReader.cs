@@ -29,22 +29,21 @@ using SnapDB.Snap.Services.Reader;
 
 namespace SnapDB.Snap;
 
-
 /// <summary>
-/// An interface that is necessary for many of the transformations inside the SortedTreeStore to function.
+/// Represents a database reader interface for reading data from a SortedTreeEngine.
 /// </summary>
-/// <typeparam name="TKey">A key type supported by the SortedTreeStore</typeparam>
-/// <typeparam name="TValue">A value type supported by the SortedTreeStore</typeparam>
+/// <typeparam name="TKey">The type of keys in the database.</typeparam>
+/// <typeparam name="TValue">The type of values in the database.</typeparam>
 public interface IDatabaseReader<TKey, TValue> : IDisposable
     where TKey : SnapTypeBase<TKey>, new()
     where TValue : SnapTypeBase<TValue>, new()
 {
     /// <summary>
-    /// Reads data from the SortedTreeEngine with the provided read options and server side filters.
+    /// Reads data from the SortedTreeEngine with the provided read options and server-side filters.
     /// </summary>
-    /// <param name="readerOptions">read options supplied to the reader. Can be null.</param>
-    /// <param name="keySeekFilter">a seek based filter to follow. Can be null.</param>
-    /// <param name="keyMatchFilter">a match based filer to follow. Can be null.</param>
+    /// <param name="readerOptions">Read options supplied to the reader. Can be <c>null</c>.</param>
+    /// <param name="keySeekFilter">A seek-based filter to follow. Can be <c>null</c>.</param>
+    /// <param name="keyMatchFilter">A match-based filter to follow. Can be <c>null</c>.</param>
     /// <returns>A stream that will read the specified data.</returns>
     TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions readerOptions, SeekFilterBase<TKey> keySeekFilter, MatchFilterBase<TKey, TValue> keyMatchFilter);
 
