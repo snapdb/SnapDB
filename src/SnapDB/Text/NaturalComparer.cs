@@ -32,8 +32,7 @@ using System.Text.RegularExpressions;
 namespace SnapDB.Text;
 
 /// <summary>
-/// Does a sort on a string that is natural to how humans look at it. 
-/// Such as sorting numbers.
+/// Provides a natural sorting mechanism for strings, considering embedded numeric values within the strings.
 /// </summary>
 public class NaturalComparer
     : Comparer<string>
@@ -41,7 +40,7 @@ public class NaturalComparer
     private readonly Dictionary<string, string[]> m_table;
 
     /// <summary>
-    /// Creates a new <see cref="NaturalComparer"/>.
+    /// Initializes a new instance of the <see cref="NaturalComparer"/> class.
     /// </summary>
     public NaturalComparer()
     {
@@ -49,15 +48,17 @@ public class NaturalComparer
     }
 
     /// <summary>
-    /// When overridden in a derived class, performs a comparison of two objects of the same type and returns a value indicating whether one object is less than, equal to, or greater than the other.
+    /// Compares two strings using natural sorting rules.
     /// </summary>
+    /// <param name="x">The first string to compare.</param>
+    /// <param name="y">The second string to compare.</param>
     /// <returns>
     /// A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, 
-    /// as shown in the following table. Value meaning less than zero <paramref name="x"/> is less than <paramref name="y"/>.
-    /// Zero <paramref name="x"/> equals <paramref name="y"/>. Greater than zero <paramref name="x"/> is greater than <paramref name="y"/>.
+    /// as shown in the following table: 
+    /// -1 if <paramref name="x"/> is less than <paramref name="y"/>,
+    /// 0 if <paramref name="x"/> equals <paramref name="y"/>,
+    /// 1 if <paramref name="x"/> is greater than <paramref name="y"/>.
     /// </returns>
-    /// <param name="x">The first object to compare.</param>
-    /// <param name="y">The second object to compare.</param>
     public override int Compare(string x, string y)
     {
         if (x is null && y is null)
@@ -101,6 +102,18 @@ public class NaturalComparer
         }
     }
 
+    /// <summary>
+    /// Compares two string parts, handling numeric values within the strings.
+    /// </summary>
+    /// <param name="left">The left string part to compare.</param>
+    /// <param name="right">The right string part to compare.</param>
+    /// <returns>
+    /// A signed integer that indicates the relative values of <paramref name="left"/> and <paramref name="right"/>, 
+    /// as shown in the following table: 
+    /// -1 if <paramref name="left"/> is less than <paramref name="right"/>,
+    /// 0 if <paramref name="left"/> equals <paramref name="right"/>,
+    /// 1 if <paramref name="left"/> is greater than <paramref name="right"/>.
+    /// </returns>
     private static int PartCompare(string left, string right)
     {
         if (!int.TryParse(left, out int x))
