@@ -65,12 +65,14 @@ public class SynchronousEvent<T>
     {
         if (m_disposed)
             return;
+            
         if (CustomEvent != null)
         {
             m_waiting.Reset();
             Thread.MemoryBarrier();
             if (m_disposed)
                 return;
+                
             m_asyncEventHelper.Post(Callback, args);
             m_waiting.WaitOne();
         }
