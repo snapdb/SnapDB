@@ -30,7 +30,7 @@ using SnapDB.IO;
 namespace SnapDB.Snap;
 
 /// <summary>
-/// The interface that is required to use as a value in <see cref="SortedTree"/> 
+/// Represents the base class for Snap types, providing methods for serialization, comparison, and manipulation.
 /// </summary>
 public abstract class SnapTypeBase
 {
@@ -42,44 +42,47 @@ public abstract class SnapTypeBase
 
     }
     /// <summary>
-    /// The Guid uniquely defining this type. 
-    /// It is important to uniquely tie 1 type to 1 guid.
+    /// The GUID uniquely defining this type. 
+    /// It is important to uniquely tie 1 type to 1 GUID.
     /// </summary>
     public abstract Guid GenericTypeGuid { get; }
 
     /// <summary>
-    /// Gets the size of this class when serialized
+    /// Gets the size of this class when serialized.
     /// </summary>
     public abstract int Size { get; }
 
     /// <summary>
-    /// Sets the provided key to it's minimum value
+    /// Sets the provided key to it's minimum value.
     /// </summary>
     public abstract void SetMin();
 
     /// <summary>
-    /// Sets the privided key to it's maximum value
+    /// Sets the privided key to it's maximum value.
     /// </summary>
     public abstract void SetMax();
 
     /// <summary>
-    /// Clears the key
+    /// Clears the key.
     /// </summary>
     public abstract void Clear();
 
     /// <summary>
     /// Reads the provided key from the stream.
     /// </summary>
-    /// <param name="stream"></param>
+    /// <param name="stream">The stream to read from.</param>
     public abstract void Read(BinaryStreamBase stream);
 
     /// <summary>
-    /// Writes the provided data to the BinaryWriter
+    /// Writes the provided data to the BinaryWriter.
     /// </summary>
-    /// <param name="stream"></param>
+    /// <param name="stream">The stream to write to.</param>
     public abstract void Write(BinaryStreamBase stream);
-
-
+    
+    /// <summary>
+    /// Reads the provided key from the stream.
+    /// </summary>
+    /// <param name="stream">The stream to read from.</param>
     public virtual unsafe void Read(Stream stream)
     {
         byte[] data = new byte[Size];
@@ -88,6 +91,10 @@ public abstract class SnapTypeBase
             Read(lp);
     }
 
+    /// <summary>
+    /// Writes the provided key to the stream.
+    /// </summary>
+    /// <param name="stream">The stream to write to.</param>
     public virtual unsafe void Write(Stream stream)
     {
         byte[] data = new byte[Size];
@@ -97,9 +104,9 @@ public abstract class SnapTypeBase
     }
 
     /// <summary>
-    /// Reads the key from the stream
+    /// Reads the key from the stream.
     /// </summary>
-    /// <param name="stream"></param>
+    /// <param name="stream">The stream to read from.</param>
     public virtual unsafe void Read(byte* stream)
     {
         BinaryStreamPointerWrapper reader = new BinaryStreamPointerWrapper(stream, Size);
@@ -109,7 +116,7 @@ public abstract class SnapTypeBase
     /// <summary>
     /// Writes the key to the stream.
     /// </summary>
-    /// <param name="stream"></param>
+    /// <param name="stream">The stream to write to.</param>
     public virtual unsafe void Write(byte* stream)
     {
         BinaryStreamPointerWrapper writer = new BinaryStreamPointerWrapper(stream, Size);
@@ -119,8 +126,8 @@ public abstract class SnapTypeBase
     /// <summary>
     /// Executes a copy command without modifying the current class.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="destination"></param>
+    /// <param name="source">The source buffer to copy from.</param>
+    /// <param name="destination">The destination buffer to copy to.</param>
     public virtual unsafe void MethodCopy(byte* source, byte* destination)
     {
         Memory.Copy(source, destination, Size);
