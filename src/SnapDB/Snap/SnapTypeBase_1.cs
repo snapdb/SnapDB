@@ -78,31 +78,41 @@ public abstract class SnapTypeBase<T>
     }
 
     /// <summary>
-    /// Compares the current item to one written at the provided stream.
+    /// Compares the current <typeparamref name="T"/> object with the data in the provided byte stream.
     /// </summary>
-    /// <param name="stream"></param>
-    /// <returns></returns>
+    /// <param name="stream">A pointer to a byte stream containing data to compare against.</param>
+    /// <returns>
+    /// A value that indicates the relative order of the current <typeparamref name="T"/> object and the data in the stream.
+    /// - Less than zero: The current object is less than the data in the stream.
+    /// - Zero: The current object is equal to the data in the stream.
+    /// - Greater than zero: The current object is greater than the data in the stream.
+    /// </returns>
     public virtual unsafe int CompareTo(byte* stream)
     {
         T other = new T();
         other.Read(stream);
+        
         return CompareTo(other);
     }
 
     /// <summary>
-    /// Creates a class that contains the necessary methods for the SortedTree.
+    /// Creates and returns an instance of custom methods for handling values of the <typeparamref name="T"/> type.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// An instance of <see cref="SnapTypeCustomMethods{T}"/> for custom value handling.
+    /// </returns>
     public virtual SnapTypeCustomMethods<T> CreateValueMethods()
     {
         return new SnapTypeCustomMethods<T>();
     }
 
     /// <summary>
-    /// Is the current instance equal to <see cref="right"/>
+    /// Compares the current instance with another instance of the same type and determines whether they are equal.
     /// </summary>
-    /// <param name="right">the key to compare to</param>
-    /// <returns></returns>
+    /// <param name="right">The instance to compare with the current instance.</param>
+    /// <returns>
+    /// <c>true</c> if the current instance is equal to the <paramref name="right"/> instance; otherwise, <c>false</c>.
+    /// </returns>
     public virtual bool IsEqualTo(T right)
     {
         return CompareTo(right) == 0;
@@ -112,7 +122,7 @@ public abstract class SnapTypeBase<T>
     /// Indicates whether the current object is equal to another object of the same type.
     /// </summary>
     /// <returns>
-    /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+    /// <c>true</c> if the current object is equal to the <paramref name="other"/> parameter; otherwise, <c>false</c>.
     /// </returns>
     /// <param name="other">An object to compare with this object.</param>
     public virtual bool Equals(T other)
@@ -121,70 +131,83 @@ public abstract class SnapTypeBase<T>
     }
 
     /// <summary>
-    /// Gets if left != right.
+    /// Compares the current instance with another instance of the same type and determines whether they are not equal.
     /// </summary>
-    /// <param name="right"></param>
-    /// <returns></returns>
+    /// <param name="right">The instance to compare with the current instance.</param>
+    /// <returns>
+    /// <c>true</c> if the current instance is not equal to the <paramref name="right"/> instance; otherwise, <c>false</c>.
+    /// </returns>
     public virtual bool IsNotEqualTo(T right)
     {
         return CompareTo(right) != 0;
     }
 
     /// <summary>
-    /// Gets if lowerBounds &lt;= key &lt; upperBounds
+    /// Determines whether the current instance falls within a specified range defined by lower and upper bounds.
     /// </summary>
-    /// <param name="lowerBounds"></param>
-    /// <param name="upperBounds"></param>
-    /// <returns></returns>
+    /// <param name="lowerBounds">The lower bounds of the range (inclusive).</param>
+    /// <param name="upperBounds">The upper bounds of the range (exclusive).</param>
+    /// <returns>
+    /// <c>true</c> if the current instance is greater than or equal to <paramref name="lowerBounds"/> (inclusive)
+    /// and less than <paramref name="upperBounds"/> (exclusive); otherwise, <c>false</c>.
+    /// </returns>
     public virtual bool IsBetween(T lowerBounds, T upperBounds)
     {
         return lowerBounds.IsLessThanOrEqualTo((T)this) && IsLessThan(upperBounds);
     }
 
     /// <summary>
-    /// Gets if left &lt;= right.
+    /// Determines whether the current instance is less than or equal to a specified value.
     /// </summary>
-    /// <param name="right"></param>
-    /// <returns></returns>
+    /// <param name="right">The value to compare with the current instance.</param>
+    /// <returns>
+    /// <c>true</c> if the current instance is less than or equal to <paramref name="right"/>; otherwise, <c>false</c>.
+    /// </returns>
     public virtual bool IsLessThanOrEqualTo(T right)
     {
         return CompareTo(right) <= 0;
     }
 
     /// <summary>
-    /// Gets if left &lt; right.
+    /// Determines whether the current instance is less than a specified value.
     /// </summary>
-    /// <param name="right"></param>
-    /// <returns></returns>
+    /// <param name="right">The value to compare with the current instance.</param>
+    /// <returns>
+    /// <c>true</c> if the current instance is less than <paramref name="right"/>; otherwise, <c>false</c>.
+    /// </returns>
     public virtual bool IsLessThan(T right)
     {
         return CompareTo(right) < 0;
     }
 
     /// <summary>
-    /// Gets if left &gt; right.
+    /// Determines whether the current instance is greater than a specified value.
     /// </summary>
-    /// <param name="right"></param>
-    /// <returns></returns>
+    /// <param name="right">The value to compare with the current instance.</param>
+    /// <returns>
+    /// <c>true</c> if the current instance is greater than <paramref name="right"/>; otherwise, <c>false</c>.
+    /// </returns>
     public virtual bool IsGreaterThan(T right)
     {
         return CompareTo(right) > 0;
     }
 
     /// <summary>
-    /// Gets if left &gt;= right.
+    /// Determines whether the current instance is greater than or equal to a specified value.
     /// </summary>
-    /// <param name="right"></param>
-    /// <returns></returns>
+    /// <param name="right">The value to compare with the current instance.</param>
+    /// <returns>
+    /// <c>true</c> if the current instance is greater than or equal to <paramref name="right"/>; otherwise, <c>false</c>.
+    /// </returns>
     public virtual bool IsGreaterThanOrEqualTo(T right)
     {
         return CompareTo(right) >= 0;
     }
 
     /// <summary>
-    /// Creates a clone of this instance.
+    /// Creates a new instance that is a copy of the current instance.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A new instance that is a copy of the current instance.</returns>
     public virtual T Clone()
     {
         T rv = new T();
