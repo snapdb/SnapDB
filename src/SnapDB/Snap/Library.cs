@@ -210,10 +210,10 @@ public static class Library
     }
 
     /// <summary>
-    /// Gets the <see cref="SnapTypeBase"/> associated with the provided <see cref="id"/>.
+    /// Retrieves the Type associated with a given Guid identifier in the SortedTree type lookup.
     /// </summary>
-    /// <param name="id">the ID to lookup</param>
-    /// <returns></returns>
+    /// <param name="id">The unique identifier (Guid) associated with the SortedTree Type.</param>
+    /// <returns>The Type corresponding to the provided identifier.</returns>
     public static Type GetSortedTreeType(Guid id)
     {
         lock (SyncRoot)
@@ -223,11 +223,15 @@ public static class Library
     }
 
     /// <summary>
-    /// Gets a set of KeyValueMethods.
+    /// Retrieves or creates the KeyValueMethods instance for a specific TKey and TValue type combination.
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <returns></returns>
+    /// <typeparam name="TKey">The type of keys in the KeyValueMethods instance.</typeparam>
+    /// <typeparam name="TValue">The type of values in the KeyValueMethods instance.</typeparam>
+    /// <returns>A KeyValueMethods instance for the specified TKey and TValue types.</returns>
+    /// <remarks>
+    /// If an existing KeyValueMethods instance is found for the specified types, it is returned.
+    /// Otherwise, a new KeyValueMethods instance is created and returned.
+    /// </remarks>
     public static KeyValueMethods<TKey, TValue> GetKeyValueMethods<TKey, TValue>()
         where TKey : SnapTypeBase<TKey>, new()
         where TValue : SnapTypeBase<TValue>, new()
@@ -244,12 +248,12 @@ public static class Library
     }
 
     /// <summary>
-    /// Creates a stream encoding from the provided <see cref="encodingMethod"/>.
+    /// Creates a new instance of StreamEncodingBase for the specified TKey and TValue types and encoding method.
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <param name="encodingMethod">the encoding method</param>
-    /// <returns></returns>
+    /// <typeparam name="TKey">The type of keys in the StreamEncodingBase instance.</typeparam>
+    /// <typeparam name="TValue">The type of values in the StreamEncodingBase instance.</typeparam>
+    /// <param name="encodingMethod">The encoding method to use for data serialization.</param>
+    /// <returns>A new StreamEncodingBase instance configured with the specified encoding method.</returns>
     internal static StreamEncodingBase<TKey, TValue> CreateStreamEncoding<TKey, TValue>(EncodingDefinition encodingMethod)
         where TKey : SnapTypeBase<TKey>, new()
         where TValue : SnapTypeBase<TValue>, new()
@@ -257,6 +261,15 @@ public static class Library
         return new StreamEncodingGeneric<TKey, TValue>(encodingMethod);
     }
 
+    /// <summary>
+    /// Creates a new instance of SortedTreeNodeBase for the specified TKey and TValue types, encoding method, and level.
+    /// </summary>
+    /// <typeparam name="TKey">The type of keys in the SortedTreeNodeBase instance.</typeparam>
+    /// <typeparam name="TValue">The type of values in the SortedTreeNodeBase instance.</typeparam>
+    /// <param name="encodingMethod">The encoding method to use for data serialization.</param>
+    /// <param name="level">The level of the tree node in the tree hierarchy.</param>
+    /// <returns>A new SortedTreeNodeBase instance configured with the specified encoding method and level.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the encodingMethod is null.</exception>
     internal static SortedTreeNodeBase<TKey, TValue> CreateTreeNode<TKey, TValue>(EncodingDefinition encodingMethod, byte level)
         where TKey : SnapTypeBase<TKey>, new()
         where TValue : SnapTypeBase<TValue>, new()
@@ -271,8 +284,12 @@ public static class Library
     }
 
     /// <summary>
-    /// Registers the generic type with the SortedTreeStore.
+    /// Registers a SnapTypeBase derived type by associating it with a unique GUID.
     /// </summary>
+    /// <param name="snapType">The SnapTypeBase derived type to be registered.</param>
+    /// <exception cref="Exception">
+    /// Thrown when the provided SnapTypeBase type is already associated with a different GUID or when another type with the same GUID is already registered.
+    /// </exception>
     private static void Register(SnapTypeBase snapType)
     {
         Type type = snapType.GetType();
