@@ -27,9 +27,9 @@
 namespace SnapDB.Snap;
 
 /// <summary>
-/// Provides basic sorting methods that assist in UnionKeyValueStream's speed.
+/// A helper class for custom sorting of items.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">The type of items to be sorted.</typeparam>
 public class CustomSortHelper<T>
 {
     /// <summary>
@@ -42,8 +42,8 @@ public class CustomSortHelper<T>
     /// <summary>
     /// Creates a new custom sort helper and presorts the list.
     /// </summary>
-    /// <param name="items"></param>
-    /// <param name="isLessThan"></param>
+    /// <param name="items">The collection of items to be sorted.</param>
+    /// <param name="isLessThan">A function that determines if one item is less than another.</param>
     public CustomSortHelper(IEnumerable<T> items, Func<T, T, bool> isLessThan)
     {
         Items = items.ToArray();
@@ -52,10 +52,10 @@ public class CustomSortHelper<T>
     }
 
     /// <summary>
-    /// Indexer to get the specified item out of the list
+    /// Indexer to get or set the specified item in the list.
     /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
+    /// <param name="index">The index of the item to access.</param>
+    /// <returns>The item at the specified index.</returns>
     public T this[int index]
     {
         get => Items[index];
@@ -63,13 +63,13 @@ public class CustomSortHelper<T>
     }
 
     /// <summary>
-    /// Resorts the entire list. Uses an insertion sort routine
+    /// Resorts the entire list using an insertion sort routine.
     /// </summary>
     public void Sort()
     {
-        //A insertion sort routine.
+        // A insertion sort routine.
 
-        //Skip first item in list since it will always be sorted correctly
+        // Skip first item in list since it will always be sorted correctly
         for (int itemToInsertIndex = 1; itemToInsertIndex < Items.Length; itemToInsertIndex++)
         {
             T itemToInsert = Items[itemToInsertIndex];
@@ -88,9 +88,9 @@ public class CustomSortHelper<T>
     /// <summary>
     /// Resorts only the item at the specified index assuming:
     /// 1) all other items are properly sorted
-    /// 2) this items's value increased.
+    /// 2) this item's value increased.
     /// </summary>
-    /// <param name="index">the index of the item to resort.</param>
+    /// <param name="index">The index of the item to resort.</param>
     public void SortAssumingIncreased(int index)
     {
         T itemToMove = Items[index];
