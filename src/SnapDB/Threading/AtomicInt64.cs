@@ -35,46 +35,63 @@ namespace SnapDB.Threading;
 /// </summary>
 public class AtomicInt64
 {
-    //Note: This is a class and not a struct to prevent users from copying the struct value
+    // Note: This is a class and not a struct to prevent users from copying the struct value
     // which would result in a non-atomic clone of the struct.  
 
     private long m_value;
 
-    /// <summary>
-    /// Creates a new AtomicInt64.
-    /// </summary>
-    /// <param name="value"></param>
+/// <summary>
+/// Initializes a new instance of the AtomicInt64 class with an optional initial value.
+/// </summary>
+/// <param name="value">The optional initial value for the AtomicInt64. Default is 0.</param>
     public AtomicInt64(long value = 0)
     {
         m_value = value;
     }
 
     /// <summary>
-    /// Gets or sets the value.
+    /// Gets or sets the value of the AtomicInt64.
     /// </summary>
+    /// <remarks>
+    /// For 64-bit processes, the value is directly read or written.
+    /// For 32-bit processes, atomic operations are used for thread-safety.
+    /// </remarks>
     public long Value
     {
+        /// <summary>
+        /// Gets the value of the AtomicInt64.
+        /// </summary>
+        /// <returns>The value of the AtomicInt64.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
             if (Environment.Is64BitProcess)
                 return m_value;
+            
             return Interlocked.Read(ref m_value);
         }
+
+        /// <summary>
+        /// Sets the value of the AtomicInt64.
+        /// </summary>
+        /// <param name="value">The new value to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        
         set
         {
             if (Environment.Is64BitProcess)
                 m_value = value;
+            
             else
                 Interlocked.Exchange(ref m_value, value);
         }
     }
 
     /// <summary>
-    /// Converts to a long.
+    /// Implicitly converts an AtomicInt64 to a long.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="value">The AtomicInt64 instance to convert.</param>
+    /// <returns>The long value obtained from the AtomicInt64 instance.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator long(AtomicInt64 value)
     {
