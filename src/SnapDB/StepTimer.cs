@@ -144,9 +144,11 @@ public static class StepTimer
     }
 
     /// <summary>
-    /// Generates a summary of recorded execution times for all timers and returns the results as a formatted string.
+    /// Measures the execution time of an action and returns the median execution time in microseconds.
     /// </summary>
-    /// <returns>A string containing the summary of recorded execution times for all timers.</returns>
+    /// <param name="internalLoopCount">The number of internal loops used for timing.</param>
+    /// <param name="del">The action to be timed.</param>
+    /// <returns>The median execution time of the action in microseconds.</returns>
     public static string Time(int internalLoopCount, Action del)
     {
         Stopwatch sw = new Stopwatch();
@@ -190,6 +192,13 @@ public static class StepTimer
         return sw.Elapsed.TotalMilliseconds;
     }
 
+    /// <summary>
+    /// Measures the execution time of an action that takes a Stopwatch parameter 
+    /// and returns the median execution time in microseconds.
+    /// </summary>
+    /// <param name="internalLoopCount">The number of internal loops used for timing.</param>
+    /// <param name="del">The action to be timed, which takes a Stopwatch parameter.</param>
+    /// <returns>The median execution time of the action in microseconds.</returns>
     public static string Time(int internalLoopCount, Action<Stopwatch> del)
     {
         Stopwatch sw = new Stopwatch();
