@@ -30,11 +30,9 @@ using SnapDB.IO;
 namespace SnapDB.Snap;
 
 /// <summary>
-/// An immutable class that represents the compression method used 
-/// by the SortedTreeStore.
+/// Represents an encoding definition used for compression of data. Provides methods for creating and comparing encoding definitions.
 /// </summary>
 /// <remarks>
-/// 
 /// Serializes as:
 /// If Combined KeyValue encoding
 /// byte type = 1
@@ -59,9 +57,9 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     private readonly bool m_isFixedSizeEncoding;
 
     /// <summary>
-    /// Loads a <see cref="EncodingDefinition"/> from a stream
+    /// Initializes a new instance of the <see cref="EncodingDefinition"/> class from a binary stream.
     /// </summary>
-    /// <param name="stream">the stream to load from.</param>
+    /// <param name="stream">The stream to load the encoding definition from.</param>
     public EncodingDefinition(BinaryStreamBase stream)
     {
         byte code = stream.ReadUInt8();
@@ -85,9 +83,9 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     }
 
     /// <summary>
-    /// Loads a <see cref="EncodingDefinition"/> from a stream
+    /// Initializes a new instance of the <see cref="EncodingDefinition"/> class from a regular stream.
     /// </summary>
-    /// <param name="stream">the stream to load from.</param>
+    /// <param name="stream">The stream to load the encoding definition from.</param>
     public EncodingDefinition(Stream stream)
     {
         byte code = stream.ReadNextByte();
@@ -125,10 +123,10 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     }
 
     /// <summary>
-    /// Specifies an encoding method that independently compresses the key and the value.
+    /// Initializes a new instance of the <see cref="EncodingDefinition"/> class with separate key and value encoding methods.
     /// </summary>
-    /// <param name="keyEncoding">the encoding of the key</param>
-    /// <param name="valueEncoding">the encoding of the value</param>
+    /// <param name="keyEncoding">The encoding method for keys.</param>
+    /// <param name="valueEncoding">The encoding method for values.</param>
     public EncodingDefinition(Guid keyEncoding, Guid valueEncoding)
     {
         m_keyEncodingMethod = keyEncoding;
@@ -146,8 +144,8 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     public bool IsFixedSizeEncoding => m_isFixedSizeEncoding;
 
     /// <summary>
-    /// Gets the compression method if <see cref="IsKeyValueEncoded"/> is false.
-    /// Throw an exception otherwise.
+    /// Gets the compression method for keys when <see cref="IsKeyValueEncoded"/> is false.
+    /// Throws an exception otherwise.
     /// </summary>
     public Guid KeyEncodingMethod
     {
@@ -155,12 +153,13 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
         {
             if (IsKeyValueEncoded)
                 throw new Exception("Not Valid");
+                
             return m_keyEncodingMethod;
         }
     }
 
     /// <summary>
-    /// Gets the compression method if <see cref="IsKeyValueEncoded"/> is false.
+    /// Gets the compression method if <see cref="IsKeyValueEncoded"/> is <c>false</c>.
     /// Throw an exception otherwise.
     /// </summary>
     public Guid ValueEncodingMethod
@@ -174,8 +173,8 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     }
 
     /// <summary>
-    /// Gets the compression method if <see cref="IsKeyValueEncoded"/> is true.
-    /// Throw an exception otherwise.
+    /// Gets the combined compression method when <see cref="IsKeyValueEncoded"/> is <c>true</c>.
+    /// Throws an exception otherwise.
     /// </summary>
     public Guid KeyValueEncodingMethod
     {
@@ -183,14 +182,15 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
         {
             if (!IsKeyValueEncoded)
                 throw new Exception("Not Valid");
+                
             return m_keyValueEncodingMethod;
         }
     }
 
     /// <summary>
-    /// Serializes the <see cref="EncodingDefinition"/> to the provided <see cref="stream"/>
+    /// Serializes the <see cref="EncodingDefinition"/> to a binary stream.
     /// </summary>
-    /// <param name="stream">the stream to write to</param>
+    /// <param name="stream">The stream to write the encoding definition to.</param>
     public void Save(BinaryStreamBase stream)
     {
         if (IsKeyValueEncoded)
@@ -206,9 +206,9 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
         }
     }
     /// <summary>
-    /// Serializes the <see cref="EncodingDefinition"/> to the provided <see cref="stream"/>
+    /// Serializes the <see cref="EncodingDefinition"/> to a regular stream.
     /// </summary>
-    /// <param name="stream">the stream to write to</param>
+    /// <param name="stream">The stream to write the encoding definition to.</param>
     public void Save(Stream stream)
     {
         if (IsKeyValueEncoded)
@@ -309,22 +309,16 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     }
 
     /// <summary>
-    /// Checks for inequality
+    /// Checks for inequality between two encoding definitions.
     /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns></returns>
     public static bool operator !=(EncodingDefinition a, EncodingDefinition b)
     {
         return !(a == b);
     }
 
     /// <summary>
-    /// Checks for equality
+    /// Checks for equality between two encoding definitions.
     /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns></returns>
     public static bool operator ==(EncodingDefinition a, EncodingDefinition b)
     {
         if (ReferenceEquals(a, b))
