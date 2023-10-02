@@ -29,10 +29,20 @@ using System.Text;
 
 namespace SnapDB;
 
+/// <summary>
+/// A utility class for measuring and analyzing the execution time of code segments.
+/// </summary>
 public static class StepTimer
 {
+    /// <summary>
+    /// Represents an interface for measuring and recording the execution time of code segments.
+    /// </summary>
     public interface ITimer
     {
+        /// <summary>
+        /// Stops the timer and records the elapsed time for the code segment.
+        /// </summary>
+        /// <param name="loopCount">The number of times the code segment was executed (default is 1).</param>
         void Stop(int loopCount = 1);
     }
 
@@ -76,6 +86,11 @@ public static class StepTimer
         AllStopwatches.Clear();
     }
 
+    /// <summary>
+    /// Calculates and returns the average execution time recorded by a timer with the specified name.
+    /// </summary>
+    /// <param name="Name">The name of the timer for which to calculate the average.</param>
+    /// <returns>The average execution time in seconds.</returns>
     public static double GetAverage(string Name)
     {
         RunCount kvp = AllStopwatches[Name];
@@ -84,6 +99,12 @@ public static class StepTimer
         return kvp.RunResults[kvp.RunResults.Count >> 1];
     }
 
+    /// <summary>
+    /// Calculates and returns the average execution time in nanoseconds recorded by a timer with the specified name.
+    /// </summary>
+    /// <param name="Name">The name of the timer for which to calculate the average.</param>
+    /// <param name="loopCount">The number of iterations or loops used during measurements.</param>
+    /// <returns>The average execution time in nanoseconds.</returns>
     public static double GetNanoSeconds(string Name, int loopCount)
     {
         RunCount kvp = AllStopwatches[Name];
@@ -92,6 +113,11 @@ public static class StepTimer
         return kvp.RunResults[kvp.RunResults.Count >> 1] * 1000000000.0 / loopCount;
     }
 
+    /// <summary>
+    /// Calculates and returns the slowest recorded execution time (90th percentile) in seconds by a timer with the specified name.
+    /// </summary>
+    /// <param name="Name">The name of the timer for which to calculate the slowest execution time.</param>
+    /// <returns>The slowest recorded execution time in seconds.</returns>
     public static double GetSlowest(string Name)
     {
         RunCount kvp = AllStopwatches[Name];
@@ -100,6 +126,10 @@ public static class StepTimer
         return kvp.RunResults[(int)(kvp.RunResults.Count * 0.9)];
     }
 
+    /// <summary>
+    /// Generates a summary of recorded execution times for all timers and returns the results as a formatted string.
+    /// </summary>
+    /// <returns>A string containing the summary of recorded execution times for all timers.</returns>
     public static string GetResults()
     {
         StringBuilder sb = new StringBuilder();
@@ -113,6 +143,10 @@ public static class StepTimer
         return sb.ToString();
     }
 
+    /// <summary>
+    /// Generates a summary of recorded execution times for all timers and returns the results as a formatted string.
+    /// </summary>
+    /// <returns>A string containing the summary of recorded execution times for all timers.</returns>
     public static string Time(int internalLoopCount, Action del)
     {
         Stopwatch sw = new Stopwatch();
