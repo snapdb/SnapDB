@@ -7,6 +7,8 @@ namespace SnapDB;
 
 public static class Number
 {
+    private static readonly double[] PowersOf10d = new double[] { 1f, 10f, 100f, 1000f, 10000f, 100000f, 1000000f, 10000000f, 100000000f, 1000000000f, 10000000000f, 100000000000f };
+
     /// <summary>
     /// Writes a floating-point value to a character array.
     /// </summary>
@@ -14,8 +16,6 @@ public static class Number
     /// <param name="str">The character array where the value will be written.</param>
     /// <param name="position">The starting position in the character array.</param>
     /// <returns>The number of characters written to the array.</returns>
-    private static readonly double[] PowersOf10d = new double[] { 1f, 10f, 100f, 1000f, 10000f, 100000f, 1000000f, 10000000f, 100000000f, 1000000000f, 10000000000f, 100000000000f };
-
     public static int WriteToChars(this float value, char[] str, int position)
     {
         int pos = position;
