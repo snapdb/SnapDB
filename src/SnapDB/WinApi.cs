@@ -45,8 +45,10 @@ public static unsafe class WinApi
     /// Flushes the buffers of a specified file and causes all buffered data to be written to a file.
     /// </summary>
     /// <param name="handle"></param>
-    /// <remarks>Since the flush of a file stream does not actually work, this finishes the flush to the disk file system.
-    /// Which still could cache the results, but this is about the best we can do for a flush right now.</remarks>
+    /// <remarks>
+    Since the flush of a file stream does not actually work, this finishes the flush to the disk file system.
+    /// Which still could cache the results, but this is about the best we can do for a flush right now.
+    </remarks>
     public static void FlushFileBuffers(SafeFileHandle handle)
     {            
     }
@@ -56,9 +58,9 @@ public static unsafe class WinApi
     /// to see if the data bytes overlaps and guarantees that the bytes are copied in 
     /// such a way to preserve the move.
     /// </summary>
-    /// <param name="destination">a pointer to the destination</param>
-    /// <param name="source">a pointer to the source</param>
-    /// <param name="count">the number of bytes to move</param>
+    /// <param name="destination">A pointer to the destination.</param>
+    /// <param name="source">A pointer to the source.</param>
+    /// <param name="count">The number of bytes to move.</param>
     public static void MoveMemory(byte* destination, byte* source, int count)
     {
         for (int i = 0; i < count; i++)
