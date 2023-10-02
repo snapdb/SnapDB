@@ -32,7 +32,6 @@ namespace SnapDB.Threading;
 
 /// <summary>
 /// A timer event that occurs on a specific interval at a specific offset.
-/// 
 /// This class is thread safe.
 /// </summary>
 public class EventTimer
@@ -53,11 +52,12 @@ public class EventTimer
     private bool m_disposed;
 
     private readonly LogStackMessages m_message;
+
     /// <summary>
-    /// Creates a <see cref="EventTimer"/>
+    /// Initializes a new instance of the EventTimer class with the specified period and day offset.
     /// </summary>
-    /// <param name="period"></param>
-    /// <param name="dayOffset"></param>
+    /// <param name="period">The time interval between timer ticks.</param>
+    /// <param name="dayOffset">The time offset added to each tick.</param>
     private EventTimer(TimeSpan period, TimeSpan dayOffset)
         : base(MessageClass.Component)
     {
@@ -106,8 +106,11 @@ public class EventTimer
     }
 
     /// <summary>
-    /// Gets/sets if the timer is enabled.
+    /// Gets or sets a value indicating whether the timer is enabled.
     /// </summary>
+    /// <remarks>
+    /// When setting to true, it starts the timer; when setting to false, it stops the timer.
+    /// </remarks>
     public bool Enabled
     {
         get => m_isRunning;
@@ -119,11 +122,13 @@ public class EventTimer
                 Stop();
         }
     }
-
+    
     /// <summary>
-    /// The remaining time until the next execution. This is a calculated value and may not exactly represent 
-    /// the next time <see cref="Elapsed"/> will run.
+    /// Gets the time remaining until the next execution of the timer.
     /// </summary>
+    /// <remarks>
+    /// The property calculates the time remaining based on the timer's period and day offset.
+    /// </remarks>
     public TimeSpan TimeUntilNextExecution
     {
         get
@@ -151,16 +156,21 @@ public class EventTimer
     }
 
     /// <summary>
-    /// Starts the watching
+    /// Starts the event timer.
     /// </summary>
+    /// <remarks>
+    /// The method starts the event timer by creating and initializing a ScheduledTask object.
+    /// </remarks>
     public void Start()
     {
         lock (m_syncRoot)
         {
             if (m_disposed)
                 return;
+                
             if (m_isRunning)
                 return;
+                
             m_isRunning = true;
             m_timer = new ScheduledTask();
             m_timer.Running += m_timer_Running;
@@ -170,10 +180,12 @@ public class EventTimer
     }
 
     /// <summary>
-    /// Stops the timer. The call that stops the timer
-    /// will pause until the event is stopped. Any subsequent
-    /// calls will return immediately.
+    /// Stops the event timer.
     /// </summary>
+    /// <remarks>
+    /// The method stops the event timer by disposing of the underlying ScheduledTask object and
+    /// resetting the timer's state.
+    /// </remarks>
     public void Stop()
     {
         lock (m_syncRoot)
@@ -194,6 +206,13 @@ public class EventTimer
         Log.Publish(MessageLevel.Info, "EventTimer Started");
     }
 
+    /// <summary>
+    /// Releases the resources used by the event timer and stops it.
+    /// </summary>
+    /// <param name="disposing">
+    /// A Boolean value that determines whether the method was called from the
+    /// <see cref="Dispose"/> method rather than from the finalizer.
+    /// </param>
     protected override void Dispose(bool disposing)
     {
         if (!m_disposed)
@@ -205,33 +224,33 @@ public class EventTimer
     }
 
     /// <summary>
-    /// Creates an <see cref="EventTimer"/> with the supplied inputs.
+    /// Creates a new instance of the <see cref="EventTimer"/> class with the specified period and day offset.
     /// </summary>
-    /// <param name="period">the period of the timer</param>
-    /// <param name="dayOffset">the day offset when the timer will run.</param>
-    /// <returns></returns>
+    /// <param name="period">The time interval between timer events.</param>
+    /// <param name="dayOffset">The initial offset from the start of the day (optional).</param>
+    /// <returns>A new <see cref="EventTimer"/> instance.</returns>
     public static EventTimer Create(TimeSpan period, TimeSpan dayOffset = default)
     {
         return new EventTimer(period, dayOffset);
     }
 
     /// <summary>
-    /// Creates an <see cref="EventTimer"/> with the supplied inputs.
+    /// Creates a new instance of the <see cref="EventTimer"/> class with the specified period and day offset in seconds.
     /// </summary>
-    /// <param name="periodInSecond">the period of the timer in seconds</param>
-    /// <param name="dayOffsetInSecond">the offset from the top of the day in seconds. </param>
-    /// <returns></returns>
+    /// <param name="periodInSecond">The time interval between timer events in seconds.</param>
+    /// <param name="dayOffsetInSecond">The initial offset from the start of the day in seconds (optional).</param>
+    /// <returns>A new <see cref="EventTimer"/> instance.</returns>
     public static EventTimer CreateSeconds(double periodInSecond, double dayOffsetInSecond = 0)
     {
         return new EventTimer(new TimeSpan((long)(periodInSecond * TimeSpan.TicksPerSecond)), new TimeSpan((long)(dayOffsetInSecond * TimeSpan.TicksPerSecond)));
     }
 
     /// <summary>
-    /// Creates an <see cref="EventTimer"/> with the supplied inputs.
+    /// Creates a new instance of the <see cref="EventTimer"/> class with the specified period and day offset in minutes.
     /// </summary>
-    /// <param name="periodInMinutes">he period of the timer in minutes</param>
-    /// <param name="dayOffsetInMinutes"></param>
-    /// <returns></returns>
+    /// <param name="periodInMinutes">The time interval between timer events in minutes.</param>
+    /// <param name="dayOffsetInMinutes">The initial offset from the start of the day in minutes (optional).</param>
+    /// <returns>A new <see cref="EventTimer"/> instance.</returns>
     public static EventTimer CreateMinutes(double periodInMinutes, double dayOffsetInMinutes = 0)
     {
         return new EventTimer(new TimeSpan((long)(periodInMinutes * TimeSpan.TicksPerMinute)), new TimeSpan((long)(dayOffsetInMinutes * TimeSpan.TicksPerMinute)));
