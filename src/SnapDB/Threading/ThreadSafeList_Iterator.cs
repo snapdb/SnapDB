@@ -50,7 +50,7 @@ public partial class ThreadSafeList<T>
         /// Only 1 item can be obtained at a time. Failing to call <see cref="UnsafeUnregisterItem"/> will
         /// result in a infinite loop. Therefore wrap each call in a Try/Finally block.
         /// </summary>
-        /// <param name="item">an output parameter for the next item</param>
+        /// <param name="item">An output parameter for the next item.</param>
         public bool UnsafeTryGetNextItem(out T item)
         {
             if (m_itemCurrentlyLocked is not null)
@@ -98,6 +98,9 @@ public partial class ThreadSafeList<T>
             m_itemCurrentlyLocked = null;
         }
 
+        /// <summary>
+        /// Resets the enumerator's state, allowing it to start iterating from the beginning.
+        /// </summary>
         public void Reset()
         {
             m_lastVersion = -1;
