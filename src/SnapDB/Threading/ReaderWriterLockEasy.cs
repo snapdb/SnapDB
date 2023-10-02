@@ -33,16 +33,20 @@ public struct DisposableReadLock
     : IDisposable
 {
     private ReaderWriterLock m_l;
+    
     /// <summary>
-    /// Creates a read lock.
+    /// Initializes a new instance of the DisposableReadLock class and acquires a reader lock.
     /// </summary>
-    /// <param name="l"></param>
+    /// <param name="l">The ReaderWriterLock to acquire the lock from.</param>
     public DisposableReadLock(ReaderWriterLock l)
     {
         m_l = l;
         l.AcquireReaderLock(Timeout.Infinite);
     }
 
+    /// <summary>
+    /// Releases the acquired reader lock, if it was acquired.
+    /// </summary>
     public void Dispose()
     {
         if (m_l is not null)
@@ -60,16 +64,20 @@ public struct DisposableWriteLock
     : IDisposable
 {
     private ReaderWriterLock m_l;
+    
     /// <summary>
-    /// Creates a read lock.
+    /// Initializes a new instance of the DisposableWriteLock class and acquires a writer lock on the specified ReaderWriterLock.
     /// </summary>
-    /// <param name="l"></param>
+    /// <param name="l">The ReaderWriterLock to acquire the writer lock on.</param>
     public DisposableWriteLock(ReaderWriterLock l)
     {
         m_l = l;
         l.AcquireWriterLock(Timeout.Infinite);
     }
 
+    /// <summary>
+    /// Releases the acquired writer lock on the associated ReaderWriterLock, allowing other threads to acquire locks.
+    /// </summary>
     public void Dispose()
     {
         if (m_l is not null)
@@ -97,9 +105,9 @@ public class ReaderWriterLockEasy
     }
 
     /// <summary>
-    /// Enters a write lock. Be sure to call within a using block.
+    /// Acquires a writer lock, preventing other threads from acquiring writer or reader locks until the writer lock is released.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A DisposableWriteLock object that should be disposed to release the acquired writer lock.</returns>
     public DisposableWriteLock EnterWriteLock()
     {
         return new DisposableWriteLock(m_lock);
