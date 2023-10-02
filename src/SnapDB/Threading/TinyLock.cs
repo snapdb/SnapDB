@@ -47,7 +47,7 @@ public class TinyLock
     private readonly TinyLockRelease m_release;
 
     /// <summary>
-    /// Creates a <see cref="TinyLock"/>
+    /// Creates a <see cref="TinyLock"/>.
     /// </summary>
     public TinyLock()
     {
@@ -59,15 +59,18 @@ public class TinyLock
     /// Acquires an exclusive lock on this class. Place call in a using block.
     /// Duplicate calls to this within the same thread will cause a deadlock.
     /// </summary>
-    /// <returns>A structure that will release the lock. 
+    /// <returns>
+    /// A structure that will release the lock. 
     /// This struct will always be the exact same value. Therefore it can be 
     /// stored once if desired, however, be careful when using it this way as inproper synchronization
-    /// will be easier to occur.</returns>
+    /// will be easier to occur.
+    /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TinyLockRelease Lock()
     {
         if (Interlocked.Exchange(ref m_lock, Locked) != Unlocked) //If I successfully changed the state from unlocked to locked, then I now acquire the lock.
             LockSlower();
+        
         return m_release;
     }
 
@@ -75,7 +78,6 @@ public class TinyLock
     /// A nested call since 99% of the time, there will not be contention. This prevents stack space being
     /// used for the SpinLock when its not needed.
     /// </summary>
-    /// <returns></returns>
     private void LockSlower()
     {
         SpinWait spin = default;
@@ -93,8 +95,10 @@ public class TinyLock
         {
             if (tinyLock is null)
                 throw new ArgumentNullException("tinyLock");
+            
             if (tinyLock.m_release.m_tinyLock != null)
                 throw new Exception("Object is already locked");
+            
             m_tinyLock = tinyLock;
         }
 
@@ -104,10 +108,10 @@ public class TinyLock
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
-            //Decided to do an Interlocked command as it implies a full memory fense.
+            // Decided to do an Interlocked command as it implies a full memory fense.
             Interlocked.Exchange(ref m_tinyLock.m_lock, Unlocked);
-            //A volatile write implies that even if this is inlined, the unlock will never be reordered above its current location.
-            //m_tinyLock.m_lock = Unlocked;
+            // A volatile write implies that even if this is inlined, the unlock will never be reordered above its current location.
+            // m_tinyLock.m_lock = Unlocked;
         }
     }
 }
