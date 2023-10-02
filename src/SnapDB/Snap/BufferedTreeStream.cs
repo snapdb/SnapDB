@@ -29,7 +29,7 @@ namespace SnapDB.Snap;
 public partial class UnionTreeStream<TKey, TValue>
 {
     /// <summary>
-    /// A wrapper around a <see cref="TreeStream{TKey,TValue}"/> that primarily supports peaking
+    /// A wrapper around a <see cref="TreeStream{TKey,TValue}"/> that primarily supports peeking
     /// a value from a stream.
     /// </summary>
     private class BufferedTreeStream
@@ -41,9 +41,9 @@ public partial class UnionTreeStream<TKey, TValue>
         public readonly TValue CacheValue = new TValue();
 
         /// <summary>
-        /// Creates the table reader.
+        /// Creates a new instance of the <see cref="BufferedTreeStream"/> class.
         /// </summary>
-        /// <param name="stream"></param>
+        /// <param name="stream">The underlying tree stream.</param>
         public BufferedTreeStream(TreeStream<TKey, TValue> stream)
         {
             if (!stream.IsAlwaysSequential)
@@ -56,7 +56,7 @@ public partial class UnionTreeStream<TKey, TValue>
         }
 
         /// <summary>
-        /// Makes sure that the cache value is valid.
+        /// Ensures that the cache value is valid.
         /// </summary>
         public void EnsureCache()
         {
@@ -65,7 +65,7 @@ public partial class UnionTreeStream<TKey, TValue>
         }
 
         /// <summary>
-        /// Reads the next value of the stream.
+        /// Reads the next value of the stream and updates the cache.
         /// </summary>
         public void ReadToCache()
         {
@@ -73,11 +73,10 @@ public partial class UnionTreeStream<TKey, TValue>
         }
 
         /// <summary>
-        /// Reads the next available value.
+        /// Reads the next available value into the provided key and value.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <param name="key">The key to store the read key.</param>
+        /// <param name="value">The value to store the read value.</param>
         public void Read(TKey key, TValue value)
         {
             if (IsValid)
@@ -91,10 +90,10 @@ public partial class UnionTreeStream<TKey, TValue>
         }
 
         /// <summary>
-        /// Writes this value back to the point buffer.
+        /// Writes the provided key and value to the cache.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+        /// <param name="key">The key to write to the cache.</param>
+        /// <param name="value">The value to write to the cache.</param>
         public void WriteToCache(TKey key, TValue value)
         {
             IsValid = true;
@@ -102,6 +101,9 @@ public partial class UnionTreeStream<TKey, TValue>
             value.CopyTo(CacheValue);
         }
 
+        /// <summary>
+        /// Disposes of the <see cref="BufferedTreeStream"/> and its underlying stream.
+        /// </summary>
         public void Dispose()
         {
             if (Stream != null)
