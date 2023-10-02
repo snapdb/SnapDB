@@ -29,15 +29,14 @@ using Gemstone.Diagnostics;
 namespace SnapDB.Threading;
 
 /// <summary>
-/// Provides a thread safe implementation of the <see cref="ManualResetEvent"/> class
+/// Provides a thread safe implementation of the <see cref="ManualResetEvent"/> class.
 /// </summary>
 /// <remarks>
 /// While <see cref="ManualResetEvent"/> is mostly thread safe, calls to Dispose
 /// can cause other waiting threads to throw <see cref="ObjectDisposedException"/>.
 /// This class makes disposing of the class thread safe as well.
-/// 
 /// Note: Not properly disposing of this class can cause all threads waiting on this
-/// class to wait indefinately. 
+/// class to wait indefinitely. 
 /// </remarks>
 public sealed class SafeManualResetEvent
     : IDisposable
@@ -56,9 +55,9 @@ public sealed class SafeManualResetEvent
     private ManualResetEvent m_resetEvent;
 
     /// <summary>
-    /// Creates a new <see cref="SafeManualResetEvent"/>
+    /// Creates a new <see cref="SafeManualResetEvent"/>.
     /// </summary>
-    /// <param name="signaledState">true to set the initial state signaled; false to set the initial state to nonsignaled.</param>
+    /// <param name="signaledState"><c>true</c> to set the initial state signaled; <c>false</c> to set the initial state to nonsignaled.</param>
     public SafeManualResetEvent(bool signaledState)
     {
         m_syncRoot = new object();
@@ -79,10 +78,10 @@ public sealed class SafeManualResetEvent
         {
             if (m_disposed)
                 return;
+                
             try
-            {
                 m_resetEvent.Reset();
-            }
+                
             catch (Exception ex)
             {
                 Log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to Reset() threw an exception", null, ex);
@@ -111,7 +110,7 @@ public sealed class SafeManualResetEvent
     }
 
     /// <summary>
-    /// Blocks the current thread until <see cref="Set"/> or <see cref="Dispose"/> is called..
+    /// Blocks the current thread until <see cref="Set"/> or <see cref="Dispose"/> is called.
     /// </summary>
     public void WaitOne()
     {
@@ -136,8 +135,8 @@ public sealed class SafeManualResetEvent
             {
                 m_waitingThreadCount--;
 
-                //if the class was recently disposed, 
-                //the last waiting thread should dispose of the wait handle.
+                // If the class was recently disposed, 
+                // the last waiting thread should dispose of the wait handle.
                 if (m_disposed && m_waitingThreadCount == 0)
                 {
                     try
@@ -167,9 +166,9 @@ public sealed class SafeManualResetEvent
                 return;
             m_disposed = true;
 
-            //If there are threads waiting, signal them to resume
-            //however, do not dispose of the wait handle, 
-            //allow the last waiting thread to dispose of the reset event.
+            // If there are threads waiting, signal them to resume
+            // however, do not dispose of the wait handle, 
+            // allow the last waiting thread to dispose of the reset event.
             if (m_waitingThreadCount > 0)
             {
                 try
@@ -183,8 +182,8 @@ public sealed class SafeManualResetEvent
             }
             else
             {
-                //since no one is waiting on the reset event, it is safe
-                //to dispose of the wait handle.
+                // Since no one is waiting on the reset event, it is safe
+                // to dispose of the wait handle.
                 try
                 {
                     m_resetEvent.Dispose();
