@@ -205,11 +205,11 @@ public abstract unsafe class BinaryStreamBase
     }
 
     /// <summary>
-    /// Copies a specified number of bytes to a new location
+    /// Copies a block of data from the current stream to another position within the same stream.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="destination"></param>
-    /// <param name="length"></param>
+    /// <param name="source">The starting position in the stream from which data will be copied.</param>
+    /// <param name="destination">The position in the stream where the data will be copied to.</param>
+    /// <param name="length">The number of bytes to copy from the source position to the destination position.</param>
     public virtual void Copy(long source, long destination, int length)
     {
         byte[] data = new byte[length];
@@ -262,7 +262,7 @@ public abstract unsafe class BinaryStreamBase
     #region [ Write ]
 
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(sbyte value)
@@ -270,18 +270,19 @@ public abstract unsafe class BinaryStreamBase
         Write((byte)value);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(bool value)
     {
         if (value)
             Write((byte)1);
+
         else
             Write((byte)0);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(ushort value)
@@ -289,7 +290,7 @@ public abstract unsafe class BinaryStreamBase
         Write((short)value);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(uint value)
@@ -297,7 +298,7 @@ public abstract unsafe class BinaryStreamBase
         Write((int)value);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(ulong value)
@@ -305,7 +306,7 @@ public abstract unsafe class BinaryStreamBase
         Write((long)value);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(float value)
@@ -313,7 +314,7 @@ public abstract unsafe class BinaryStreamBase
         Write(*(int*)&value);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(double value)
@@ -321,7 +322,7 @@ public abstract unsafe class BinaryStreamBase
         Write(*(long*)&value);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(DateTime value)
@@ -329,7 +330,7 @@ public abstract unsafe class BinaryStreamBase
         Write(value.Ticks);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public virtual void Write(byte value)
@@ -338,7 +339,7 @@ public abstract unsafe class BinaryStreamBase
         Write(m_buffer, 0, 1);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public virtual void Write(short value)
@@ -348,7 +349,7 @@ public abstract unsafe class BinaryStreamBase
         Write(m_buffer, 0, 2);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public virtual void Write(int value)
@@ -360,7 +361,7 @@ public abstract unsafe class BinaryStreamBase
         Write(m_buffer, 0, 4);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public virtual void Write(long value)
@@ -376,7 +377,7 @@ public abstract unsafe class BinaryStreamBase
         Write(m_buffer, 0, 8);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(decimal value)
@@ -411,7 +412,7 @@ public abstract unsafe class BinaryStreamBase
         Write(m_buffer, 0, 16);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(Guid value)
@@ -445,7 +446,7 @@ public abstract unsafe class BinaryStreamBase
         Write(m_buffer, 0, 16);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void WriteUInt24(uint value)
@@ -454,7 +455,7 @@ public abstract unsafe class BinaryStreamBase
         Write((byte)(value >> 16));
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void WriteUInt40(ulong value)
@@ -463,7 +464,7 @@ public abstract unsafe class BinaryStreamBase
         Write((byte)(value >> 32));
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void WriteUInt48(ulong value)
@@ -472,7 +473,7 @@ public abstract unsafe class BinaryStreamBase
         Write((ushort)(value >> 32));
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void WriteUInt56(ulong value)
@@ -483,7 +484,7 @@ public abstract unsafe class BinaryStreamBase
     }
 
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     /// <param name="bytes">The number of bytes to write.</param>
@@ -521,7 +522,7 @@ public abstract unsafe class BinaryStreamBase
         throw new ArgumentOutOfRangeException(nameof(bytes), "must be between 0 and 8 inclusive.");
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public virtual void Write7Bit(uint value)
@@ -529,7 +530,7 @@ public abstract unsafe class BinaryStreamBase
         Encoding7Bit.Write(Write, value);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public virtual void Write7Bit(ulong value)
@@ -537,7 +538,7 @@ public abstract unsafe class BinaryStreamBase
         Encoding7Bit.Write(Write, value);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(string value)
@@ -545,7 +546,7 @@ public abstract unsafe class BinaryStreamBase
         WriteWithLength(Utf8.GetBytes(value));
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(byte[] value)
@@ -553,7 +554,7 @@ public abstract unsafe class BinaryStreamBase
         Write(value, 0, value.Length);
     }
     /// <summary>
-    /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void WriteWithLength(byte[] value)
@@ -582,7 +583,7 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// Reads from the underlying stream in little-endian format. Advancing the position.
     /// </summary>
-    /// <returns>The data read</returns>
+    /// <returns>The data read.</returns>
     public sbyte ReadInt8()
     {
         return (sbyte)ReadUInt8();
@@ -590,7 +591,7 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// Reads from the underlying stream in little-endian format. Advancing the position.
     /// </summary>
-    /// <returns>The data read</returns>
+    /// <returns>The data read.</returns>
     public bool ReadBoolean()
     {
         return ReadUInt8() != 0;
@@ -598,7 +599,7 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// Reads from the underlying stream in little-endian format. Advancing the position.
     /// </summary>
-    /// <returns>The data read</returns>
+    /// <returns>The data read.</returns>
     public ushort ReadUInt16()
     {
         return (ushort)ReadInt16();
@@ -606,7 +607,7 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// Reads from the underlying stream in little-endian format. Advancing the position.
     /// </summary>
-    /// <returns>The data read</returns>
+    /// <returns>The data read.</returns>
     public uint ReadUInt24()
     {
         uint value = ReadUInt16();
@@ -615,7 +616,7 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// Reads from the underlying stream in little-endian format. Advancing the position.
     /// </summary>
-    /// <returns>The data read</returns>
+    /// <returns>The data read.</returns>
     public uint ReadUInt32()
     {
         return (uint)ReadInt32();
@@ -623,7 +624,7 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// Reads from the underlying stream in little-endian format. Advancing the position.
     /// </summary>
-    /// <returns>The data read</returns>
+    /// <returns>The data read.</returns>
     public ulong ReadUInt40()
     {
         ulong value = ReadUInt32();
@@ -632,7 +633,7 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// Reads from the underlying stream in little-endian format. Advancing the position.
     /// </summary>
-    /// <returns>The data read</returns>
+    /// <returns>The data read.</returns>
     public ulong ReadUInt48()
     {
         ulong value = ReadUInt32();
@@ -641,7 +642,7 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// Reads from the underlying stream in little-endian format. Advancing the position.
     /// </summary>
-    /// <returns>The data read</returns>
+    /// <returns>The data read.</returns>
     public ulong ReadUInt56()
     {
         ulong value = ReadUInt32();
@@ -650,7 +651,7 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// Reads from the underlying stream in little-endian format. Advancing the position.
     /// </summary>
-    /// <returns>The data read</returns>
+    /// <returns>The data read.</returns>
     public ulong ReadUInt64()
     {
         return (ulong)ReadInt64();
@@ -659,7 +660,7 @@ public abstract unsafe class BinaryStreamBase
     /// Reads from the underlying stream in little-endian format. Advancing the position.
     /// </summary>
     /// <param name="bytes">The number of bytes in the value</param>
-    /// <returns>The data read</returns>
+    /// <returns>The data read.</returns>
     public ulong ReadUInt(int bytes)
     {
         switch (bytes)
@@ -803,7 +804,7 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// Reads from the underlying stream in little-endian format. Advancing the position.
     /// </summary>
-    /// <returns>The data read</returns>
+    /// <returns>The data read.</returns>
     public Guid ReadGuid()
     {
         ReadAll(m_buffer, 0, 16);
@@ -814,24 +815,24 @@ public abstract unsafe class BinaryStreamBase
         {
             if (BitConverter.IsLittleEndian)
             {
-                //internal stucture is correct, just copy
+                // Internal stucture is correct - just copy.
                 *(long*)(dst + 0) = *(long*)(src + 0);
                 *(long*)(dst + 8) = *(long*)(src + 8);
             }
             else
             {
-                //Guid._a (int) //swap endian
+                // Guid._a (int) //swap endian
                 dst[0] = src[3];
                 dst[1] = src[2];
                 dst[2] = src[1];
                 dst[3] = src[0];
-                //Guid._b (short) //swap endian
+                // Guid._b (short) //swap endian
                 dst[4] = src[5];
                 dst[5] = src[4];
                 //Guid._c (short) //swap endian
                 dst[6] = src[7];
                 dst[7] = src[6];
-                //Guid._d - Guid._k (8 bytes)
+                // Guid._d - Guid._k (8 bytes)
                 *(long*)(dst + 8) = *(long*)(src + 8);
             }
 
@@ -841,7 +842,7 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// Reads from the underlying stream in little-endian format. Advancing the position.
     /// </summary>
-    /// <returns>The data read</returns>
+    /// <returns>The data read.</returns>
     public virtual uint Read7BitUInt32()
     {
         return Encoding7Bit.ReadUInt32(ReadUInt8);
@@ -849,7 +850,7 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// Reads from the underlying stream in little-endian format. Advancing the position.
     /// </summary>
-    /// <returns>The data read</returns>
+    /// <returns>The data read.</returns>
     public virtual ulong Read7BitUInt64()
     {
         return Encoding7Bit.ReadUInt64(ReadUInt8);
@@ -876,18 +877,13 @@ public abstract unsafe class BinaryStreamBase
     }
 
     /// <summary>
-    /// Reads a byte array from the provided stream. 
-    /// If the size of the stream exceeds <see cref="maxLength"/>
-    /// <see cref="value"/> is set to <c>null</c> and this function returns <c>false</c>.
+    /// Attempts to read a byte array from the stream with a specified maximum length.
     /// </summary>
-    /// <param name="maxLength"></param>
-    /// <param name="value"></param>
-    /// <remarks>
-    /// This method can be used to limit the byte size returned.
-    /// Since an untrusted source could claim that the length is 
-    /// <see cref="int.MaxValue"/>, this prevents allocating 2GB
-    /// of RAM to store the result.
-    /// </remarks>
+    /// <param name="maxLength">The maximum allowed length for the byte array to be read.</param>
+    /// <param name="value">When this method returns, contains the byte array read from the stream, if successful; otherwise, <c>null</c>.</param>
+    /// <returns>
+    ///   <c>true</c> If a byte array is successfully read within the specified maximum length; otherwise, <c>false</c>.
+    /// </returns>
     public bool TryReadBytes(int maxLength, out byte[] value)
     {
         int length = (int)Read7BitUInt32();
@@ -910,18 +906,13 @@ public abstract unsafe class BinaryStreamBase
     }
 
     /// <summary>
-    /// Reads a string from the provided stream. 
-    /// If the size of the string exceeds <see cref="maxLength"/>
-    /// <see cref="value"/> is set to <c>null</c> and this function returns <c>false</c>.
+    /// Attempts to read a byte array from the stream with a specified maximum length.
     /// </summary>
-    /// <param name="maxLength">The maximum number of characters in the string.</param>
-    /// <param name="value">An output.</param>
-    /// <remarks>
-    /// This method can be used to limit the byte size returned.
-    /// Since an untrusted source could claim that the length is 
-    /// <see cref="int.MaxValue"/>, this prevents allocating 2GB
-    /// of RAM to store the result.
-    /// </remarks>
+    /// <param name="maxLength">The maximum allowed length for the byte array to be read.</param>
+    /// <param name="value">When this method returns, contains the byte array read from the stream, if successful; otherwise, <c>null</c>.</param>
+    /// <returns>
+    ///   <c>true</c> if a byte array is successfully read within the specified maximum length; otherwise, <c>false</c>.
+    /// </returns>
     public bool TryReadString(int maxLength, out string value)
     {
         if (!TryReadBytes(maxLength * 6, out byte[] data))

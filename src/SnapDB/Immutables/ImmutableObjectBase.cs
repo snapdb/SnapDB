@@ -45,8 +45,8 @@ public abstract class ImmutableObjectBase<T>
     private bool m_isReadOnly;
 
     /// <summary>
-    /// Gets or sets if this class is immutable and thus "read-only". Once
-    /// setting to "read-only", the class becomes immutable.
+    /// Gets or sets if this class is immutable and thus read-only. Once
+    /// setting to read-only, the class becomes immutable.
     /// </summary>
     public bool IsReadOnly
     {
@@ -65,7 +65,7 @@ public abstract class ImmutableObjectBase<T>
     }
 
     /// <summary>
-    /// Test if the class has been marked as "read-only". Throws an exception if editing cannot occur.
+    /// Test if the class has been marked as read-only. Throws an exception if editing cannot occur.
     /// </summary>
     protected void TestForEditable()
     {
@@ -79,7 +79,7 @@ public abstract class ImmutableObjectBase<T>
     }
 
     /// <summary>
-    /// Requests that member fields be set to "read-only". 
+    /// Requests that member fields be set to read-only. 
     /// </summary>
     protected abstract void SetMembersAsReadOnly();
 
@@ -104,7 +104,7 @@ public abstract class ImmutableObjectBase<T>
     }
 
     /// <summary>
-    /// Makes a "read-only" clone of this object. Returns the same object if it is already marked as "read-only".
+    /// Makes a "read-only" clone of this object. Returns the same object if it is already marked as read-only.
     /// </summary>
     /// <returns>The non-editable clone.</returns>
     object IImmutableObject.CloneReadonly()
@@ -122,9 +122,15 @@ public abstract class ImmutableObjectBase<T>
     }
 
     /// <summary>
-    /// Makes a "read-only" clone of the object.
-    /// If the class is currently marked as "read-only", the current instance is returned.
+    /// Creates a read-only clone of the object.
     /// </summary>
+    /// <returns>
+    /// A new instance with the same state as the original, marked as read-only.
+    /// </returns>
+    /// <remarks>
+    /// This method is used to create a copy of the object with read-only access.
+    /// If the object is already read-only, it returns itself.
+    /// </remarks>
     public virtual T CloneReadonly()
     {
         if (IsReadOnly)
@@ -137,9 +143,16 @@ public abstract class ImmutableObjectBase<T>
     }
 
     /// <summary>
-    /// Returns a clone of this class.
-    /// If the class is marked as "read-only", it returns the current instance.
+    /// Creates a clone of the object, either as a read-only instance or an editable one.
     /// </summary>
+    /// <returns>
+    /// If the object is read-only, it returns itself. If the object is editable, it returns
+    /// a new instance with the same state as the original.
+    /// </returns>
+    /// <remarks>
+    /// This method is used to create a copy of the object, allowing either read-only or
+    /// editable access depending on the object's current state.
+    /// </remarks>
     public object Clone()
     {
         return IsReadOnly ? this : CloneEditable();

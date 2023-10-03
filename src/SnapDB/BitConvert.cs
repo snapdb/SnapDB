@@ -43,8 +43,7 @@ public static class BitConvert
     /// This method performs an unsafe conversion by treating the input float as a uint and
     /// then casting it to ulong.
     /// </remarks>
-    /// <seealso cref="ToFloatToUInt64(float)"/>
-    /// <seealso cref="ToDoubleToUInt64(double)"/>
+    /// <seealso cref="ToUInt64(float)"/>
     public static unsafe ulong ToUInt64(float value)
     {
         return *(uint*)&value;
@@ -62,10 +61,10 @@ public static class BitConvert
     /// and then treating it as a float.
     /// </remarks>
     /// <seealso cref="ToUInt64(float)"/>
-    /// <seealso cref="ToDoubleToSingle(double)"/>
     public static unsafe float ToSingle(ulong value)
     {
         uint tmpValue = (uint)value;
+
         return *(float*)&tmpValue;
     }
 }

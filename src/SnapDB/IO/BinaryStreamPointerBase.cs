@@ -82,12 +82,24 @@ public unsafe abstract class BinaryStreamPointerBase
     protected byte* LastWrite;
 
 
+    /// <summary>
+    /// Indicates whether or not the stream allows writing.
+    /// </summary>
     public override bool CanWrite => true;
 
+    /// <summary>
+    /// Throws a <see cref="NotSupportedException"/> since getting the length of this stream is not supported.
+    /// </summary>
     public override long Length => throw new NotSupportedException();
 
+    /// <summary>
+    /// Indicates whether or not the stream allows reading.
+    /// </summary>
     public override bool CanRead => true;
 
+    /// <summary>
+    /// Indicates whether or not the stream allows seeking.
+    /// </summary>
     public override bool CanSeek => true;
 
     /// <summary>
@@ -104,9 +116,8 @@ public unsafe abstract class BinaryStreamPointerBase
         set
         {
             if (FirstPosition <= value && value < LastPosition)
-            {
                 Current = First + (value - FirstPosition);
-            }
+
             else
             {
                 FirstPosition = value;
@@ -147,20 +158,20 @@ public unsafe abstract class BinaryStreamPointerBase
 
         return Current;
     }
-
     /// <summary>
-    /// Gets a pointer from the current position that can be used for writing up the the provided length.
-    /// The current position is not advanced after calling this function.
+    /// Gets a read pointer to a specified position in the stream for a specified length of data.
     /// </summary>
-    /// <param name="position"></param>
-    /// <param name="length">The number of bytes valid for the writing.</param>
-    /// <remarks>This method will throw an exception if the provided length cannot be provided.</remarks>
+    /// <param name="position">The position in the stream to obtain the read pointer from.</param>
+    /// <param name="length">The length of data to read starting from the specified position.</param>
+    /// <returns>A read pointer to the specified position in the stream.</returns>
+    /// <exception cref="Exception">Thrown if the requested length exceeds the available data.</exception>
     public byte* GetReadPointer(long position, int length)
     {
         Position = position;
 
         if (RemainingReadLength <= 0)
             UpdateLocalBuffer(false);
+
         if (RemainingReadLength < length)
             throw new Exception("Cannot get the provided length.");
 
@@ -168,31 +179,37 @@ public unsafe abstract class BinaryStreamPointerBase
     }
 
     /// <summary>
-    /// Gets a pointer from the current position that can be used for writing up the the provided length.
-    /// The current position is not advanced after calling this function.
+    /// Gets a read pointer to a specified position in the stream for a specified length of data
+    /// and determines if the stream supports writing at that position.
     /// </summary>
-    /// <param name="position"></param>
-    /// <param name="length">The number of bytes valid for the writing.</param>
-    /// <param name="supportsWriting">An output parameter detailing if writing to this block is supported.</param>
-    /// <remarks>This method will throw an exception if the provided length cannot be provided.</remarks>
+    /// <param name="position">The position in the stream to obtain the read pointer from.</param>
+    /// <param name="length">The length of data to read starting from the specified position.</param>
+    /// <param name="supportsWriting">
+    ///   When this method returns, contains a boolean indicating whether writing is supported at the specified position.
+    /// </param>
+    /// <returns>A read pointer to the specified position in the stream.</returns>
+    /// <exception cref="Exception">Thrown if the requested length exceeds the available data.</exception>
     public byte* GetReadPointer(long position, int length, out bool supportsWriting)
     {
         Position = position;
         if (RemainingReadLength <= 0)
             UpdateLocalBuffer(false);
+
         if (RemainingReadLength < length)
             throw new Exception("Cannot get the provided length.");
 
         supportsWriting = RemainingWriteLength >= length;
+
         return Current;
     }
 
     /// <summary>
-    /// Copies a specified number of bytes to a new location.
+    /// Copies a block of data from one position in the stream to another position within the same stream.
     /// </summary>
-    /// <param name="source">The source position to start copying from.</param>
-    /// <param name="destination">The destination position to start copying to.</param>
-    /// <param name="length">The number of bytes to copy.</param>
+    /// <param name="source">The starting position in the stream from which data will be copied.</param>
+    /// <param name="destination">The position in the stream where the data will be copied to.</param>
+    /// <param name="length">The number of bytes to copy from the source position to the destination position.</param>
+    /// <exception cref="ArgumentException">Thrown if source, destination, or length is less than zero.</exception>
     public override void Copy(long source, long destination, int length)
     {
         if (source < 0)
@@ -230,6 +247,10 @@ public unsafe abstract class BinaryStreamPointerBase
         Write(data, 0, data.Length);
     }
 
+    /// <summary>
+    /// Writes a single byte to the stream.
+    /// </summary>
+    /// <param name="value">The byte value to write to the stream.</param>
     public override void Write(byte value)
     {
         const int size = sizeof(byte);
@@ -244,6 +265,10 @@ public unsafe abstract class BinaryStreamPointerBase
         base.Write(value);
     }
 
+    /// <summary>
+    /// Writes a single short to the stream.
+    /// </summary>
+    /// <param name="value">The short value to write to the stream.</param>
     public override void Write(short value)
     {
         const int size = sizeof(short);
@@ -258,6 +283,10 @@ public unsafe abstract class BinaryStreamPointerBase
         base.Write(value);
     }
 
+    /// <summary>
+    /// Writes a single int to the stream.
+    /// </summary>
+    /// <param name="value">The int value to write to the stream.</param>
     public override void Write(int value)
     {
         const int size = sizeof(int);
@@ -272,6 +301,10 @@ public unsafe abstract class BinaryStreamPointerBase
         base.Write(value);
     }
 
+    /// <summary>
+    /// Writes a single long to the stream.
+    /// </summary>
+    /// <param name="value">The long value to write to the stream.</param>
     public override void Write(long value)
     {
         const int size = sizeof(long);
@@ -286,6 +319,10 @@ public unsafe abstract class BinaryStreamPointerBase
         base.Write(value);
     }
 
+    /// <summary>
+    /// Writes a single uint to the stream.
+    /// </summary>
+    /// <param name="value">The uint value to write to the stream.</param>
     public override void Write7Bit(uint value)
     {
         const int size = 5;
@@ -297,6 +334,10 @@ public unsafe abstract class BinaryStreamPointerBase
         base.Write7Bit(value);
     }
 
+    /// <summary>
+    /// Writes a single ulong to the stream.
+    /// </summary>
+    /// <param name="value">The ulong value to write to the stream.</param>
     public override void Write7Bit(ulong value)
     {
         const int size = 9;
@@ -384,6 +425,11 @@ public unsafe abstract class BinaryStreamPointerBase
         base.Write7Bit(value);
     }
 
+    /// <summary>
+    /// Writes a block of data from a pointer to the stream.
+    /// </summary>
+    /// <param name="buffer">A pointer to the data to write.</param>
+    /// <param name="length">The number of bytes to write from the buffer.</param>
     public override void Write(byte* buffer, int length)
     {
         if (RemainingWriteLength <= 0)
@@ -419,6 +465,12 @@ public unsafe abstract class BinaryStreamPointerBase
         Current += length;
     }
 
+    /// <summary>
+    /// Writes a block of data from a byte array to the stream, starting from a specified offset and for a specified count of bytes.
+    /// </summary>
+    /// <param name="value">The byte array containing the data to write.</param>
+    /// <param name="offset">The starting offset in the byte array from which to begin writing.</param>
+    /// <param name="count">The number of bytes to write from the byte array.</param>
     public override void Write(byte[] value, int offset, int count)
     {
         if (Current + count <= LastWrite)
@@ -447,6 +499,10 @@ public unsafe abstract class BinaryStreamPointerBase
         }
     }
 
+    /// <summary>
+    /// Reads a single unsigned byte (UInt8) from the stream.
+    /// </summary>
+    /// <returns>The unsigned byte (UInt8) read from the stream.</returns>
     public override byte ReadUInt8()
     {
         const int size = sizeof(byte);
@@ -460,6 +516,10 @@ public unsafe abstract class BinaryStreamPointerBase
         return base.ReadUInt8();
     }
 
+    /// <summary>
+    /// Reads a single unsigned byte (UInt16) from the stream.
+    /// </summary>
+    /// <returns>The unsigned byte (UInt16) read from the stream.</returns>
     public override short ReadInt16()
     {
         const int size = sizeof(short);
@@ -473,6 +533,10 @@ public unsafe abstract class BinaryStreamPointerBase
         return base.ReadInt16();
     }
 
+    /// <summary>
+    /// Reads a single unsigned byte (UInt32) from the stream.
+    /// </summary>
+    /// <returns>The unsigned byte (UInt32) read from the stream.</returns>
     public override int ReadInt32()
     {
         const int size = sizeof(int);
@@ -486,6 +550,10 @@ public unsafe abstract class BinaryStreamPointerBase
         return base.ReadInt32();
     }
 
+    /// <summary>
+    /// Reads a single unsigned byte (UInt64) from the stream.
+    /// </summary>
+    /// <returns>The unsigned byte (UInt64) read from the stream.</returns>
     public override long ReadInt64()
     {
         const int size = sizeof(long);
@@ -499,6 +567,10 @@ public unsafe abstract class BinaryStreamPointerBase
         return base.ReadInt64();
     }
 
+    /// <summary>
+    /// Reads a 7-bit encoded unsigned 32-bit integer (UInt32) from the stream.
+    /// </summary>
+    /// <returns>The 7-bit encoded unsigned 32-bit integer (UInt32) read from the stream.</returns>
     public override uint Read7BitUInt32()
     {
         const int size = 5;
@@ -537,6 +609,10 @@ public unsafe abstract class BinaryStreamPointerBase
         return base.Read7BitUInt32();
     }
 
+    /// <summary>
+    /// Reads a 7-bit encoded unsigned 64-bit integer (UInt64) from the stream.
+    /// </summary>
+    /// <returns>The 7-bit encoded unsigned 64-bit integer (UInt64) read from the stream.</returns>
     public override ulong Read7BitUInt64()
     {
         const int size = 9;
@@ -545,58 +621,75 @@ public unsafe abstract class BinaryStreamPointerBase
         if (stream + size <= LastRead)
         {
             ulong value11 = stream[0];
+
             if (value11 < 128)
             {
                 Current += 1;
                 return value11;
             }
+
             value11 ^= (ulong)stream[1] << 7;
             if (value11 < 128 * 128)
             {
                 Current += 2;
                 return value11 ^ 0x80;
             }
+
             value11 ^= (ulong)stream[2] << (7 + 7);
+
             if (value11 < 128 * 128 * 128)
             {
                 Current += 3;
                 return value11 ^ 0x4080;
             }
+
             value11 ^= (ulong)stream[3] << (7 + 7 + 7);
+
             if (value11 < 128 * 128 * 128 * 128)
             {
                 Current += 4;
                 return value11 ^ 0x204080;
             }
+
             value11 ^= (ulong)stream[4] << (7 + 7 + 7 + 7);
+
             if (value11 < 128L * 128 * 128 * 128 * 128)
             {
                 Current += 5;
                 return value11 ^ 0x10204080L;
             }
+
             value11 ^= (ulong)stream[5] << (7 + 7 + 7 + 7 + 7);
+
             if (value11 < 128L * 128 * 128 * 128 * 128 * 128)
             {
                 Current += 6;
                 return value11 ^ 0x810204080L;
             }
+
             value11 ^= (ulong)stream[6] << (7 + 7 + 7 + 7 + 7 + 7);
+
             if (value11 < 128L * 128 * 128 * 128 * 128 * 128 * 128)
             {
                 Current += 7;
                 return value11 ^ 0x40810204080L;
             }
+
             value11 ^= (ulong)stream[7] << (7 + 7 + 7 + 7 + 7 + 7 + 7);
+
             if (value11 < 128L * 128 * 128 * 128 * 128 * 128 * 128 * 128)
             {
                 Current += 8;
                 return value11 ^ 0x2040810204080L;
             }
+
             value11 ^= (ulong)stream[8] << (7 + 7 + 7 + 7 + 7 + 7 + 7 + 7);
+
             Current += 9;
 
             return value11 ^ 0x102040810204080L;
         }
+
         return base.Read7BitUInt64();
     }
 
@@ -637,6 +730,10 @@ public unsafe abstract class BinaryStreamPointerBase
         throw new NotSupportedException();
     }
 
+    /// <summary>
+    /// Flushes any buffered data or state within the stream.
+    /// This method intentionally does nothing, as there is no buffering to flush.
+    /// </summary>
     public override void Flush()
     {
         // Do Nothing

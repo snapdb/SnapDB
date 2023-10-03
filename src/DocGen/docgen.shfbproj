@@ -21,7 +21,6 @@
       <Argument Key="RobotsMetadata" Value="" />
       <Argument Key="BibliographyDataFile" Value="" />
       <Argument Key="RootBreadcrumbTitleText" Value="Docs" />
-      <Argument Key="ResizableTocColumn" Value="False" />
       <Argument Key="CollapsibleSections" Value="True" />
       <Argument Key="LogoFile" Value="gemstone-square-48.png" />
       <Argument Key="LogoHeight" Value="" />
@@ -36,7 +35,7 @@
       <Argument Key="EnumMemberSortOrder" Value="Value" />
       <Argument Key="FlagsEnumValueFormat" Value="IntegerValue" />
       <Argument Key="FlagsEnumSeparatorSize" Value="0" />
-      <Argument Key="BaseSourceCodeUrl" Value="https://github.com/snapdb/SnapDB/blob/main/src" />
+      <Argument Key="BaseSourceCodeUrl" Value="https://github.com/snapdb/SnapDB/blob/main/src/" />
       <Argument Key="RequestExampleUrl" Value="Create a new issue: https://github.com/snapdb/SnapDB/issues/new" />
     </TransformComponentArguments>
     <HelpFileFormat>Website</HelpFileFormat>
@@ -59,12 +58,42 @@
           <colorizer syntaxFile="{@CoreComponentsFolder}Colorizer\highlight.xml" styleFile="{@CoreComponentsFolder}Colorizer\highlight.xsl" stylesheet="{@CoreComponentsFolder}Colorizer\highlight.css" scriptFile="{@CoreComponentsFolder}Colorizer\highlight.js" disabled="{@DisableCodeBlockComponent}" language="cs" tabSize="0" numberLines="false" outlining="false" keepSeeTags="false" defaultTitle="true" />
         </component>
       </ComponentConfig>
-<ComponentConfig id="API Token Resolution" enabled="True"><component id="API Token Resolution">{@TokenFiles}
-<replace elements="/*//token" item="string(.)" /></component></ComponentConfig>
-<ComponentConfig id="IntelliSense Component" enabled="True"><component id="IntelliSense Component"><output includeNamespaces="false" namespacesFile="Namespaces" folder="{@OutputFolder}" boundedCapacity="100" /></component></ComponentConfig>
-<ComponentConfig id="Syntax Component" enabled="True"><component id="Syntax Component"><syntax input="/document/reference" output="/document/syntax" renderReferenceLinks="true" /><generators>
+      <ComponentConfig id="API Token Resolution" enabled="True">
+        <component id="API Token Resolution">{@TokenFiles}
+<replace elements="/*//token" item="string(.)" /></component>
+      </ComponentConfig>
+      <ComponentConfig id="IntelliSense Component" enabled="True">
+        <component id="IntelliSense Component">
+          <output includeNamespaces="false" namespacesFile="Namespaces" folder="{@OutputFolder}" boundedCapacity="100" />
+        </component>
+      </ComponentConfig>
+      <ComponentConfig id="Syntax Component" enabled="True">
+        <component id="Syntax Component">
+          <syntax input="/document/reference" output="/document/syntax" renderReferenceLinks="true" />
+          <generators>
     {@SyntaxFilters}
-</generators><containerElement name="codeSnippetGroup" addNoExampleTabs="true" includeOnSingleSnippets="false" groupingEnabled="{@CodeSnippetGrouping}" /><configurations><generator id="C#" /><generator id="Visual Basic"><includeLineContinuation value="false" /></generator><generator id="Visual Basic Usage"><includeLineContinuation value="false" /></generator><generator id="Managed C++" /><generator id="F#" /><generator id="J#" /><generator id="JScript" /><generator id="JavaScript" /><generator id="XAML Usage" /><generator id="ASP.NET" /><generator id="X#" /></configurations></component></ComponentConfig></ComponentConfigurations>
+</generators>
+          <containerElement name="codeSnippetGroup" addNoExampleTabs="true" includeOnSingleSnippets="false" groupingEnabled="{@CodeSnippetGrouping}" />
+          <configurations>
+            <generator id="C#" />
+            <generator id="Visual Basic">
+              <includeLineContinuation value="false" />
+            </generator>
+            <generator id="Visual Basic Usage">
+              <includeLineContinuation value="false" />
+            </generator>
+            <generator id="Managed C++" />
+            <generator id="F#" />
+            <generator id="J#" />
+            <generator id="JScript" />
+            <generator id="JavaScript" />
+            <generator id="XAML Usage" />
+            <generator id="ASP.NET" />
+            <generator id="X#" />
+          </configurations>
+        </component>
+      </ComponentConfig>
+    </ComponentConfigurations>
     <PlugInConfigurations>
       <PlugInConfig id="Table of Contents Exclusion" enabled="True">
         <configuration />
@@ -88,7 +117,7 @@
     <HeaderText>
     </HeaderText>
     <FooterText>&amp;lt%3bspan class=&amp;quot%3bsite-footer-credits&amp;quot%3b&amp;gt%3b
-&amp;lt%3ba href=&amp;quot%3bhttps://snapdb.github.io/SnapDB/&amp;quot%3b target=&amp;quot%3b_self&amp;quot%3b&amp;gt%3bDocumentation Home&amp;lt%3b/a&amp;gt%3b &amp;#160%3b•&amp;#160%3b &amp;lt%3ba href=&amp;quot%3bhttps://www.nuget.org/packages/Gemstone.GemTem/&amp;quot%3b target=&amp;quot%3b_blank&amp;quot%3b&amp;gt%3bGemstone GemTem Library on NuGet&amp;lt%3b/a&amp;gt%3b&amp;lt%3bbr/&amp;gt%3b&amp;lt%3bbr/&amp;gt%3b
+&amp;lt%3ba href=&amp;quot%3bhttps://snapdb.github.io/SnapDB/&amp;quot%3b target=&amp;quot%3b_self&amp;quot%3b&amp;gt%3bDocumentation Home&amp;lt%3b/a&amp;gt%3b &amp;lt%3bbr/&amp;gt%3b&amp;lt%3bbr/&amp;gt%3b
 Generated by &amp;lt%3ba href=&amp;quot%3bhttps://github.com/EWSoftware/SHFB&amp;quot%3b target=&amp;quot%3b_blank&amp;quot%3b&amp;gt%3bSandcastle Help File Builder&amp;lt%3b/a&amp;gt%3b
 &amp;lt%3b/span&amp;gt%3b</FooterText>
     <RootNamespaceTitle>
