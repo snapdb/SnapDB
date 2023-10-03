@@ -40,7 +40,7 @@ public abstract class SeekFilterDefinitionBase
     public abstract Guid FilterType { get; }
 
     /// <summary>
-    /// Determines if a key-value is contained in the filter
+    /// Determines if a key-value is contained in the filter.
     /// </summary>
     /// <param name="stream">The value to check.</param>
     public abstract SeekFilterBase<TKey> Create<TKey>(BinaryStreamBase stream);
