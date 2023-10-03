@@ -49,9 +49,13 @@ public class NullableLargeArray<T> : IEnumerable<T?>
     }
 
     /// <summary>
-    /// Returns if the object is not null.
+    /// Checks if the element at the specified index has a value.
     /// </summary>
-    /// <param name="index"></param>
+    /// <param name="index">The index to check.</param>
+    /// <returns><c>true</c> if the element has a value; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    /// Bounds checking is performed by the underlying BitArray.
+    /// </remarks>
     public bool HasValue(int index)
     {
         // Bounds checking is done in BitArray.
@@ -59,11 +63,14 @@ public class NullableLargeArray<T> : IEnumerable<T?>
     }
 
     /// <summary>
-    /// Tries to get the following value for the list.
+    /// Tries to get the value at the specified index if it exists.
     /// </summary>
-    /// <param name="index"></param>
-    /// <param name="value"></param>
-    /// <returns><c>true</c> if the item exists; otherwise, <c>false</c>.</returns>
+    /// <param name="index">The index of the value to retrieve.</param>
+    /// <param name="value">When this method returns, contains the value at the specified index if it exists, or the default value for the type if not.</param>
+    /// <returns><c>true</c> if the value at the specified index exists; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    /// This method checks if the element at the specified index has a value using <see cref="HasValue(int)"/>.
+    /// </remarks>
     public bool TryGetValue(int index, out T? value)
     {
         if (HasValue(index))
@@ -119,7 +126,7 @@ public class NullableLargeArray<T> : IEnumerable<T?>
     }
 
     /// <summary>
-    /// Gets the specified item from the list. Throws an exception if the item is null.
+    /// Gets the specified item from the list. Throws an exception if the item is <c>null</c>.
     /// </summary>
     /// <param name="index"></param>
     /// <returns>The item from the specified index.</returns>
@@ -132,7 +139,7 @@ public class NullableLargeArray<T> : IEnumerable<T?>
     }
 
     /// <summary>
-    /// Sets the following item to null.
+    /// Sets the following item to <c>null</c>.
     /// </summary>
     /// <param name="index"></param>
     public void SetNull(int index)
@@ -142,10 +149,13 @@ public class NullableLargeArray<T> : IEnumerable<T?>
     }
 
     /// <summary>
-    /// Sets a value in the list.
+    /// Sets the value at the specified index.
     /// </summary>
-    /// <param name="index"></param>
-    /// <param name="value"></param>
+    /// <param name="index">The index at which to set the value.</param>
+    /// <param name="value">The value to set at the specified index.</param>
+    /// <remarks>
+    /// This method sets the value at the specified index and marks it as used using <see cref="BitArray.SetBit(int)"/>.
+    /// </remarks>
     public void SetValue(int index, T? value)
     {
         m_isUsed.SetBit(index);
@@ -153,10 +163,14 @@ public class NullableLargeArray<T> : IEnumerable<T?>
     }
 
     /// <summary>
-    /// Replaces an existing value in the list. Throws an exception if the existing item is null.
+    /// Overwrites the value at the specified index.
     /// </summary>
-    /// <param name="index"></param>
-    /// <param name="value"></param>
+    /// <param name="index">The index of the value to overwrite.</param>
+    /// <param name="value">The new value to set at the specified index.</param>
+    /// <exception cref="IndexOutOfRangeException">Thrown if the index does not exist.</exception>
+    /// <remarks>
+    /// This method replaces the existing value at the specified index with the new value.
+    /// </remarks>
     public void OverwriteValue(int index, T? value)
     {
         if (!HasValue(index))

@@ -40,10 +40,16 @@ public interface IImmutableObject
     /// <summary>
     /// Makes a clone of this object and allows it to be edited.
     /// </summary>
+    /// <returns>
+    /// An editable clone of the object.
+    /// </returns>
     object CloneEditable();
 
     /// <summary>
     /// Makes a "read only" clone of this object. Returns the same object if it is already marked as "read only".
     /// </summary>
+    /// <returns>
+    /// A "read only" clone of the object.
+    /// </returns>
     object CloneReadonly();
 }

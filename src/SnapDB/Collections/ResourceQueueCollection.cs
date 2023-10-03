@@ -97,9 +97,18 @@ public class ResourceQueueCollection<TKey, TResource>
     public ResourceQueue<TResource>? this[TKey key] => GetResourceQueue(key);
 
     /// <summary>
-    /// Gets the resource queue for a key of this.
+    /// Gets a resource queue associated with the specified key or creates a new one if it doesn't exist.
     /// </summary>
-    /// <param name="key">The key identifying the resource queue to pull from</param>
+    /// <param name="key">The key associated with the resource queue.</param>
+    /// <returns>
+    /// A <see cref="ResourceQueue{TResource}"/> instance associated with the specified key.
+    /// If the resource queue doesn't exist, a new one is created and added to the collection.
+    /// </returns>
+    /// <remarks>
+    /// This method provides thread-safe access to resource queues. It attempts to retrieve an
+    /// existing resource queue associated with the given key. If the queue doesn't exist, it creates
+    /// a new resource queue based on the provided initialization parameters and adds it to the collection.
+    /// </remarks>
     public ResourceQueue<TResource>? GetResourceQueue(TKey key)
     {
         ResourceQueue<TResource>? resourceQueue;

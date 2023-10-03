@@ -29,15 +29,16 @@ namespace SnapDB.Collections;
 /// <summary>
 /// Extensions for <see cref="IList{T}"/>
 /// </summary>
-public static class ListExtensions
-{
+public static class ListExtensions { 
+
     /// <summary>
-    /// Parses through the provided list and assigns <see cref="item"/> to the first null field. 
-    /// Otherwise, it will be added to the end of the list.
+    /// Replaces the first <c>null</c> element in the list with the specified item, or adds the item to the end of the list if no <c>null</c> elements are found.
     /// </summary>
-    /// <param name="list">The list to iterate through.</param>
-    /// <param name="item">The item to add.</param>
-    /// <returns>The index of the added item.</returns>
+    /// <typeparam name="T">The type of elements in the list, which must be reference types.</typeparam>
+    /// <param name="list">The list to operate on.</param>
+    /// <param name="item">The item to replace or add.</param>
+    /// <returns>The index of the replaced or added item in the list.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the input list is <c>null</c>.</exception>
     public static int ReplaceFirstNullOrAdd<T>(this IList<T?> list, T item)
         where T : class
     {
@@ -62,14 +63,15 @@ public static class ListExtensions
         return list.Count - 1;
     }
 
-    /// <summary>
-    /// Parses through the provided list and assigns <see cref="item"/> to the first null field. 
-    /// Otherwise, it will be added to the end of the list.
-    /// </summary>
-    /// <param name="list">The list to iterate through.</param>
-    /// <param name="item">The item to add.</param>
-    /// <returns>Th index of the added item.</returns>
-    public static int ReplaceFirstNullOrAdd<T>(this List<T?> list, T item)
+/// <summary>
+/// Replaces the first <c>null</c> element in the list with the specified item, or adds the item to the end of the list if no <c>null</c> elements are found.
+/// </summary>
+/// <typeparam name="T">The type of elements in the list, which must be reference types.</typeparam>
+/// <param name="list">The list to operate on.</param>
+/// <param name="item">The item to replace or add.</param>
+/// <returns>The index of the replaced or added item in the list.</returns>
+/// <exception cref="ArgumentNullException">Thrown when the input list is <c>null</c>.</exception>
+public static int ReplaceFirstNullOrAdd<T>(this List<T?> list, T item)
        where T : class
     {
         if (list is null)

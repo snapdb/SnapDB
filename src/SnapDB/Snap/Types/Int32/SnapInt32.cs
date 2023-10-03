@@ -34,13 +34,23 @@ namespace SnapDB.Snap.Types;
 public class SnapInt32
     : SnapTypeBase<SnapInt32>
 {
-
+    /// <summary>
+    /// Gets or sets the integer value.
+    /// </summary>
     public int Value;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SnapInt32"/> class.
+    /// </summary>
     public SnapInt32()
     {
 
     }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SnapInt32"/> class with the specified value.
+    /// </summary>
+    /// <param name="value">The integer value to initialize with.</param>
     public SnapInt32(int value)
     {
         Value = value;
