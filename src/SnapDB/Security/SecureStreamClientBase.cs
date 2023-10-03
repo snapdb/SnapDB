@@ -142,15 +142,13 @@ public abstract class SecureStreamClientBase
                 return true;
             }
 
-            if (ssl is not null)
-                ssl.Dispose();
+            ssl?.Dispose();
             return false;
         }
         catch (Exception ex)
         {
             Log.Publish(MessageLevel.Info, "Authentication Failed", null, null, ex);
-            if (ssl is not null)
-                ssl.Dispose();
+            ssl?.Dispose();
             return false;
         }
 
@@ -246,8 +244,7 @@ public abstract class SecureStreamClientBase
         }
         finally
         {
-            if (secureStream is not null)
-                secureStream.Dispose();
+            secureStream?.Dispose();
         }
     }
     /// <summary>
@@ -269,8 +266,7 @@ public abstract class SecureStreamClientBase
         }
         catch
         {
-            if (secureStream is not null)
-                secureStream.Dispose();
+            secureStream?.Dispose();
             throw;
         }
     }

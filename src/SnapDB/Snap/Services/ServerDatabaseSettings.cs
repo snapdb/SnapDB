@@ -40,10 +40,6 @@ public class ServerDatabaseSettings
     private Guid m_keyType;
     private Guid m_valueType;
     private string m_databaseName;
-    private readonly ImmutableList<EncodingDefinition> m_streamingEncodingMethods;
-    private readonly ArchiveListSettings m_archiveList;
-    private readonly WriteProcessorSettings m_writeProcessor;
-    private readonly RolloverLogSettings m_rolloverLog;
     private bool m_supportsWriting;
 
     /// <summary>
@@ -52,12 +48,12 @@ public class ServerDatabaseSettings
     public ServerDatabaseSettings()
     {
         m_databaseName = string.Empty;
-        m_archiveList = new ArchiveListSettings();
-        m_writeProcessor = new WriteProcessorSettings();
-        m_rolloverLog = new RolloverLogSettings();
+        ArchiveList = new ArchiveListSettings();
+        WriteProcessor = new WriteProcessorSettings();
+        RolloverLog = new RolloverLogSettings();
         m_keyType = Guid.Empty;
         m_valueType = Guid.Empty;
-        m_streamingEncodingMethods = new ImmutableList<EncodingDefinition>(x =>
+        StreamingEncodingMethods = new ImmutableList<EncodingDefinition>(x =>
         {
             if (x is null)
                 throw new ArgumentNullException("value");
@@ -108,22 +104,22 @@ public class ServerDatabaseSettings
     /// <summary>
     /// Gets the supported streaming methods.
     /// </summary>
-    public ImmutableList<EncodingDefinition> StreamingEncodingMethods => m_streamingEncodingMethods;
+    public ImmutableList<EncodingDefinition> StreamingEncodingMethods { get; }
 
     /// <summary>
     /// The settings for the ArchiveList.
     /// </summary>
-    public ArchiveListSettings ArchiveList => m_archiveList;
+    public ArchiveListSettings ArchiveList { get; }
 
     /// <summary>
     /// Settings for the writer -- <c>null</c> if the server does not support writing.
     /// </summary>
-    public WriteProcessorSettings WriteProcessor => m_writeProcessor;
+    public WriteProcessorSettings WriteProcessor { get; }
 
     /// <summary>
     /// The settings for the rollover log.
     /// </summary>
-    public RolloverLogSettings RolloverLog => m_rolloverLog;
+    public RolloverLogSettings RolloverLog { get; }
 
     /// <summary>
     /// Gets if writing or file combination will be enabled.
@@ -149,14 +145,14 @@ public class ServerDatabaseSettings
         stream.Write(m_keyType);
         stream.Write(m_valueType);
         stream.Write(m_databaseName);
-        stream.Write(m_streamingEncodingMethods.Count);
+        stream.Write(StreamingEncodingMethods.Count);
 
-        foreach (EncodingDefinition path in m_streamingEncodingMethods)
+        foreach (EncodingDefinition path in StreamingEncodingMethods)
             path.Save(stream);
 
-        m_archiveList.Save(stream);
-        m_writeProcessor.Save(stream);
-        m_rolloverLog.Save(stream);
+        ArchiveList.Save(stream);
+        WriteProcessor.Save(stream);
+        RolloverLog.Save(stream);
     }
 
     public override void Load(Stream stream)
@@ -171,17 +167,17 @@ public class ServerDatabaseSettings
                 m_valueType = stream.ReadGuid();
                 m_databaseName = stream.ReadString();
                 int cnt = stream.ReadInt32();
-                m_streamingEncodingMethods.Clear();
+                StreamingEncodingMethods.Clear();
 
                 while (cnt > 0)
                 {
                     cnt--;
-                    m_streamingEncodingMethods.Add(new EncodingDefinition(stream));
+                    StreamingEncodingMethods.Add(new EncodingDefinition(stream));
                 }
 
-                m_archiveList.Load(stream);
-                m_writeProcessor.Load(stream);
-                m_rolloverLog.Load(stream);
+                ArchiveList.Load(stream);
+                WriteProcessor.Load(stream);
+                RolloverLog.Load(stream);
 
                 break;
 
@@ -192,11 +188,11 @@ public class ServerDatabaseSettings
 
     public override void Validate()
     {
-        m_archiveList.Validate();
-        m_rolloverLog.Validate();
+        ArchiveList.Validate();
+        RolloverLog.Validate();
 
         if (m_supportsWriting)
-            m_writeProcessor.Validate();
+            WriteProcessor.Validate();
 
         if (StreamingEncodingMethods.Count == 0)
             throw new Exception("Must specify a streaming method");

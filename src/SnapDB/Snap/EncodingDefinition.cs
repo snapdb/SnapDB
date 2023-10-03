@@ -48,13 +48,12 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     /// <summary>
     /// Gets if the compression method compresses the key and value as a unit.
     /// </summary>
-    public bool IsKeyValueEncoded { get; private set; }
+    public bool IsKeyValueEncoded { get; }
 
     private readonly Guid m_keyEncodingMethod;
     private readonly Guid m_valueEncodingMethod;
     private readonly Guid m_keyValueEncodingMethod;
     private readonly int m_hashCode;
-    private readonly bool m_isFixedSizeEncoding;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EncodingDefinition"/> class from a binary stream.
@@ -78,7 +77,7 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
             IsKeyValueEncoded = false;
         }
         m_hashCode = ComputeHashCode();
-        m_isFixedSizeEncoding = this == FixedSizeCombinedEncoding ||
+        IsFixedSizeEncoding = this == FixedSizeCombinedEncoding ||
                                 this == FixedSizeIndividualEncoding;
     }
 
@@ -104,7 +103,7 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
             IsKeyValueEncoded = false;
         }
         m_hashCode = ComputeHashCode();
-        m_isFixedSizeEncoding = this == FixedSizeCombinedEncoding ||
+        IsFixedSizeEncoding = this == FixedSizeCombinedEncoding ||
                                 this == FixedSizeIndividualEncoding;
     }
 
@@ -119,7 +118,7 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
         m_keyValueEncodingMethod = keyValueEncoding;
         IsKeyValueEncoded = true;
         m_hashCode = ComputeHashCode();
-        m_isFixedSizeEncoding = keyValueEncoding == FixedSizeIndividualGuid;
+        IsFixedSizeEncoding = keyValueEncoding == FixedSizeIndividualGuid;
     }
 
     /// <summary>
@@ -134,14 +133,14 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
         m_keyValueEncodingMethod = Guid.Empty;
         IsKeyValueEncoded = false;
         m_hashCode = ComputeHashCode();
-        m_isFixedSizeEncoding = keyEncoding == FixedSizeIndividualGuid &&
+        IsFixedSizeEncoding = keyEncoding == FixedSizeIndividualGuid &&
                                 valueEncoding == FixedSizeIndividualGuid;
     }
 
     /// <summary>
     /// Gets if the encoding method is the special fixed size encoding method.
     /// </summary>
-    public bool IsFixedSizeEncoding => m_isFixedSizeEncoding;
+    public bool IsFixedSizeEncoding { get; }
 
     /// <summary>
     /// Gets the compression method for keys when <see cref="IsKeyValueEncoded"/> is false.
@@ -233,8 +232,7 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     /// <param name="other">An object to compare with this object.</param>
     public int CompareTo(EncodingDefinition other)
     {
-        int cmp;
-        cmp = m_hashCode.CompareTo(other.m_hashCode); if (cmp != 0) return cmp;
+        int cmp = m_hashCode.CompareTo(other.m_hashCode); if (cmp != 0) return cmp;
         cmp = IsKeyValueEncoded.CompareTo(other.IsKeyValueEncoded); if (cmp != 0) return cmp;
         cmp = m_keyEncodingMethod.CompareTo(other.m_keyEncodingMethod); if (cmp != 0) return cmp;
         cmp = m_valueEncodingMethod.CompareTo(other.m_valueEncodingMethod); if (cmp != 0) return cmp;
@@ -250,7 +248,7 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     /// <param name="other">An object to compare with this object.</param>
     public bool Equals(EncodingDefinition other)
     {
-        return (object)other != null &&
+        return (object)other is not null &&
                m_hashCode == other.m_hashCode &&
                IsKeyValueEncoded == other.IsKeyValueEncoded &&
                m_keyEncodingMethod == other.m_keyEncodingMethod &&
@@ -267,8 +265,7 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     /// <param name="obj">The object to compare with the current object. </param><filterpriority>2</filterpriority>
     public override bool Equals(object obj)
     {
-        EncodingDefinition o = obj as EncodingDefinition;
-        if (o is null)
+        if (obj is not EncodingDefinition o)
             return false;
         return Equals(o);
     }
@@ -282,8 +279,7 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     /// <param name="obj">An object to compare with this instance. </param><exception cref="T:System.ArgumentException"><paramref name="obj"/> is not the same type as this instance. </exception><filterpriority>2</filterpriority>
     public int CompareTo(object obj)
     {
-        EncodingDefinition o = obj as EncodingDefinition;
-        if (o is null)
+        if (obj is not EncodingDefinition o)
             return -1;
         return CompareTo(o);
     }

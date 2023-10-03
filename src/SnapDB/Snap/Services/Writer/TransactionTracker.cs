@@ -46,7 +46,7 @@ public class TransactionTracker<TKey, TValue>
     /// </summary>
     private class WaitForCommit : IDisposable
     {
-        public long TransactionId { get; private set; }
+        public long TransactionId { get; }
         private ManualResetEvent m_resetEvent;
         public WaitForCommit(long transactionId)
         {
@@ -66,7 +66,7 @@ public class TransactionTracker<TKey, TValue>
 
         public void Dispose()
         {
-            if (m_resetEvent != null)
+            if (m_resetEvent is not null)
             {
                 m_resetEvent.Dispose();
                 m_resetEvent = null;
@@ -156,7 +156,7 @@ public class TransactionTracker<TKey, TValue>
         }
         m_prebuffer.Commit(transactionId);
 
-        using (WaitForCommit wait = new WaitForCommit(transactionId))
+        using (WaitForCommit wait = new(transactionId))
         {
             lock (m_syncRoot)
             {
@@ -187,7 +187,7 @@ public class TransactionTracker<TKey, TValue>
         m_firstStageWriter.Commit(transactionId);
 
 
-        using (WaitForCommit wait = new WaitForCommit(transactionId))
+        using (WaitForCommit wait = new(transactionId))
         {
             lock (m_syncRoot)
             {

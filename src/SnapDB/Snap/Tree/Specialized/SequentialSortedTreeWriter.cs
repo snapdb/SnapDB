@@ -49,15 +49,15 @@ public static class SequentialSortedTreeWriter<TKey, TValue>
     public static void Create(BinaryStreamPointerBase stream, int blockSize, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream)
     {
         if (stream is null)
-            throw new ArgumentNullException("stream");
+            throw new ArgumentNullException(nameof(stream));
         if (treeStream is null)
-            throw new ArgumentNullException("stream");
+            throw new ArgumentNullException(nameof(stream));
         if (treeNodeType is null)
-            throw new ArgumentNullException("treeNodeType");
+            throw new ArgumentNullException(nameof(treeNodeType));
         if (!(treeStream.IsAlwaysSequential && treeStream.NeverContainsDuplicates))
-            throw new ArgumentException("Stream must gaurentee sequential reads and that it never will contain a duplicate", "treeStream");
+            throw new ArgumentException("Stream must guarantee sequential reads and that it never will contain a duplicate", nameof(treeStream));
 
-        SortedTreeHeader header = new SortedTreeHeader();
+        SortedTreeHeader header = new();
         header.TreeNodeType = treeNodeType;
         header.BlockSize = blockSize;
         header.RootNodeLevel = 0;
@@ -70,7 +70,7 @@ public static class SequentialSortedTreeWriter<TKey, TValue>
             return header.LastAllocatedBlock;
         };
 
-        SparseIndexWriter<TKey> indexer = new SparseIndexWriter<TKey>();
+        SparseIndexWriter<TKey> indexer = new();
 
         NodeWriter<TKey, TValue>.Create(treeNodeType, stream, header.BlockSize, header.RootNodeLevel, header.RootNodeIndexAddress, getNextNewNodeIndex, indexer, treeStream);
 
@@ -80,7 +80,7 @@ public static class SequentialSortedTreeWriter<TKey, TValue>
             header.RootNodeLevel++;
             header.RootNodeIndexAddress = getNextNewNodeIndex();
 
-            SparseIndexWriter<TKey> indexer2 = new SparseIndexWriter<TKey>();
+            SparseIndexWriter<TKey> indexer2 = new();
             NodeWriter<TKey, SnapUInt32>.Create(EncodingDefinition.FixedSizeCombinedEncoding, stream, header.BlockSize, header.RootNodeLevel, header.RootNodeIndexAddress, getNextNewNodeIndex, indexer2, indexer);
 
             indexer.Dispose();

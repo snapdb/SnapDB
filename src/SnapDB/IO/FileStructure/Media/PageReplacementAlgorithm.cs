@@ -41,7 +41,7 @@ internal partial class PageReplacementAlgorithm
     : IDisposable
 {
 
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(PageReplacementAlgorithm), MessageClass.Component);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(PageReplacementAlgorithm), MessageClass.Component);
 
     #region [ Members ]
 
@@ -104,7 +104,7 @@ internal partial class PageReplacementAlgorithm
 #if DEBUG
     ~PageReplacementAlgorithm()
     {
-        Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
+        s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
         // Don't dispose since only the page list contains data that must be released.
     }
 #endif

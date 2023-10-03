@@ -120,7 +120,7 @@ public class ArchiveDetails
         where TKey : SnapTypeBase<TKey>, new()
         where TValue : SnapTypeBase<TValue>, new()
     {
-        ArchiveDetails details = new ArchiveDetails
+        ArchiveDetails details = new()
         {
             Id = table.FileId,
             FileName = table.SortedTreeTable.BaseFile.FilePath,

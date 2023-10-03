@@ -106,7 +106,7 @@ public class SnapStreamingClient
         {
             case ServerResponse.UnhandledException:
                 string exception = m_stream.ReadString();
-                throw new Exception($"Server UnhandledExcetion: \n{exception}");
+                throw new Exception($"Server UnhandledException: \n{exception}");
             case ServerResponse.UnknownProtocol:
                 throw new Exception("Client and server cannot agree on a protocol, this is commonly because they are running incompatible versions.");
             case ServerResponse.ConnectedToRoot:
@@ -129,15 +129,15 @@ public class SnapStreamingClient
         {
             case ServerResponse.UnhandledException:
                 string exception = m_stream.ReadString();
-                throw new Exception($"Server UnhandledExcetion: \n{exception}");
+                throw new Exception($"Server UnhandledException: \n{exception}");
             case ServerResponse.ListOfDatabases:
                 int count = m_stream.ReadInt32();
-                Dictionary<string, DatabaseInfo> dict = new Dictionary<string, DatabaseInfo>();
+                Dictionary<string, DatabaseInfo> dict = new();
 
                 while (count > 0)
                 {
                     count--;
-                    DatabaseInfo info = new DatabaseInfo(m_stream);
+                    DatabaseInfo info = new(m_stream);
                     dict.Add(info.DatabaseName.ToUpper(), info);
                 }
 
@@ -213,7 +213,7 @@ public class SnapStreamingClient
         if (encodingMethod is null)
             encodingMethod = dbInfo.SupportedStreamingModes.First();
 
-        if (m_sortedTreeEngine != null)
+        if (m_sortedTreeEngine is not null)
             throw new Exception($"Can only connect to one database at a time. Please disconnect from database{m_historianDatabaseString}");
 
         if (dbInfo.KeyType != typeof(TKey))
@@ -234,7 +234,7 @@ public class SnapStreamingClient
         {
             case ServerResponse.UnhandledException:
                 string exception = m_stream.ReadString();
-                throw new Exception($"Server UnhandledExcetion: \n{exception}");
+                throw new Exception($"Server UnhandledException: \n{exception}");
             case ServerResponse.DatabaseDoesNotExist:
                 throw new Exception($"Database does not exist on the server: {databaseName}");
             case ServerResponse.DatabaseKeyUnknown:
@@ -247,7 +247,7 @@ public class SnapStreamingClient
                 throw new Exception($"Unknown server response: {command}");
         }
 
-        StreamingClientDatabase<TKey, TValue> db = new StreamingClientDatabase<TKey, TValue>(m_stream, () => m_sortedTreeEngine = null, dbInfo);
+        StreamingClientDatabase<TKey, TValue> db = new(m_stream, () => m_sortedTreeEngine = null, dbInfo);
         m_sortedTreeEngine = db;
         m_historianDatabaseString = databaseName;
 
@@ -270,8 +270,7 @@ public class SnapStreamingClient
             if (!disposing)
                 return;
 
-            if (m_sortedTreeEngine != null)
-                m_sortedTreeEngine.Dispose();
+            m_sortedTreeEngine?.Dispose();
 
             m_sortedTreeEngine = null;
 
@@ -285,8 +284,7 @@ public class SnapStreamingClient
                 Logger.SwallowException(ex);
             }
 
-            if (m_rawStream != null)
-                m_rawStream.Dispose();
+            m_rawStream?.Dispose();
 
             m_rawStream = null;
         }

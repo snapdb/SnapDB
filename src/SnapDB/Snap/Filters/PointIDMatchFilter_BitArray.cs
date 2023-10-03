@@ -30,14 +30,14 @@ using SnapDB.Snap.Types;
 
 namespace SnapDB.Snap.Filters;
 
-public partial class PointIdMatchFilter_BitArray
+public partial class PointIdMatchFilterBitArray
 {
     /// <summary>
     /// A filter that uses a <see cref="BitArray"/> to set <c>true</c> and <c>false</c> values.
     /// </summary>
     public class BitArrayFilter<TKey, TValue>
         : MatchFilterBase<TKey, TValue>
-        where TKey : TimestampPointIDBase<TKey>, new()
+        where TKey : TimestampPointIdBase<TKey>, new()
     {
         private readonly BitArray m_points;
 
@@ -53,7 +53,7 @@ public partial class PointIdMatchFilter_BitArray
         public BitArrayFilter(BinaryStreamBase stream, int pointCount, ulong maxValue)
         {
             if (maxValue >= int.MaxValue)
-                throw new ArgumentOutOfRangeException("maxValue", "Cannot be larger than int.MaxValue-1");
+                throw new ArgumentOutOfRangeException(nameof(maxValue), "Cannot be larger than int.MaxValue-1");
 
             MaxValue = maxValue;
             m_points = new BitArray(false, (int)maxValue + 1);
@@ -109,9 +109,9 @@ public partial class PointIdMatchFilter_BitArray
 
         public override bool Contains(TKey key, TValue value)
         {
-            int point = (int)key.PointID;
+            int point = (int)key.PointId;
 
-            return key.PointID <= MaxValue && m_points.GetBitUnchecked(point);
+            return key.PointId <= MaxValue && m_points.GetBitUnchecked(point);
         }
     }
 }

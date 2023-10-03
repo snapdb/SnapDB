@@ -74,7 +74,7 @@ public class SrpServerSession
         //  byte    Mode = (1: New, 2: Resume)
 
         byte mode = stream.ReadNextByte();
-        Sha512Digest hash = new Sha512Digest();
+        Sha512Digest hash = new();
 
         switch (mode)
         {
@@ -116,7 +116,7 @@ public class SrpServerSession
         stream.Flush(); //since computing B takes a long time. Go ahead and flush
 
         SrpConstants param = SrpConstants.Lookup(m_user.SrpStrength);
-        Srp6Server server = new Srp6Server(param, m_user.VerificationInteger);
+        Srp6Server server = new(param, m_user.VerificationInteger);
         BigInteger pubB = server.GenerateServerCredentials();
 
         byte[] pubBBytes = pubB.ToPaddedArray(srpNumberLength);
@@ -125,15 +125,15 @@ public class SrpServerSession
 
         //Read from client: A
         byte[] pubABytes = stream.ReadBytes(srpNumberLength);
-        BigInteger pubA = new BigInteger(1, pubABytes);
+        BigInteger pubA = new(1, pubABytes);
 
         //Calculate Session Key
-        BigInteger S = server.CalculateSecret(hash, pubA);
-        byte[] SBytes = S.ToPaddedArray(srpNumberLength);
+        BigInteger s = server.CalculateSecret(hash, pubA);
+        byte[] sBytes = s.ToPaddedArray(srpNumberLength);
 
 
-        byte[] clientProofCheck = hash.ComputeHash(pubABytes, pubBBytes, SBytes, additionalChallenge);
-        byte[] serverProof = hash.ComputeHash(pubBBytes, pubABytes, SBytes, additionalChallenge);
+        byte[] clientProofCheck = hash.ComputeHash(pubABytes, pubBBytes, sBytes, additionalChallenge);
+        byte[] serverProof = hash.ComputeHash(pubBBytes, pubABytes, sBytes, additionalChallenge);
         byte[] clientProof = stream.ReadBytes(hash.GetDigestSize());
 
         if (clientProof.SecureEquals(clientProofCheck))
@@ -142,9 +142,9 @@ public class SrpServerSession
             stream.Write(serverProof);
             stream.Flush();
 
-            byte[] K = hash.ComputeHash(pubABytes, SBytes, pubBBytes).Combine(hash.ComputeHash(pubBBytes, SBytes, pubABytes));
-            byte[] ticket = CreateSessionData(K, m_user);
-            SessionSecret = K;
+            byte[] k = hash.ComputeHash(pubABytes, sBytes, pubBBytes).Combine(hash.ComputeHash(pubBBytes, sBytes, pubABytes));
+            byte[] ticket = CreateSessionData(k, m_user);
+            SessionSecret = k;
             stream.Write((short)ticket.Length);
             stream.Write(ticket);
             stream.Flush();
@@ -246,7 +246,7 @@ public class SrpServerSession
 
             fixed (byte* lp = ticket)
             {
-                using (BinaryStreamPointerWrapper stream = new BinaryStreamPointerWrapper(lp, ticket.Length))
+                using (BinaryStreamPointerWrapper stream = new(lp, ticket.Length))
                 {
                     stream.Write((byte)1);
                     stream.Write((short)len);
@@ -254,7 +254,7 @@ public class SrpServerSession
                     stream.Write(DateTime.UtcNow);
                     stream.Write(initializationVector);
                     stream.Write(encryptedData);
-                    stream.Write(HMAC<Sha256Digest>.Compute(user.ServerHMACKey, ticket, 0, ticket.Length - 32));
+                    stream.Write(Hmac<Sha256Digest>.Compute(user.ServerHmacKey, ticket, 0, ticket.Length - 32));
                 }
             }
         }
@@ -290,7 +290,7 @@ public class SrpServerSession
 
         fixed (byte* lp = ticket)
         {
-            BinaryStreamPointerWrapper stream = new BinaryStreamPointerWrapper(lp, ticket.Length);
+            BinaryStreamPointerWrapper stream = new(lp, ticket.Length);
             if (stream.ReadUInt8() != 1)
                 return false;
 
@@ -317,7 +317,7 @@ public class SrpServerSession
             //Verify the signature if everything else looks good.
             //This is last because it is the most computationally complex.
             //This limits denial of service attacks.
-            byte[] hmac = HMAC<Sha256Digest>.Compute(user.ServerHMACKey, ticket, 0, ticket.Length - 32);
+            byte[] hmac = Hmac<Sha256Digest>.Compute(user.ServerHmacKey, ticket, 0, ticket.Length - 32);
             if (!hmac.SecureEquals(ticket, ticket.Length - 32, 32))
                 return false;
 

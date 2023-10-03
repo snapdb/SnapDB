@@ -176,7 +176,7 @@ public class AdvancedServerDatabaseConfig<TKey, TValue>
 
     public ServerDatabaseSettings ToServerDatabaseSettings()
     {
-        ServerDatabaseSettings settings = new ServerDatabaseSettings
+        ServerDatabaseSettings settings = new()
         {
             DatabaseName = DatabaseName
         };
@@ -207,7 +207,7 @@ public class AdvancedServerDatabaseConfig<TKey, TValue>
         ValidateExtension(IntermediateFileExtension, out string intermediateFilePendingExtension, out string intermediateFileFinalExtension);
         ValidateExtension(FinalFileExtension, out string finalFilePendingExtension, out string finalFileFinalExtension);
 
-        List<string> finalPaths = new List<string>();
+        List<string> finalPaths = new();
 
         if (FinalWritePaths.Count > 0)
             finalPaths.AddRange(FinalWritePaths);
@@ -232,7 +232,7 @@ public class AdvancedServerDatabaseConfig<TKey, TValue>
         {
             int remainingStages = StagingCount - stage;
 
-            CombineFilesSettings rollover = new CombineFilesSettings();
+            CombineFilesSettings rollover = new();
 
             if (remainingStages > 0)
             {

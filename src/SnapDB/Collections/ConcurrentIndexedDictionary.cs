@@ -81,6 +81,7 @@ public class ConcurrentIndexedDictionary<TKey, TValue> where TKey : notnull
     public TValue Get(TKey key)
     {
         int index;
+
         lock (m_syncRoot)
             index = m_lookup[key];
 
@@ -162,7 +163,7 @@ public class ConcurrentIndexedDictionary<TKey, TValue> where TKey : notnull
         }
     }
 
-    private void ThrowIndexException()
+    private static void ThrowIndexException()
     {
         throw new IndexOutOfRangeException("specified index is outside the range of valid indexes");
     }

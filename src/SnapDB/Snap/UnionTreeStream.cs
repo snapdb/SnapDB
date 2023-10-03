@@ -41,8 +41,8 @@ public partial class UnionTreeStream<TKey, TValue>
     private TreeStream<TKey, TValue> m_firstStream;
     private BufferedTreeStream m_firstTable;
 
-    private readonly TKey m_readWhileUpperBounds = new TKey();
-    private readonly TKey m_nextArchiveStreamLowerBounds = new TKey();
+    private readonly TKey m_readWhileUpperBounds = new();
+    private readonly TKey m_nextArchiveStreamLowerBounds = new();
     private readonly bool m_ownsStreams;
 
     /// <summary>
@@ -86,7 +86,7 @@ public partial class UnionTreeStream<TKey, TValue>
     /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected override void Dispose(bool disposing)
     {
-        if (m_tablesOrigList != null && m_ownsStreams)
+        if (m_tablesOrigList is not null && m_ownsStreams)
         {
             foreach (BufferedTreeStream table in m_tablesOrigList)
             {
@@ -115,7 +115,7 @@ public partial class UnionTreeStream<TKey, TValue>
     /// <returns><see langword="true"/> if a key-value pair was successfully read; otherwise, <see langword="false"/>.</returns>
     protected override bool ReadNext(TKey key, TValue value)
     {
-        if (m_firstStream != null && m_firstStream.Read(key, value))
+        if (m_firstStream is not null && m_firstStream.Read(key, value))
         {
             if (key.IsLessThan(m_readWhileUpperBounds))
             {
@@ -135,7 +135,7 @@ public partial class UnionTreeStream<TKey, TValue>
             // the value is cached.
             // or
             // the end of the stream has occured.
-            if (m_firstTable != null && m_firstTable.IsValid)
+            if (m_firstTable is not null && m_firstTable.IsValid)
             {
                 // The value is cached.
                 m_firstTable.Read(key, value);

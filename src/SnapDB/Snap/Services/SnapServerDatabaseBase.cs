@@ -48,7 +48,7 @@ public abstract class SnapServerDatabaseBase
 
     protected LogStackMessages GetSourceDetails()
     {
-        return Info != null ?
+        return Info is not null ?
             LogStackMessages.Empty.Union("Database", $"Database: {Info.DatabaseName} Key: {Info.KeyType.FullName} Value: {Info.ValueType.FullName}") :
             LogStackMessages.Empty;
     }

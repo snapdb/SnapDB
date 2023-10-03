@@ -67,13 +67,13 @@ public class PrebufferWriter<TKey, TValue>
     /// <summary>
     /// The point sequence number assigned to points when they are added to the prebuffer.
     /// </summary>
-    private readonly AtomicInt64 m_latestTransactionId = new AtomicInt64();
+    private readonly AtomicInt64 m_latestTransactionId = new();
 
     /// <summary>
     /// The Transaction Id that is currently being processed by the rollover thread.
     /// Its possible that it has not completed rolling over yet.
     /// </summary>
-    private AtomicInt64 m_currentTransactionIdRollingOver = new AtomicInt64();
+    private AtomicInt64 m_currentTransactionIdRollingOver = new();
 
     private readonly object m_syncRoot;
     private readonly Action<PrebufferRolloverArgs<TKey, TValue>> m_onRollover;
@@ -92,9 +92,9 @@ public class PrebufferWriter<TKey, TValue>
         : base(MessageClass.Framework)
     {
         if (settings is null)
-            throw new ArgumentNullException("settings");
+            throw new ArgumentNullException(nameof(settings));
         if (onRollover is null)
-            throw new ArgumentNullException("onRollover");
+            throw new ArgumentNullException(nameof(onRollover));
 
         m_settings = settings.CloneReadonly();
         m_settings.Validate();
@@ -205,7 +205,7 @@ public class PrebufferWriter<TKey, TValue>
     private void m_rolloverTask_Running(object sender, EventArgs<ScheduledTaskRunningReason> e)
     {
         //the nature of how the ScheduledTask works 
-        //gaurentees that this function will not be called concurrently
+        //guarantees that this function will not be called concurrently
 
         //The worker can be disposed either via the Stop() method or 
         //the Dispose() method.  If via the dispose method, then
@@ -245,7 +245,7 @@ public class PrebufferWriter<TKey, TValue>
         try
         {
             m_processingQueue.IsReadingMode = true; //Very CPU intensive. This does a sort on the incoming measurements. Profiling shows that about 33% of the time is spent sorting elements.
-            PrebufferRolloverArgs<TKey, TValue> args = new PrebufferRolloverArgs<TKey, TValue>(m_processingQueue, m_currentTransactionIdRollingOver);
+            PrebufferRolloverArgs<TKey, TValue> args = new(m_processingQueue, m_currentTransactionIdRollingOver);
             m_onRollover(args);
             m_processingQueue.IsReadingMode = false; //Clears the queue
         }

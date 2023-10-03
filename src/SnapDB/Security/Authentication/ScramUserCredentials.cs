@@ -36,7 +36,7 @@ namespace SnapDB.Security.Authentication;
 /// </remarks>
 public class ScramUserCredentials
 {
-    private readonly Dictionary<ReadonlyByteArray, ScramUserCredential> m_users = new Dictionary<ReadonlyByteArray, ScramUserCredential>();
+    private readonly Dictionary<ReadonlyByteArray, ScramUserCredential> m_users = new();
 
     public bool TryLookup(byte[] username, out ScramUserCredential user)
     {
@@ -48,7 +48,7 @@ public class ScramUserCredentials
 
     public void AddUser(string username, string password, int iterations = 4000, int saltSize = 32, HashMethod hashMethod = HashMethod.Sha256)
     {
-        ScramUserCredential user = new ScramUserCredential(username, password, iterations, saltSize, hashMethod);
+        ScramUserCredential user = new(username, password, iterations, saltSize, hashMethod);
         lock (m_users)
         {
             m_users.Add(user.UserBytes, user);

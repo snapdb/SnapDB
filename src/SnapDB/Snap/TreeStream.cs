@@ -35,13 +35,12 @@ public abstract class TreeStream<TKey, TValue> : IDisposable
     where TKey : class, new()
     where TValue : class, new()
 {
-    private bool m_eos;
     private bool m_disposed;
 
     /// <summary>
     /// Boolean indicating that the end of the stream has been read or class has been disposed.
     /// </summary>
-    public bool EOS => m_eos;
+    public bool Eos { get; private set; }
 
     /// <summary>
     /// Gets if the stream is always in sequential order. Do not return true unless it is guaranteed that 
@@ -62,7 +61,7 @@ public abstract class TreeStream<TKey, TValue> : IDisposable
     /// <returns><c>true</c> if the advance was successful; otherwise, <c>false</c> if the end of the stream was reached.</returns>
     public bool Read(TKey key, TValue value)
     {
-        if (m_eos || !ReadNext(key, value))
+        if (Eos || !ReadNext(key, value))
         {
             EndOfStreamReached();
             return false;
@@ -89,7 +88,7 @@ public abstract class TreeStream<TKey, TValue> : IDisposable
     {
         if (m_disposed && !value)
             throw new ObjectDisposedException(GetType().FullName);
-        m_eos = value;
+        Eos = value;
     }
 
     /// <summary>
@@ -115,7 +114,7 @@ public abstract class TreeStream<TKey, TValue> : IDisposable
             }
             finally
             {
-                m_eos = true;
+                Eos = true;
                 m_disposed = true;
             }
         }
@@ -128,6 +127,6 @@ public abstract class TreeStream<TKey, TValue> : IDisposable
     /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
-        m_eos = true;
+        Eos = true;
     }
 }

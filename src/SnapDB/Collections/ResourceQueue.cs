@@ -29,7 +29,7 @@ using System.Collections.Concurrent;
 namespace SnapDB.Collections;
 
 /// <summary>
-/// Provides a specialized, thread-safe queue that acts as a quazi buffer pool. 
+/// Provides a specialized, thread-safe queue that acts as a quasi-buffer pool. 
 /// </summary>
 /// <typeparam name="T">The type of resources managed by the queue (must be a reference type).</typeparam>
 public class ResourceQueue<T>
@@ -38,7 +38,6 @@ public class ResourceQueue<T>
     private readonly ConcurrentQueue<T> m_queue;
     private readonly Func<T> m_instanceObject;
     private readonly int m_maximumCount;
-
 
     /// <summary>
     /// Creates a new Resource Queue with the specified initial resources and maximum capacity.

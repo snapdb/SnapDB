@@ -23,6 +23,7 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
+// ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
 
 using SnapDB.IO.Unmanaged;
 using Gemstone.Diagnostics;
@@ -38,15 +39,15 @@ namespace SnapDB.IO.FileStructure.Media;
 /// and can not buffer general purpose file.
 /// 
 /// The cache algorithm is a least recently used algorithm.
-/// This is accomplised by incrementing a counter every time a page is accessed 
+/// This is accomplished by incrementing a counter every time a page is accessed 
 /// and dividing by 2 every time a collection occurs from the <see cref="MemoryPool"/>.
 /// </remarks>
-// TODO: Consider allowing this class to scale horizontally like how the concurrent dictionary scales.
-// TODO: this will reduce the concurrent contention on the class at the cost of more memory required.
+// FUTURE: Consider allowing this class to scale horizontally like how the concurrent dictionary scales.
+// FUTURE: this will reduce the concurrent contention on the class at the cost of more memory required.
 internal partial class BufferedFile
     : IDiskMediumCoreFunctions
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(BufferedFile), MessageClass.Component);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(BufferedFile), MessageClass.Component);
 
     #region [ Members ]
 
@@ -160,7 +161,7 @@ internal partial class BufferedFile
 #if DEBUG
     ~BufferedFile()
     {
-        Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
+        s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
     }
 #endif
 
@@ -181,13 +182,13 @@ internal partial class BufferedFile
 
     #endregion
 
-    #region [ Public Methdos ]
+    #region [ Public Methods ]
 
     /// <summary>
     /// Executes a commit of data. This will flush the data to the disk use the provided header data to properly
     /// execute this function.
     /// </summary>
-    /// <param name="header"></param>
+    /// <param name="header">File header block.</param>
     public void CommitChanges(FileHeaderBlock header)
     {
         using (IoSession pageLock = new(this, m_pageReplacementAlgorithm))
@@ -200,6 +201,7 @@ internal partial class BufferedFile
             m_queue.Write(m_lengthOfCommittedData, m_writeBuffer, copyLength, waitForWriteToDisk: true);
 
             byte[] bytes = header.GetBytes();
+
             if (header.HeaderBlockCount == 10)
             {
                 // Update the new header to position 0, position 1, and one of position 2-9.
@@ -207,7 +209,6 @@ internal partial class BufferedFile
                 m_queue.WriteRaw(m_fileStructureBlockSize, bytes, m_fileStructureBlockSize);
                 m_queue.WriteRaw(m_fileStructureBlockSize * ((header.SnapshotSequenceNumber & 7) + 2), bytes, m_fileStructureBlockSize);
             }
-
             else
             {
                 for (int x = 0; x < header.HeaderBlockCount; x++)
@@ -219,11 +220,11 @@ internal partial class BufferedFile
             long startPos;
 
             // Copy recently committed data to the buffer pool
-            if ((m_lengthOfCommittedData & m_diskBlockSize - 1) != 0) //Only if there is a split page.
+            if ((m_lengthOfCommittedData & m_diskBlockSize - 1) != 0) // Only if there is a split page.
             {
                 startPos = m_lengthOfCommittedData & ~(m_diskBlockSize - 1);
-                // Finish filling up the split page in the buffer.
 
+                // Finish filling up the split page in the buffer.
                 if (pageLock.TryGetSubPage(startPos, out nint ptrDest))
                 {
                     m_writeBuffer.ReadBlock(m_lengthOfCommittedData, out nint ptrSrc, out int length);
@@ -231,9 +232,9 @@ internal partial class BufferedFile
                     ptrDest += m_diskBlockSize - length;
                     Memory.Copy(ptrSrc, ptrDest, length);
                 }
+
                 startPos += m_diskBlockSize;
             }
-
             else
             {
                 startPos = m_lengthOfCommittedData;
@@ -241,9 +242,10 @@ internal partial class BufferedFile
 
             while (startPos < lengthOfAllData)
             {
-                //If the address doesn't exist in the current list. Read it from the disk.
+                // If the address doesn't exist in the current list. Read it from the disk.
                 m_pool.AllocatePage(out int poolPageIndex, out nint poolAddress);
                 m_writeBuffer.CopyTo(startPos, poolAddress, m_diskBlockSize);
+
                 Footer.WriteChecksumResultsToFooter(poolAddress, m_fileStructureBlockSize, m_diskBlockSize);
 
                 if (!m_pageReplacementAlgorithm.TryAddPage(startPos, poolAddress, poolPageIndex))
@@ -251,8 +253,10 @@ internal partial class BufferedFile
 
                 startPos += m_diskBlockSize;
             }
+
             m_lengthOfCommittedData = lengthOfAllData;
         }
+
         ReleaseWriteBufferSpace();
     }
 
@@ -303,44 +307,38 @@ internal partial class BufferedFile
     /// <filterpriority>2</filterpriority>
     public void Dispose()
     {
-        if (!m_disposed)
+        if (m_disposed)
+            return;
+
+        try
         {
-            try
+            m_disposed = true;
+
+            // Unregistering from this event guarantees that a collection will no longer
+            // be called since this class utilizes custom code to guarantee this.
+            m_pool.RequestCollection -= m_pool_RequestCollection;
+
+            lock (m_syncRoot)
             {
-                m_disposed = true;
-                // Unregistering from this event gaurentees that a collection will no longer
-                // be called since this class utilizes custom code to guarantee this.
-                m_pool.RequestCollection -= m_pool_RequestCollection;
-
-                lock (m_syncRoot)
-                {
-                    if (m_pageReplacementAlgorithm is not null)
-                        m_pageReplacementAlgorithm.Dispose();
-
-                    if (m_queue is not null)
-                        m_queue.Dispose();
-
-                    if (m_writeBuffer is not null)
-                        m_writeBuffer.Dispose();
-                }
+                m_pageReplacementAlgorithm?.Dispose();
+                m_queue?.Dispose();
+                m_writeBuffer?.Dispose();
             }
+        }
 
-            finally
-            {
-                m_queue = null;
-                m_disposed = true;
-                m_pageReplacementAlgorithm = null;
-                m_writeBuffer = null;
-                m_queue = null;
-                GC.SuppressFinalize(this);
-            }
+        finally
+        {
+            m_queue = null!;
+            m_disposed = true;
+            m_pageReplacementAlgorithm = null!;
+            m_writeBuffer = null!;
+            GC.SuppressFinalize(this);
         }
     }
 
     #endregion
 
     #region [ Private Methods ]
-
 
     /// <summary>
     /// Populates the pointer data inside <see cref="args"/> for the desired block as specified in <see cref="args"/>.
@@ -369,7 +367,6 @@ internal partial class BufferedFile
             // If the block is in the header, error because this area of the file is not designed to be accessed.
             throw new ArgumentOutOfRangeException(nameof(args), "Cannot use this function to modify the file header.");
         }
-
         else
         {
             // If it is between the file header and uncommitted space, 
@@ -379,6 +376,7 @@ internal partial class BufferedFile
 
             args.SupportsWriting = false;
             args.Length = m_diskBlockSize;
+
             // Rounds to the beginning of the block to be looked up.
             args.FirstPosition = args.Position & ~m_pool.PageMask;
 
@@ -395,7 +393,6 @@ internal partial class BufferedFile
     /// </summary>
     /// <param name="pageLock">The page lock used for page management.</param>
     /// <param name="position">The position of the block.</param>
-    /// <param name="pointer">An output parameter that contains the pointer to the block.</param>
     /// <param name="pointer">an output parameter that contains the pointer for the provided position.</param>
     /// <remarks>The valid length is at least the size of the buffer pools page size.</remarks>
     private void GetBlockFromCommittedSpace(PageReplacementAlgorithm.PageLock pageLock, long position, out nint pointer)
@@ -406,7 +403,6 @@ internal partial class BufferedFile
 
         // If the address doesn't exist in the current list. Read it from the disk.
         m_pool.AllocatePage(out int poolPageIndex, out nint poolAddress);
-
         m_queue.Read(position, poolAddress);
 
         // Since a race condition exists, I need to check the buffer to make sure that 
@@ -423,7 +419,7 @@ internal partial class BufferedFile
     /// </summary>
     /// <param name="sender">The sender of the event.</param>
     /// <param name="e">The collection event arguments.</param>
-    private void m_pool_RequestCollection(object sender, CollectionEventArgs e)
+    private void m_pool_RequestCollection(object? sender, CollectionEventArgs e)
     {
         if (m_disposed)
             return;
@@ -431,14 +427,12 @@ internal partial class BufferedFile
         m_pageReplacementAlgorithm.DoCollection(e);
 
         if (e.CollectionMode == MemoryPoolCollectionMode.Critical)
-        {
             m_pageReplacementAlgorithm.DoCollection(e);
-        }
     }
 
     /// <summary>
     /// Releases the buffered data contained in the buffer pool.
-    /// This is acomplished by disposing of the writer and recreating it.
+    /// This is accomplished by disposing of the writer and recreating it.
     /// </summary>
     private void ReleaseWriteBufferSpace()
     {
@@ -448,6 +442,4 @@ internal partial class BufferedFile
     }
 
     #endregion
-
-
 }

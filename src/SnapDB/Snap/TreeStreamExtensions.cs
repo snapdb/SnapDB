@@ -43,8 +43,8 @@ public static class TreeStreamExtensions
         where TKey : class, new()
         where TValue : class, new()
     {
-        TKey key = new TKey();
-        TValue value = new TValue();
+        TKey key = new();
+        TValue value = new();
         long cnt = 0;
         while (stream.Read(key, value))
             cnt++;

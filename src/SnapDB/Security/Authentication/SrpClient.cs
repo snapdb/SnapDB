@@ -38,7 +38,7 @@ namespace SnapDB.Security.Authentication;
 /// </summary>
 public class SrpClient
 {
-    private readonly PBDKFCredentials m_credentials;
+    private readonly PbdkfCredentials m_credentials;
 
     //The SRP Mechanism
     private int m_srpByteLength;
@@ -62,14 +62,14 @@ public class SrpClient
     public SrpClient(string username, string password)
     {
         if (username is null)
-            throw new ArgumentNullException("username");
+            throw new ArgumentNullException(nameof(username));
         if (password is null)
-            throw new ArgumentNullException("username");
+            throw new ArgumentNullException(nameof(username));
 
 
-        m_credentials = new PBDKFCredentials(username, password);
+        m_credentials = new PbdkfCredentials(username, password);
         if (m_credentials.UsernameBytes.Length > 1024)
-            throw new ArgumentException("Username cannot consume more than 1024 bytes encoded as UTF8", "username");
+            throw new ArgumentException("Username cannot consume more than 1024 bytes encoded as UTF8", nameof(username));
     }
 
     private void SetSrpStrength(SrpStrength strength)
@@ -100,7 +100,7 @@ public class SrpClient
         stream.Write((short)m_credentials.UsernameBytes.Length);
         stream.Write(m_credentials.UsernameBytes);
 
-        if (m_resumeTicket != null)
+        if (m_resumeTicket is not null)
         {
             //resume
             stream.Write((byte)2);
@@ -169,17 +169,17 @@ public class SrpClient
 
         //Read from Server: B
         byte[] pubBBytes = stream.ReadBytes(m_srpByteLength);
-        BigInteger pubB = new BigInteger(1, pubBBytes);
+        BigInteger pubB = new(1, pubBBytes);
 
         //Calculate Session Key
-        BigInteger S = m_client.CalculateSecret(m_hash, pubB);
-        byte[] SBytes = S.ToPaddedArray(m_srpByteLength);
+        BigInteger s = m_client.CalculateSecret(m_hash, pubB);
+        byte[] sBytes = s.ToPaddedArray(m_srpByteLength);
 
-        byte[] clientProof = m_hash.ComputeHash(pubABytes, pubBBytes, SBytes, additionalChallenge);
+        byte[] clientProof = m_hash.ComputeHash(pubABytes, pubBBytes, sBytes, additionalChallenge);
         stream.Write(clientProof);
         stream.Flush();
 
-        byte[] serverProof = m_hash.ComputeHash(pubBBytes, pubABytes, SBytes, additionalChallenge);
+        byte[] serverProof = m_hash.ComputeHash(pubBBytes, pubABytes, sBytes, additionalChallenge);
 
         if (stream.ReadBoolean())
         {
@@ -191,7 +191,7 @@ public class SrpClient
             if (serverProofCheck.SecureEquals(serverProof))
             {
                 m_resumeTicket = stream.ReadBytes(ticketLength);
-                m_sessionSecret = m_hash.ComputeHash(pubABytes, SBytes, pubBBytes).Combine(m_hash.ComputeHash(pubBBytes, SBytes, pubABytes));
+                m_sessionSecret = m_hash.ComputeHash(pubABytes, sBytes, pubBBytes).Combine(m_hash.ComputeHash(pubBBytes, sBytes, pubABytes));
                 return true;
             }
             return false;

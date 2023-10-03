@@ -53,8 +53,6 @@ public sealed class BitArray
     public const int BitsPerElement = sizeof(int) * 8;
 
     private int[] m_array;
-    private int m_count;
-    private int m_setCount;
     private int m_lastFoundClearedIndex;
     private int m_lastFoundSetIndex;
     private readonly bool m_initialState;
@@ -76,14 +74,13 @@ public sealed class BitArray
             throw new ArgumentOutOfRangeException(nameof(count));
 
         // If the number does not lie on a 32 bit boundary, add 1 to the number of items in the array.
-        if ((count & BitsPerElementMask) != 0)
-            m_array = new int[(count >> BitsPerElementShift) + 1];
-        else
-            m_array = new int[count >> BitsPerElementShift];
+        m_array = (count & BitsPerElementMask) != 0 ? 
+            new int[(count >> BitsPerElementShift) + 1] : 
+            new int[count >> BitsPerElementShift];
 
         if (initialState)
         {
-            m_setCount = count;
+            SetCount = count;
 
             // If the initial state is true, set all bits to 1 (-1 in two's complement).
             for (int x = 0; x < m_array.Length; x++)            
@@ -92,10 +89,10 @@ public sealed class BitArray
         else
         {
             // If initial state is false, .NET initializes all memory with zeroes.
-            m_setCount = 0;
+            SetCount = 0;
         }
 
-        m_count = count;
+        Count = count;
         m_initialState = initialState;
     }
 
@@ -123,17 +120,17 @@ public sealed class BitArray
     /// <summary>
     /// Gets the number of bits this array contains.
     /// </summary>
-    public int Count => m_count;
+    public int Count { get; private set; }
 
     /// <summary>
     /// Gets the number of bits that are set in this array.
     /// </summary>
-    public int SetCount => m_setCount;
+    public int SetCount { get; private set; }
 
     /// <summary>
     /// Gets the number of bits that are cleared in this array.
     /// </summary>
-    public int ClearCount => m_count - m_setCount;
+    public int ClearCount => Count - SetCount;
 
     #endregion
 
@@ -192,7 +189,7 @@ public sealed class BitArray
         if ((value & subBit) == 0) // If bit is set
         {
             m_lastFoundSetIndex = 0;
-            m_setCount++;
+            SetCount++;
             m_array[element] = value | subBit;
 
             return true;
@@ -206,7 +203,7 @@ public sealed class BitArray
     /// </summary>
     public void ClearAll()
     {
-        m_setCount = 0;
+        SetCount = 0;
         Array.Clear(m_array, 0, m_array.Length);
     }
 
@@ -224,7 +221,7 @@ public sealed class BitArray
     /// Returns <c>true</c> if the bit state was changed.
     /// </summary>
     /// <param name="index">Bit position to clear.</param>
-    /// <returns><c>true</c> if the bit state was changed; othwerwise, <c>false</c> if the bit was already cleared.</returns>
+    /// <returns><c>true</c> if the bit state was changed; otherwise, <c>false</c> if the bit was already cleared.</returns>
     public bool TryClearBit(int index)
     {
         Validate(index);
@@ -235,7 +232,7 @@ public sealed class BitArray
         if ((value & subBit) != 0) // If bit is set
         {
             m_lastFoundClearedIndex = 0;
-            m_setCount--;
+            SetCount--;
             m_array[element] = value & ~subBit;
 
             return true;
@@ -262,7 +259,7 @@ public sealed class BitArray
     /// </summary>
     public void SetAll()
     {
-        m_setCount = m_count;
+        SetCount = Count;
 
         for (int x = 0; x < m_array.Length; x++)
             m_array[x] = -1; // (-1 is all bits set)
@@ -326,16 +323,13 @@ public sealed class BitArray
     /// <param name="capacity">Number of bits to support.</param>
     public void SetCapacity(int capacity)
     {
-        int[] array;
-
-        if (m_count >= capacity)
+        if (Count >= capacity)
             return;
 
         // If the number does not lie on a 32 bit boundary, add 1 to the number of items in the array.
-        if ((capacity & BitsPerElementMask) != 0)
-            array = new int[(capacity >> BitsPerElementShift) + 1];
-        else
-            array = new int[capacity >> BitsPerElementShift];
+        int[] array = (capacity & BitsPerElementMask) != 0 ? 
+            new int[(capacity >> BitsPerElementShift) + 1] : 
+            new int[capacity >> BitsPerElementShift];
 
         m_array.CopyTo(array, 0);
 
@@ -344,14 +338,14 @@ public sealed class BitArray
         // after m_count, this does not need to be done again.
         if (m_initialState)
         {
-            m_setCount += capacity - m_count;
+            SetCount += capacity - Count;
 
             for (int x = m_array.Length; x < array.Length; x++)
                 array[x] = -1;
         }
 
         m_array = array;
-        m_count = capacity;
+        Count = capacity;
     }
 
     /// <summary>
@@ -365,7 +359,7 @@ public sealed class BitArray
     /// </remarks>
     public void EnsureCapacity(int capacity)
     {
-        if (capacity > m_count)
+        if (capacity > Count)
             SetCapacity(Math.Max(m_array.Length * BitsPerElement * 2, capacity));
     }
 
@@ -391,7 +385,7 @@ public sealed class BitArray
                 m_lastFoundClearedIndex = position;
 
                 // Check if the position is beyond the total bit count, indicating no more cleared bits.
-                if (m_lastFoundClearedIndex >= m_count)
+                if (m_lastFoundClearedIndex >= Count)
                     return -1;
 
                 // Return the position of the cleared bit within the bit array.
@@ -425,7 +419,7 @@ public sealed class BitArray
                 m_lastFoundSetIndex = position;
 
                 // Check if the position is beyond the total bit count, indicating no more set bits.
-                if (m_lastFoundSetIndex >= m_count)
+                if (m_lastFoundSetIndex >= Count)
                     return -1;
 
                 // Return the position of the set bit within the bit array.
@@ -452,7 +446,7 @@ public sealed class BitArray
             // If all bits are cleared, this entire section can be skipped
             if (m_array[x] != 0)
             {
-                int end = Math.Min(x * BitsPerElement + BitsPerElement, m_count);
+                int end = Math.Min(x * BitsPerElement + BitsPerElement, Count);
 
                 for (int k = x * BitsPerElement; k < end; k++)
                 {
@@ -478,7 +472,7 @@ public sealed class BitArray
             // If all bits are cleared, this entire section can be skipped.
             if (m_array[x] != -1)
             {
-                int end = Math.Min(x * BitsPerElement + BitsPerElement, m_count);
+                int end = Math.Min(x * BitsPerElement + BitsPerElement, Count);
 
                 for (int k = x * BitsPerElement; k < end; k++)
                 {
@@ -493,7 +487,7 @@ public sealed class BitArray
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void Validate(int index)
     {
-        if (index < 0 || index >= m_count)
+        if (index < 0 || index >= Count)
             ThrowException(index);
     }
 
@@ -504,7 +498,7 @@ public sealed class BitArray
         if (index < 0)
             throw new ArgumentOutOfRangeException(nameof(index), "Must be greater than or equal to zero.");
 
-        if (index >= m_count)
+        if (index >= Count)
             throw new ArgumentOutOfRangeException(nameof(index), "exceeds the length of the array.");
     }
 
@@ -512,7 +506,7 @@ public sealed class BitArray
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void Validate(int index, int length)
     {
-        if (index < 0 || length < 0 || index + length > m_count)
+        if (index < 0 || length < 0 || index + length > Count)
             ThrowException(index, length);
     }
 
@@ -526,7 +520,7 @@ public sealed class BitArray
         if (length < 0)
             throw new ArgumentOutOfRangeException(nameof(length), "Must be greater than or equal to zero.");
 
-        if (index + length > m_count)
+        if (index + length > Count)
             throw new ArgumentOutOfRangeException(nameof(length), "index + length exceeds the length of the array.");
     }
 

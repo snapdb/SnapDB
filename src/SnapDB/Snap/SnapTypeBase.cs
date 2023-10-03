@@ -109,7 +109,7 @@ public abstract class SnapTypeBase
     /// <param name="stream">The stream to read from.</param>
     public virtual unsafe void Read(byte* stream)
     {
-        BinaryStreamPointerWrapper reader = new BinaryStreamPointerWrapper(stream, Size);
+        BinaryStreamPointerWrapper reader = new(stream, Size);
         Read(reader);
     }
 
@@ -119,7 +119,7 @@ public abstract class SnapTypeBase
     /// <param name="stream">The stream to write to.</param>
     public virtual unsafe void Write(byte* stream)
     {
-        BinaryStreamPointerWrapper writer = new BinaryStreamPointerWrapper(stream, Size);
+        BinaryStreamPointerWrapper writer = new(stream, Size);
         Write(writer);
     }
 

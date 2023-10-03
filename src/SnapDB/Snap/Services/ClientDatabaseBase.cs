@@ -45,8 +45,8 @@ public abstract class ClientDatabaseBase : IDisposable
     /// <summary>
     /// Detaches the list of files from the database.
     /// </summary>
-    /// <param name="files">The file IDs that need to be detatched.</param>
-    public abstract void DetatchFiles(List<Guid> files);
+    /// <param name="files">The file IDs that need to be detached.</param>
+    public abstract void DetachFiles(List<Guid> files);
 
     /// <summary>
     /// Deletes the list of files from the database.

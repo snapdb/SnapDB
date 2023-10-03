@@ -42,15 +42,14 @@ public class StreamingClientDatabase<TKey, TValue>
     where TKey : SnapTypeBase<TKey>, new()
     where TValue : SnapTypeBase<TValue>, new()
 {
-    private BulkWriting m_writer;
+    private BulkWriting? m_writer;
     private readonly TKey m_tmpKey;
     private readonly TValue m_tmpValue;
-    private PointReader m_reader;
+    private PointReader? m_reader;
     private bool m_disposed;
     private readonly RemoteBinaryStream m_stream;
     private readonly Action m_onDispose;
-    private StreamEncodingBase<TKey, TValue> m_encodingMode;
-    private readonly DatabaseInfo m_info;
+    private StreamEncodingBase<TKey, TValue> m_encodingMode = default!;
 
     /// <summary>
     /// Creates a streaming wrapper around a database.
@@ -60,7 +59,7 @@ public class StreamingClientDatabase<TKey, TValue>
     /// <param name="info"></param>
     public StreamingClientDatabase(RemoteBinaryStream stream, Action onDispose, DatabaseInfo info)
     {
-        m_info = info;
+        Info = info;
         m_tmpKey = new TKey();
         m_tmpValue = new TValue();
         m_onDispose = onDispose;
@@ -79,13 +78,14 @@ public class StreamingClientDatabase<TKey, TValue>
         m_stream.Flush();
 
         ServerResponse command = (ServerResponse)m_stream.ReadUInt8();
+
         switch (command)
         {
             case ServerResponse.UnhandledException:
                 string exception = m_stream.ReadString();
-                throw new Exception("Server UnhandledExcetion: \n" + exception);
+                throw new Exception("Server UnhandledException: \n" + exception);
             case ServerResponse.UnknownEncodingMethod:
-                throw new Exception("Server does not recgonize encoding method");
+                throw new Exception("Server does not recognize encoding method");
             case ServerResponse.EncodingMethodAccepted:
                 break;
             default:
@@ -101,12 +101,13 @@ public class StreamingClientDatabase<TKey, TValue>
     /// <param name="keySeekFilter">a seek based filter to follow. Can be null.</param>
     /// <param name="keyMatchFilter">a match based filer to follow. Can be null.</param>
     /// <returns>A stream that will read the specified data.</returns>
-    public override TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions readerOptions, SeekFilterBase<TKey> keySeekFilter, MatchFilterBase<TKey, TValue> keyMatchFilter)
+    public override TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions, SeekFilterBase<TKey>? keySeekFilter, MatchFilterBase<TKey, TValue>? keyMatchFilter)
     {
-        if (m_reader != null)
+        if (m_reader is not null)
             throw new Exception("Sockets do not support concurrent readers. Dispose of old reader.");
 
         m_stream.Write((byte)ServerCommand.Read);
+
         if (keySeekFilter is null)
         {
             m_stream.Write(false);
@@ -138,21 +139,22 @@ public class StreamingClientDatabase<TKey, TValue>
             m_stream.Write(true);
             readerOptions.Save(m_stream);
         }
+
         m_stream.Flush();
 
-
         ServerResponse command = (ServerResponse)m_stream.ReadUInt8();
+        
         switch (command)
         {
             case ServerResponse.UnhandledException:
                 string exception = m_stream.ReadString();
-                throw new Exception("Server UnhandledExcetion: \n" + exception);
+                throw new Exception("Server UnhandledException: \n" + exception);
             case ServerResponse.UnknownOrCorruptSeekFilter:
-                throw new Exception("Server does not recgonize the seek filter");
+                throw new Exception("Server does not recognize the seek filter");
             case ServerResponse.UnknownOrCorruptMatchFilter:
-                throw new Exception("Server does not recgonize the match filter");
+                throw new Exception("Server does not recognize the match filter");
             case ServerResponse.UnknownOrCorruptReaderOptions:
-                throw new Exception("Server does not recgonize the reader options");
+                throw new Exception("Server does not recognize the reader options");
             case ServerResponse.SerializingPoints:
                 break;
             case ServerResponse.ErrorWhileReading:
@@ -163,6 +165,7 @@ public class StreamingClientDatabase<TKey, TValue>
         }
 
         m_reader = new PointReader(m_encodingMode, m_stream, () => m_reader = null);
+
         return m_reader;
     }
 
@@ -173,7 +176,7 @@ public class StreamingClientDatabase<TKey, TValue>
     /// <param name="stream">all of the key/value pairs to add to the database.</param>
     public override void Write(TreeStream<TKey, TValue> stream)
     {
-        if (m_reader != null)
+        if (m_reader is not null)
             throw new Exception("Sockets do not support writing while a reader is open. Dispose of reader.");
 
         m_stream.Write((byte)ServerCommand.Write);
@@ -193,7 +196,7 @@ public class StreamingClientDatabase<TKey, TValue>
     /// <param name="value"></param>
     public override void Write(TKey key, TValue value)
     {
-        if (m_reader != null)
+        if (m_reader is not null)
             throw new Exception("Sockets do not support writing while a reader is open. Dispose of reader.");
 
         m_stream.Write((byte)ServerCommand.Write);
@@ -213,22 +216,36 @@ public class StreamingClientDatabase<TKey, TValue>
         return new BulkWriting(this);
     }
 
-
+    /// <summary>
+    /// Loads the provided files from all of the specified paths.
+    /// </summary>
+    /// <param name="paths">all of the paths of archive files to attach. These can either be a path, or an individual file name.</param>
     public override void AttachFilesOrPaths(IEnumerable<string> paths)
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Enumerates all of the files attached to the database.
+    /// </summary>
     public override List<ArchiveDetails> GetAllAttachedFiles()
     {
         throw new NotImplementedException();
     }
 
-    public override void DetatchFiles(List<Guid> files)
+    /// <summary>
+    /// Detaches the list of files from the database.
+    /// </summary>
+    /// <param name="files">The file IDs that need to be detached.</param>
+    public override void DetachFiles(List<Guid> files)
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Deletes the list of files from the database.
+    /// </summary>
+    /// <param name="files">The files that need to be deleted.</param>
     public override void DeleteFiles(List<Guid> files)
     {
         throw new NotImplementedException();
@@ -242,7 +259,7 @@ public class StreamingClientDatabase<TKey, TValue>
     /// <summary>
     /// Gets basic information about the current Database.
     /// </summary>
-    public override DatabaseInfo Info => m_info;
+    public override DatabaseInfo Info { get; }
 
     /// <summary>
     /// Forces a soft commit on the database. A soft commit 
@@ -272,29 +289,28 @@ public class StreamingClientDatabase<TKey, TValue>
     /// <filterpriority>2</filterpriority>
     public override void Dispose()
     {
-        if (!m_disposed)
+        if (m_disposed)
+            return;
+        
+        m_disposed = true;
+
+        m_reader?.Dispose();
+
+        m_stream.Write((byte)ServerCommand.DisconnectDatabase);
+        m_stream.Flush();
+        m_onDispose();
+
+        ServerResponse command = (ServerResponse)m_stream.ReadUInt8();
+        
+        switch (command)
         {
-            m_disposed = true;
-
-            if (m_reader != null)
-                m_reader.Dispose();
-
-
-            m_stream.Write((byte)ServerCommand.DisconnectDatabase);
-            m_stream.Flush();
-            m_onDispose();
-
-            ServerResponse command = (ServerResponse)m_stream.ReadUInt8();
-            switch (command)
-            {
-                case ServerResponse.UnhandledException:
-                    string exception = m_stream.ReadString();
-                    throw new Exception("Server UnhandledExcetion: \n" + exception);
-                case ServerResponse.DatabaseDisconnected:
-                    break;
-                default:
-                    throw new Exception("Unknown server response: " + command.ToString());
-            }
+            case ServerResponse.UnhandledException:
+                string exception = m_stream.ReadString();
+                throw new Exception("Server UnhandledException: \n" + exception);
+            case ServerResponse.DatabaseDisconnected:
+                break;
+            default:
+                throw new Exception("Unknown server response: " + command.ToString());
         }
     }
 
@@ -311,7 +327,7 @@ public class StreamingClientDatabase<TKey, TValue>
 
         internal BulkWriting(StreamingClientDatabase<TKey, TValue> client)
         {
-            if (client.m_writer != null)
+            if (client.m_writer is not null)
                 throw new Exception("Duplicate call to StartBulkWriting");
 
             m_client = client;
@@ -339,14 +355,14 @@ public class StreamingClientDatabase<TKey, TValue>
         /// <filterpriority>2</filterpriority>
         public void Dispose()
         {
-            if (!m_disposed)
-            {
-                m_client.m_writer = null;
-                m_disposed = true;
+            if (m_disposed)
+                return;
+            
+            m_client.m_writer = null;
+            m_disposed = true;
 
-                m_encodingMode.WriteEndOfStream(m_stream);
-                m_stream.Flush();
-            }
+            m_encodingMode.WriteEndOfStream(m_stream);
+            m_stream.Flush();
         }
     }
 
@@ -384,19 +400,25 @@ public class StreamingClientDatabase<TKey, TValue>
             }
         }
 
+        /// <summary>
+        /// Cancels the read operation.
+        /// </summary>
         public void Cancel()
         {
-            //ToDo: Actually cancel the stream.
-            TKey key = new TKey();
-            TValue value = new TValue();
+            // TODO: Actually cancel the stream.
+            TKey key = new();
+            TValue value = new();
+
             if (m_completed)
                 return;
-            //flush the rest of the data off of the receive queue.
+            
+            // Flush the rest of the data off of the receive queue.
             while (m_encodingMethod.TryDecode(m_stream, key, value))
             {
-                //CurrentKey.ReadCompressed(m_client.m_stream, CurrentKey);
-                //CurrentValue.ReadCompressed(m_client.m_stream, CurrentValue);
+                // CurrentKey.ReadCompressed(m_client.m_stream, CurrentKey);
+                // CurrentValue.ReadCompressed(m_client.m_stream, CurrentValue);
             }
+            
             Complete();
         }
 
@@ -412,7 +434,7 @@ public class StreamingClientDatabase<TKey, TValue>
                 {
                     case ServerResponse.UnhandledException:
                         exception = m_stream.ReadString();
-                        throw new Exception("Server UnhandledExcetion: \n" + exception);
+                        throw new Exception("Server UnhandledException: \n" + exception);
                     case ServerResponse.ErrorWhileReading:
                         exception = m_stream.ReadString();
                         throw new Exception("Server Error While Reading: \n" + exception);
@@ -431,9 +453,8 @@ public class StreamingClientDatabase<TKey, TValue>
         protected override void Dispose(bool disposing)
         {
             if (disposing)
-            {
                 Cancel();
-            }
+
             base.Dispose(disposing);
         }
     }

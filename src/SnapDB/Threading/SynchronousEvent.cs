@@ -66,7 +66,7 @@ public class SynchronousEvent<T>
         if (m_disposed)
             return;
             
-        if (CustomEvent != null)
+        if (CustomEvent is not null)
         {
             m_waiting.Reset();
             Thread.MemoryBarrier();
@@ -84,10 +84,7 @@ public class SynchronousEvent<T>
             return;
         try
         {
-            if (CustomEvent != null)
-            {
-                CustomEvent(this, (T)sender);
-            }
+            CustomEvent?.Invoke(this, (T)sender);
         }
         finally
         {

@@ -91,11 +91,11 @@ public partial class TimestampSeekFilter
         private void Initialize(ulong start, ulong stop, ulong mainInterval, ulong subInterval, ulong tolerance)
         {
             if (start > stop)
-                throw new ArgumentOutOfRangeException("start", "start must be before stop");
+                throw new ArgumentOutOfRangeException(nameof(start), "start must be before stop");
             if (mainInterval < subInterval)
-                throw new ArgumentOutOfRangeException("mainInterval", "must be larger than the subinterval");
+                throw new ArgumentOutOfRangeException(nameof(mainInterval), "must be larger than the subinterval");
             if (tolerance > subInterval)
-                throw new ArgumentOutOfRangeException("tolerance", "must be smaller than the subinterval");
+                throw new ArgumentOutOfRangeException(nameof(tolerance), "must be smaller than the subinterval");
 
             m_start = start;
             m_stop = stop;
@@ -122,13 +122,13 @@ public partial class TimestampSeekFilter
             checked
             {
                 ulong middle = m_current + m_subInterval * m_count;
-                startOfWindow = middle - m_tolerance;
-                endOfWindow = middle + m_tolerance;
+                StartOfWindow = middle - m_tolerance;
+                EndOfWindow = middle + m_tolerance;
 
-                if (startOfWindow > m_stop)
+                if (StartOfWindow > m_stop)
                 {
-                    startOfWindow = 0;
-                    endOfWindow = 0;
+                    StartOfWindow = 0;
+                    EndOfWindow = 0;
                     return false;
                 }
 
@@ -145,7 +145,7 @@ public partial class TimestampSeekFilter
             }
         }
 
-        private ulong startOfWindow
+        private ulong StartOfWindow
         {
             get => StartOfFrame.Timestamp;
             set
@@ -155,7 +155,7 @@ public partial class TimestampSeekFilter
             }
         }
 
-        private ulong endOfWindow
+        private ulong EndOfWindow
         {
             get => EndOfFrame.Timestamp;
             set

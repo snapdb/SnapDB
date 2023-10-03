@@ -48,7 +48,7 @@ public class RolloverLog
         {
             foreach (string logFile in Directory.GetFiles(settings.LogPath, settings.SearchPattern))
             {
-                RolloverLogFile log = new RolloverLogFile(logFile);
+                RolloverLogFile log = new(logFile);
                 if (log.IsValid)
                     log.Recover(list);
 

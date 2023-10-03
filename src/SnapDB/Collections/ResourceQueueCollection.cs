@@ -34,7 +34,6 @@ namespace SnapDB.Collections;
 public class ResourceQueueCollection<TKey, TResource>
     where TResource : class where TKey : notnull
 {
-    
     private readonly SortedList<TKey, ResourceQueue<TResource>?> m_list;
     private readonly Func<TKey, Func<TResource>> m_instanceObject;
     private readonly Func<TKey, int> m_maximumCount;

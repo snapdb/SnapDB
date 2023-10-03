@@ -73,11 +73,7 @@ public abstract class WeakDelegateBase<T> : WeakReference
         if (ReferenceEquals(this, obj))
             return true;
 
-        if (obj is null)
-            return false;
-
-        WeakDelegateBase<T> typeObject = obj as WeakDelegateBase<T>;
-        if (typeObject is not null)
+        if (obj is WeakDelegateBase<T> typeObject)
             return Equals(typeObject);
 
         return false;

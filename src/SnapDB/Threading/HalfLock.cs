@@ -94,8 +94,8 @@ public class HalfLock
         internal HalfLockRelease(HalfLock halfLock)
         {
             if (halfLock is null)
-                throw new ArgumentNullException("halfLock");
-            if (halfLock.m_release.m_halfLock != null)
+                throw new ArgumentNullException(nameof(halfLock));
+            if (halfLock.m_release.m_halfLock is not null)
                 throw new Exception("Object is already locked");
             m_halfLock = halfLock;
         }

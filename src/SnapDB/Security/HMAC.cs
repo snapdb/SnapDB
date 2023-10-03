@@ -32,7 +32,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 namespace SnapDB.Security;
 
 
-public static class HMAC
+public static class Hmac
 {
     public static byte[] Compute(IDigest hash, byte[] key, byte[] data)
     {
@@ -42,7 +42,7 @@ public static class HMAC
     public static byte[] Compute(IDigest hash, byte[] key, byte[] data, int position, int length)
     {
         data.ValidateParameters(position, length);
-        HMac hmac = new HMac(hash);
+        HMac hmac = new(hash);
         hmac.Init(new KeyParameter(key));
         byte[] result = new byte[hmac.GetMacSize()];
         hmac.BlockUpdate(data, position, length);
@@ -51,16 +51,16 @@ public static class HMAC
     }
 }
 
-public static class HMAC<T>
+public static class Hmac<T>
   where T : IDigest, new()
 {
     public static byte[] Compute(byte[] key, byte[] data)
     {
-        return HMAC.Compute(new T(), key, data, 0, data.Length);
+        return Hmac.Compute(new T(), key, data, 0, data.Length);
     }
 
     public static byte[] Compute(byte[] key, byte[] data, int position, int length)
     {
-        return HMAC.Compute(new T(), key, data, position, length);
+        return Hmac.Compute(new T(), key, data, position, length);
     }
 }

@@ -44,9 +44,9 @@ public class SortedTree<TKey, TValue>
 {
     #region [ Members ]
 
-    protected SparseIndex<TKey> Indexer;
-    protected SortedTreeNodeBase<TKey, TValue> LeafStorage;
-    private readonly TValue m_tempValue = new TValue();
+    protected SparseIndex<TKey> Indexer = default!;
+    protected SortedTreeNodeBase<TKey, TValue> LeafStorage = default!;
+    private readonly TValue m_tempValue = new();
 
     private bool m_isInitialized;
     private readonly SortedTreeHeader m_header;
@@ -70,8 +70,9 @@ public class SortedTree<TKey, TValue>
         m_isInitialized = true;
 
         SortedTree.ReadHeader(Stream, out m_header.TreeNodeType, out m_header.BlockSize);
-        //Since m_loadHeader is currently null in the constructor, 
-        //this will load as much data that this tree can load.
+
+        // Since m_loadHeader is currently null in the constructor, 
+        // this will load as much data that this tree can load.
         m_header.LoadHeader(Stream);
 
         Initialize();
@@ -83,8 +84,9 @@ public class SortedTree<TKey, TValue>
     {
         if (m_isInitialized)
             throw new Exception("Duplicate calls to Initialize");
+        
         if (treeNodeType is null)
-            throw new ArgumentNullException("treeNodeType");
+            throw new ArgumentNullException(nameof(treeNodeType));
 
 
         m_isInitialized = true;
@@ -129,9 +131,9 @@ public class SortedTree<TKey, TValue>
     public bool IsDirty => m_header.IsDirty;
 
     /// <summary>
-    /// The sorted tree will not continuely call the <see cref="Flush"/> method every time the header is changed.
+    /// The sorted tree will not continually call the <see cref="Flush"/> method every time the header is changed.
     /// When setting this to false, flushes must be manually invoked. Failing to do this can corrupt the SortedTree. 
-    /// Only set if you can gaurentee that <see cref="Flush"/> will be called before disposing this class.
+    /// Only set if you can guarantee that <see cref="Flush"/> will be called before disposing this class.
     /// </summary>
     public bool AutoFlush
     {
@@ -140,7 +142,7 @@ public class SortedTree<TKey, TValue>
     }
 
     /// <summary>
-    /// Contains the block size that the tree nodes will be alligned on.
+    /// Contains the block size that the tree nodes will be aligned on.
     /// </summary>
     protected int BlockSize => m_header.BlockSize;
 
@@ -150,7 +152,6 @@ public class SortedTree<TKey, TValue>
     protected BinaryStreamPointerBase Stream
     {
         get;
-        private set;
     }
 
     #endregion
@@ -164,6 +165,7 @@ public class SortedTree<TKey, TValue>
     {
         if (!m_isInitialized)
             throw new Exception("Class has not been initialized");
+
         m_header.SaveHeader(Stream);
     }
 
@@ -185,6 +187,7 @@ public class SortedTree<TKey, TValue>
         if (!TryAdd(key, value))
             throw new Exception("Key already exists");
     }
+
     /// <summary>
     /// Attempts to add the provided key/value to the Tree.
     /// </summary>
@@ -193,13 +196,13 @@ public class SortedTree<TKey, TValue>
     /// <returns>returns true if successful, false if a duplicate key was found</returns>
     public bool TryAdd(TKey key, TValue value)
     {
-        if (LeafStorage.TryInsert(key, value))
-        {
-            if (IsDirty && AutoFlush)
-                m_header.SaveHeader(Stream);
-            return true;
-        }
-        return false;
+        if (!LeafStorage.TryInsert(key, value))
+            return false;
+
+        if (IsDirty && AutoFlush)
+            m_header.SaveHeader(Stream);
+        
+        return true;
     }
 
     /// <summary>
@@ -208,15 +211,14 @@ public class SortedTree<TKey, TValue>
     /// <param name="stream">stream to add</param>
     public void AddRange(TreeStream<TKey, TValue> stream)
     {
-        TKey key = new TKey();
-        TValue value = new TValue();
-        while (stream.Read(key, value))
-        {
+        TKey key = new();
+        TValue value = new();
+
+        while (stream.Read(key, value)) 
             Add(key, value);
-        }
     }
     /// <summary>
-    /// Adds all of the items in the stream to this tree. Skips any dulpicate entries.
+    /// Adds all of the items in the stream to this tree. Skips any duplicate entries.
     /// </summary>
     /// <param name="stream">the stream to add.</param>
     public void TryAddRange(TreeStream<TKey, TValue> stream)
@@ -229,25 +231,22 @@ public class SortedTree<TKey, TValue>
         //}
         //return;
 
-        InsertStreamHelper<TKey, TValue> helper = new InsertStreamHelper<TKey, TValue>(stream);
+        InsertStreamHelper<TKey, TValue> helper = new(stream);
         LeafStorage.TryInsertSequentialStream(helper);
+        
         while (helper.IsValid)
         {
-            if (helper.IsKVP1)
-            {
+            if (helper.IsKvp1)
                 LeafStorage.TryInsert(helper.Key1, helper.Value1);
-            }
             else
-            {
                 LeafStorage.TryInsert(helper.Key2, helper.Value2);
-            }
+
             helper.NextDoNotCheckSequential();
         }
+
         if (IsDirty && AutoFlush)
             m_header.SaveHeader(Stream);
     }
-
-
 
     /// <summary>
     /// Tries to remove the following key from the tree.
@@ -266,7 +265,7 @@ public class SortedTree<TKey, TValue>
     }
 
     /// <summary>
-    /// Gets the following key from the Tree. Assignes to the value.
+    /// Gets the following key from the Tree. Assigns to the value.
     /// </summary>
     /// <param name="key">the key to look for</param>
     /// <param name="value">the place to store the value</param>
@@ -275,12 +274,13 @@ public class SortedTree<TKey, TValue>
         if (!TryGet(key, value))
             throw new Exception("Key does not exists");
     }
+
     /// <summary>
     /// Attempts to get the following key from the Tree. Assigns to the value.
     /// </summary>
     /// <param name="key">the key to look for</param>
     /// <param name="value">the place to store the value</param>
-    /// <returns>True if successful, False otherwise.</returns>
+    /// <returns><c>true</c> if successful; otherwise, <c>false</c>.</returns>
     public bool TryGet(TKey key, TValue value)
     {
         return LeafStorage.TryGet(key, value);
@@ -299,12 +299,13 @@ public class SortedTree<TKey, TValue>
     {
         LeafStorage.SeekToFirstNode();
         bool firstFound = LeafStorage.TryGetFirstRecord(lowerBounds, m_tempValue);
+
         LeafStorage.SeekToLastNode();
         bool lastFound = LeafStorage.TryGetLastRecord(upperBounds, m_tempValue);
+
         if (firstFound && lastFound)
-        {
             return;
-        }
+        
         lowerBounds.SetMax();
         upperBounds.SetMin();
     }
@@ -325,7 +326,7 @@ public class SortedTree<TKey, TValue>
     /// <summary>
     /// Returns the node index address for a freshly allocated block.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Node index address for a freshly allocated block.</returns>
     /// <remarks>Also saves the header data</remarks>
     protected uint GetNextNewNodeIndex()
     {
@@ -341,21 +342,21 @@ public class SortedTree<TKey, TValue>
     /// <summary>
     /// Opens a sorted tree using the provided stream.
     /// </summary>
-    /// <param name="stream">the stream to use to open.</param>
-    /// <returns></returns>
+    /// <param name="stream">Source stream to open.</param>
+    /// <returns>Sorted tree using the provided stream.</returns>
     public static SortedTree<TKey, TValue> Open(BinaryStreamPointerBase stream)
     {
-        SortedTree<TKey, TValue> tree = new SortedTree<TKey, TValue>(stream);
+        SortedTree<TKey, TValue> tree = new(stream);
         tree.InitializeOpen();
         return tree;
     }
 
     /// <summary>
-    /// Creates a new FixedSize SortedTree using the provided stream.
+    /// Creates a new fixed size SortedTree using the provided stream.
     /// </summary>
-    /// <param name="stream"></param>
-    /// <param name="blockSize"></param>
-    /// <returns></returns>
+    /// <param name="stream">Source stream.</param>
+    /// <param name="blockSize">Block size.</param>
+    /// <returns>New fixed size SortedTree using the provided stream.</returns>
     public static SortedTree<TKey, TValue> Create(BinaryStreamPointerBase stream, int blockSize)
     {
         return Create(stream, blockSize, EncodingDefinition.FixedSizeCombinedEncoding);
@@ -364,16 +365,18 @@ public class SortedTree<TKey, TValue>
     /// <summary>
     /// Creates a new SortedTree writing to the provided streams and using the specified compression method for the tree node.
     /// </summary>
-    /// <param name="stream"></param>
-    /// <param name="blockSize"></param>
-    /// <param name="treeNodeType"></param>
-    /// <returns></returns>
+    /// <param name="stream">Source stream.</param>
+    /// <param name="blockSize">Block size.</param>
+    /// <param name="treeNodeType">Encoding definition.</param>
+    /// <returns>New SortedTree writing to the provided streams and using the specified compression method for the tree node.</returns>
     public static SortedTree<TKey, TValue> Create(BinaryStreamPointerBase stream, int blockSize, EncodingDefinition treeNodeType)
     {
         if (treeNodeType is null)
-            throw new ArgumentNullException("treeNodeType");
-        SortedTree<TKey, TValue> tree = new SortedTree<TKey, TValue>(stream);
+            throw new ArgumentNullException(nameof(treeNodeType));
+
+        SortedTree<TKey, TValue> tree = new(stream);
         tree.InitializeCreate(treeNodeType, blockSize);
+        
         return tree;
     }
 

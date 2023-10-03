@@ -31,31 +31,31 @@ using SnapDB.Snap.Definitions;
 namespace SnapDB.Snap.Filters;
 
 /// <summary>
-/// Represents a seek filter definition for the <see cref="TimestampPointIDSeekFilter"/> methods.
+/// Represents a seek filter definition for the <see cref="TimestampPointIdSeekFilter"/> methods.
 /// </summary>
-public class TimestampPointIDSeekFilterDefinition
+public class TimestampPointIdSeekFilterDefinition
     : SeekFilterDefinitionBase
 {
     /// <summary>
-    /// Guid for the <see cref="TimestampPointIDSeekFilterDefinition"/>.
+    /// Guid for the <see cref="TimestampPointIdSeekFilterDefinition"/>.
     /// </summary>
     // {8E0A841F-03C3-4B55-87CB-9F9A732F86DC}
-    public static Guid FilterGuid = new Guid(0x8E0A841F, 0x03C3, 0x4B55, 0x87, 0xCB, 0x9F, 0x9A, 0x73, 0x2F, 0x86, 0xDC);
+    public static Guid FilterGuid = new(0x8E0A841F, 0x03C3, 0x4B55, 0x87, 0xCB, 0x9F, 0x9A, 0x73, 0x2F, 0x86, 0xDC);
 
     /// <summary>
-    /// Gets the filter type Guid for the <see cref="TimestampPointIDSeekFilterDefinition"/>.
+    /// Gets the filter type Guid for the <see cref="TimestampPointIdSeekFilterDefinition"/>.
     /// </summary>
     public override Guid FilterType => FilterGuid;
 
     /// <summary>
-    /// Creates a new seek filter for the <see cref="TimestampPointIDSeekFilterDefinition"/>.
+    /// Creates a new seek filter for the <see cref="TimestampPointIdSeekFilterDefinition"/>.
     /// </summary>
     /// <typeparam name="TKey">Type of key/</typeparam>
     /// <param name="stream">Binary stream to create seek filter from.</param>
     /// <returns>New seek filter based on information in binary stream.</returns>
     public override SeekFilterBase<TKey> Create<TKey>(BinaryStreamBase stream)
     {
-        MethodInfo method = typeof(TimestampPointIDSeekFilter).GetMethod("CreateFromStream", BindingFlags.NonPublic | BindingFlags.Static);
+        MethodInfo method = typeof(TimestampPointIdSeekFilter).GetMethod("CreateFromStream", BindingFlags.NonPublic | BindingFlags.Static);
         MethodInfo generic = method.MakeGenericMethod(typeof(TKey));
         object rv = generic.Invoke(null, new[] { stream });
 

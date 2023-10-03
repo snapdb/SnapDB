@@ -102,7 +102,7 @@ public class ScramUserCredential
         }
         else
         {
-            return HMAC.Compute(Scram.CreateDigest(HashMethod), StoredKey, authMessage);
+            return Hmac.Compute(Scram.CreateDigest(HashMethod), StoredKey, authMessage);
         }
         return result;
     }
@@ -124,7 +124,7 @@ public class ScramUserCredential
         }
         else
         {
-            return HMAC.Compute(Scram.CreateDigest(HashMethod), StoredKey, authMessage);
+            return Hmac.Compute(Scram.CreateDigest(HashMethod), StoredKey, authMessage);
         }
         return result;
     }

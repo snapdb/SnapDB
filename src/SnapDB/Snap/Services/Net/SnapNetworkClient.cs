@@ -65,7 +65,7 @@ public class SnapNetworkClient
             ip = Dns.GetHostAddresses(settings.ServerNameOrIp)[0];
         }
 
-        IPEndPoint server = new IPEndPoint(ip, settings.NetworkPort);
+        IPEndPoint server = new(ip, settings.NetworkPort);
 
         m_client = new TcpClient(ip.AddressFamily);
         m_client.Connect(server);

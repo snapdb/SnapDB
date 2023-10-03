@@ -43,7 +43,7 @@ public class IsolatedQueue<T>
     /// Represents an individual node that allows for items to be added and removed from the 
     /// queue independently and without locks. 
     /// </summary>
-    class IsolatedNode
+    private class IsolatedNode
     {
         private readonly int m_lastBlock;
         private volatile int m_tail;
@@ -165,7 +165,7 @@ public class IsolatedQueue<T>
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    void EnqueueSlower(T item)
+    private void EnqueueSlower(T item)
     {
         if (m_currentHead is null || !m_currentHead.CanEnqueue)
         {
@@ -194,7 +194,7 @@ public class IsolatedQueue<T>
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    bool TryDequeueSlower(out T item)
+    private bool TryDequeueSlower(out T item)
     {
         if (m_currentTail is null)
         {

@@ -38,7 +38,7 @@ namespace SnapDB.IO.FileStructure;
 public class TransactionalFileStructure
     : IDisposable
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(TransactionalFileStructure), MessageClass.Component);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(TransactionalFileStructure), MessageClass.Component);
 
     #region [ Members ]
 
@@ -75,7 +75,7 @@ public class TransactionalFileStructure
 #if DEBUG
     ~TransactionalFileStructure()
     {
-        Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
+        s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
     }
 #endif
 

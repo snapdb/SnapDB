@@ -37,8 +37,8 @@ public partial class UnionTreeStream<TKey, TValue>
     {
         public TreeStream<TKey, TValue> Stream;
         public bool IsValid;
-        public readonly TKey CacheKey = new TKey();
-        public readonly TValue CacheValue = new TValue();
+        public readonly TKey CacheKey = new();
+        public readonly TValue CacheValue = new();
 
         /// <summary>
         /// Creates a new instance of the <see cref="BufferedTreeStream"/> class.
@@ -47,7 +47,7 @@ public partial class UnionTreeStream<TKey, TValue>
         public BufferedTreeStream(TreeStream<TKey, TValue> stream)
         {
             if (!stream.IsAlwaysSequential)
-                throw new ArgumentException("Stream must gaurentee sequential data access");
+                throw new ArgumentException("Stream must guarantee sequential data access");
             if (!stream.NeverContainsDuplicates)
                 stream = new DistinctTreeStream<TKey, TValue>(stream);
 
@@ -106,7 +106,7 @@ public partial class UnionTreeStream<TKey, TValue>
         /// </summary>
         public void Dispose()
         {
-            if (Stream != null)
+            if (Stream is not null)
             {
                 Stream.Dispose();
                 Stream = null;

@@ -44,7 +44,6 @@ public class RemoteBinaryStream
     private readonly byte[] m_sendBuffer;
 
     private readonly Stream m_stream;
-    private readonly WorkerThreadSynchronization m_workerThreadSynchronization;
 
     /// <summary>
     /// Creates a <see cref="RemoteBinaryStream"/>
@@ -59,7 +58,7 @@ public class RemoteBinaryStream
         if (workerThreadSynchronization is null)
             workerThreadSynchronization = new WorkerThreadSynchronization();
 
-        m_workerThreadSynchronization = workerThreadSynchronization;
+        WorkerThreadSynchronization = workerThreadSynchronization;
         m_receiveBuffer = new byte[BufferSize];
         m_sendBuffer = new byte[BufferSize];
         m_sendLength = 0;
@@ -72,7 +71,7 @@ public class RemoteBinaryStream
     /// Gets the <see cref="WorkerThreadSynchronization"/>. 
     /// This context will be entered when communcating to the socket layer.
     /// </summary>
-    public WorkerThreadSynchronization WorkerThreadSynchronization => m_workerThreadSynchronization;
+    public WorkerThreadSynchronization WorkerThreadSynchronization { get; }
 
     private int SendBufferFreeSpace => BufferSize - m_sendLength;
 
@@ -93,7 +92,7 @@ public class RemoteBinaryStream
         if (m_sendLength <= 0)
             return;
 
-        m_workerThreadSynchronization.BeginSafeToCallbackRegion();
+        WorkerThreadSynchronization.BeginSafeToCallbackRegion();
         try
         {
             m_stream.Write(m_sendBuffer, 0, m_sendLength);
@@ -101,7 +100,7 @@ public class RemoteBinaryStream
         }
         finally
         {
-            m_workerThreadSynchronization.EndSafeToCallbackRegion();
+            WorkerThreadSynchronization.EndSafeToCallbackRegion();
         }
         m_sendLength = 0;
     }
@@ -144,14 +143,14 @@ public class RemoteBinaryStream
             // Loop, since ReceiveFromSocket can return parial results.
             while (count > 0)
             {
-                m_workerThreadSynchronization.BeginSafeToCallbackRegion();
+                WorkerThreadSynchronization.BeginSafeToCallbackRegion();
                 try
                 {
                     receiveBufferLength = m_stream.Read(buffer, offset, count);
                 }
                 finally
                 {
-                    m_workerThreadSynchronization.EndSafeToCallbackRegion();
+                    WorkerThreadSynchronization.EndSafeToCallbackRegion();
                 }
 
 
@@ -174,14 +173,14 @@ public class RemoteBinaryStream
             m_receiveLength = 0;
             while (m_receiveLength < count)
             {
-                m_workerThreadSynchronization.BeginSafeToCallbackRegion();
+                WorkerThreadSynchronization.BeginSafeToCallbackRegion();
                 try
                 {
                     receiveBufferLength = m_stream.Read(m_receiveBuffer, m_receiveLength, prebufferLength);
                 }
                 finally
                 {
-                    m_workerThreadSynchronization.EndSafeToCallbackRegion();
+                    WorkerThreadSynchronization.EndSafeToCallbackRegion();
                 }
                 if (receiveBufferLength == 0)
                     throw new EndOfStreamException();
@@ -479,14 +478,14 @@ public class RemoteBinaryStream
         if (count > 100)
         {
             Flush();
-            m_workerThreadSynchronization.BeginSafeToCallbackRegion();
+            WorkerThreadSynchronization.BeginSafeToCallbackRegion();
             try
             {
                 m_stream.Write(buffer, offset, count);
             }
             finally
             {
-                m_workerThreadSynchronization.EndSafeToCallbackRegion();
+                WorkerThreadSynchronization.EndSafeToCallbackRegion();
             }
         }
 

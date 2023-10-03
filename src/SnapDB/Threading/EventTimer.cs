@@ -66,8 +66,8 @@ public class EventTimer
         m_period = period;
         m_dayOffset = dayOffset;
 
-        m_message = LogStackMessages.Empty.Union("Event Timer Details", string.Format("EventTimer: {0} in {1}", m_period, m_dayOffset));
-        Log.InitialStackMessages.Union("Event Timer Details", string.Format("EventTimer: {0} in {1}", m_period, m_dayOffset));
+        m_message = LogStackMessages.Empty.Union("Event Timer Details", $"EventTimer: {m_period} in {m_dayOffset}");
+        Log.InitialStackMessages.Union("Event Timer Details", $"EventTimer: {m_period} in {m_dayOffset}");
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public class EventTimer
         if (m_stopping)
             return;
 
-        if (Elapsed != null)
+        if (Elapsed is not null)
         {
             try
             {

@@ -178,7 +178,7 @@ public unsafe class GenericEncodedNode<TKey, TValue>
             }
 
             int length;
-            if (stream.IsKVP1)
+            if (stream.IsKvp1)
             {
                 //Key1,Value1 are the current record
                 if (RemainingBytes - additionalValidBytes < m_maximumStorageSize)
@@ -202,7 +202,7 @@ public unsafe class GenericEncodedNode<TKey, TValue>
                 //Inlined stream.Next()
                 stream.IsValid = stream.Stream.Read(stream.Key2, stream.Value2);
                 stream.IsStillSequential = stream.Key1.IsLessThan(stream.Key2);
-                stream.IsKVP1 = false;
+                stream.IsKvp1 = false;
                 //End Inlined
                 goto TryAgain;
             }
@@ -230,7 +230,7 @@ public unsafe class GenericEncodedNode<TKey, TValue>
                 //Inlined stream.Next()
                 stream.IsValid = stream.Stream.Read(stream.Key1, stream.Value1);
                 stream.IsStillSequential = stream.Key2.IsLessThan(stream.Key1);
-                stream.IsKVP1 = true;
+                stream.IsKvp1 = true;
                 //End Inlined
 
                 goto TryAgain;

@@ -34,7 +34,7 @@ namespace SnapDB.Security.Authentication;
 internal static class Scram
 {
     internal const int PasswordSize = 64;
-    internal readonly static UTF8Encoding Utf8 = new UTF8Encoding(true);
+    internal readonly static UTF8Encoding Utf8 = new(true);
     internal readonly static byte[] StringClientKey = Utf8.GetBytes("Client Key");
     internal readonly static byte[] StringServerKey = Utf8.GetBytes("Server Key");
 
@@ -55,7 +55,7 @@ internal static class Scram
         }
     }
 
-    internal static byte[] XOR(byte[] a, byte[] b)
+    internal static byte[] Xor(byte[] a, byte[] b)
     {
         if (a.Length != b.Length)
             throw new Exception();
@@ -84,12 +84,12 @@ internal static class Scram
 
     internal static byte[] ComputeClientKey(HashMethod hashMethod, byte[] saltedPassword)
     {
-        return ComputeHMAC(hashMethod, saltedPassword, StringClientKey);
+        return ComputeHmac(hashMethod, saltedPassword, StringClientKey);
     }
 
     internal static byte[] ComputeServerKey(HashMethod hashMethod, byte[] saltedPassword)
     {
-        return ComputeHMAC(hashMethod, saltedPassword, StringServerKey);
+        return ComputeHmac(hashMethod, saltedPassword, StringServerKey);
     }
 
     internal static byte[] ComputeStoredKey(HashMethod hashMethod, byte[] clientKey)
@@ -97,9 +97,9 @@ internal static class Scram
         return Hash.Compute(CreateDigest(hashMethod), clientKey);
     }
 
-    internal static byte[] ComputeHMAC(HashMethod hashMethod, byte[] key, byte[] message)
+    internal static byte[] ComputeHmac(HashMethod hashMethod, byte[] key, byte[] message)
     {
-        return HMAC.Compute(CreateDigest(hashMethod), key, message);
+        return Hmac.Compute(CreateDigest(hashMethod), key, message);
     }
 
     internal static byte[] GenerateSaltedPassword(string password, byte[] salt, int iterations)
@@ -110,7 +110,7 @@ internal static class Scram
 
     internal static byte[] GenerateSaltedPassword(byte[] passwordBytes, byte[] salt, int iterations)
     {
-        using (PBKDF2 pass = new PBKDF2(HMACMethod.SHA512, passwordBytes, salt, iterations))
+        using (Pbkdf2 pass = new(HmacMethod.Sha512, passwordBytes, salt, iterations))
         {
             return pass.GetBytes(PasswordSize);
         }

@@ -39,11 +39,8 @@ public partial class SortedTreeTable<TKey, TValue>
     #region [ Members ]
 
     private readonly SubFileName m_fileName;
-    private readonly TKey m_firstKey;
-    private readonly TKey m_lastKey;
     private readonly TransactionalFileStructure m_fileStructure;
     private Editor m_activeEditor;
-    private bool m_disposed;
 
     /// <summary>
     /// Gets the archive file where this table exists.
@@ -65,10 +62,10 @@ public partial class SortedTreeTable<TKey, TValue>
         BaseFile = baseFile;
         m_fileName = fileName;
         m_fileStructure = fileStructure;
-        m_firstKey = new TKey();
-        m_lastKey = new TKey();
+        FirstKey = new TKey();
+        LastKey = new TKey();
         using SortedTreeTableReadSnapshot<TKey, TValue> snapshot = BeginRead();
-        snapshot.GetKeyRange(m_firstKey, m_lastKey);
+        snapshot.GetKeyRange(FirstKey, LastKey);
     }
 
     #endregion
@@ -78,17 +75,17 @@ public partial class SortedTreeTable<TKey, TValue>
     /// <summary>
     /// Determines if the archive file has been disposed. 
     /// </summary>
-    public bool IsDisposed => m_disposed;
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// The first key.  Note: Values only update on commit.
     /// </summary>
-    public TKey FirstKey => m_firstKey;
+    public TKey FirstKey { get; }
 
     /// <summary>
     /// The last key.  Note: Values only update on commit.
     /// </summary>
-    public TKey LastKey => m_lastKey;
+    public TKey LastKey { get; }
 
 
     public Guid ArchiveId => BaseFile.Snapshot.Header.ArchiveId;
@@ -108,7 +105,7 @@ public partial class SortedTreeTable<TKey, TValue>
     /// </remarks>
     public SortedTreeTableSnapshotInfo<TKey, TValue> AcquireReadSnapshot()
     {
-        if (m_disposed)
+        if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
         return new SortedTreeTableSnapshotInfo<TKey, TValue>(m_fileStructure, m_fileName);
     }
@@ -142,7 +139,7 @@ public partial class SortedTreeTable<TKey, TValue>
     /// </example>
     public SortedTreeTableEditor<TKey, TValue> BeginEdit()
     {
-        if (m_disposed)
+        if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
         if (m_activeEditor is not null)
             throw new Exception("Only one concurrent edit is supported");
@@ -156,12 +153,11 @@ public partial class SortedTreeTable<TKey, TValue>
     /// </summary>
     public void Dispose()
     {
-        if (!m_disposed)
+        if (!IsDisposed)
         {
-            if (m_activeEditor is not null)
-                m_activeEditor.Dispose();
+            m_activeEditor?.Dispose();
             m_fileStructure.Dispose();
-            m_disposed = true;
+            IsDisposed = true;
         }
     }
 

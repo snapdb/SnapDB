@@ -38,7 +38,6 @@ public class SimplifiedArchiveInitializer<TKey, TValue>
     where TKey : SnapTypeBase<TKey>, new()
     where TValue : SnapTypeBase<TValue>, new()
 {
-    private SimplifiedArchiveInitializerSettings m_settings;
     private readonly ReaderWriterLockEasy m_lock;
 
     /// <summary>
@@ -47,15 +46,15 @@ public class SimplifiedArchiveInitializer<TKey, TValue>
     /// <param name="settings"></param>
     public SimplifiedArchiveInitializer(SimplifiedArchiveInitializerSettings settings)
     {
-        m_settings = settings.CloneReadonly();
-        m_settings.Validate();
+        Settings = settings.CloneReadonly();
+        Settings.Validate();
         m_lock = new ReaderWriterLockEasy();
     }
 
     /// <summary>
     /// Gets current settings.
     /// </summary>
-    public SimplifiedArchiveInitializerSettings Settings => m_settings;
+    public SimplifiedArchiveInitializerSettings Settings { get; private set; }
 
     /// <summary>
     /// Replaces the existing settings with this new set.
@@ -67,7 +66,7 @@ public class SimplifiedArchiveInitializer<TKey, TValue>
         settings.Validate();
         using (m_lock.EnterWriteLock())
         {
-            m_settings = settings;
+            Settings = settings;
         }
     }
 
@@ -82,7 +81,7 @@ public class SimplifiedArchiveInitializer<TKey, TValue>
     /// <returns></returns>
     public SortedTreeTable<TKey, TValue> CreateArchiveFile(TKey startKey, TKey endKey, long estimatedSize, TreeStream<TKey, TValue> data, Action<Guid> archiveIdCallback)
     {
-        SimplifiedArchiveInitializerSettings settings = m_settings;
+        SimplifiedArchiveInitializerSettings settings = Settings;
 
         string pendingFile = CreateArchiveName(GetPathWithEnoughSpace(estimatedSize), startKey, endKey);
         string finalFile = Path.ChangeExtension(pendingFile, settings.FinalExtension);
@@ -99,7 +98,7 @@ public class SimplifiedArchiveInitializer<TKey, TValue>
     private string CreateArchiveName(string path)
     {
         path = GetPath(path, DateTime.Now);
-        return Path.Combine(path, m_settings.Prefix.ToLower() + "-" + Guid.NewGuid() + "-" + DateTime.UtcNow.Ticks + m_settings.PendingExtension);
+        return Path.Combine(path, Settings.Prefix.ToLower() + "-" + Guid.NewGuid() + "-" + DateTime.UtcNow.Ticks + Settings.PendingExtension);
     }
 
     /// <summary>
@@ -108,22 +107,19 @@ public class SimplifiedArchiveInitializer<TKey, TValue>
     /// <returns></returns>
     private string CreateArchiveName(string path, TKey startKey, TKey endKey)
     {
-        IHasTimestampField startTime = startKey as IHasTimestampField;
-        IHasTimestampField endTime = endKey as IHasTimestampField;
-
-        if (startTime is null || endTime is null)
+        if (startKey is not IHasTimestampField startTime || endKey is not IHasTimestampField endTime)
             return CreateArchiveName(path);
 
         if (!startTime.TryGetDateTime(out DateTime startDate) || !endTime.TryGetDateTime(out DateTime endDate))
             return CreateArchiveName(path);
 
         path = GetPath(path, startDate);
-        return Path.Combine(path, m_settings.Prefix.ToLower() + "-" + startDate.ToString("yyyy-MM-dd HH.mm.ss.fff") + "_to_" + endDate.ToString("yyyy-MM-dd HH.mm.ss.fff") + "-" + DateTime.UtcNow.Ticks + m_settings.PendingExtension);
+        return Path.Combine(path, Settings.Prefix.ToLower() + "-" + startDate.ToString("yyyy-MM-dd HH.mm.ss.fff") + "_to_" + endDate.ToString("yyyy-MM-dd HH.mm.ss.fff") + "-" + DateTime.UtcNow.Ticks + Settings.PendingExtension);
     }
 
     private string GetPath(string rootPath, DateTime time)
     {
-        switch (m_settings.DirectoryMethod)
+        switch (Settings.DirectoryMethod)
         {
             case ArchiveDirectoryMethod.TopDirectoryOnly:
                 break;
@@ -145,9 +141,9 @@ public class SimplifiedArchiveInitializer<TKey, TValue>
     private string GetPathWithEnoughSpace(long estimatedSize)
     {
         if (estimatedSize < 0)
-            return m_settings.WritePath.First();
-        long remainingSpace = m_settings.DesiredRemainingSpace;
-        foreach (string path in m_settings.WritePath)
+            return Settings.WritePath.First();
+        long remainingSpace = Settings.DesiredRemainingSpace;
+        foreach (string path in Settings.WritePath)
         {
             FilePath.GetAvailableFreeSpace(path, out long freeSpace, out _);
             if (freeSpace - estimatedSize > remainingSpace)

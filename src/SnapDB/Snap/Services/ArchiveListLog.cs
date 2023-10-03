@@ -35,14 +35,14 @@ namespace SnapDB.Snap.Services;
 internal class ArchiveListLog
        : DisposableLoggingClassBase
 {
-    private readonly List<ArchiveListLogFile> m_files = new List<ArchiveListLogFile>();
-    private HashSet<Guid> m_allFilesToDelete = new HashSet<Guid>();
+    private readonly List<ArchiveListLogFile> m_files = new();
+    private HashSet<Guid> m_allFilesToDelete = new();
 
     private readonly object m_syncRoot;
     private bool m_disposed;
     private readonly ArchiveListLogSettings m_settings;
 
-    private ArchiveListLogFile m_pendingFile = new ArchiveListLogFile();
+    private ArchiveListLogFile m_pendingFile = new();
 
     /// <summary>
     /// Creates a log that monitors pending deletions.
@@ -64,7 +64,7 @@ internal class ArchiveListLog
         {
             foreach (string file in Directory.GetFiles(m_settings.LogPath, m_settings.SearchPattern))
             {
-                ArchiveListLogFile logFile = new ArchiveListLogFile();
+                ArchiveListLogFile logFile = new();
                 logFile.Load(file);
                 if (logFile.IsValid)
                 {
@@ -137,8 +137,7 @@ internal class ArchiveListLog
                 throw new ObjectDisposedException(GetType().FullName);
 
             m_pendingFile.FilesToDelete.Add(archiveId);
-            if (m_allFilesToDelete != null)
-                m_allFilesToDelete.Add(archiveId);
+            m_allFilesToDelete?.Add(archiveId);
         }
 
     }
@@ -169,7 +168,7 @@ internal class ArchiveListLog
     /// </summary>
     private HashSet<Guid> GetAllFilesToDelete()
     {
-        HashSet<Guid> allFiles = new HashSet<Guid>();
+        HashSet<Guid> allFiles = new();
         if (m_pendingFile.IsValid)
         {
             allFiles.UnionWith(m_pendingFile.FilesToDelete);

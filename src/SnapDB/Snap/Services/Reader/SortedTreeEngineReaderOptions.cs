@@ -37,7 +37,7 @@ public class SortedTreeEngineReaderOptions
     /// <summary>
     /// Default options. Same as default constructor
     /// </summary>
-    public static SortedTreeEngineReaderOptions Default
+    public static SortedTreeEngineReaderOptions? Default
     {
         get;
         private set;
@@ -102,7 +102,6 @@ public class SortedTreeEngineReaderOptions
     public TimeSpan Timeout
     {
         get;
-        private set;
     }
 
     /// <summary>
@@ -111,7 +110,6 @@ public class SortedTreeEngineReaderOptions
     public long MaxReturnedCount
     {
         get;
-        private set;
     }
 
     /// <summary>
@@ -121,7 +119,6 @@ public class SortedTreeEngineReaderOptions
     public long MaxScanCount
     {
         get;
-        private set;
     }
 
     /// <summary>
@@ -130,6 +127,5 @@ public class SortedTreeEngineReaderOptions
     public long MaxSeekCount
     {
         get;
-        private set;
     }
 }

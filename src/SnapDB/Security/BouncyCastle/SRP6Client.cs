@@ -33,23 +33,23 @@ namespace Org.BouncyCastle.Crypto.Agreement.Srp;
  */
 internal class Srp6Client
 {
-    private readonly SrpConstants param;
+    private readonly SrpConstants m_param;
 
-    protected BigInteger privA;
-    protected BigInteger pubA;
+    protected BigInteger PrivA;
+    protected BigInteger PubA;
 
     protected BigInteger B;
 
-    protected BigInteger x;
-    protected BigInteger u;
+    protected BigInteger X;
+    protected BigInteger U;
     protected BigInteger S;
 
-    protected SecureRandom random;
+    protected SecureRandom Random;
 
     public Srp6Client(SrpConstants param)
     {
-        this.param = param;
-        random = new SecureRandom();
+        this.m_param = param;
+        Random = new SecureRandom();
     }
 
     /**
@@ -61,11 +61,11 @@ internal class Srp6Client
      */
     public virtual BigInteger GenerateClientCredentials(IDigest digest, byte[] salt, byte[] identity, byte[] password)
     {
-        this.x = Srp6Utilities.CalculateX(digest, param.N, salt, identity, password);
-        this.privA = SelectPrivateValue();
-        this.pubA = param.g.ModPow(privA, param.N);
+        this.X = Srp6Utilities.CalculateX(digest, m_param.N, salt, identity, password);
+        this.PrivA = SelectPrivateValue();
+        this.PubA = m_param.G.ModPow(PrivA, m_param.N);
 
-        return pubA;
+        return PubA;
     }
 
     /**
@@ -76,8 +76,8 @@ internal class Srp6Client
      */
     public virtual BigInteger CalculateSecret(IDigest digest, BigInteger serverB)
     {
-        this.B = Srp6Utilities.ValidatePublicValue(param.N, serverB);
-        this.u = Srp6Utilities.CalculateU(digest, param.N, pubA, B);
+        this.B = Srp6Utilities.ValidatePublicValue(m_param.N, serverB);
+        this.U = Srp6Utilities.CalculateU(digest, m_param.N, PubA, B);
         this.S = CalculateS();
 
         return S;
@@ -85,13 +85,13 @@ internal class Srp6Client
 
     protected virtual BigInteger SelectPrivateValue()
     {
-        return Srp6Utilities.GeneratePrivateValue(param.N, random);
+        return Srp6Utilities.GeneratePrivateValue(m_param.N, Random);
     }
 
     private BigInteger CalculateS()
     {
-        BigInteger exp = u.Multiply(x).Add(privA);
-        BigInteger tmp = param.g.ModPow(x, param.N).Multiply(param.k).Mod(param.N);
-        return B.Subtract(tmp).Mod(param.N).ModPow(exp, param.N);
+        BigInteger exp = U.Multiply(X).Add(PrivA);
+        BigInteger tmp = m_param.G.ModPow(X, m_param.N).Multiply(m_param.K).Mod(m_param.N);
+        return B.Subtract(tmp).Mod(m_param.N).ModPow(exp, m_param.N);
     }
 }

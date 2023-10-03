@@ -165,7 +165,6 @@ internal unsafe class IndexParser
             lowestChange = 4;
         else
         {
-            lowestChange = 5;
             // DataClusterAddress = m_subFile.DirectBlock;
             return;
         }

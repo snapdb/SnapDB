@@ -59,7 +59,7 @@ internal class IndividualEncodingDictionary
             {
                 m_combinedEncoding.Add(encoding.Method, encoding);
             }
-            else if (encoding.TypeIfNotGeneric != null)
+            else if (encoding.TypeIfNotGeneric is not null)
             {
                 m_keyTypedCombinedEncoding.Add(Tuple.Create(encoding.Method, encoding.TypeIfNotGeneric), encoding);
             }

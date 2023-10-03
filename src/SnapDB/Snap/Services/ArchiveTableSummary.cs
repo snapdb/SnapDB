@@ -38,11 +38,6 @@ public class ArchiveTableSummary<TKey, TValue>
 {
     #region [ Members ]
 
-    private readonly TKey m_firstKey;
-    private readonly TKey m_lastKey;
-    private readonly SortedTreeTable<TKey, TValue> m_sortedTreeTable;
-    private readonly SortedTreeTableSnapshotInfo<TKey, TValue> m_activeSnapshotInfo;
-    private readonly Guid m_fileId;
     #endregion
 
     #region [ Constructors ]
@@ -53,13 +48,13 @@ public class ArchiveTableSummary<TKey, TValue>
     /// <param name="table">the table to take the read snapshot of.</param>
     public ArchiveTableSummary(SortedTreeTable<TKey, TValue> table)
     {
-        m_firstKey = new TKey();
-        m_lastKey = new TKey();
-        m_sortedTreeTable = table;
-        m_activeSnapshotInfo = table.AcquireReadSnapshot();
-        table.FirstKey.CopyTo(m_firstKey);
-        table.LastKey.CopyTo(m_lastKey);
-        m_fileId = m_sortedTreeTable.BaseFile.Snapshot.Header.ArchiveId;
+        FirstKey = new TKey();
+        LastKey = new TKey();
+        SortedTreeTable = table;
+        ActiveSnapshotInfo = table.AcquireReadSnapshot();
+        table.FirstKey.CopyTo(FirstKey);
+        table.LastKey.CopyTo(LastKey);
+        FileId = SortedTreeTable.BaseFile.Snapshot.Header.ArchiveId;
     }
 
     #endregion
@@ -69,22 +64,22 @@ public class ArchiveTableSummary<TKey, TValue>
     /// <summary>
     /// Gets the ID for this file.
     /// </summary>
-    public Guid FileId => m_fileId;
+    public Guid FileId { get; }
 
     /// <summary>
     /// Gets the <see cref="SortedTreeTable{TKey, TValue}"/> that this class represents.
     /// </summary>
-    public SortedTreeTable<TKey, TValue> SortedTreeTable => m_sortedTreeTable;
+    public SortedTreeTable<TKey, TValue> SortedTreeTable { get; }
 
     /// <summary>
     /// Gets the first key contained in this partition.
     /// </summary>
-    public TKey FirstKey => m_firstKey;
+    public TKey FirstKey { get; }
 
     /// <summary>
     /// Gets the last key contained in this partition.
     /// </summary>
-    public TKey LastKey => m_lastKey;
+    public TKey LastKey { get; }
 
     /// <summary>
     /// Gets if this table is empty.
@@ -94,7 +89,7 @@ public class ArchiveTableSummary<TKey, TValue>
     /// <summary>
     /// Gets the most recent <see cref="SortedTreeTableSnapshotInfo{TKey,TValue}"/> of this class when it was created.
     /// </summary>
-    public SortedTreeTableSnapshotInfo<TKey, TValue> ActiveSnapshotInfo => m_activeSnapshotInfo;
+    public SortedTreeTableSnapshotInfo<TKey, TValue> ActiveSnapshotInfo { get; }
 
     #endregion
 

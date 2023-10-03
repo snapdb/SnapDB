@@ -88,8 +88,8 @@ public class WriteProcessor<TKey, TValue>
     public long Write(TreeStream<TKey, TValue> stream)
     {
         long sequenceId = -1;
-        TKey key = new TKey();
-        TValue value = new TValue();
+        TKey key = new();
+        TValue value = new();
         while (stream.Read(key, value))
             sequenceId = m_prebuffer.Write(key, value);
         return sequenceId;

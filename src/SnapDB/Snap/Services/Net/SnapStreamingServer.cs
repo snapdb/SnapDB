@@ -47,7 +47,7 @@ public class SnapStreamingServer
     private RemoteBinaryStream m_stream;
     private SecureStreamServer<SocketUserPermissions> m_authentication;
     private SocketUserPermissions m_permissions;
-    public bool RequireSSL;
+    public bool RequireSsl;
 
     public SnapStreamingServer(SecureStreamServer<SocketUserPermissions> authentication, Stream stream, SnapServer server, bool requireSsl = false)
         : base(MessageClass.Framework)
@@ -69,7 +69,7 @@ public class SnapStreamingServer
     /// </summary>
     protected void Initialize(SecureStreamServer<SocketUserPermissions> authentication, Stream stream, SnapServer server, bool requireSsl)
     {
-        RequireSSL = requireSsl;
+        RequireSsl = requireSsl;
         m_rawStream = stream;
         m_authentication = authentication;
         m_server = server;
@@ -92,7 +92,7 @@ public class SnapStreamingServer
                 return;
             }
 
-            bool useSsl = m_rawStream.ReadBoolean() || RequireSSL;
+            bool useSsl = m_rawStream.ReadBoolean() || RequireSsl;
 
             m_rawStream.Write((byte)ServerResponse.KnownProtocol);
             m_rawStream.Write(useSsl);
@@ -166,14 +166,14 @@ public class SnapStreamingServer
                     }
                     ClientDatabaseBase database = m_host.GetDatabase(databaseName);
                     DatabaseInfo dbinfo = database.Info;
-                    if (dbinfo.KeyTypeID != keyTypeId)
+                    if (dbinfo.KeyTypeId != keyTypeId)
                     {
                         m_stream.Write((byte)ServerResponse.DatabaseKeyUnknown);
                         m_stream.Write("Database Key Type Is Invalid");
                         m_stream.Flush();
                         return;
                     }
-                    if (dbinfo.ValueTypeID != valueTypeId)
+                    if (dbinfo.ValueTypeId != valueTypeId)
                     {
                         m_stream.Write((byte)ServerResponse.DatabaseValueUnknown);
                         m_stream.Write("Database Value Type Is Invalid");
@@ -212,7 +212,7 @@ public class SnapStreamingServer
     {
         m_stream.Write((byte)ServerResponse.SuccessfullyConnectedToDatabase);
         m_stream.Flush();
-        StreamingServerDatabase<TKey, TValue> engine = new StreamingServerDatabase<TKey, TValue>(m_stream, database);
+        StreamingServerDatabase<TKey, TValue> engine = new(m_stream, database);
         return engine.RunDatabaseLevel();
     }
 

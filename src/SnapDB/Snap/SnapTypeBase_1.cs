@@ -89,7 +89,7 @@ public abstract class SnapTypeBase<T>
     /// </returns>
     public virtual unsafe int CompareTo(byte* stream)
     {
-        T other = new T();
+        T other = new();
         other.Read(stream);
         
         return CompareTo(other);
@@ -210,7 +210,7 @@ public abstract class SnapTypeBase<T>
     /// <returns>A new instance that is a copy of the current instance.</returns>
     public virtual T Clone()
     {
-        T rv = new T();
+        T rv = new();
         CopyTo(rv);
         return rv;
     }

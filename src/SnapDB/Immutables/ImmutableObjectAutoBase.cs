@@ -32,7 +32,7 @@ namespace SnapDB.Immutables;
 /// Represents an object that can be configured as read only and thus made immutable.  
 /// This class will automatically clone any field that implements <see cref="IImmutableObject"/>
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">Object type.</typeparam>
 public abstract class ImmutableObjectAutoBase<T>
     : ImmutableObjectBase<T>
     where T : ImmutableObjectAutoBase<T>

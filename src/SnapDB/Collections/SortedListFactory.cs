@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  SortedListConstructor.cs - Gbtc
+//  SortedListFactory.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -31,7 +31,7 @@ namespace SnapDB.Collections;
 /// <summary>
 /// Quickly creates a <see cref="SortedList"/> from a provided list of keys and values.
 /// </summary>
-public static class SortedListConstructor
+public static class SortedListFactory
 {
     /// <summary>
     /// Creates a sorted list from a provided keys and values.
@@ -51,7 +51,7 @@ public static class SortedListConstructor
     private class DictionaryWrapper<TKey, TValue>
         : IDictionary<TKey, TValue> where TKey : notnull
     {
-        // Initializes a new instance of the <see cref="DictionaryWrapper{TKey, TValue}"/> class with the provided collections of keys and values.
+        // Initializes a new instance of the DictionaryWrapper<TKey, TValue> class with the provided collections of keys and values.
         public DictionaryWrapper(ICollection<TKey> keys, ICollection<TValue> values)
         {
             Keys = keys;
@@ -138,6 +138,7 @@ public static class SortedListConstructor
         }
 
         public ICollection<TKey> Keys { get; }
+
         public ICollection<TValue> Values { get; }
     }
 }

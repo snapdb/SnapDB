@@ -66,11 +66,6 @@ public sealed partial class SubFileStream
     /// </summary>
     private readonly DiskIo m_dataReader;
 
-    /// <summary>
-    /// The file used by the stream.
-    /// </summary>
-    private readonly SubFileHeader? m_subFile;
-
     private readonly int m_blockSize;
 
     #endregion
@@ -112,7 +107,7 @@ public sealed partial class SubFileStream
 
         m_blockSize = dataReader.BlockSize;
         m_dataReader = dataReader;
-        m_subFile = subFile;
+        SubFile = subFile;
         m_fileHeaderBlock = fileHeaderBlock;
         m_isReadOnly = isReadOnly;
     }
@@ -121,7 +116,10 @@ public sealed partial class SubFileStream
 
     #region [ Properties ]
 
-    internal SubFileHeader? SubFile => m_subFile;
+    /// <summary>
+    /// The file used by the stream.
+    /// </summary>
+    internal SubFileHeader? SubFile { get; }
 
     /// <summary>
     /// Gets if this file was opened in readonly mode.
@@ -174,10 +172,10 @@ public sealed partial class SubFileStream
     {
         if (!m_fileHeaderBlock.IsSimplifiedFileFormat)
         {
-            if (m_ioStream1 != null && !m_ioStream1.IsDisposed && m_ioStream1 != caller)
+            if (m_ioStream1 is not null && !m_ioStream1.IsDisposed && m_ioStream1 != caller)
                 ((IoSession)m_ioStream1).ClearIndexCache(mostRecentParser);
 
-            if (m_ioStream2 != null && !m_ioStream2.IsDisposed && m_ioStream2 != caller)
+            if (m_ioStream2 is not null && !m_ioStream2.IsDisposed && m_ioStream2 != caller)
                 ((IoSession)m_ioStream2).ClearIndexCache(mostRecentParser);
         }
     }

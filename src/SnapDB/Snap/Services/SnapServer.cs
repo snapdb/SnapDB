@@ -45,7 +45,7 @@ public partial class SnapServer
     : DisposableLoggingClassBase
 {
     private bool m_disposed;
-    private readonly object m_syncRoot = new object();
+    private readonly object m_syncRoot = new();
 
     /// <summary>
     /// Contains a list of databases that are UPPER case names.
@@ -174,7 +174,7 @@ public partial class SnapServer
 
         using (Logger.AppendStackMessages(Log.InitialStackMessages))
         {
-            SnapSocketListener listener = new SnapSocketListener(socketSettings, this);
+            SnapSocketListener listener = new(socketSettings, this);
 
             lock (m_syncRoot)
             {

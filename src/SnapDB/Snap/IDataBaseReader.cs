@@ -45,6 +45,6 @@ public interface IDatabaseReader<TKey, TValue> : IDisposable
     /// <param name="keySeekFilter">A seek-based filter to follow. Can be <c>null</c>.</param>
     /// <param name="keyMatchFilter">A match-based filter to follow. Can be <c>null</c>.</param>
     /// <returns>A stream that will read the specified data.</returns>
-    TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions readerOptions, SeekFilterBase<TKey> keySeekFilter, MatchFilterBase<TKey, TValue> keyMatchFilter);
+    TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions, SeekFilterBase<TKey> keySeekFilter, MatchFilterBase<TKey, TValue>? keyMatchFilter);
 
 }

@@ -39,7 +39,7 @@ public class SrpServer
     /// </summary>
     public readonly SrpUserCredentials Users;
 
-    private static readonly UTF8Encoding UTF8 = new UTF8Encoding(true);
+    private static readonly UTF8Encoding s_utf8 = new(true);
 
     /// <summary>
     /// 
@@ -71,9 +71,9 @@ public class SrpServer
             return null;
 
         byte[] usernameBytes = stream.ReadBytes(len);
-        string username = UTF8.GetString(usernameBytes);
+        string username = s_utf8.GetString(usernameBytes);
         SrpUserCredential user = Users.Lookup(username);
-        SrpServerSession session = new SrpServerSession(user);
+        SrpServerSession session = new(user);
         if (session.TryAuthenticate(stream, additionalChallenge))
         {
             return session;

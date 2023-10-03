@@ -30,10 +30,10 @@ namespace SnapDB.Collections;
 
 /// <summary>
 /// Provides a high speed list that can have elements that can be null.
-/// It is similiar to a <see cref="List{T}"/> except high speed lookup for
+/// It is similar to a <see cref="List{T}"/> except high speed lookup for
 /// NextIndexOfNull-like functions is provided as well.
 /// </summary>
-/// <typeparam name="T">The type.</typeparam>
+/// <typeparam name="T">Array type.</typeparam>
 public class NullableLargeArray<T> : IEnumerable<T?>
 {
     private readonly LargeArray<T?> m_list;

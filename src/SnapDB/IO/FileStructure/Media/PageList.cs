@@ -37,7 +37,7 @@ namespace SnapDB.IO.FileStructure.Media;
 internal sealed unsafe class PageList
     : IDisposable
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(PageList), MessageClass.Component);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(PageList), MessageClass.Component);
 
 
     #region [ Members ]
@@ -99,7 +99,7 @@ internal sealed unsafe class PageList
 
     ~PageList()
     {
-        Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
+        s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
         Dispose();
     }
 
@@ -271,7 +271,7 @@ internal sealed unsafe class PageList
 
             catch (Exception ex)
             {
-                Log.Publish(MessageLevel.Critical, "Unhandled exception when returning resources to the memory pool", null, null, ex);
+                s_log.Publish(MessageLevel.Critical, "Unhandled exception when returning resources to the memory pool", null, null, ex);
             }
 
             finally

@@ -96,7 +96,7 @@ public partial class ArchiveList<TKey, TValue>
 
         AttachFileOrPath(m_settings.ImportPaths);
 
-        HashSet<Guid> files = new HashSet<Guid>(m_filesToDelete.Select(x => x.ArchiveId));
+        HashSet<Guid> files = new(m_filesToDelete.Select(x => x.ArchiveId));
         m_listLog.ClearCompletedLogs(files);
     }
 
@@ -107,13 +107,13 @@ public partial class ArchiveList<TKey, TValue>
     /// <returns></returns>
     public override void AttachFileOrPath(IEnumerable<string> paths)
     {
-        List<string> attachedFiles = new List<string>();
+        List<string> attachedFiles = new();
 
         foreach (string path in paths)
         {
             try
             {
-                void exceptionHandler(Exception ex) => Log.Publish(MessageLevel.Error, "Unknown error occurred while attaching paths", "Path: " + path, null, ex);
+                void ExceptionHandler(Exception ex) => Log.Publish(MessageLevel.Error, "Unknown error occurred while attaching paths", "Path: " + path, null, ex);
 
                 if (File.Exists(path))
                 {
@@ -122,7 +122,7 @@ public partial class ArchiveList<TKey, TValue>
                 else if (Directory.Exists(path))
                 {
                     foreach (string extension in m_settings.ImportExtensions)
-                        attachedFiles.AddRange(FilePath.GetFiles(path, "*" + extension, SearchOption.AllDirectories, exceptionHandler));
+                        attachedFiles.AddRange(FilePath.GetFiles(path, "*" + extension, SearchOption.AllDirectories, ExceptionHandler));
                 }
                 else
                 {
@@ -148,7 +148,7 @@ public partial class ArchiveList<TKey, TValue>
         if (m_disposed)
             throw new Exception("Object is disposing");
 
-        List<SortedTreeTable<TKey, TValue>> loadedFiles = new List<SortedTreeTable<TKey, TValue>>();
+        List<SortedTreeTable<TKey, TValue>> loadedFiles = new();
 
         foreach (string file in archiveFiles)
         {
@@ -299,7 +299,7 @@ public partial class ArchiveList<TKey, TValue>
     /// </summary>
     public override List<ArchiveDetails> GetAllAttachedFiles()
     {
-        List<ArchiveDetails> attachedFiles = new List<ArchiveDetails>();
+        List<ArchiveDetails> attachedFiles = new();
 
         lock (m_syncRoot)
         {
@@ -391,9 +391,9 @@ public partial class ArchiveList<TKey, TValue>
     private bool InternalIsFileBeingUsed(SortedTreeTable<TKey, TValue> sortedTree)
     {
         return m_allSnapshots.Select(snapshot => snapshot.Tables)
-            .Where(tables => tables != null)
+            .Where(tables => tables is not null)
             .Any(tables => tables
-                .Any(summary => summary != null && summary.SortedTreeTable == sortedTree));
+                .Any(summary => summary is not null && summary.SortedTreeTable == sortedTree));
     }
 
     private void ProcessRemovals_Running(object sender, EventArgs<ScheduledTaskRunningReason> eventArgs)
@@ -427,7 +427,7 @@ public partial class ArchiveList<TKey, TValue>
 
             if (wasAFileDeleted)
             {
-                HashSet<Guid> files = new HashSet<Guid>(m_filesToDelete.Select(x => x.ArchiveId));
+                HashSet<Guid> files = new(m_filesToDelete.Select(x => x.ArchiveId));
                 m_listLog.ClearCompletedLogs(files);
             }
 
@@ -481,7 +481,7 @@ public partial class ArchiveList<TKey, TValue>
 
     private void ReleaseClientResources()
     {
-        List<ArchiveListSnapshot<TKey, TValue>> tablesInUse = new List<ArchiveListSnapshot<TKey, TValue>>();
+        List<ArchiveListSnapshot<TKey, TValue>> tablesInUse = new();
 
         lock (m_syncRoot)
         {

@@ -40,7 +40,7 @@ public class CombineFilesSettings
     private int m_combineOnFileCount = 100;
     private long m_combineOnFileSize = 1024 * 1024 * 1024;
     private Guid m_matchFlag = Guid.Empty;
-    private SimplifiedArchiveInitializerSettings m_archiveSettings = new SimplifiedArchiveInitializerSettings();
+    private SimplifiedArchiveInitializerSettings m_archiveSettings = new();
 
     /// <summary>
     /// Gets the rate a which a rollover check is executed
@@ -173,7 +173,7 @@ public class CombineFilesSettings
         {
             TestForEditable();
             if (value is null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             m_archiveSettings = value;
         }
     }

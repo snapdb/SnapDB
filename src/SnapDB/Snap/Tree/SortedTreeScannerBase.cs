@@ -114,7 +114,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     protected long PointerVersion { get; private set; }
 
     private readonly byte m_level;
-    protected readonly int m_blockSize;
+    protected readonly int BlockSize;
     protected readonly BinaryStreamPointerBase Stream;
 
     /// <summary>
@@ -144,7 +144,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
 
         // OffsetOfUpperBounds = OffsetOfLowerBounds + KeySize;
         HeaderSize = OffsetOfLowerBounds + 2 * KeySize;
-        m_blockSize = blockSize;
+        BlockSize = blockSize;
         Stream = stream;
         PointerVersion = -1;
         IndexOfNextKeyValue = 0;
@@ -167,11 +167,11 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
 
     protected abstract void InternalRead(TKey key, TValue value);
 
-    protected abstract bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue> filter);
+    protected abstract bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue>? filter);
 
     protected abstract bool InternalReadWhile(TKey key, TValue value, TKey upperBounds);
 
-    protected abstract bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue> filter);
+    protected abstract bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue>? filter);
 
     /// <summary>
     /// Using <see cref="Pointer"/> advance to the search location of the provided <see cref="key"/>.
@@ -241,7 +241,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     /// <param name="key">Where to store the key</param>
     /// <param name="value">Where to store the value</param>
     /// <param name="upperBounds">the test condition. Will return <c>false</c> if the returned point would have 
-    /// exceeded this value</param>
+    /// exceedd this value</param>
     /// <returns>
     /// Returns <c>true</c> if the point returned is valid. 
     /// Returns <c>false</c> if:
@@ -305,7 +305,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     /// <param name="key">Where to store the key.</param>
     /// <param name="value">Where to store the value.</param>
     /// <param name="upperBounds">the test condition. Will return <c>false</c> if the returned point would have 
-    /// exceeded this value</param>
+    /// exceedd this value</param>
     /// <param name="filter">the filter to apply to the reading.</param>
     /// <returns>
     /// Returns true if the point returned is valid. 
@@ -314,7 +314,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     ///     The end of the stream is reached.
     ///     The end of the current node has been reached.
     /// </returns>
-    public virtual bool ReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue> filter)
+    public virtual bool ReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue>? filter)
     {
         if (Stream.PointerVersion == PointerVersion && IndexOfNextKeyValue < RecordCount)
         {
@@ -327,7 +327,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
         return ReadWhileCatchAll(key, value, upperBounds, filter);
     }
 
-    protected bool ReadWhileCatchAll(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue> filter)
+    protected bool ReadWhileCatchAll(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue>? filter)
     {
         // If there are no more records in the current node.
         if (IndexOfNextKeyValue >= RecordCount)
@@ -495,7 +495,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue>
     /// </summary>
     private void RefreshPointer()
     {
-        Pointer = Stream.GetReadPointer(NodeIndex * m_blockSize, m_blockSize) + HeaderSize;
+        Pointer = Stream.GetReadPointer(NodeIndex * BlockSize, BlockSize) + HeaderSize;
         PointerVersion = Stream.PointerVersion;
     }
 

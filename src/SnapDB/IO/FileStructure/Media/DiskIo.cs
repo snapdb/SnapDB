@@ -37,14 +37,12 @@ namespace SnapDB.IO.FileStructure.Media;
 /// </summary>
 internal sealed class DiskIo : IDisposable
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(DiskIo), MessageClass.Component);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(DiskIo), MessageClass.Component);
 
     #region [ Members ]
 
     private DiskMedium m_stream;
-    private readonly int m_blockSize;
     private readonly bool m_isReadOnly;
-    private bool m_disposed;
 
     #endregion
 
@@ -56,14 +54,14 @@ internal sealed class DiskIo : IDisposable
             throw new ArgumentNullException(nameof(stream));
 
         m_isReadOnly = isReadOnly;
-        m_blockSize = stream.BlockSize;
+        BlockSize = stream.BlockSize;
         m_stream = stream;
     }
 
 #if DEBUG
     ~DiskIo()
     {
-        Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
+        s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
     }
 #endif
 
@@ -74,7 +72,7 @@ internal sealed class DiskIo : IDisposable
     /// <summary>
     /// Gets the number of bytes in a single block.
     /// </summary>
-    public int BlockSize => m_blockSize;
+    public int BlockSize { get; }
 
     /// <summary>
     /// Gets if the disk supports writing.
@@ -83,7 +81,7 @@ internal sealed class DiskIo : IDisposable
     {
         get
         {
-            if (m_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
             return m_isReadOnly;
@@ -93,7 +91,7 @@ internal sealed class DiskIo : IDisposable
     /// <summary>
     /// Gets if the class has been disposed.
     /// </summary>
-    public bool IsDisposed => m_disposed;
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Gets the current size of the file.
@@ -102,7 +100,7 @@ internal sealed class DiskIo : IDisposable
     {
         get
         {
-            if (m_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
             return m_stream.Length;
@@ -116,7 +114,7 @@ internal sealed class DiskIo : IDisposable
     {
         get
         {
-            if (m_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
             return m_stream.Header.LastAllocatedBlock;
@@ -130,7 +128,7 @@ internal sealed class DiskIo : IDisposable
     {
         get
         {
-            if (m_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
             return m_stream.Header;
@@ -149,7 +147,7 @@ internal sealed class DiskIo : IDisposable
     /// </summary>
     public void RollbackChanges()
     {
-        if (m_disposed)
+        if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
 
         if (m_isReadOnly)
@@ -166,7 +164,7 @@ internal sealed class DiskIo : IDisposable
     /// <param name="count">The number of bytes to copy from the source to the destination.</param>
     public void CommitChanges(FileHeaderBlock header)
     {
-        if (m_disposed)
+        if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
 
         if (m_isReadOnly)
@@ -184,7 +182,7 @@ internal sealed class DiskIo : IDisposable
     /// <exception cref="ObjectDisposedException">Thrown if the <see cref="DiskIo"/> instance is disposed.</exception>
     public DiskIoSession CreateDiskIoSession(FileHeaderBlock header, SubFileHeader? file)
     {
-        if (m_disposed)
+        if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
 
         return new DiskIoSession(this, m_stream.CreateIoSession(), header, file);
@@ -216,21 +214,18 @@ internal sealed class DiskIo : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (!m_disposed)
+        if (!IsDisposed)
         {
             try
             {
-                if (m_stream is not null)
-                {
-                    m_stream.Dispose();
-                }
+                m_stream?.Dispose();
             }
 
             finally
             {
                 GC.SuppressFinalize(this);
                 m_stream = null;
-                m_disposed = true;
+                IsDisposed = true;
             }
         }
     }

@@ -40,7 +40,7 @@ namespace SnapDB.Security.Authentication;
 /// </remarks>
 public class IntegratedSecurityUserCredentials
 {
-    private readonly Dictionary<string, IntegratedSecurityUserCredential> m_users = new Dictionary<string, IntegratedSecurityUserCredential>();
+    private readonly Dictionary<string, IntegratedSecurityUserCredential> m_users = new();
 
     /// <summary>
     /// Gets if the user exists in the database
@@ -53,9 +53,7 @@ public class IntegratedSecurityUserCredentials
         token = Guid.Empty;
 
         WindowsIdentity i = identity as WindowsIdentity;
-        if (i is null)
-            return false;
-        if (i.User is null)
+        if (i?.User is null)
             return false;
         lock (m_users)
         {
@@ -84,10 +82,10 @@ public class IntegratedSecurityUserCredentials
     /// <param name="userToken"></param>
     public void AddUser(string username, Guid userToken)
     {
-        IntegratedSecurityUserCredential user = new IntegratedSecurityUserCredential(username, userToken);
+        IntegratedSecurityUserCredential user = new(username, userToken);
         lock (m_users)
         {
-            m_users.Add(user.UserID, user);
+            m_users.Add(user.UserId, user);
         }
     }
 
@@ -125,8 +123,8 @@ public class IntegratedSecurityUserCredentials
                     while (count > 0)
                     {
                         count--;
-                        IntegratedSecurityUserCredential user = new IntegratedSecurityUserCredential(stream);
-                        m_users.Add(user.UserID, user);
+                        IntegratedSecurityUserCredential user = new(stream);
+                        m_users.Add(user.UserId, user);
                     }
                 }
                 return;

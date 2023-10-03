@@ -63,7 +63,7 @@ public class FixedSizeNodeScanner<TKey, TValue>
         IndexOfNextKeyValue++;
     }
 
-    protected override unsafe bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue> filter)
+    protected override unsafe bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue>? filter)
     {
     TryAgain:
         byte* ptr = Pointer + IndexOfNextKeyValue * m_keyValueSize;
@@ -108,7 +108,7 @@ public class FixedSizeNodeScanner<TKey, TValue>
     /// <summary>
     /// Using <see cref="SortedTreeScannerBase{TKey,TValue}.Pointer"/> to advance to the next KeyValue.
     /// </summary>
-    protected override unsafe bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue> filter)
+    protected override unsafe bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue>? filter)
     {
     TryAgain:
         byte* ptr = Pointer + IndexOfNextKeyValue * m_keyValueSize;

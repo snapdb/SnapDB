@@ -32,12 +32,10 @@ namespace SnapDB.IO.Unmanaged;
 public abstract class BinaryStreamIoSessionBase
     : IDisposable
 {
-    private bool m_disposed;
-
     /// <summary>
     /// Gets if the object has been disposed.
     /// </summary>
-    public bool IsDisposed => m_disposed;
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Gets a block for the following I/O session.
@@ -65,7 +63,7 @@ public abstract class BinaryStreamIoSessionBase
     /// <param name="disposing"><c>true</c> releases both managed and unmanaged resources; <c>false</c> releases only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
-        if (!m_disposed)
+        if (!IsDisposed)
         {
             try
             {
@@ -76,7 +74,7 @@ public abstract class BinaryStreamIoSessionBase
             }
             finally
             {
-                m_disposed = true;  // Prevent duplicate dispose.
+                IsDisposed = true;  // Prevent duplicate dispose.
             }
         }
     }

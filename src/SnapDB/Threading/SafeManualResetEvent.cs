@@ -44,7 +44,7 @@ public sealed class SafeManualResetEvent
     /// <summary>
     /// A place to report exception logs associated with this class.
     /// </summary>
-    private readonly static LogPublisher Log = Logger.CreatePublisher(typeof(SafeManualResetEvent), MessageClass.Component);
+    private readonly static LogPublisher s_log = Logger.CreatePublisher(typeof(SafeManualResetEvent), MessageClass.Component);
     private bool m_disposed;
     private readonly object m_syncRoot;
 
@@ -78,13 +78,14 @@ public sealed class SafeManualResetEvent
         {
             if (m_disposed)
                 return;
-                
+
             try
+            {
                 m_resetEvent.Reset();
-                
+            }
             catch (Exception ex)
             {
-                Log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to Reset() threw an exception", null, ex);
+                s_log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to Reset() threw an exception", null, ex);
             }
         }
     }
@@ -104,7 +105,7 @@ public sealed class SafeManualResetEvent
             }
             catch (Exception ex)
             {
-                Log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to Set() threw an exception", null, ex);
+                s_log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to Set() threw an exception", null, ex);
             }
         }
     }
@@ -127,7 +128,7 @@ public sealed class SafeManualResetEvent
         }
         catch (Exception ex)
         {
-            Log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to WaitOne() threw an exception", null, ex);
+            s_log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to WaitOne() threw an exception", null, ex);
         }
         finally
         {
@@ -145,7 +146,7 @@ public sealed class SafeManualResetEvent
                     }
                     catch (Exception ex)
                     {
-                        Log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to WaitOne() threw an exception", null, ex);
+                        s_log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to WaitOne() threw an exception", null, ex);
                     }
                     m_resetEvent = null;
                 }
@@ -177,7 +178,7 @@ public sealed class SafeManualResetEvent
                 }
                 catch (Exception ex)
                 {
-                    Log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to Dispose() threw an exception", null, ex);
+                    s_log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to Dispose() threw an exception", null, ex);
                 }
             }
             else
@@ -190,7 +191,7 @@ public sealed class SafeManualResetEvent
                 }
                 catch (Exception ex)
                 {
-                    Log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to Dispose() threw an exception", null, ex);
+                    s_log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to Dispose() threw an exception", null, ex);
                 }
                 m_resetEvent = null;
             }

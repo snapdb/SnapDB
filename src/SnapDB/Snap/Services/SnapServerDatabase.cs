@@ -155,8 +155,7 @@ public partial class SnapServerDatabase<TKey, TValue>
             {
                 m_disposed = true;
 
-                if (m_archiveWriter != null)
-                    m_archiveWriter.Dispose();
+                m_archiveWriter?.Dispose();
 
                 m_archiveList.Dispose();
             }
@@ -203,17 +202,17 @@ public partial class SnapServerDatabase<TKey, TValue>
 
     private void Write(TreeStream<TKey, TValue> stream)
     {
-        TKey key = new TKey();
-        TValue value = new TValue();
+        TKey key = new();
+        TValue value = new();
 
         // TODO: Pre=buffer the points in the stream. It is possible that this call may be behind a slow socket interface, therefore it will lockup the writing speed.
         while (stream.Read(key, value))
             Write(key, value);
     }
 
-    private SequentialReaderStream<TKey, TValue> Read(SortedTreeEngineReaderOptions readerOptions,
+    private SequentialReaderStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions,
         SeekFilterBase<TKey> keySeekFilter,
-        MatchFilterBase<TKey, TValue> keyMatchFilter,
+        MatchFilterBase<TKey, TValue>? keyMatchFilter,
         WorkerThreadSynchronization workerThreadSynchronization)
     {
         if (m_disposed)

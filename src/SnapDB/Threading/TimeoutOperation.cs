@@ -31,7 +31,7 @@ public class TimeoutOperation
 {
     // ToDo: Figure out how to allow for a weak referenced callback.
 
-    private readonly object m_syncRoot = new object();
+    private readonly object m_syncRoot = new();
     private RegisteredWaitHandle m_registeredHandle;
     private ManualResetEvent m_resetEvent;
     private Action m_callback;
@@ -46,7 +46,7 @@ public class TimeoutOperation
     {
         lock (m_syncRoot)
         {
-            if (m_callback != null)
+            if (m_callback is not null)
                 throw new Exception("Duplicate calls are not permitted");
 
             m_callback = callback;
@@ -78,7 +78,7 @@ public class TimeoutOperation
     {
         lock (m_syncRoot)
         {
-            if (m_registeredHandle != null)
+            if (m_registeredHandle is not null)
             {
                 m_registeredHandle.Unregister(null);
                 m_resetEvent.Dispose();

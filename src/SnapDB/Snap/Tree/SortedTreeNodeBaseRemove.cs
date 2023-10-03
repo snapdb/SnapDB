@@ -187,8 +187,8 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
 
     private void UpdateBoundsOfNode(Node<TKey> leftNode, Node<TKey> rightNode)
     {
-        TKey oldLowerKey = new TKey();
-        TKey newLowerKey = new TKey();
+        TKey oldLowerKey = new();
+        TKey newLowerKey = new();
 
         rightNode.LowerKey.CopyTo(oldLowerKey);
         newLowerKey.Read(rightNode.GetReadPointerAfterHeader()); //ToDo: Make Generic

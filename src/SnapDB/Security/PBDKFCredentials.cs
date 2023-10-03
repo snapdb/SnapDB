@@ -32,7 +32,7 @@ namespace SnapDB.Security;
 /// Computes the password credentials. 
 /// Optimized so duplicate calls will not recompute the password unless necessary.
 /// </summary>
-internal class PBDKFCredentials
+internal class PbdkfCredentials
 {
     // Original username and password
     /// <summary>
@@ -51,7 +51,7 @@ internal class PBDKFCredentials
     /// </summary>
     public byte[] SaltedPassword;
 
-    public PBDKFCredentials(string username, string password)
+    public PbdkfCredentials(string username, string password)
     {
         UsernameBytes = Encoding.UTF8.GetBytes(username.Normalize(NormalizationForm.FormKC));
         m_passwordBytes = Encoding.UTF8.GetBytes(password.Normalize(NormalizationForm.FormKC));
@@ -91,16 +91,16 @@ internal class PBDKFCredentials
             switch (hashMethod)
             {
                 case HashMethod.Sha1:
-                    SaltedPassword = PBKDF2.ComputeSaltedPassword(HMACMethod.SHA1, m_passwordBytes, m_salt, m_iterations, 20);
+                    SaltedPassword = Pbkdf2.ComputeSaltedPassword(HmacMethod.Sha1, m_passwordBytes, m_salt, m_iterations, 20);
                     break;
                 case HashMethod.Sha256:
-                    SaltedPassword = PBKDF2.ComputeSaltedPassword(HMACMethod.SHA256, m_passwordBytes, m_salt, m_iterations, 32);
+                    SaltedPassword = Pbkdf2.ComputeSaltedPassword(HmacMethod.Sha256, m_passwordBytes, m_salt, m_iterations, 32);
                     break;
                 case HashMethod.Sha384:
-                    SaltedPassword = PBKDF2.ComputeSaltedPassword(HMACMethod.SHA384, m_passwordBytes, m_salt, m_iterations, 48);
+                    SaltedPassword = Pbkdf2.ComputeSaltedPassword(HmacMethod.Sha384, m_passwordBytes, m_salt, m_iterations, 48);
                     break;
                 case HashMethod.Sha512:
-                    SaltedPassword = PBKDF2.ComputeSaltedPassword(HMACMethod.SHA512, m_passwordBytes, m_salt, m_iterations, 64);
+                    SaltedPassword = Pbkdf2.ComputeSaltedPassword(HmacMethod.Sha512, m_passwordBytes, m_salt, m_iterations, 64);
                     break;
                 default:
                     throw new Exception("Invalid Hash Method");

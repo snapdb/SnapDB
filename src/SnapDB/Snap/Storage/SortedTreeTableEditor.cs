@@ -64,7 +64,7 @@ public partial class SortedTreeTable<TKey, TValue>
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
-            GetKeyRange(m_sortedTreeFile.m_firstKey, m_sortedTreeFile.m_lastKey);
+            GetKeyRange(m_sortedTreeFile.FirstKey, m_sortedTreeFile.LastKey);
 
             if (m_tree is not null)
             {

@@ -43,8 +43,6 @@ public class SimplifiedArchiveInitializerSettings
     private string m_finalExtension;
     private long m_desiredRemainingSpace;
     private EncodingDefinition m_encodingMethod;
-    private ImmutableList<string> m_writePath;
-    private ImmutableList<Guid> m_flags;
 
     /// <summary>
     /// Creates a new <see cref="ArchiveInitializerSettings"/>.
@@ -62,13 +60,13 @@ public class SimplifiedArchiveInitializerSettings
         m_finalExtension = ".d2i";
         m_desiredRemainingSpace = 5 * 1024 * 1024 * 1024L; //5GB
         m_encodingMethod = EncodingDefinition.FixedSizeCombinedEncoding;
-        m_writePath = new ImmutableList<string>((x) =>
+        WritePath = new ImmutableList<string>((x) =>
         {
             PathHelpers.ValidatePathName(x);
 
             return x;
         });
-        m_flags = new ImmutableList<Guid>();
+        Flags = new ImmutableList<Guid>();
     }
 
     /// <summary>
@@ -101,7 +99,7 @@ public class SimplifiedArchiveInitializerSettings
             }
 
             if (value.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
-                throw new ArgumentException("filename has invalid characters.", "value");
+                throw new ArgumentException("filename has invalid characters.", nameof(value));
 
             m_prefix = value;
         }
@@ -110,7 +108,7 @@ public class SimplifiedArchiveInitializerSettings
     /// <summary>
     /// The list of all available paths to write files to.
     /// </summary>
-    public ImmutableList<string> WritePath => m_writePath;
+    public ImmutableList<string> WritePath { get; private set; }
 
     /// <summary>
     /// The extension to name the file.
@@ -142,7 +140,7 @@ public class SimplifiedArchiveInitializerSettings
     /// <summary>
     /// The flags that will be added to any created archive files.
     /// </summary>
-    public ImmutableList<Guid> Flags => m_flags;
+    public ImmutableList<Guid> Flags { get; private set; }
 
     /// <summary>
     /// The encoding method that will be used to write files.
@@ -155,7 +153,7 @@ public class SimplifiedArchiveInitializerSettings
             TestForEditable();
 
             if (value is null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             m_encodingMethod = value;
         }
@@ -220,14 +218,14 @@ public class SimplifiedArchiveInitializerSettings
         stream.Write(m_finalExtension);
         stream.Write(m_desiredRemainingSpace);
         m_encodingMethod.Save(stream);
-        stream.Write(m_writePath.Count);
+        stream.Write(WritePath.Count);
 
-        foreach (string path in m_writePath)
+        foreach (string path in WritePath)
             stream.Write(path);
 
-        stream.Write(m_flags.Count);
+        stream.Write(Flags.Count);
 
-        foreach (Guid flag in m_flags)
+        foreach (Guid flag in Flags)
             stream.Write(flag);
     }
 
@@ -246,21 +244,21 @@ public class SimplifiedArchiveInitializerSettings
                 m_desiredRemainingSpace = stream.ReadInt64();
                 m_encodingMethod = new EncodingDefinition(stream);
                 int cnt = stream.ReadInt32();
-                m_writePath.Clear();
+                WritePath.Clear();
 
                 while (cnt > 0)
                 {
                     cnt--;
-                    m_writePath.Add(stream.ReadString());
+                    WritePath.Add(stream.ReadString());
                 }
 
                 cnt = stream.ReadInt32();
-                m_flags.Clear();
+                Flags.Clear();
 
                 while (cnt > 0)
                 {
                     cnt--;
-                    m_flags.Add(stream.ReadGuid());
+                    Flags.Add(stream.ReadGuid());
                 }
 
                 break;

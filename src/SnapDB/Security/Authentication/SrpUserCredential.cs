@@ -44,7 +44,7 @@ public class SrpUserCredential
     /// <summary>
     /// Session Resume HMAC key
     /// </summary>
-    public readonly byte[] ServerHMACKey = SaltGenerator.Create(32);
+    public readonly byte[] ServerHmacKey = SaltGenerator.Create(32);
 
     /// <summary>
     /// Session Resume Encryption Key
@@ -113,12 +113,12 @@ public class SrpUserCredential
         UsernameBytes = Encoding.UTF8.GetBytes(username);
 
         SrpConstants constants = SrpConstants.Lookup(strength);
-        BigInteger N = constants.N;
-        BigInteger g = constants.g;
+        BigInteger n = constants.N;
+        BigInteger g = constants.G;
         byte[] s = SaltGenerator.Create(saltSize);
-        byte[] hashPassword = PBKDF2.ComputeSaltedPassword(HMACMethod.SHA512, Encoding.UTF8.GetBytes(password), s, iterations, 64);
+        byte[] hashPassword = Pbkdf2.ComputeSaltedPassword(HmacMethod.Sha512, Encoding.UTF8.GetBytes(password), s, iterations, 64);
 
-        Sha512Digest hash = new Sha512Digest();
+        Sha512Digest hash = new();
         byte[] output = new byte[hash.GetDigestSize()];
         hash.BlockUpdate(UsernameBytes, 0, UsernameBytes.Length);
         hash.Update((byte)':');
@@ -127,8 +127,8 @@ public class SrpUserCredential
         hash.BlockUpdate(s, 0, s.Length);
         hash.BlockUpdate(output, 0, output.Length);
         hash.DoFinal(output, 0);
-        BigInteger x = new BigInteger(1, output).Mod(N);
-        BigInteger v = g.ModPow(x, N);
+        BigInteger x = new BigInteger(1, output).Mod(n);
+        BigInteger v = g.ModPow(x, n);
 
         UserName = username;
         Salt = s;

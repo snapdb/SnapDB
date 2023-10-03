@@ -38,7 +38,6 @@ internal partial class PageReplacementAlgorithm
     {
         private readonly PageReplacementAlgorithm m_parent;
         private readonly int m_hashCode;
-        private int m_currentPageIndex;
         private bool m_disposed;
 
         /// <summary>
@@ -48,7 +47,7 @@ internal partial class PageReplacementAlgorithm
         {
             m_hashCode = DateTime.UtcNow.Ticks.GetHashCode();
             m_parent = parent;
-            m_currentPageIndex = -1;
+            CurrentPageIndex = -1;
 
             lock (m_parent.m_syncRoot)
             {
@@ -63,21 +62,21 @@ internal partial class PageReplacementAlgorithm
         /// that is cached. 
         /// Returns a -1 if no page is currently being used.
         /// </summary>
-        public int CurrentPageIndex => m_currentPageIndex;
+        public int CurrentPageIndex { get; private set; }
 
         /// <summary>
         /// Releases a lock.
         /// </summary>
         public override void Clear()
         {
-            m_currentPageIndex = -1;
+            CurrentPageIndex = -1;
         }
 
         protected override void Dispose(bool disposing)
         {
             if (!m_disposed)
             {
-                m_currentPageIndex = -1; // Reset current page index.
+                CurrentPageIndex = -1; // Reset current page index.
                 m_disposed = true; // Mark object as disposed.
                 if (disposing)
                 {
@@ -120,7 +119,7 @@ internal partial class PageReplacementAlgorithm
 
                 if (m_parent.m_pageList.TryGetPageIndex(positionIndex, out int pageIndex))
                 {
-                    m_currentPageIndex = pageIndex;
+                    CurrentPageIndex = pageIndex;
                     location = m_parent.m_pageList.GetPointerToPage(pageIndex, 1);
 
                     return true;
@@ -163,14 +162,14 @@ internal partial class PageReplacementAlgorithm
 
                 if (m_parent.m_pageList.TryGetPageIndex(positionIndex, out int pageIndex))
                 {
-                    m_currentPageIndex = pageIndex;
+                    CurrentPageIndex = pageIndex;
                     IntPtr location = m_parent.m_pageList.GetPointerToPage(pageIndex, 1);
                     wasPageAdded = false;
 
                     return location;
                 }
 
-                m_currentPageIndex = m_parent.m_pageList.AddNewPage(positionIndex, startOfMemoryPoolPage, memoryPoolIndex);
+                CurrentPageIndex = m_parent.m_pageList.AddNewPage(positionIndex, startOfMemoryPoolPage, memoryPoolIndex);
                 wasPageAdded = true;
 
                 return startOfMemoryPoolPage;

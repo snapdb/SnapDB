@@ -101,8 +101,8 @@ public class CombineFiles<TKey, TValue>
             {
                 resource.UpdateSnapshot();
 
-                List<ArchiveTableSummary<TKey, TValue>> list = new List<ArchiveTableSummary<TKey, TValue>>();
-                List<Guid> listIds = new List<Guid>();
+                List<ArchiveTableSummary<TKey, TValue>> list = new();
+                List<Guid> listIds = new();
 
                 for (int x = 0; x < resource.Tables.Length; x++)
                 {
@@ -139,8 +139,8 @@ public class CombineFiles<TKey, TValue>
                 if (shouldRollover)
                 {
 
-                    TKey startKey = new TKey();
-                    TKey endKey = new TKey();
+                    TKey startKey = new();
+                    TKey endKey = new();
                     startKey.SetMax();
                     endKey.SetMin();
 
@@ -166,7 +166,7 @@ public class CombineFiles<TKey, TValue>
                         logFile = m_rolloverLog.Create(listIds, x);
                     };
 
-                    using (UnionReader<TKey, TValue> reader = new UnionReader<TKey, TValue>(list))
+                    using (UnionReader<TKey, TValue> reader = new(list))
                     {
                         SortedTreeTable<TKey, TValue> dest = m_createNextStageFile.CreateArchiveFile(startKey, endKey, size, reader, createLog);
 
@@ -185,8 +185,7 @@ public class CombineFiles<TKey, TValue>
 
                     }
 
-                    if (logFile != null)
-                        logFile.Delete();
+                    logFile?.Delete();
                 }
 
                 resource.Dispose();
@@ -208,8 +207,7 @@ public class CombineFiles<TKey, TValue>
 
             if (disposing)
             {
-                if (m_rolloverTask != null)
-                    m_rolloverTask.Dispose();
+                m_rolloverTask?.Dispose();
                 m_rolloverTask = null;
             }
         }

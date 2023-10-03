@@ -45,8 +45,6 @@ public unsafe class BinaryStream
 
     private BinaryStreamIoSessionBase m_secondaryIoSession;
 
-    private ISupportsBinaryStream m_stream;
-
     #endregion
 
     #region [ Constructors ]
@@ -101,7 +99,7 @@ public unsafe class BinaryStream
     {
         m_args = new BlockArguments();
         m_leaveOpen = leaveOpen;
-        m_stream = stream;
+        BaseStream = stream;
         FirstPosition = 0;
         Current = null;
         First = null;
@@ -124,7 +122,7 @@ public unsafe class BinaryStream
 
     #region [ Properties ]
 
-    public ISupportsBinaryStream BaseStream => m_stream;
+    public ISupportsBinaryStream BaseStream { get; private set; }
 
     #endregion
 
@@ -142,11 +140,9 @@ public unsafe class BinaryStream
         LastRead = null;
         LastWrite = null;
 
-        if (m_mainIoSession is not null)
-            m_mainIoSession.Clear();
+        m_mainIoSession?.Clear();
 
-        if (m_secondaryIoSession is not null)
-            m_secondaryIoSession.Clear();
+        m_secondaryIoSession?.Clear();
     }
 
     /// <summary>
@@ -189,16 +185,14 @@ public unsafe class BinaryStream
             try
             {
                 // Dispose of the main I/O session
-                if (m_mainIoSession is not null)
-                    m_mainIoSession.Dispose();
+                m_mainIoSession?.Dispose();
 
                 // Dispose of the secondary I/O session
-                if (m_secondaryIoSession is not null)
-                    m_secondaryIoSession.Dispose();
-                
+                m_secondaryIoSession?.Dispose();
+
                 // Dispose of the I/O stream
-                if (!m_leaveOpen && m_stream is not null)
-                    m_stream.Dispose();
+                if (!m_leaveOpen && BaseStream is not null)
+                    BaseStream.Dispose();
             }
             finally
 
@@ -212,7 +206,7 @@ public unsafe class BinaryStream
                 LastWrite = null;
                 m_mainIoSession = null;
                 m_secondaryIoSession = null;
-                m_stream = null;
+                BaseStream = null;
                 m_disposed = true;
             }
         }

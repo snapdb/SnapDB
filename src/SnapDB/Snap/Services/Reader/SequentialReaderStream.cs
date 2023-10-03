@@ -38,7 +38,7 @@ internal class SequentialReaderStream<TKey, TValue>
     where TKey : SnapTypeBase<TKey>, new()
     where TValue : SnapTypeBase<TValue>, new()
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(SequentialReaderStream<TKey, TValue>), MessageClass.Framework);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(SequentialReaderStream<TKey, TValue>), MessageClass.Framework);
 
     public event Action<SequentialReaderStream<TKey, TValue>> Disposed;
 
@@ -49,22 +49,22 @@ internal class SequentialReaderStream<TKey, TValue>
     private readonly bool m_keyMatchIsUniverse;
 
     private readonly SeekFilterBase<TKey> m_keySeekFilter;
-    private readonly MatchFilterBase<TKey, TValue> m_keyMatchFilter;
+    private readonly MatchFilterBase<TKey, TValue>? m_keyMatchFilter;
 
     private TimeoutOperation m_timeout;
     private List<BufferedArchiveStream<TKey, TValue>> m_tablesOrigList;
     private readonly CustomSortHelper<BufferedArchiveStream<TKey, TValue>> m_sortedArchiveStreams;
     private BufferedArchiveStream<TKey, TValue> m_firstTable;
     private SortedTreeScannerBase<TKey, TValue> m_firstTableScanner;
-    private readonly TKey m_readWhileUpperBounds = new TKey();
-    private readonly TKey m_nextArchiveStreamLowerBounds = new TKey();
+    private readonly TKey m_readWhileUpperBounds = new();
+    private readonly TKey m_nextArchiveStreamLowerBounds = new();
     private WorkerThreadSynchronization m_workerThreadSynchronization;
     private readonly bool m_ownsWorkerThreadSynchronization;
 
     public SequentialReaderStream(ArchiveList<TKey, TValue> archiveList,
-        SortedTreeEngineReaderOptions readerOptions = null,
+        SortedTreeEngineReaderOptions? readerOptions = null,
         SeekFilterBase<TKey> keySeekFilter = null,
-        MatchFilterBase<TKey, TValue> keyMatchFilter = null,
+        MatchFilterBase<TKey, TValue>? keyMatchFilter = null,
         WorkerThreadSynchronization workerThreadSynchronization = null)
     {
         if (readerOptions is null)
@@ -83,7 +83,7 @@ internal class SequentialReaderStream<TKey, TValue>
         m_pointCount = 0;
         m_keySeekFilter = keySeekFilter;
         m_keyMatchFilter = keyMatchFilter;
-        m_keyMatchIsUniverse = m_keyMatchFilter as MatchFilterUniverse<TKey, TValue> != null;
+        m_keyMatchIsUniverse = m_keyMatchFilter as MatchFilterUniverse<TKey, TValue> is not null;
 
         if (readerOptions.Timeout.Ticks > 0)
         {
@@ -98,7 +98,7 @@ internal class SequentialReaderStream<TKey, TValue>
         for (int x = 0; x < m_snapshot.Tables.Count(); x++)
         {
             ArchiveTableSummary<TKey, TValue> table = m_snapshot.Tables[x];
-            if (table != null)
+            if (table is not null)
             {
                 if (table.Contains(keySeekFilter.StartOfRange, keySeekFilter.EndOfRange))
                 {
@@ -109,13 +109,13 @@ internal class SequentialReaderStream<TKey, TValue>
                     catch (Exception e)
                     {
                         //ToDo: Make sure firstkey.tostring doesn't ever throw an exception.
-                        StringBuilder sb = new StringBuilder();
+                        StringBuilder sb = new();
                         sb.AppendLine($"Archive ID {table.FileId}");
                         sb.AppendLine($"First Key {table.FirstKey.ToString()}");
                         sb.AppendLine($"Last Key {table.LastKey.ToString()}");
                         sb.AppendLine($"File Size {table.SortedTreeTable.BaseFile.ArchiveSize}");
                         sb.AppendLine($"File Name {table.SortedTreeTable.BaseFile.FilePath}");
-                        Log.Publish(MessageLevel.Error, "Error while reading file", sb.ToString(), null, e);
+                        s_log.Publish(MessageLevel.Error, "Error while reading file", sb.ToString(), null, e);
                     }
                 }
                 else
@@ -159,7 +159,7 @@ internal class SequentialReaderStream<TKey, TValue>
 
     protected override bool ReadNext(TKey key, TValue value)
     {
-        if (!m_timedOut && m_firstTableScanner != null)
+        if (!m_timedOut && m_firstTableScanner is not null)
         {
             if (m_keyMatchIsUniverse)
             {
@@ -234,7 +234,7 @@ internal class SequentialReaderStream<TKey, TValue>
         return false;
     }
 
-    private bool ReadWhileFollowupActions(TKey key, TValue value, MatchFilterBase<TKey, TValue> filter)
+    private bool ReadWhileFollowupActions(TKey key, TValue value, MatchFilterBase<TKey, TValue>? filter)
     {
         //There are certain followup requirements when a ReadWhile method returns false.
         //Condition 1:
@@ -267,7 +267,7 @@ internal class SequentialReaderStream<TKey, TValue>
         //Since condition 2 and 3 can occur at the same time, verifying the sort of the Archive Stream is a good thing to do.
         VerifyArchiveStreamSortingOrder();
 
-        if (EOS)
+        if (Eos)
             return false;
 
         //Check if Condition 3's exception occured.
@@ -300,7 +300,7 @@ internal class SequentialReaderStream<TKey, TValue>
     /// </summary>
     private void VerifyArchiveStreamSortingOrder()
     {
-        if (EOS)
+        if (Eos)
             return;
 
         m_sortedArchiveStreams[0].UpdateCachedValue();
@@ -351,7 +351,7 @@ internal class SequentialReaderStream<TKey, TValue>
     {
 
     TryAgain:
-        if (m_keySeekFilter != null && m_keySeekFilter.NextWindow())
+        if (m_keySeekFilter is not null && m_keySeekFilter.NextWindow())
         {
             //If the current point is a valid point. 
             //Check to see if the seek operation can be avoided.
@@ -536,7 +536,7 @@ internal class SequentialReaderStream<TKey, TValue>
         m_nextArchiveStreamLowerBounds.CopyTo(m_readWhileUpperBounds);
 
         //If there is a key seek filter. adjust this bounds if necessary
-        if (m_keySeekFilter != null)
+        if (m_keySeekFilter is not null)
         {
             if (m_keySeekFilter.EndOfFrame.IsLessThan(m_readWhileUpperBounds))
             {
@@ -549,8 +549,7 @@ internal class SequentialReaderStream<TKey, TValue>
     {
         try
         {
-            if (Disposed != null)
-                Disposed(this);
+            Disposed?.Invoke(this);
         }
         catch (Exception)
         {
@@ -560,13 +559,13 @@ internal class SequentialReaderStream<TKey, TValue>
         Interlocked.Add(ref Stats.PointsReturned, m_pointCount);
         m_pointCount = 0;
 
-        if (m_timeout != null)
+        if (m_timeout is not null)
         {
             m_timeout.Cancel();
             m_timeout = null;
         }
 
-        if (m_tablesOrigList != null)
+        if (m_tablesOrigList is not null)
         {
             m_tablesOrigList.ForEach(x => x.Dispose());
             m_tablesOrigList = null;
@@ -574,13 +573,13 @@ internal class SequentialReaderStream<TKey, TValue>
         }
         m_timedOut = true;
 
-        if (m_snapshot != null)
+        if (m_snapshot is not null)
         {
             m_snapshot.Dispose();
             m_snapshot = null;
         }
 
-        if (m_workerThreadSynchronization != null && m_ownsWorkerThreadSynchronization)
+        if (m_workerThreadSynchronization is not null && m_ownsWorkerThreadSynchronization)
         {
             m_workerThreadSynchronization.Dispose();
             m_workerThreadSynchronization = null;

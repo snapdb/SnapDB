@@ -94,9 +94,9 @@ public class TinyLock
         internal TinyLockRelease(TinyLock tinyLock)
         {
             if (tinyLock is null)
-                throw new ArgumentNullException("tinyLock");
+                throw new ArgumentNullException(nameof(tinyLock));
             
-            if (tinyLock.m_release.m_tinyLock != null)
+            if (tinyLock.m_release.m_tinyLock is not null)
                 throw new Exception("Object is already locked");
             
             m_tinyLock = tinyLock;

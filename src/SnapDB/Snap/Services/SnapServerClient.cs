@@ -48,7 +48,7 @@ public partial class SnapServer
         public Client(SnapServer server)
         {
             if (server is null)
-                throw new ArgumentNullException("server");
+                throw new ArgumentNullException(nameof(server));
 
             m_syncRoot = new object();
             m_connectedDatabases = new Dictionary<string, ClientDatabaseBase>();

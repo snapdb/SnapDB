@@ -40,7 +40,7 @@ namespace SnapDB.Snap;
 /// </summary>
 public static class Library
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(Library), MessageClass.Framework);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(Library), MessageClass.Framework);
 
     /// <summary>
     /// Gets all of the encoding data.
@@ -51,52 +51,52 @@ public static class Library
     /// </summary>
     public static readonly FilterLibrary Filters;
 
-    private static readonly object SyncRoot;
-    private static readonly Dictionary<Guid, Type> TypeLookup;
-    private static readonly Dictionary<Type, Guid> RegisteredType;
+    private static readonly object s_syncRoot;
+    private static readonly Dictionary<Guid, Type> s_typeLookup;
+    private static readonly Dictionary<Type, Guid> s_registeredType;
 
     /// <summary>
     /// The assembly must reference one of these assembly names in order to be scanned for matching types.
     /// </summary>
-    private static readonly HashSet<string> FilterAssemblyNames;
-    private static readonly HashSet<Assembly> LoadedAssemblies;
+    private static readonly HashSet<string> s_filterAssemblyNames;
+    private static readonly HashSet<Assembly> s_loadedAssemblies;
 
-    private static readonly Dictionary<Tuple<Type, Type>, object> KeyValueMethodsList;
+    private static readonly Dictionary<Tuple<Type, Type>, object> s_keyValueMethodsList;
 
     static Library()
     {
         try
         {
-            FilterAssemblyNames = new HashSet<string>();
-            LoadedAssemblies = new HashSet<Assembly>();
+            s_filterAssemblyNames = new HashSet<string>();
+            s_loadedAssemblies = new HashSet<Assembly>();
             Encodings = new EncodingLibrary();
             Filters = new FilterLibrary();
-            SyncRoot = new object();
-            TypeLookup = new Dictionary<Guid, Type>();
-            RegisteredType = new Dictionary<Type, Guid>();
-            KeyValueMethodsList = new Dictionary<Tuple<Type, Type>, object>();
+            s_syncRoot = new object();
+            s_typeLookup = new Dictionary<Guid, Type>();
+            s_registeredType = new Dictionary<Type, Guid>();
+            s_keyValueMethodsList = new Dictionary<Tuple<Type, Type>, object>();
 
-            FilterAssemblyNames.Add(typeof(IndividualEncodingDefinitionBase).Assembly.GetName().Name);
-            FilterAssemblyNames.Add(typeof(PairEncodingDefinitionBase).Assembly.GetName().Name);
-            FilterAssemblyNames.Add(typeof(MatchFilterDefinitionBase).Assembly.GetName().Name);
-            FilterAssemblyNames.Add(typeof(SeekFilterDefinitionBase).Assembly.GetName().Name);
-            FilterAssemblyNames.Add(typeof(SnapTypeBase).Assembly.GetName().Name);
-            FilterAssemblyNames.Add(typeof(KeyValueMethods).Assembly.GetName().Name);
+            s_filterAssemblyNames.Add(typeof(IndividualEncodingDefinitionBase).Assembly.GetName().Name);
+            s_filterAssemblyNames.Add(typeof(PairEncodingDefinitionBase).Assembly.GetName().Name);
+            s_filterAssemblyNames.Add(typeof(MatchFilterDefinitionBase).Assembly.GetName().Name);
+            s_filterAssemblyNames.Add(typeof(SeekFilterDefinitionBase).Assembly.GetName().Name);
+            s_filterAssemblyNames.Add(typeof(SnapTypeBase).Assembly.GetName().Name);
+            s_filterAssemblyNames.Add(typeof(KeyValueMethods).Assembly.GetName().Name);
 
             ReloadNewAssemblies();
             AppDomain.CurrentDomain.AssemblyLoad += CurrentDomainOnAssemblyLoad;
         }
         catch (Exception ex)
         {
-            Log.Publish(MessageLevel.Critical, "Static Constructor Error", null, null, ex);
+            s_log.Publish(MessageLevel.Critical, "Static Constructor Error", null, null, ex);
         }
     }
 
     private static void CurrentDomainOnAssemblyLoad(object sender, AssemblyLoadEventArgs args)
     {
-        lock (SyncRoot)
+        lock (s_syncRoot)
         {
-            Log.Publish(MessageLevel.Debug, "Reloading Assembly", args.LoadedAssembly.FullName);
+            s_log.Publish(MessageLevel.Debug, "Reloading Assembly", args.LoadedAssembly.FullName);
             ReloadNewAssemblies();
         }
     }
@@ -120,13 +120,13 @@ public static class Library
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (Assembly assembly in assemblies)
             {
-                if (!LoadedAssemblies.Contains(assembly))
+                if (!s_loadedAssemblies.Contains(assembly))
                 {
-                    LoadedAssemblies.Add(assembly);
+                    s_loadedAssemblies.Add(assembly);
 
-                    if (FilterAssemblyNames.Contains(assembly.GetName().Name) || assembly.GetReferencedAssemblies().Any(x => FilterAssemblyNames.Contains(x.Name)))
+                    if (s_filterAssemblyNames.Contains(assembly.GetName().Name) || assembly.GetReferencedAssemblies().Any(x => s_filterAssemblyNames.Contains(x.Name)))
                     {
-                        Log.Publish(MessageLevel.Debug, "Loading Assembly", assembly.GetName().Name);
+                        s_log.Publish(MessageLevel.Debug, "Loading Assembly", assembly.GetName().Name);
 
                         Module[] modules = assembly.GetModules(false);
                         foreach (Module module in modules)
@@ -140,7 +140,7 @@ public static class Library
                                 }
                                 catch (ReflectionTypeLoadException ex)
                                 {
-                                    Log.Publish(MessageLevel.Debug, "Reflection Load Error Occurred",
+                                    s_log.Publish(MessageLevel.Debug, "Reflection Load Error Occurred",
                                         assembly.GetName().Name, ex.ToString() + Environment.NewLine +
                                         String.Join(Environment.NewLine, ex.LoaderExceptions.Select(x => x.ToString())));
                                     types = ex.Types;
@@ -149,54 +149,54 @@ public static class Library
                                 {
                                     try
                                     {
-                                        if ((object)assemblyType != null && !assemblyType.IsAbstract && !assemblyType.ContainsGenericParameters)
+                                        if ((object)assemblyType is not null && !assemblyType.IsAbstract && !assemblyType.ContainsGenericParameters)
                                         {
                                             if (typeCreateSingleValueEncodingBase.IsAssignableFrom(assemblyType))
                                             {
-                                                Log.Publish(MessageLevel.Debug, "Loading Individual Encoding Method", assemblyType.AssemblyQualifiedName);
+                                                s_log.Publish(MessageLevel.Debug, "Loading Individual Encoding Method", assemblyType.AssemblyQualifiedName);
                                                 Encodings.Register((IndividualEncodingDefinitionBase)Activator.CreateInstance(assemblyType));
                                             }
                                             else if (typeCreateDoubleValueEncodingBase.IsAssignableFrom(assemblyType))
                                             {
-                                                Log.Publish(MessageLevel.Debug, "Loading Pair Encoding Method", assemblyType.AssemblyQualifiedName);
+                                                s_log.Publish(MessageLevel.Debug, "Loading Pair Encoding Method", assemblyType.AssemblyQualifiedName);
                                                 Encodings.Register((PairEncodingDefinitionBase)Activator.CreateInstance(assemblyType));
                                             }
                                             else if (typeCreateFilterBase.IsAssignableFrom(assemblyType))
                                             {
-                                                Log.Publish(MessageLevel.Debug, "Loading Match Filter", assemblyType.AssemblyQualifiedName);
+                                                s_log.Publish(MessageLevel.Debug, "Loading Match Filter", assemblyType.AssemblyQualifiedName);
                                                 Filters.Register((MatchFilterDefinitionBase)Activator.CreateInstance(assemblyType));
                                             }
                                             else if (typeCreateSeekFilterBase.IsAssignableFrom(assemblyType))
                                             {
-                                                Log.Publish(MessageLevel.Debug, "Loading Seek Filter", assemblyType.AssemblyQualifiedName);
+                                                s_log.Publish(MessageLevel.Debug, "Loading Seek Filter", assemblyType.AssemblyQualifiedName);
                                                 Filters.Register((SeekFilterDefinitionBase)Activator.CreateInstance(assemblyType));
                                             }
                                             else if (typeSnapTypeBase.IsAssignableFrom(assemblyType))
                                             {
-                                                Log.Publish(MessageLevel.Debug, "Loading Snap Type", assemblyType.AssemblyQualifiedName);
+                                                s_log.Publish(MessageLevel.Debug, "Loading Snap Type", assemblyType.AssemblyQualifiedName);
                                                 Register((SnapTypeBase)Activator.CreateInstance(assemblyType));
                                             }
                                             else if (typeKeyValueMethods.IsAssignableFrom(assemblyType))
                                             {
-                                                Log.Publish(MessageLevel.Debug, "Loading Key Value Methods", assemblyType.AssemblyQualifiedName);
+                                                s_log.Publish(MessageLevel.Debug, "Loading Key Value Methods", assemblyType.AssemblyQualifiedName);
                                                 KeyValueMethods obj = (KeyValueMethods)Activator.CreateInstance(assemblyType);
                                                 Tuple<Type, Type> ttypes = Tuple.Create(obj.KeyType, obj.ValueType);
-                                                if (!KeyValueMethodsList.ContainsKey(ttypes))
+                                                if (!s_keyValueMethodsList.ContainsKey(ttypes))
                                                 {
-                                                    KeyValueMethodsList.Add(ttypes, obj);
+                                                    s_keyValueMethodsList.Add(ttypes, obj);
                                                 }
                                             }
                                         }
                                     }
                                     catch (Exception ex)
                                     {
-                                        Log.Publish(MessageLevel.Critical, "Static Constructor Error", null, null, ex);
+                                        s_log.Publish(MessageLevel.Critical, "Static Constructor Error", null, null, ex);
                                     }
                                 }
                             }
                             catch (Exception ex)
                             {
-                                Log.Publish(MessageLevel.Critical, "Static Constructor Error", null, null, ex);
+                                s_log.Publish(MessageLevel.Critical, "Static Constructor Error", null, null, ex);
                             }
                         }
                     }
@@ -205,7 +205,7 @@ public static class Library
         }
         catch (Exception ex)
         {
-            Log.Publish(MessageLevel.Critical, "Static Constructor Error", null, null, ex);
+            s_log.Publish(MessageLevel.Critical, "Static Constructor Error", null, null, ex);
         }
     }
 
@@ -216,9 +216,9 @@ public static class Library
     /// <returns>The Type corresponding to the provided identifier.</returns>
     public static Type GetSortedTreeType(Guid id)
     {
-        lock (SyncRoot)
+        lock (s_syncRoot)
         {
-            return TypeLookup[id];
+            return s_typeLookup[id];
         }
     }
 
@@ -237,9 +237,9 @@ public static class Library
         where TValue : SnapTypeBase<TValue>, new()
     {
         Tuple<Type, Type> t = Tuple.Create(typeof(TKey), typeof(TValue));
-        lock (SyncRoot)
+        lock (s_syncRoot)
         {
-            if (KeyValueMethodsList.TryGetValue(t, out object obj))
+            if (s_keyValueMethodsList.TryGetValue(t, out object obj))
             {
                 return (KeyValueMethods<TKey, TValue>)obj;
             }
@@ -275,7 +275,7 @@ public static class Library
         where TValue : SnapTypeBase<TValue>, new()
     {
         if (encodingMethod is null)
-            throw new ArgumentNullException("encodingMethod");
+            throw new ArgumentNullException(nameof(encodingMethod));
 
         if (encodingMethod.IsFixedSizeEncoding)
             return new FixedSizeNode<TKey, TValue>(level);
@@ -295,9 +295,9 @@ public static class Library
         Type type = snapType.GetType();
         Guid id = snapType.GenericTypeGuid;
 
-        lock (SyncRoot)
+        lock (s_syncRoot)
         {
-            if (RegisteredType.TryGetValue(type, out Guid existingId))
+            if (s_registeredType.TryGetValue(type, out Guid existingId))
             {
                 if (existingId != id)
                     throw new Exception("Existing type does not match Guid: " + type.FullName + " ID: " + id.ToString());
@@ -306,7 +306,7 @@ public static class Library
                 return;
             }
 
-            if (TypeLookup.TryGetValue(id, out Type existingType))
+            if (s_typeLookup.TryGetValue(id, out Type existingType))
             {
                 if (existingType != type)
                     throw new Exception("Existing type does not have a unique Guid. Type1:" + type.FullName + " Type2: " + existingType.FullName + " ID: " + id.ToString());
@@ -315,8 +315,8 @@ public static class Library
                 return;
             }
 
-            RegisteredType.Add(type, id);
-            TypeLookup.Add(id, type);
+            s_registeredType.Add(type, id);
+            s_typeLookup.Add(id, type);
         }
     }
 }

@@ -53,9 +53,6 @@ public class SortedTreeFile
 
     #region [ Members ]
 
-    private string m_filePath;
-    private bool m_disposed;
-
     private TransactionalFileStructure m_fileStructure;
     private readonly SortedList<SubFileName, IDisposable> m_openedFiles;
 
@@ -76,7 +73,7 @@ public class SortedTreeFile
     public static SortedTreeFile CreateInMemory(int blockSize = 4096, params Guid[] flags)
     {
         SortedTreeFile file = new();
-        file.m_filePath = string.Empty;
+        file.FilePath = string.Empty;
         file.m_fileStructure = TransactionalFileStructure.CreateInMemory(blockSize, flags);
         return file;
     }
@@ -91,7 +88,7 @@ public class SortedTreeFile
     {
         SortedTreeFile af = new();
         file = Path.GetFullPath(file);
-        af.m_filePath = file;
+        af.FilePath = file;
         af.m_fileStructure = TransactionalFileStructure.CreateFile(file, blockSize, flags);
         return af;
     }
@@ -106,7 +103,7 @@ public class SortedTreeFile
     {
         SortedTreeFile af = new();
         file = Path.GetFullPath(file);
-        af.m_filePath = file;
+        af.FilePath = file;
         af.m_fileStructure = TransactionalFileStructure.OpenFile(file, isReadOnly);
         if (af.m_fileStructure.Snapshot.Header.ArchiveType != FileType)
             throw new Exception("Archive type is unknown");
@@ -120,18 +117,18 @@ public class SortedTreeFile
     /// <summary>
     /// Determines if the archive file has been disposed. 
     /// </summary>
-    public bool IsDisposed => m_disposed;
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Returns the name of the file.  Returns <see cref="String.Empty"/> if this is a memory archive.
     /// This is the name of the entire path.
     /// </summary>
-    public string FilePath => m_filePath;
+    public string FilePath { get; private set; }
 
     /// <summary>
     /// Gets if the file is a memory file.
     /// </summary>
-    public bool IsMemoryFile => m_filePath == string.Empty;
+    public bool IsMemoryFile => FilePath == string.Empty;
 
     /// <summary>
     /// Gets the name of the file, but only the file, not the entire path.
@@ -140,9 +137,9 @@ public class SortedTreeFile
     {
         get
         {
-            if (m_filePath == string.Empty)
+            if (FilePath == string.Empty)
                 return string.Empty;
-            return Path.GetFileName(m_filePath);
+            return Path.GetFileName(FilePath);
         }
     }
 
@@ -171,7 +168,7 @@ public class SortedTreeFile
     public void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled)
     {
         m_fileStructure.ChangeExtension(extension, isReadOnly, isSharingEnabled);
-        m_filePath = m_fileStructure.FileName;
+        FilePath = m_fileStructure.FileName;
     }
 
     /// <summary>
@@ -349,7 +346,7 @@ public class SortedTreeFile
     /// </summary>
     public void Dispose()
     {
-        if (!m_disposed)
+        if (!IsDisposed)
         {
             foreach (IDisposable d in m_openedFiles.Values)
             {
@@ -357,7 +354,7 @@ public class SortedTreeFile
             }
             m_openedFiles.Clear();
             m_fileStructure.Dispose();
-            m_disposed = true;
+            IsDisposed = true;
         }
     }
 
@@ -368,9 +365,9 @@ public class SortedTreeFile
     public void Delete()
     {
         Dispose();
-        if (m_filePath != string.Empty)
+        if (FilePath != string.Empty)
         {
-            File.Delete(m_filePath);
+            File.Delete(FilePath);
         }
     }
 

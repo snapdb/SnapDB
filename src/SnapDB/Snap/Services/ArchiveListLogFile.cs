@@ -38,7 +38,7 @@ namespace SnapDB.Snap.Services;
 /// </summary>
 internal class ArchiveListLogFile
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(ArchiveListLogFile), MessageClass.Framework);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(ArchiveListLogFile), MessageClass.Framework);
 
     /// <summary>
     /// Gets if the file is valid and not corrupt.
@@ -48,7 +48,7 @@ internal class ArchiveListLogFile
     /// <summary>
     /// Gets the list of all files that are pending deletion.
     /// </summary>
-    public readonly List<Guid> FilesToDelete = new List<Guid>();
+    public readonly List<Guid> FilesToDelete = new();
 
     /// <summary>
     /// Gets the filename of this log file. String.Empty if not currently associated with a file.
@@ -95,16 +95,16 @@ internal class ArchiveListLogFile
         try
         {
             byte[] data = File.ReadAllBytes(fileName);
-            if (data.Length < Header.Length + 1 + 20) //Header + Version + SHA1
+            if (data.Length < s_header.Length + 1 + 20) //Header + Version + SHA1
             {
-                Log.Publish(MessageLevel.Warning, "Failed to load file.", "Expected file length is not long enough");
+                s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Expected file length is not long enough");
                 return;
             }
-            for (int x = 0; x < Header.Length; x++)
+            for (int x = 0; x < s_header.Length; x++)
             {
-                if (data[x] != Header[x])
+                if (data[x] != s_header[x])
                 {
-                    Log.Publish(MessageLevel.Warning, "Failed to load file.", "Incorrect File Header");
+                    s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Incorrect File Header");
                     return;
                 }
             }
@@ -117,14 +117,14 @@ internal class ArchiveListLogFile
                 byte[] checksum = sha.ComputeHash(data, 0, data.Length - 20);
                 if (!hash.SequenceEqual(checksum))
                 {
-                    Log.Publish(MessageLevel.Warning, "Failed to load file.", "Hash sum failed.");
+                    s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Hash sum failed.");
                     return;
                 }
             }
 
-            MemoryStream stream = new MemoryStream(data);
+            MemoryStream stream = new(data);
 
-            stream.Position = Header.Length;
+            stream.Position = s_header.Length;
 
             int version = stream.ReadNextByte();
             switch (version)
@@ -139,14 +139,14 @@ internal class ArchiveListLogFile
                     IsValid = true;
                     return;
                 default:
-                    Log.Publish(MessageLevel.Warning, "Failed to load file.", "Version Not Recognized.");
+                    s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Version Not Recognized.");
                     FilesToDelete.Clear();
                     return;
             }
         }
         catch (Exception ex)
         {
-            Log.Publish(MessageLevel.Warning, "Failed to load file.", "Unexpected Error", null, ex);
+            s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Unexpected Error", null, ex);
             FilesToDelete.Clear();
         }
     }
@@ -156,8 +156,8 @@ internal class ArchiveListLogFile
     /// </summary>
     public void Save(string fileName)
     {
-        MemoryStream stream = new MemoryStream();
-        stream.Write(Header);
+        MemoryStream stream = new();
+        stream.Write(s_header);
         stream.Write((byte)1);
         stream.Write(FilesToDelete.Count);
         foreach (Guid file in FilesToDelete)
@@ -187,14 +187,14 @@ internal class ArchiveListLogFile
         }
         catch (Exception ex)
         {
-            Log.Publish(MessageLevel.Error, "Could not delete file", "Could not delete file: " + FileName, null, ex);
+            s_log.Publish(MessageLevel.Error, "Could not delete file", "Could not delete file: " + FileName, null, ex);
         }
     }
 
-    private static readonly byte[] Header;
+    private static readonly byte[] s_header;
     static ArchiveListLogFile()
     {
-        Header = System.Text.Encoding.UTF8.GetBytes("openHistorian 2.0 Archive List Log");
+        s_header = System.Text.Encoding.UTF8.GetBytes("openHistorian 2.0 Archive List Log");
     }
 
 }

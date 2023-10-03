@@ -39,7 +39,6 @@ internal class PairEncodingGeneric<TKey, TValue>
     where TKey : SnapTypeBase<TKey>, new()
     where TValue : SnapTypeBase<TValue>, new()
 {
-    private readonly EncodingDefinition m_encodingMethod;
     private readonly IndividualEncodingBase<TKey> m_keyEncoding;
     private readonly IndividualEncodingBase<TValue> m_valueEncoding;
     /// <summary>
@@ -48,12 +47,12 @@ internal class PairEncodingGeneric<TKey, TValue>
     /// <param name="encodingMethod">the encoding method to use this class</param>
     public PairEncodingGeneric(EncodingDefinition encodingMethod)
     {
-        m_encodingMethod = encodingMethod;
+        EncodingMethod = encodingMethod;
         m_keyEncoding = Library.Encodings.GetEncodingMethod<TKey>(encodingMethod.KeyEncodingMethod);
         m_valueEncoding = Library.Encodings.GetEncodingMethod<TValue>(encodingMethod.ValueEncodingMethod);
     }
 
-    public override EncodingDefinition EncodingMethod => m_encodingMethod;
+    public override EncodingDefinition EncodingMethod { get; }
 
     /// <summary>
     /// Gets if the previous key will need to be presented to the encoding algorithms to

@@ -45,9 +45,9 @@ public class DatabaseInfo
     public DatabaseInfo(string databaseName, SnapTypeBase key, SnapTypeBase value, IList<EncodingDefinition> supportedStreamingModes)
     {
         DatabaseName = databaseName;
-        KeyTypeID = key.GenericTypeGuid;
+        KeyTypeId = key.GenericTypeGuid;
         KeyType = key.GetType();
-        ValueTypeID = value.GenericTypeGuid;
+        ValueTypeId = value.GenericTypeGuid;
         ValueType = value.GetType();
         SupportedStreamingModes = new ReadOnlyCollection<EncodingDefinition>(supportedStreamingModes);
     }
@@ -63,8 +63,8 @@ public class DatabaseInfo
         {
             case 1:
                 DatabaseName = stream.ReadString();
-                KeyTypeID = stream.ReadGuid();
-                ValueTypeID = stream.ReadGuid();
+                KeyTypeId = stream.ReadGuid();
+                ValueTypeId = stream.ReadGuid();
                 int count = stream.ReadInt32();
                 EncodingDefinition[] definitions = new EncodingDefinition[count];
                 for (int x = 0; x < count; x++)
@@ -72,8 +72,8 @@ public class DatabaseInfo
                     definitions[x] = new EncodingDefinition(stream);
                 }
                 SupportedStreamingModes = new ReadOnlyCollection<EncodingDefinition>(definitions);
-                KeyType = Library.GetSortedTreeType(KeyTypeID);
-                ValueType = Library.GetSortedTreeType(ValueTypeID);
+                KeyType = Library.GetSortedTreeType(KeyTypeId);
+                ValueType = Library.GetSortedTreeType(ValueTypeId);
                 break;
             default:
                 throw new VersionNotFoundException("Unknown version code.");
@@ -83,17 +83,17 @@ public class DatabaseInfo
     /// <summary>
     /// Gets the name of the database
     /// </summary>
-    public string DatabaseName { get; private set; }
+    public string DatabaseName { get; }
 
     /// <summary>
     /// Gets the ID for the database key.
     /// </summary>
-    public Guid KeyTypeID { get; private set; }
+    public Guid KeyTypeId { get; }
 
     /// <summary>
     /// Gets the ID for the database value.
     /// </summary>
-    public Guid ValueTypeID { get; private set; }
+    public Guid ValueTypeId { get; }
 
     /// <summary>
     /// Gets the type for the database key.
@@ -108,14 +108,14 @@ public class DatabaseInfo
     /// <summary>
     /// Gets all of the supported streaming modes for the server.
     /// </summary>
-    public ReadOnlyCollection<EncodingDefinition> SupportedStreamingModes { get; private set; }
+    public ReadOnlyCollection<EncodingDefinition> SupportedStreamingModes { get; }
 
     public void Save(BinaryStreamBase stream)
     {
         stream.Write((byte)1);
         stream.Write(DatabaseName);
-        stream.Write(KeyTypeID);
-        stream.Write(ValueTypeID);
+        stream.Write(KeyTypeId);
+        stream.Write(ValueTypeId);
         stream.Write(SupportedStreamingModes.Count);
         foreach (EncodingDefinition encoding in SupportedStreamingModes)
         {

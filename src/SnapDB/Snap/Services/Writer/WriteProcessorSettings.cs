@@ -37,9 +37,6 @@ public class WriteProcessorSettings
     : SettingsBase<WriteProcessorSettings>
 {
     private bool m_isEnabled;
-    private readonly PrebufferWriterSettings m_prebufferWriter;
-    private readonly FirstStageWriterSettings m_firstStageWriter;
-    private readonly ImmutableList<CombineFilesSettings> m_stagingRollovers;
 
     /// <summary>
     /// The default write processor settings.
@@ -47,9 +44,9 @@ public class WriteProcessorSettings
     public WriteProcessorSettings()
     {
         m_isEnabled = false;
-        m_prebufferWriter = new PrebufferWriterSettings();
-        m_firstStageWriter = new FirstStageWriterSettings();
-        m_stagingRollovers = new ImmutableList<CombineFilesSettings>(x =>
+        PrebufferWriter = new PrebufferWriterSettings();
+        FirstStageWriter = new FirstStageWriterSettings();
+        StagingRollovers = new ImmutableList<CombineFilesSettings>(x =>
         {
             if (x is null)
                 throw new ArgumentNullException("value", "cannot be null");
@@ -61,17 +58,17 @@ public class WriteProcessorSettings
     /// <summary>
     /// The settings for the prebuffer.
     /// </summary>
-    public PrebufferWriterSettings PrebufferWriter => m_prebufferWriter;
+    public PrebufferWriterSettings PrebufferWriter { get; }
 
     /// <summary>
     /// The settings for the first stage writer.
     /// </summary>
-    public FirstStageWriterSettings FirstStageWriter => m_firstStageWriter;
+    public FirstStageWriterSettings FirstStageWriter { get; }
 
     /// <summary>
     /// Contains all of the staging rollovers.
     /// </summary>
-    public ImmutableList<CombineFilesSettings> StagingRollovers => m_stagingRollovers;
+    public ImmutableList<CombineFilesSettings> StagingRollovers { get; }
 
     /// <summary>
     /// Gets or sets if writing will be enabled.
@@ -90,11 +87,11 @@ public class WriteProcessorSettings
     {
         stream.Write((byte)1);
         stream.Write(m_isEnabled);
-        m_prebufferWriter.Save(stream);
-        m_firstStageWriter.Save(stream);
-        stream.Write(m_stagingRollovers.Count);
+        PrebufferWriter.Save(stream);
+        FirstStageWriter.Save(stream);
+        stream.Write(StagingRollovers.Count);
 
-        foreach (CombineFilesSettings stage in m_stagingRollovers)
+        foreach (CombineFilesSettings stage in StagingRollovers)
             stage.Save(stream);
     }
 
@@ -107,17 +104,17 @@ public class WriteProcessorSettings
         {
             case 1:
                 m_isEnabled = stream.ReadBoolean();
-                m_prebufferWriter.Load(stream);
-                m_firstStageWriter.Load(stream);
+                PrebufferWriter.Load(stream);
+                FirstStageWriter.Load(stream);
                 int cnt = stream.ReadInt32();
-                m_stagingRollovers.Clear();
+                StagingRollovers.Clear();
 
                 while (cnt > 0)
                 {
                     cnt--;
-                    CombineFilesSettings cfs = new CombineFilesSettings();
+                    CombineFilesSettings cfs = new();
                     cfs.Load(stream);
-                    m_stagingRollovers.Add(cfs);
+                    StagingRollovers.Add(cfs);
                 }
 
                 break;
@@ -131,10 +128,10 @@ public class WriteProcessorSettings
     {
         if (IsEnabled)
         {
-            m_prebufferWriter.Validate();
-            m_firstStageWriter.Validate();
+            PrebufferWriter.Validate();
+            FirstStageWriter.Validate();
 
-            foreach (CombineFilesSettings stage in m_stagingRollovers)
+            foreach (CombineFilesSettings stage in StagingRollovers)
             {
                 stage.Validate();
             }

@@ -71,7 +71,7 @@ public partial class SubFileStream
             m_lastEditedBlock = stream.m_dataReader.LastCommittedHeader.LastAllocatedBlock;
             m_isReadOnly = stream.m_isReadOnly;
             m_blockDataLength = m_stream.m_blockSize - FileStructureConstants.BlockFooterLength;
-            m_ioSessions = new SubFileDiskIoSessionPool(stream.m_dataReader, stream.m_fileHeaderBlock, stream.m_subFile, stream.m_isReadOnly);
+            m_ioSessions = new SubFileDiskIoSessionPool(stream.m_dataReader, stream.m_fileHeaderBlock, stream.SubFile, stream.m_isReadOnly);
 
             if (m_isReadOnly)
             {

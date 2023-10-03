@@ -44,7 +44,7 @@ public class IntegratedSecurityUserCredential
     /// <summary>
     /// The security identifier for the username
     /// </summary>
-    public string UserID;
+    public string UserId;
 
     /// <summary>
     /// The token associated with this user and their permissions.
@@ -63,7 +63,7 @@ public class IntegratedSecurityUserCredential
         SecurityIdentifier sid = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
         UserID = sid.ToString();
 #else
-        UserID = UserInfo.UserNameToSID(username);
+        UserId = UserInfo.UserNameToSID(username);
 #endif
         UserToken = userToken;
     }
@@ -84,7 +84,7 @@ public class IntegratedSecurityUserCredential
     {
         stream.WriteByte(1);
         stream.Write(Username);
-        stream.Write(UserID);
+        stream.Write(UserId);
         stream.Write(UserToken);
     }
 
@@ -99,7 +99,7 @@ public class IntegratedSecurityUserCredential
         {
             case 1:
                 Username = stream.ReadString();
-                UserID = stream.ReadString();
+                UserId = stream.ReadString();
                 UserToken = stream.ReadGuid();
                 return;
             default:

@@ -80,7 +80,7 @@ public enum ServerResponse : byte
     /// </summary>
     UnhandledException = 0,
     /// <summary>
-    /// Occurs at first connection if the protocol version is not recgonized by the server.
+    /// Occurs at first connection if the protocol version is not recognized by the server.
     /// </summary>
     UnknownProtocol = 1,
     /// <summary>

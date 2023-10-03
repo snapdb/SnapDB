@@ -50,7 +50,7 @@ public class DistinctTreeStream<TKey, TValue>
     public DistinctTreeStream(TreeStream<TKey, TValue> baseStream)
     {
         if (!baseStream.IsAlwaysSequential)
-            throw new ArgumentException("Must be sequential access", "baseStream");
+            throw new ArgumentException("Must be sequential access", nameof(baseStream));
 
         m_lastKey = new TKey();
         m_lastValue = new TValue();
