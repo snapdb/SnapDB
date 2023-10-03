@@ -29,9 +29,7 @@ using SnapDB.Threading;
 namespace SnapDB.IO;
 
 /// <summary>
-/// A binary stream that works on some kind of piped stream.
-/// This means the reader of one stream 
-/// is connected to the writer of another stream.
+/// Represents a remote binary stream for reading and writing data over a network connection.
 /// </summary>
 public class RemoteBinaryStream
     : BinaryStreamBase
@@ -46,10 +44,13 @@ public class RemoteBinaryStream
     private readonly Stream m_stream;
 
     /// <summary>
-    /// Creates a <see cref="RemoteBinaryStream"/>
+    /// Initializes a new instance of the RemoteBinaryStream class with the specified stream for communication.
     /// </summary>
-    /// <param name="stream">The underlying stream to wrap</param>
-    /// <param name="workerThreadSynchronization">The synchronization object</param>
+    /// <param name="stream">The underlying stream used for communication.</param>
+    /// <param name="workerThreadSynchronization">
+    ///     An optional instance of WorkerThreadSynchronization for synchronization. If not provided, a new instance will be created.
+    /// </param>
+    /// <exception cref="Exception">Thrown if the processor is not little-endian (not supported).</exception>
     public RemoteBinaryStream(Stream stream, WorkerThreadSynchronization? workerThreadSynchronization = null)
     {
         if (!BitConverter.IsLittleEndian)
@@ -68,25 +69,42 @@ public class RemoteBinaryStream
     }
 
     /// <summary>
-    /// Gets the <see cref="WorkerThreadSynchronization"/>. 
-    /// This context will be entered when communcating to the socket layer.
+    /// Gets the WorkerThreadSynchronization instance used for synchronization in this stream.
     /// </summary>
     public WorkerThreadSynchronization WorkerThreadSynchronization { get; }
 
+    /// <summary>
+    /// Gets the amount of free space available in the send buffer.
+    /// </summary>
     private int SendBufferFreeSpace => BufferSize - m_sendLength;
 
+    /// <summary>
+    /// Gets the number of bytes available in the receive buffer for reading.
+    /// </summary>
     protected int ReceiveBufferAvailable => m_receiveLength - m_receivePosition;
 
+    /// <summary>
+    /// Gets a value indicating whether the stream allows writing.
+    /// </summary>
     public override bool CanWrite => true;
 
+    /// <summary>
+    /// Throws a <see cref="NotSupportedException"/> since getting the length of this stream is not supported.
+    /// </summary>
     public override long Length => throw new NotSupportedException();
 
+    /// <summary>
+    /// Throws a <see cref="NotSupportedException"/> since setting or getting the position of this stream is not supported.
+    /// </summary>
     public override long Position
     {
         get => throw new NotSupportedException();
         set => throw new NotSupportedException();
     }
 
+    /// <summary>
+    /// Flushes any buffered data in the send buffer to the underlying stream.
+    /// </summary>
     public override void Flush()
     {
         if (m_sendLength <= 0)
@@ -105,11 +123,23 @@ public class RemoteBinaryStream
         m_sendLength = 0;
     }
 
+    /// <summary>
+    /// Throws a <see cref="NotSupportedException"/> since setting the length of this stream is not supported.
+    /// </summary>
+    /// <param name="value">The new length of the stream, which is not supported.</param>
+    /// <exception cref="NotSupportedException">Thrown to indicate that setting the stream length is not supported.</exception>
     public override void SetLength(long value)
     {
         throw new NotSupportedException();
     }
 
+    /// <summary>
+    /// Reads a specified number of bytes from the stream into a byte array, starting at the specified offset.
+    /// </summary>
+    /// <param name="buffer">The byte array where the read data will be stored.</param>
+    /// <param name="offset">The offset in the byte array where reading will start.</param>
+    /// <param name="count">The maximum number of bytes to read.</param>
+    /// <returns>The total number of bytes read into the buffer.</returns>
     public override int Read(byte[] buffer, int offset, int count)
     {
         if (count <= 0)
@@ -182,37 +212,55 @@ public class RemoteBinaryStream
                 {
                     WorkerThreadSynchronization.EndSafeToCallbackRegion();
                 }
+
                 if (receiveBufferLength == 0)
                     throw new EndOfStreamException();
+
                 m_receiveLength += receiveBufferLength;
                 prebufferLength -= receiveBufferLength;
             }
             Array.Copy(m_receiveBuffer, 0, buffer, offset, count);
             m_receivePosition = count;
+
             return origionalCount;
         }
     }
 
+    /// <summary>
+    /// Disposes of the RemoteBinaryStream, releasing any resources associated with it.
+    /// </summary>
+    /// <param name="disposing">
+    ///     A flag indicating whether the method is called from the finalizer or directly by user code.
+    /// </param>
     protected override void Dispose(bool disposing)
     {
         if (disposing)
-        {
             WorkerThreadSynchronization.BeginSafeToCallbackRegion();
-        }
+
         base.Dispose(disposing);
     }
 
+    /// <summary>
+    /// Writes a single byte to the stream.
+    /// </summary>
+    /// <param name="value">The byte value to write to the stream.</param>
     public override void Write(byte value)
     {
         if (m_sendLength < BufferSize)
         {
             m_sendBuffer[m_sendLength] = value;
             m_sendLength++;
+
             return;
         }
+
         base.Write(value);
     }
 
+    /// <summary>
+    /// Writes an 8-byte (64-bit) signed integer to the stream.
+    /// </summary>
+    /// <param name="value">The long value to write to the stream.</param>
     public unsafe override void Write(long value)
     {
         if (m_sendLength <= BufferSize - 8)
@@ -228,6 +276,10 @@ public class RemoteBinaryStream
         base.Write(value);
     }
 
+    /// <summary>
+    /// Writes a 4-byte (32-bit) signed integer to the stream.
+    /// </summary>
+    /// <param name="value">The integer value to write to the stream.</param>
     public unsafe override void Write(int value)
     {
         if (m_sendLength <= BufferSize - 4)
@@ -243,6 +295,10 @@ public class RemoteBinaryStream
         base.Write(value);
     }
 
+    /// <summary>
+    /// Writes a 7-bit encoded unsigned 64-bit integer (UInt64) to the stream.
+    /// </summary>
+    /// <param name="value">The 7-bit encoded unsigned 64-bit integer (UInt64) value to write to the stream.</param>
     public unsafe override void Write7Bit(ulong value)
     {
         const int size = 9;
@@ -339,6 +395,10 @@ public class RemoteBinaryStream
         base.Write7Bit(value);
     }
 
+    /// <summary>
+    /// Reads a single unsigned byte (UInt8) from the stream.
+    /// </summary>
+    /// <returns>The unsigned byte (UInt8) read from the stream.</returns>
     public override byte ReadUInt8()
     {
         if (m_receivePosition < m_receiveLength)
@@ -351,6 +411,10 @@ public class RemoteBinaryStream
         return base.ReadUInt8();
     }
 
+    /// <summary>
+    /// Reads a 4-byte (32-bit) signed integer from the stream.
+    /// </summary>
+    /// <returns>The 4-byte (32-bit) signed integer read from the stream.</returns>
     public unsafe override int ReadInt32()
     {
         if (m_receivePosition <= m_receiveLength - 4)
@@ -366,6 +430,10 @@ public class RemoteBinaryStream
         return base.ReadInt32();
     }
 
+    /// <summary>
+    /// Reads an 8-byte (64-bit) signed integer from the stream.
+    /// </summary>
+    /// <returns>The 8-byte (64-bit) signed integer read from the stream.</returns>
     public unsafe override long ReadInt64()
     {
         if (m_receivePosition <= m_receiveLength - 8)
@@ -382,6 +450,10 @@ public class RemoteBinaryStream
         return base.ReadInt64();
     }
 
+    /// <summary>
+    /// Reads a 7-bit encoded unsigned 64-bit integer (UInt64) from the stream.
+    /// </summary>
+    /// <returns>The 7-bit encoded unsigned 64-bit integer (UInt64) read from the stream.</returns>
     public unsafe override ulong Read7BitUInt64()
     {
         if (m_receivePosition <= m_receiveLength - 9)
@@ -470,6 +542,12 @@ public class RemoteBinaryStream
         return base.Read7BitUInt64();
     }
 
+    /// <summary>
+    /// Writes a specified number of bytes from a byte array to the stream.
+    /// </summary>
+    /// <param name="buffer">The byte array containing the data to be written to the stream.</param>
+    /// <param name="offset">The offset in the byte array where writing will start.</param>
+    /// <param name="count">The number of bytes to write from the byte array.</param>
     public override void Write(byte[] buffer, int offset, int count)
     {
         if (SendBufferFreeSpace < count)
@@ -496,7 +574,13 @@ public class RemoteBinaryStream
         }
     }
 
+    /// <summary>
+    /// Gets a value indicating whether the stream supports reading.
+    /// </summary>
     public override bool CanRead => true;
 
+    /// <summary>
+    /// Gets a value indicating whether the stream supports seeking (positioning).
+    /// </summary>
     public override bool CanSeek => false;
 }
