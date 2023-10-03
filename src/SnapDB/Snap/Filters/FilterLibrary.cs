@@ -49,9 +49,9 @@ public class FilterLibrary
     }
 
     /// <summary>
-    /// Registers this type
+    /// Registers a match filter definition to the collection of filters.
     /// </summary>
-    /// <param name="encoding"></param>
+    /// <param name="encoding">The match filter definition to be registered.</param>
     public void Register(MatchFilterDefinitionBase encoding)
     {
         lock (m_syncRoot)
@@ -61,9 +61,9 @@ public class FilterLibrary
     }
 
     /// <summary>
-    /// Registers this type
+    /// Registers a seek filter definition to the collection of seek filters.
     /// </summary>
-    /// <param name="encoding"></param>
+    /// <param name="encoding">The seek filter definition to be registered.</param>
     public void Register(SeekFilterDefinitionBase encoding)
     {
         lock (m_syncRoot)
@@ -72,6 +72,15 @@ public class FilterLibrary
         }
     }
 
+    /// <summary>
+    /// Retrieves a match filter based on the specified filter GUID and binary stream.
+    /// </summary>
+    /// <typeparam name="TKey">The type of keys used in the match filter.</typeparam>
+    /// <typeparam name="TValue">The type of values used in the match filter.</typeparam>
+    /// <param name="filter">The GUID identifying the desired match filter.</param>
+    /// <param name="stream">The binary stream to associate with the match filter.</param>
+    /// <returns>The match filter instance if found; otherwise, an exception is thrown.</returns>
+    /// <exception cref="Exception">Thrown when the match filter is not found.</exception>
     public MatchFilterBase<TKey, TValue> GetMatchFilter<TKey, TValue>(Guid filter, BinaryStreamBase stream)
         where TKey : SnapTypeBase<TKey>, new()
         where TValue : SnapTypeBase<TValue>, new()
@@ -81,22 +90,30 @@ public class FilterLibrary
             lock (m_syncRoot)
             {
                 if (m_filters.TryGetValue(filter, out MatchFilterDefinitionBase encoding))
-                {
                     return encoding.Create<TKey, TValue>(stream);
-                }
             }
         }
         catch (Exception ex)
         {
             s_log.Publish(MessageLevel.Error, "Match Filter Exception",
                 $"ID: {filter.ToString()} Key: {typeof(TKey).ToString()} Value: {typeof(TValue).ToString()}", null, ex);
+
             throw;
         }
         s_log.Publish(MessageLevel.Info, "Missing Match Filter",
             $"ID: {filter.ToString()} Key: {typeof(TKey).ToString()} Value: {typeof(TValue).ToString()}");
+
         throw new Exception("Filter not found");
     }
 
+    /// <summary>
+    /// Retrieves a seek filter based on the specified filter GUID and binary stream.
+    /// </summary>
+    /// <typeparam name="TKey">The type of keys used in the seek filter.</typeparam>
+    /// <param name="filter">The GUID identifying the desired seek filter.</param>
+    /// <param name="stream">The binary stream to associate with the seek filter.</param>
+    /// <returns>The seek filter instance if found; otherwise, an exception is thrown.</returns>
+    /// <exception cref="Exception">Thrown when the seek filter is not found.</exception>
     public SeekFilterBase<TKey> GetSeekFilter<TKey>(Guid filter, BinaryStreamBase stream)
         where TKey : SnapTypeBase<TKey>, new()
     {
@@ -105,19 +122,19 @@ public class FilterLibrary
             lock (m_syncRoot)
             {
                 if (m_seekFilters.TryGetValue(filter, out SeekFilterDefinitionBase encoding))
-                {
                     return encoding.Create<TKey>(stream);
-                }
             }
         }
         catch (Exception ex)
         {
             s_log.Publish(MessageLevel.Error, "Seek Filter Exception",
                 $"ID: {filter.ToString()} Key: {typeof(TKey).ToString()}", null, ex);
+
             throw;
         }
 
         s_log.Publish(MessageLevel.Info, "Missing Seek Filter", $"ID: {filter.ToString()} Key: {typeof(TKey).ToString()}");
+
         throw new Exception("Filter not found");
     }
 }

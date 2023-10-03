@@ -31,26 +31,25 @@ namespace SnapDB.Snap.Filters;
 /// <summary>
 /// Represents some kind of filter that does a match based on the key/value.
 /// </summary>
-/// <typeparam name="TKey">the key to match</typeparam>
-/// <typeparam name="TValue">the value to match</typeparam>
+/// <typeparam name="TKey">The key to match.</typeparam>
+/// <typeparam name="TValue">The value to match.</typeparam>
 public abstract class MatchFilterBase<TKey, TValue>
 {
     /// <summary>
-    /// The filter guid 
+    /// The filter GUID.
     /// </summary>
     public abstract Guid FilterType { get; }
 
     /// <summary>
-    /// Serializes the filter to a stream
+    /// Serializes the filter to a stream.
     /// </summary>
-    /// <param name="stream">the stream to write to</param>
+    /// <param name="stream">The stream to write to.</param>
     public abstract void Save(BinaryStreamBase stream);
 
     /// <summary>
-    /// Determines if a Key/Value is contained in the filter
+    /// Determines if a key-value is contained in the filter.
     /// </summary>
-    /// <param name="key">the key to check</param>
-    /// <param name="value">the value to check</param>
-    /// <returns></returns>
+    /// <param name="key">The key to check.</param>
+    /// <param name="value">The value to check.</param>
     public abstract bool Contains(TKey key, TValue value);
 }

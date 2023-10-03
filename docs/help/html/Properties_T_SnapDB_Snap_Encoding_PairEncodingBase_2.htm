@@ -5,7 +5,7 @@
             Gets the encoding method that this class implements.
             </td></tr><tr><td><a href="P_SnapDB_Snap_Encoding_PairEncodingBase_2_EndOfStreamSymbol.htm">EndOfStreamSymbol</a></td><td>
             The byte code to use as the end of stream symbol.
-            May throw NotSupportedException if <a href="P_SnapDB_Snap_Encoding_PairEncodingBase_2_ContainsEndOfStreamSymbol.htm">ContainsEndOfStreamSymbol</a> is false.
+            May throw NotSupportedException if <a href="P_SnapDB_Snap_Encoding_PairEncodingBase_2_ContainsEndOfStreamSymbol.htm">ContainsEndOfStreamSymbol</a> is <span class="code">false</span>.
             </td></tr><tr><td><a href="P_SnapDB_Snap_Encoding_PairEncodingBase_2_MaxCompressionSize.htm">MaxCompressionSize</a></td><td>
             Gets the maximum amount of space that is required for the compression algorithm. This
             prevents lower levels from having overflows on the underlying streams. It is critical
@@ -13,11 +13,11 @@
             too small will corrupt data and be next to impossible to track down the point of corruption
             </td></tr><tr><td><a href="P_SnapDB_Snap_Encoding_PairEncodingBase_2_UsesPreviousKey.htm">UsesPreviousKey</a></td><td>
             Gets if the previous key will need to be presented to the encoding algorithms to
-            property encode the next sample. Returning false will cause nulls to be passed
+            property encode the next sample. Returning <span class="code">false</span> will cause nulls to be passed
             in a parameters to the encoding.
             </td></tr><tr><td><a href="P_SnapDB_Snap_Encoding_PairEncodingBase_2_UsesPreviousValue.htm">UsesPreviousValue</a></td><td>
             Gets if the previous value will need to be presented to the encoding algorithms to
-            property encode the next sample. Returning false will cause nulls to be passed
+            property encode the next sample. Returning <span class="code">false</span> will cause nulls to be passed
             in a parameters to the encoding.
             </td></tr></table></div><h2 class="quickLinkHeader"><span class="icon toggleSection" tabindex="0"><i class="fa fa-angle-down"></i></span>See Also</h2><div id="seeAlsoSection"><h4>Reference</h4><div><a href="T_SnapDB_Snap_Encoding_PairEncodingBase_2.htm">PairEncodingBase<span id="LST85BE4C87_2" data-languageSpecificText="cs=&lt;|vb=(Of |cpp=&lt;|nu=(|fs=&lt;'"></span>TKey, TValue<span id="LST85BE4C87_3" data-languageSpecificText="cs=&gt;|vb=)|cpp=&gt;|nu=)|fs=&gt;"></span> Class</a></div><div><a href="N_SnapDB_Snap_Encoding.htm">SnapDB.Snap.Encoding Namespace</a></div></div></div><div id="InThisArticleColumn" class="column is-hidden-mobile"><nav class="menu sticky is-hidden"><p class="menu-label"><strong>In This Article</strong></p><ul id="InThisArticleMenu" class="menu-list"><li><a class="quickLink">Properties</a></li><li><a class="quickLink">See Also</a></li></ul></nav></div></div></div><footer id="PageFooter" class="footer border-top py-3 fixedFooter"><div class="columns"><div class="column"><span class="site-footer-credits">
 <a href="https://snapdb.github.io/SnapDB/" target="_self">Documentation Home</a> <br /><br />

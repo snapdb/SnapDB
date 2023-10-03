@@ -137,7 +137,8 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// When overridden in a derived class, clears all buffers for this stream and causes any buffered data to be written to the underlying device.
     /// </summary>
-    /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>2</filterpriority>
+    /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
+    /// <filterpriority>2</filterpriority>
     public abstract void Flush();
 
     /// <summary>
@@ -198,7 +199,7 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// Updates the local buffer data.
     /// </summary>
-    /// <param name="isWriting">hints to the stream if write access is desired.</param>
+    /// <param name="isWriting">Hints to the stream if write access is desired.</param>
     public virtual void UpdateLocalBuffer(bool isWriting)
     {
 
@@ -564,7 +565,7 @@ public abstract unsafe class BinaryStreamBase
     }
 
     /// <summary>
-    /// Writes the specifed <see cref="buffer"/> to the underlying stream in little-endian format.
+    /// Writes the specifed <paramref name="buffer"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="buffer">The pointer to the first byte.</param>
     /// <param name="length">The number of bytes to write.</param>
@@ -946,7 +947,7 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// Reads all of the provided bytes. Will not return prematurely, 
     /// but continue to execute a <see cref="Read"/> command until the entire
-    /// <see cref="length"/> has been read.
+    /// <paramref name="length"/> has been read.
     /// </summary>
     /// <param name="buffer"></param>
     /// <param name="position"></param>

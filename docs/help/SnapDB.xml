@@ -923,7 +923,7 @@
     </member>
     <member name="M:SnapDB.Collections.WeakList`1.Add(`0)">
       <summary>
-            Adds the <see cref="!:item" /> to the list. Method is thread safe.
+            Adds the <paramref name="item" /> to the list. Method is thread safe.
             </summary>
       <param name="item">Item to add.</param>
     </member>
@@ -942,7 +942,7 @@
     </member>
     <member name="M:SnapDB.Collections.WeakList`1.Remove(`0)">
       <summary>
-            Removes all occurrences of the <see cref="!:item" /> from the list. Method is thread-safe.
+            Removes all occurrences of the <paramref name="item" /> from the list. Method is thread-safe.
             </summary>
       <param name="item">Item to remove.</param>
     </member>
@@ -1414,7 +1414,7 @@
       <summary>
             Reads all of the provided bytes. Will not return prematurely, 
             but continue to execute a <see cref="M:SnapDB.IO.BinaryStreamBase.Read(System.Byte[],System.Int32,System.Int32)" /> command until the entire
-            <see cref="!:length" /> has been read.
+            <paramref name="length" /> has been read.
             </summary>
       <param name="buffer"></param>
       <param name="position"></param>
@@ -1620,7 +1620,7 @@
       <summary>
             Updates the local buffer data.
             </summary>
-      <param name="isWriting">hints to the stream if write access is desired.</param>
+      <param name="isWriting">Hints to the stream if write access is desired.</param>
     </member>
     <member name="F:SnapDB.IO.BinaryStreamBase.Utf8">
       <summary>
@@ -1641,7 +1641,7 @@
     </member>
     <member name="M:SnapDB.IO.BinaryStreamBase.Write(System.Byte*,System.Int32)">
       <summary>
-            Writes the specifed <see cref="!:buffer" /> to the underlying stream in little-endian format.
+            Writes the specifed <paramref name="buffer" /> to the underlying stream in little-endian format.
             </summary>
       <param name="buffer">The pointer to the first byte.</param>
       <param name="length">The number of bytes to write.</param>
@@ -8470,8 +8470,8 @@
       <summary>
             Represents an encoding method that takes both a key and a value to encode.
             </summary>
-      <typeparam name="TKey">The key type</typeparam>
-      <typeparam name="TValue">The value type</typeparam>
+      <typeparam name="TKey">The key type.</typeparam>
+      <typeparam name="TValue">The value type.</typeparam>
     </member>
     <member name="M:SnapDB.Snap.Encoding.PairEncodingBase`2.#ctor">
       <summary>
@@ -8486,7 +8486,7 @@
       <summary>
             Clones this encoding method.
             </summary>
-      <returns>A clone</returns>
+      <returns>A clone.</returns>
     </member>
     <member name="P:SnapDB.Snap.Encoding.PairEncodingBase`2.ContainsEndOfStreamSymbol">
       <summary>
@@ -8507,49 +8507,47 @@
     </member>
     <member name="M:SnapDB.Snap.Encoding.PairEncodingBase`2.Decode(SnapDB.IO.BinaryStreamBase,`0,`1,`0,`1,System.Boolean@)">
       <summary>
-            Decodes <see cref="!:key" /> and <see cref="!:value" /> from the provided <see cref="!:stream" />.
+            Decodes data from a binary stream, producing key-value pairs and indicating whether it's the end of the stream.
             </summary>
-      <param name="stream">where to read the data</param>
-      <param name="prevKey">the previous key if required by <see cref="P:SnapDB.Snap.Encoding.PairEncodingBase`2.UsesPreviousKey" />. Otherwise null.</param>
-      <param name="prevValue">the previous value if required by <see cref="P:SnapDB.Snap.Encoding.PairEncodingBase`2.UsesPreviousValue" />. Otherwise null.</param>
-      <param name="key">the place to store the decoded key</param>
-      <param name="value">the place to store the decoded value</param>
-      <param name="isEndOfStream">outputs true if the end of the stream symbol is detected. Not all encoding methods have an end of stream symbol and therefore will always return false.</param>
-      <returns>the number of bytes necessary to decode the next key/value.</returns>
+      <param name="stream">The binary stream from which to decode data.</param>
+      <param name="prevKey">The previously decoded key.</param>
+      <param name="prevValue">The previously decoded value.</param>
+      <param name="key">The decoded key.</param>
+      <param name="value">The decoded value.</param>
+      <param name="isEndOfStream">A boolean indicating whether the end of the stream has been reached.</param>
     </member>
     <member name="M:SnapDB.Snap.Encoding.PairEncodingBase`2.Decode(System.Byte*,`0,`1,`0,`1,System.Boolean@)">
       <summary>
-            Decodes <see cref="!:key" /> and <see cref="!:value" /> from the provided <see cref="!:stream" />.
+            Decodes data from a byte pointer, producing key-value pairs and indicating whether it's the end of the stream.
             </summary>
-      <param name="stream">where to read the data</param>
-      <param name="prevKey">the previous key if required by <see cref="P:SnapDB.Snap.Encoding.PairEncodingBase`2.UsesPreviousKey" />. Otherwise null.</param>
-      <param name="prevValue">the previous value if required by <see cref="P:SnapDB.Snap.Encoding.PairEncodingBase`2.UsesPreviousValue" />. Otherwise null.</param>
-      <param name="key">the place to store the decoded key</param>
-      <param name="value">the place to store the decoded value</param>
-      <param name="isEndOfStream">outputs true if the end of the stream symbol is detected. Not all encoding methods have an end of stream symbol and therefore will always return false.</param>
-      <returns>the number of bytes necessary to decode the next key/value.</returns>
+      <param name="stream">The byte pointer from which to decode data.</param>
+      <param name="prevKey">The previously decoded key.</param>
+      <param name="prevValue">The previously decoded value.</param>
+      <param name="key">The decoded key.</param>
+      <param name="value">The decoded value.</param>
+      <param name="isEndOfStream">A boolean indicating whether the end of the stream has been reached.</param>
+      <returns>The position of the byte pointer after decoding.</returns>
     </member>
     <member name="M:SnapDB.Snap.Encoding.PairEncodingBase`2.Encode(SnapDB.IO.BinaryStreamBase,`0,`1,`0,`1)">
       <summary>
-            Encodes <see cref="!:key" /> and <see cref="!:value" /> to the provided <see cref="!:stream" />.
+            Encodes key-value pairs and writes them to a binary stream.
             </summary>
-      <param name="stream">where to write the data</param>
-      <param name="prevKey">the previous key if required by <see cref="P:SnapDB.Snap.Encoding.PairEncodingBase`2.UsesPreviousKey" />. Otherwise null.</param>
-      <param name="prevValue">the previous value if required by <see cref="P:SnapDB.Snap.Encoding.PairEncodingBase`2.UsesPreviousValue" />. Otherwise null.</param>
-      <param name="key">the key to encode</param>
-      <param name="value">the value to encode</param>
-      <returns>the number of bytes necessary to encode this key/value.</returns>
+      <param name="stream">The binary stream to which to write encoded data.</param>
+      <param name="prevKey">The previously encoded key.</param>
+      <param name="prevValue">The previously encoded value.</param>
+      <param name="key">The key to be encoded and written.</param>
+      <param name="value">The value to be encoded and written.</param>
     </member>
     <member name="M:SnapDB.Snap.Encoding.PairEncodingBase`2.Encode(System.Byte*,`0,`1,`0,`1)">
       <summary>
-            Encodes <see cref="!:key" /> and <see cref="!:value" /> to the provided <see cref="!:stream" />.
+            Encodes key-value pairs and writes them to a byte pointer.
             </summary>
-      <param name="stream">where to write the data</param>
-      <param name="prevKey">the previous key if required by <see cref="P:SnapDB.Snap.Encoding.PairEncodingBase`2.UsesPreviousKey" />. Otherwise null.</param>
-      <param name="prevValue">the previous value if required by <see cref="P:SnapDB.Snap.Encoding.PairEncodingBase`2.UsesPreviousValue" />. Otherwise null.</param>
-      <param name="key">the key to encode</param>
-      <param name="value">the value to encode</param>
-      <returns>the number of bytes necessary to encode this key/value.</returns>
+      <param name="stream">The byte pointer to which to write encoded data.</param>
+      <param name="prevKey">The previously encoded key.</param>
+      <param name="prevValue">The previously encoded value.</param>
+      <param name="key">The key to be encoded and written.</param>
+      <param name="value">The value to be encoded and written.</param>
+      <returns>The position of the byte pointer after encoding.</returns>
     </member>
     <member name="P:SnapDB.Snap.Encoding.PairEncodingBase`2.EncodingMethod">
       <summary>
@@ -8559,7 +8557,7 @@
     <member name="P:SnapDB.Snap.Encoding.PairEncodingBase`2.EndOfStreamSymbol">
       <summary>
             The byte code to use as the end of stream symbol.
-            May throw NotSupportedException if <see cref="P:SnapDB.Snap.Encoding.PairEncodingBase`2.ContainsEndOfStreamSymbol" /> is false.
+            May throw NotSupportedException if <see cref="P:SnapDB.Snap.Encoding.PairEncodingBase`2.ContainsEndOfStreamSymbol" /> is <c>false</c>.
             </summary>
     </member>
     <member name="P:SnapDB.Snap.Encoding.PairEncodingBase`2.MaxCompressionSize">
@@ -8573,14 +8571,14 @@
     <member name="P:SnapDB.Snap.Encoding.PairEncodingBase`2.UsesPreviousKey">
       <summary>
             Gets if the previous key will need to be presented to the encoding algorithms to
-            property encode the next sample. Returning false will cause nulls to be passed
+            property encode the next sample. Returning <c>false</c> will cause nulls to be passed
             in a parameters to the encoding.
             </summary>
     </member>
     <member name="P:SnapDB.Snap.Encoding.PairEncodingBase`2.UsesPreviousValue">
       <summary>
             Gets if the previous value will need to be presented to the encoding algorithms to
-            property encode the next sample. Returning false will cause nulls to be passed
+            property encode the next sample. Returning <c>false</c> will cause nulls to be passed
             in a parameters to the encoding.
             </summary>
     </member>
@@ -8591,121 +8589,43 @@
     </member>
     <member name="M:SnapDB.Snap.Filters.FilterLibrary.GetMatchFilter``2(System.Guid,SnapDB.IO.BinaryStreamBase)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Filters.FilterLibrary.GetMatchFilter``2(System.Guid,SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="filter">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>filter</parameter>
-            <parameter>M:SnapDB.Snap.Filters.FilterLibrary.GetMatchFilter``2(System.Guid,SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Filters.FilterLibrary.GetMatchFilter``2(System.Guid,SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </param>
-      <typeparam name="TKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>typeparam</parameter>
-            <parameter>TKey</parameter>
-            <parameter>M:SnapDB.Snap.Filters.FilterLibrary.GetMatchFilter``2(System.Guid,SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </typeparam>
-      <typeparam name="TValue">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>typeparam</parameter>
-            <parameter>TValue</parameter>
-            <parameter>M:SnapDB.Snap.Filters.FilterLibrary.GetMatchFilter``2(System.Guid,SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </typeparam>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Filters.FilterLibrary.GetMatchFilter``2(System.Guid,SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </returns>
+            Retrieves a match filter based on the specified filter GUID and binary stream.
+            </summary>
+      <param name="filter">The GUID identifying the desired match filter.</param>
+      <param name="stream">The binary stream to associate with the match filter.</param>
+      <typeparam name="TKey">The type of keys used in the match filter.</typeparam>
+      <typeparam name="TValue">The type of values used in the match filter.</typeparam>
+      <returns>The match filter instance if found; otherwise, an exception is thrown.</returns>
+      <exception cref="T:System.Exception">Thrown when the match filter is not found.</exception>
     </member>
     <member name="M:SnapDB.Snap.Filters.FilterLibrary.GetSeekFilter``1(System.Guid,SnapDB.IO.BinaryStreamBase)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Filters.FilterLibrary.GetSeekFilter``1(System.Guid,SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="filter">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>filter</parameter>
-            <parameter>M:SnapDB.Snap.Filters.FilterLibrary.GetSeekFilter``1(System.Guid,SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Filters.FilterLibrary.GetSeekFilter``1(System.Guid,SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </param>
-      <typeparam name="TKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>typeparam</parameter>
-            <parameter>TKey</parameter>
-            <parameter>M:SnapDB.Snap.Filters.FilterLibrary.GetSeekFilter``1(System.Guid,SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </typeparam>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Filters.FilterLibrary.GetSeekFilter``1(System.Guid,SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </returns>
+            Retrieves a seek filter based on the specified filter GUID and binary stream.
+            </summary>
+      <param name="filter">The GUID identifying the desired seek filter.</param>
+      <param name="stream">The binary stream to associate with the seek filter.</param>
+      <typeparam name="TKey">The type of keys used in the seek filter.</typeparam>
+      <returns>The seek filter instance if found; otherwise, an exception is thrown.</returns>
+      <exception cref="T:System.Exception">Thrown when the seek filter is not found.</exception>
     </member>
     <member name="M:SnapDB.Snap.Filters.FilterLibrary.Register(SnapDB.Snap.Definitions.MatchFilterDefinitionBase)">
       <summary>
-            Registers this type
+            Registers a match filter definition to the collection of filters.
             </summary>
-      <param name="encoding"></param>
+      <param name="encoding">The match filter definition to be registered.</param>
     </member>
     <member name="M:SnapDB.Snap.Filters.FilterLibrary.Register(SnapDB.Snap.Definitions.SeekFilterDefinitionBase)">
       <summary>
-            Registers this type
+            Registers a seek filter definition to the collection of seek filters.
             </summary>
-      <param name="encoding"></param>
+      <param name="encoding">The seek filter definition to be registered.</param>
     </member>
     <member name="T:SnapDB.Snap.Filters.MatchFilterBase`2">
       <summary>
             Represents some kind of filter that does a match based on the key/value.
             </summary>
-      <typeparam name="TKey">the key to match</typeparam>
-      <typeparam name="TValue">the value to match</typeparam>
+      <typeparam name="TKey">The key to match.</typeparam>
+      <typeparam name="TValue">The value to match.</typeparam>
     </member>
     <member name="M:SnapDB.Snap.Filters.MatchFilterBase`2.#ctor">
       <summary>
@@ -8718,10 +8638,10 @@
     </member>
     <member name="M:SnapDB.Snap.Filters.MatchFilterBase`2.Contains(`0,`1)">
       <summary>
-            Determines if a Key/Value is contained in the filter
+            Determines if a key-value is contained in the filter.
             </summary>
-      <param name="key">the key to check</param>
-      <param name="value">the value to check</param>
+      <param name="key">The key to check.</param>
+      <param name="value">The value to check.</param>
       <returns>
         <markup>
           <include item="SMCMissingTag">
@@ -8733,21 +8653,21 @@
     </member>
     <member name="P:SnapDB.Snap.Filters.MatchFilterBase`2.FilterType">
       <summary>
-            The filter guid 
+            The filter GUID.
             </summary>
     </member>
     <member name="M:SnapDB.Snap.Filters.MatchFilterBase`2.Save(SnapDB.IO.BinaryStreamBase)">
       <summary>
-            Serializes the filter to a stream
+            Serializes the filter to a stream.
             </summary>
-      <param name="stream">the stream to write to</param>
+      <param name="stream">The stream to write to.</param>
     </member>
     <member name="T:SnapDB.Snap.Filters.MatchFilterUniverse`2">
       <summary>
-            Represents no filter
+            Represents a match filter that matches any key-value pair (universe filter).
             </summary>
-      <typeparam name="TKey"></typeparam>
-      <typeparam name="TValue"></typeparam>
+      <typeparam name="TKey">The type of keys to be matched.</typeparam>
+      <typeparam name="TValue">The type of values to be matched.</typeparam>
     </member>
     <member name="M:SnapDB.Snap.Filters.MatchFilterUniverse`2.#ctor">
       <summary>
@@ -8760,68 +8680,23 @@
     </member>
     <member name="M:SnapDB.Snap.Filters.MatchFilterUniverse`2.Contains(`0,`1)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Filters.MatchFilterUniverse`2.Contains(`0,`1)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Snap.Filters.MatchFilterUniverse`2.Contains(`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Filters.MatchFilterUniverse`2.Contains(`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Filters.MatchFilterUniverse`2.Contains(`0,`1)</parameter>
-          </include>
-        </markup>
-      </returns>
+            Determines whether the universe filter contains any key-value pair.
+            </summary>
+      <param name="key">The key to be checked.</param>
+      <param name="value">The value to be checked.</param>
+      <returns>Always returns true, indicating that the universe filter matches any key-value pair.</returns>
     </member>
     <member name="P:SnapDB.Snap.Filters.MatchFilterUniverse`2.FilterType">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>P:SnapDB.Snap.Filters.MatchFilterUniverse`2.FilterType</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets the unique identifier for this match filter, which is always Guid.Empty for the universe filter.
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Filters.MatchFilterUniverse`2.Save(SnapDB.IO.BinaryStreamBase)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Filters.MatchFilterUniverse`2.Save(SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Filters.MatchFilterUniverse`2.Save(SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </param>
+            Saves the universe filter to a binary stream (not supported).
+            </summary>
+      <param name="stream">The binary stream to which the filter should be saved.</param>
+      <exception cref="T:System.NotSupportedException">Thrown when saving the universe filter is not supported.</exception>
     </member>
     <member name="T:SnapDB.Snap.Filters.PointIdMatchFilter">
       <summary>

@@ -102,7 +102,7 @@ public class WeakList<T> : IEnumerable<T>
         }
 
         /// <summary>
-        /// Removes all occurrences of <see cref="item"/> from the list.
+        /// Removes all occurrences of <paramref name="item"/> from the list.
         /// </summary>
         /// <param name="item">Item to remove.</param>
         public void Remove(T? item)
@@ -133,7 +133,7 @@ public class WeakList<T> : IEnumerable<T>
         }
 
         /// <summary>
-        /// Attempts to add <see cref="item"/> to the list. 
+        /// Attempts to add <paramref name="item"/> to the list. 
         /// </summary>
         /// <param name="item"></param>
         /// <returns><c>true</c> if added, <c>false</c> otherwise.</returns>
@@ -268,7 +268,7 @@ public class WeakList<T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Adds the <see cref="item"/> to the list. Method is thread safe.
+    /// Adds the <paramref name="item"/> to the list. Method is thread safe.
     /// </summary>
     /// <param name="item">Item to add.</param>
     public void Add(T item)
@@ -286,7 +286,7 @@ public class WeakList<T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Removes all occurrences of the <see cref="item"/> from the list. Method is thread-safe.
+    /// Removes all occurrences of the <paramref name="item"/> from the list. Method is thread-safe.
     /// </summary>
     /// <param name="item">Item to remove.</param>
     public void Remove(T item)

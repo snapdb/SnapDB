@@ -32,8 +32,8 @@ namespace SnapDB.Snap.Encoding;
 /// <summary>
 /// Represents an encoding method that takes both a key and a value to encode.
 /// </summary>
-/// <typeparam name="TKey">The key type</typeparam>
-/// <typeparam name="TValue">The value type</typeparam>
+/// <typeparam name="TKey">The key type.</typeparam>
+/// <typeparam name="TValue">The value type.</typeparam>
 public abstract class PairEncodingBase<TKey, TValue>
 {
     /// <summary>
@@ -43,14 +43,14 @@ public abstract class PairEncodingBase<TKey, TValue>
 
     /// <summary>
     /// Gets if the previous key will need to be presented to the encoding algorithms to
-    /// property encode the next sample. Returning false will cause nulls to be passed
+    /// property encode the next sample. Returning <c>false</c> will cause nulls to be passed
     /// in a parameters to the encoding.
     /// </summary>
     public abstract bool UsesPreviousKey { get; }
 
     /// <summary>
     /// Gets if the previous value will need to be presented to the encoding algorithms to
-    /// property encode the next sample. Returning false will cause nulls to be passed
+    /// property encode the next sample. Returning <c>false</c> will cause nulls to be passed
     /// in a parameters to the encoding.
     /// </summary>
     public abstract bool UsesPreviousValue { get; }
@@ -82,19 +82,19 @@ public abstract class PairEncodingBase<TKey, TValue>
 
     /// <summary>
     /// The byte code to use as the end of stream symbol.
-    /// May throw NotSupportedException if <see cref="ContainsEndOfStreamSymbol"/> is false.
+    /// May throw NotSupportedException if <see cref="ContainsEndOfStreamSymbol"/> is <c>false</c>.
     /// </summary>
     public abstract byte EndOfStreamSymbol { get; }
 
     /// <summary>
-    /// Encodes <see cref="key"/> and <see cref="value"/> to the provided <see cref="stream"/>.
+    /// Encodes key-value pairs and writes them to a byte pointer.
     /// </summary>
-    /// <param name="stream">where to write the data</param>
-    /// <param name="prevKey">the previous key if required by <see cref="UsesPreviousKey"/>. Otherwise null.</param>
-    /// <param name="prevValue">the previous value if required by <see cref="UsesPreviousValue"/>. Otherwise null.</param>
-    /// <param name="key">the key to encode</param>
-    /// <param name="value">the value to encode</param>
-    /// <returns>the number of bytes necessary to encode this key/value.</returns>
+    /// <param name="stream">The byte pointer to which to write encoded data.</param>
+    /// <param name="prevKey">The previously encoded key.</param>
+    /// <param name="prevValue">The previously encoded value.</param>
+    /// <param name="key">The key to be encoded and written.</param>
+    /// <param name="value">The value to be encoded and written.</param>
+    /// <returns>The position of the byte pointer after encoding.</returns>
     public unsafe virtual int Encode(byte* stream, TKey prevKey, TValue prevValue, TKey key, TValue value)
     {
         BinaryStreamPointerWrapper bs = new(stream, MaxCompressionSize);
@@ -103,48 +103,47 @@ public abstract class PairEncodingBase<TKey, TValue>
     }
 
     /// <summary>
-    /// Decodes <see cref="key"/> and <see cref="value"/> from the provided <see cref="stream"/>.
+    /// Decodes data from a byte pointer, producing key-value pairs and indicating whether it's the end of the stream.
     /// </summary>
-    /// <param name="stream">where to read the data</param>
-    /// <param name="prevKey">the previous key if required by <see cref="UsesPreviousKey"/>. Otherwise null.</param>
-    /// <param name="prevValue">the previous value if required by <see cref="UsesPreviousValue"/>. Otherwise null.</param>
-    /// <param name="key">the place to store the decoded key</param>
-    /// <param name="value">the place to store the decoded value</param>
-    /// <param name="isEndOfStream">outputs true if the end of the stream symbol is detected. Not all encoding methods have an end of stream symbol and therefore will always return false.</param>
-    /// <returns>the number of bytes necessary to decode the next key/value.</returns>
+    /// <param name="stream">The byte pointer from which to decode data.</param>
+    /// <param name="prevKey">The previously decoded key.</param>
+    /// <param name="prevValue">The previously decoded value.</param>
+    /// <param name="key">The decoded key.</param>
+    /// <param name="value">The decoded value.</param>
+    /// <param name="isEndOfStream">A boolean indicating whether the end of the stream has been reached.</param>
+    /// <returns>The position of the byte pointer after decoding.</returns>
     public unsafe virtual int Decode(byte* stream, TKey prevKey, TValue prevValue, TKey key, TValue value, out bool isEndOfStream)
     {
         BinaryStreamPointerWrapper bs = new(stream, MaxCompressionSize);
         Decode(bs, prevKey, prevValue, key, value, out isEndOfStream);
+
         return (int)bs.Position;
     }
 
     /// <summary>
-    /// Encodes <see cref="key"/> and <see cref="value"/> to the provided <see cref="stream"/>.
+    /// Encodes key-value pairs and writes them to a binary stream.
     /// </summary>
-    /// <param name="stream">where to write the data</param>
-    /// <param name="prevKey">the previous key if required by <see cref="UsesPreviousKey"/>. Otherwise null.</param>
-    /// <param name="prevValue">the previous value if required by <see cref="UsesPreviousValue"/>. Otherwise null.</param>
-    /// <param name="key">the key to encode</param>
-    /// <param name="value">the value to encode</param>
-    /// <returns>the number of bytes necessary to encode this key/value.</returns>
+    /// <param name="stream">The binary stream to which to write encoded data.</param>
+    /// <param name="prevKey">The previously encoded key.</param>
+    /// <param name="prevValue">The previously encoded value.</param>
+    /// <param name="key">The key to be encoded and written.</param>
+    /// <param name="value">The value to be encoded and written.</param>
     public abstract void Encode(BinaryStreamBase stream, TKey prevKey, TValue prevValue, TKey key, TValue value);
 
     /// <summary>
-    /// Decodes <see cref="key"/> and <see cref="value"/> from the provided <see cref="stream"/>.
+    /// Decodes data from a binary stream, producing key-value pairs and indicating whether it's the end of the stream.
     /// </summary>
-    /// <param name="stream">where to read the data</param>
-    /// <param name="prevKey">the previous key if required by <see cref="UsesPreviousKey"/>. Otherwise null.</param>
-    /// <param name="prevValue">the previous value if required by <see cref="UsesPreviousValue"/>. Otherwise null.</param>
-    /// <param name="key">the place to store the decoded key</param>
-    /// <param name="value">the place to store the decoded value</param>
-    /// <param name="isEndOfStream">outputs true if the end of the stream symbol is detected. Not all encoding methods have an end of stream symbol and therefore will always return false.</param>
-    /// <returns>the number of bytes necessary to decode the next key/value.</returns>
+    /// <param name="stream">The binary stream from which to decode data.</param>
+    /// <param name="prevKey">The previously decoded key.</param>
+    /// <param name="prevValue">The previously decoded value.</param>
+    /// <param name="key">The decoded key.</param>
+    /// <param name="value">The decoded value.</param>
+    /// <param name="isEndOfStream">A boolean indicating whether the end of the stream has been reached.</param>
     public abstract void Decode(BinaryStreamBase stream, TKey prevKey, TValue prevValue, TKey key, TValue value, out bool isEndOfStream);
 
     /// <summary>
     /// Clones this encoding method.
     /// </summary>
-    /// <returns>A clone</returns>
+    /// <returns>A clone.</returns>
     public abstract PairEncodingBase<TKey, TValue> Clone();
 }
