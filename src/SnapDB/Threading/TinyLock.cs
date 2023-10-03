@@ -88,7 +88,7 @@ public class TinyLock
     /// <summary>
     /// A structure that will allow releasing of a lock. This is returned by <see cref="Lock"/>.
     /// </summary>
-    public struct TinyLockRelease : IDisposable
+    public readonly struct TinyLockRelease : IDisposable
     {
         private readonly TinyLock m_tinyLock;
         internal TinyLockRelease(TinyLock tinyLock)

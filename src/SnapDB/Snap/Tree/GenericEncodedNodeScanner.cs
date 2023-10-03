@@ -33,8 +33,8 @@ namespace SnapDB.Snap.Tree;
 /// <summary>
 /// Base class for reading from a node that is encoded and must be read sequentially through the node.
 /// </summary>
-/// <typeparam name="TKey">The type of keys stored in the sorted tree.</typeparam>
-/// <typeparam name="TValue">The type of values associated with the keys in the sorted tree.</typeparam>
+/// <typeparam name="TKey">The type of keys stored in the nodes.</typeparam>
+/// <typeparam name="TValue">The type of values stored in the nodes.</typeparam>
 public unsafe class GenericEncodedNodeScanner<TKey, TValue>
         : SortedTreeScannerBase<TKey, TValue>
     where TKey : SnapTypeBase<TKey>, new()
@@ -48,12 +48,13 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
     private readonly TValue m_tmpValue;
 
     /// <summary>
-    /// Creates a new class
+    /// Initializes a new instance of the <see cref="GenericEncodedNodeScanner{TKey, TValue}"/> class with the specified encoding, node level, block size, binary stream, and key lookup function.
     /// </summary>
-    /// <param name="level"></param>
-    /// <param name="blockSize"></param>
-    /// <param name="stream"></param>
-    /// <param name="lookupKey"></param>
+    /// <param name="encoding">The encoding method used for key and value pairs.</param>
+    /// <param name="level">The level of the node (0 for leaf nodes).</param>
+    /// <param name="blockSize">The size of a block or node in bytes.</param>
+    /// <param name="stream">The binary stream from which to read data.</param>
+    /// <param name="lookupKey">A function for looking up keys based on an input key and direction.</param>
     public GenericEncodedNodeScanner(PairEncodingBase<TKey, TValue> encoding, byte level, int blockSize, BinaryStreamPointerBase stream, Func<TKey, byte, uint> lookupKey)
         : base(level, blockSize, stream, lookupKey)
     {
@@ -67,12 +68,22 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
         m_tmpValue = new TValue();
     }
 
+    /// <summary>
+    /// Reads and decodes the next key-value pair at the current position for peeking without advancing the position.
+    /// </summary>
+    /// <param name="key">The key to be populated with the peeked key data.</param>
+    /// <param name="value">The value to be populated with the peeked value data.</param>
     protected override void InternalPeek(TKey key, TValue value)
     {
         byte* stream = Pointer + m_nextOffset;
         m_encoding.Decode(stream, m_prevKey, m_prevValue, key, value, out _);
     }
 
+    /// <summary>
+    /// Reads and decodes the next key-value pair at the current position and advances the position.
+    /// </summary>
+    /// <param name="key">The key to be populated with the read key data.</param>
+    /// <param name="value">The value to be populated with the read value data.</param>
     protected override void InternalRead(TKey key, TValue value)
     {
         byte* stream = Pointer + m_nextOffset;
@@ -83,6 +94,13 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
         IndexOfNextKeyValue++;
     }
 
+    /// <summary>
+    /// Reads and decodes the next key-value pair at the current position, advances the position, and checks if it matches the specified filter.
+    /// </summary>
+    /// <param name="key">The key to be populated with the read key data.</param>
+    /// <param name="value">The value to be populated with the read value data.</param>
+    /// <param name="filter">An optional filter to check if the key-value pair matches certain criteria.</param>
+    /// <returns><c>true</c> if the key-value pair matches the filter; otherwise, <c>false</c>.</returns>
     protected override bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue>? filter)
     {
     TryAgain:
@@ -102,6 +120,14 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
         goto TryAgain;
     }
 
+    /// <summary>
+    /// Reads and decodes the next key-value pair at the current position, advances the position,
+    /// and continues reading as long as the key is less than the specified upper bounds.
+    /// </summary>
+    /// <param name="key">The key to be populated with the read key data.</param>
+    /// <param name="value">The value to be populated with the read value data.</param>
+    /// <param name="upperBounds">The upper bounds for keys, reading continues as long as the key is less than this value.</param>
+    /// <returns><c>true</c> if the key-value pair matches the condition; otherwise, <c>false</c>.</returns>
     protected override bool InternalReadWhile(TKey key, TValue value, TKey upperBounds)
     {
         byte* stream = Pointer + m_nextOffset;
@@ -119,6 +145,15 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
         return false;
     }
 
+    /// <summary>
+    /// Reads and decodes the next key-value pair at the current position, advances the position,
+    /// and continues reading as long as the key is less than the specified upper bounds and matches the filter condition.
+    /// </summary>
+    /// <param name="key">The key to be populated with the read key data.</param>
+    /// <param name="value">The value to be populated with the read value data.</param>
+    /// <param name="upperBounds">The upper bounds for keys, reading continues as long as the key is less than this value.</param>
+    /// <param name="filter">An optional filter to apply to the read key-value pairs.</param>
+    /// <returns>True if the key-value pair matches the condition; otherwise, false.</returns>
     protected override bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue>? filter)
     {
     TryAgain:
@@ -146,9 +181,9 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
     }
 
     /// <summary>
-    /// Using <see cref="SortedTreeScannerBase{TKey,TValue}.Pointer"/> advance to the search location of the provided <see cref="key"/>
+    /// Finds the specified key within the node and positions the scanner at the first key-value pair that matches or is greater than the specified key.
     /// </summary>
-    /// <param name="key">the key to advance to</param>
+    /// <param name="key">The key to find within the node.</param>
     protected override void FindKey(TKey key)
     {
         OnNoadReload();

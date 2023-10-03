@@ -49,7 +49,7 @@ public sealed class SafeManualResetEvent
     private readonly object m_syncRoot;
 
     /// <summary>
-    /// The number of threads waiting
+    /// The number of threads waiting.
     /// </summary>
     private int m_waitingThreadCount;
     private ManualResetEvent m_resetEvent;

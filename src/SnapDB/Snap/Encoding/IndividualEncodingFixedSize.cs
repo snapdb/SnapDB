@@ -84,7 +84,7 @@ internal class IndividualEncodingFixedSize<T>
     public override int MaxCompressionSize => m_size;
 
     /// <summary>
-    /// Encodes <see cref="value"/> to the provided <see cref="stream"/>.
+    /// Encodes <paramref name="value"/> to the provided <paramref name="stream"/>.
     /// </summary>
     /// <param name="stream">where to write the data</param>
     /// <param name="prevValue">the previous value if required by <see cref="IndividualEncodingBase{T}.UsesPreviousValue"/>. Otherwise null.</param>
@@ -96,7 +96,7 @@ internal class IndividualEncodingFixedSize<T>
     }
 
     /// <summary>
-    /// Decodes <see cref="value"/> from the provided <see cref="stream"/>.
+    /// Decodes <paramref name="value"/> from the provided <paramref name="stream"/>.
     /// </summary>
     /// <param name="stream">where to read the data</param>
     /// <param name="prevValue">the previous value if required by <see cref="IndividualEncodingBase{T}.UsesPreviousValue"/>. Otherwise null.</param>
@@ -110,7 +110,7 @@ internal class IndividualEncodingFixedSize<T>
     }
 
     /// <summary>
-    /// Decodes <see cref="value"/> from the provided <see cref="stream"/>.
+    /// Decodes <paramref name="value"/> from the provided <paramref name="stream"/>.
     /// </summary>
     /// <param name="stream">where to read the data</param>
     /// <param name="prevValue">the previous value if required by <see cref="IndividualEncodingBase{T}.UsesPreviousValue"/>. Otherwise null.</param>
@@ -125,7 +125,7 @@ internal class IndividualEncodingFixedSize<T>
     }
 
     /// <summary>
-    /// Encodes <see cref="value"/> to the provided <see cref="stream"/>.
+    /// Encodes <paramref name="value"/> to the provided <paramref name="stream"/>.
     /// </summary>
     /// <param name="stream">where to write the data</param>
     /// <param name="prevValue">the previous value if required by <see cref="IndividualEncodingBase{T}.UsesPreviousValue"/>. Otherwise null.</param>

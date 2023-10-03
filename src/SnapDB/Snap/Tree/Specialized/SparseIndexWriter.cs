@@ -102,27 +102,64 @@ public sealed class SparseIndexWriter<TKey>
 
     #endregion
 
+    /// <summary>
+    /// Releases the resources used by the current instance of the class.
+    /// </summary>
+    /// <param name="disposing">A flag indicating whether to release both managed and unmanaged resources (<c>true</c>), or only unmanaged resources (<c>false</c>).</param>
+    /// <remarks>
+    /// This method is called by the <see cref="Dispose"/> method and the finalizer to release the resources used by the current instance of the class.
+    /// It disposes of the underlying stream.
+    /// </remarks>
     protected override void Dispose(bool disposing)
     {
         m_stream.Dispose();
         base.Dispose(disposing);
     }
 
+    /// <summary>
+    /// Gets a value indicating whether the data source is always sequential.
+    /// </summary>
+    /// <remarks>
+    /// When this property is <c>true</c>, it means that the data source maintains a sequential order for its elements.
+    /// In other words, the elements are stored and retrieved in a fixed order that does not change.
+    /// </remarks>
     public override bool IsAlwaysSequential => true;
 
+    /// <summary>
+    /// Gets a value indicating whether the data source never contains duplicate elements.
+    /// </summary>
+    /// <remarks>
+    /// When this property is <c>true</c>, it means that the data source does not allow duplicate elements.
+    /// Each key in the data source is unique, and attempts to add duplicate keys may be ignored or overwritten.
+    /// </remarks>
     public override bool NeverContainsDuplicates => true;
 
+    /// <summary>
+    /// Reads the next key-value pair from the data source.
+    /// </summary>
+    /// <returns>
+    /// <c>true</c> if a key-value pair was successfully read; otherwise, <c>false</c> if the end of the data source is reached.
+    /// </returns>
+    /// <remarks>
+    /// This method is used to sequentially read key-value pairs from the data source.
+    /// It should be called after switching to reading mode using <see cref="SwitchToReading"/> method.
+    /// </remarks>
+    /// <paramref name="key">The key to read./>
+    /// <paramref name="value">The value to read./>
     protected override bool ReadNext(TKey key, SnapUInt32 value)
     {
         if (!m_isReading)
             throw new Exception("Must call SwitchToReading() first.");
+
         if (m_readingCount < Count)
         {
             m_readingCount++;
             key.Read(m_stream);
             value.Read(m_stream);
+
             return true;
         }
+
         return false;
     }
 }

@@ -40,6 +40,10 @@ public partial class ThreadSafeList<T>
 
         private Wrapper m_itemCurrentlyLocked;
 
+        /// <summary>
+        /// Initializes a new iterator for a thread-safe list.
+        /// </summary>
+        /// <param name="list">The thread-safe list to iterate over.</param>
         public Iterator(ThreadSafeList<T> list)
         {
             m_list = list;
@@ -71,6 +75,7 @@ public partial class ThreadSafeList<T>
                         m_currentIndex = k;
                         currentObject = m_list.m_list.Values[x];
                         Interlocked.Increment(ref currentObject.ReferencedCount);
+
                         break;
                     }
                 }

@@ -168,13 +168,8 @@
     </member>
     <member name="T:SnapDB.Number">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Number</parameter>
-          </include>
-        </markup>
-      </summary>
+            Provides utility methods for working with numbers.
+            </summary>
     </member>
     <member name="M:SnapDB.Number.WriteToChars(System.Single,System.Char[],System.Int32)">
       <summary>
@@ -238,49 +233,16 @@
     </member>
     <member name="M:SnapDB.StepTimer.Reset">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.StepTimer.Reset</parameter>
-          </include>
-        </markup>
-      </summary>
+            Resets all timers, clearing their recorded data.
+            </summary>
     </member>
     <member name="M:SnapDB.StepTimer.Start(System.String,System.Boolean)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.StepTimer.Start(System.String,System.Boolean)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="name">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>name</parameter>
-            <parameter>M:SnapDB.StepTimer.Start(System.String,System.Boolean)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="runGc">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>runGc</parameter>
-            <parameter>M:SnapDB.StepTimer.Start(System.String,System.Boolean)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.StepTimer.Start(System.String,System.Boolean)</parameter>
-          </include>
-        </markup>
-      </returns>
+            Starts a named timer and optionally forces garbage collection before starting.
+            </summary>
+      <param name="name">The name of the timer.</param>
+      <param name="runGc">Indicates whether to force garbage collection before starting the timer.</param>
+      <returns>An object implementing the ITimer interface that represents the started timer.</returns>
     </member>
     <member name="M:SnapDB.StepTimer.Time(System.Int32,System.Action)">
       <summary>
@@ -8316,9 +8278,9 @@
     </member>
     <member name="M:SnapDB.Snap.Definitions.SeekFilterDefinitionBase.Create``1(SnapDB.IO.BinaryStreamBase)">
       <summary>
-            Determines if a Key/Value is contained in the filter
+            Determines if a key-value is contained in the filter
             </summary>
-      <param name="stream">the value to check</param>
+      <param name="stream">The value to check.</param>
       <typeparam name="TKey">
         <markup>
           <include item="SMCMissingParamTag">
@@ -8339,7 +8301,7 @@
     </member>
     <member name="P:SnapDB.Snap.Definitions.SeekFilterDefinitionBase.FilterType">
       <summary>
-            The filter guid 
+            The filter GUID. 
             </summary>
     </member>
     <member name="T:SnapDB.Snap.Encoding.EncodingLibrary">
@@ -8407,7 +8369,7 @@
     </member>
     <member name="M:SnapDB.Snap.Encoding.IndividualEncodingBase`1.Decode(SnapDB.IO.BinaryStreamBase,`0,`0,System.Boolean@)">
       <summary>
-            Decodes <see cref="!:value" /> from the specified binary <see cref="!:stream" />.
+            Decodes <paramref name="value" /> from the specified binary <paramref name="stream" />.
             </summary>
       <param name="stream">The binary stream to read from.</param>
       <param name="prevValue">The previous value used for decoding reference, if required by <see cref="P:SnapDB.Snap.Encoding.IndividualEncodingBase`1.UsesPreviousValue" />; otherwise, <c>null</c>.</param>
@@ -8417,7 +8379,7 @@
     </member>
     <member name="M:SnapDB.Snap.Encoding.IndividualEncodingBase`1.Decode(System.Byte*,`0,`0,System.Boolean@)">
       <summary>
-            Decodes <see cref="!:value" /> from the specified memory <see cref="!:stream" />, returning the decoded data length.
+            Decodes <paramref name="value" /> from the specified memory <paramref name="stream" />, returning the decoded data length.
             </summary>
       <param name="stream">A pointer to the memory stream.</param>
       <param name="prevValue">The previous value used for decoding reference, if required by <see cref="P:SnapDB.Snap.Encoding.IndividualEncodingBase`1.UsesPreviousValue" />; otherwise, <c>null</c>.</param>
@@ -8434,7 +8396,7 @@
     </member>
     <member name="M:SnapDB.Snap.Encoding.IndividualEncodingBase`1.Encode(SnapDB.IO.BinaryStreamBase,`0,`0)">
       <summary>
-            Encodes <see cref="!:value" /> and writes it to the specified binary <see cref="!:stream" />.
+            Encodes <paramref name="value" /> and writes it to the specified binary <paramref name="stream" />.
             </summary>
       <param name="stream">The binary stream to write to.</param>
       <param name="prevValue">The previous value for encoding reference, if required by <see cref="P:SnapDB.Snap.Encoding.IndividualEncodingBase`1.UsesPreviousValue" />; otherwise, <c>null</c>.</param>
@@ -8443,7 +8405,7 @@
     </member>
     <member name="M:SnapDB.Snap.Encoding.IndividualEncodingBase`1.Encode(System.Byte*,`0,`0)">
       <summary>
-            Encodes <see cref="!:value" /> and writes it to the specified memory <see cref="!:stream" />, returning the encoded data length.
+            Encodes <paramref name="value" /> and writes it to the specified memory <paramref name="stream" />, returning the encoded data length.
             </summary>
       <param name="stream">A pointer to the memory stream.</param>
       <param name="prevValue">The previous value for encoding reference, if required by <see cref="P:SnapDB.Snap.Encoding.IndividualEncodingBase`1.UsesPreviousValue" />; otherwise, <c>null</c>.</param>
@@ -11159,21 +11121,9 @@
     </member>
     <member name="M:SnapDB.Snap.Services.Configuration.AdvancedServerDatabaseConfig`2.ToServerDatabaseSettings">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Services.Configuration.AdvancedServerDatabaseConfig`2.ToServerDatabaseSettings</parameter>
-          </include>
-        </markup>
-      </summary>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Services.Configuration.AdvancedServerDatabaseConfig`2.ToServerDatabaseSettings</parameter>
-          </include>
-        </markup>
-      </returns>
+            Converts the current instance of the database settings to a <see cref="T:SnapDB.Snap.Services.ServerDatabaseSettings" /> object.
+            </summary>
+      <returns>A <see cref="T:SnapDB.Snap.Services.ServerDatabaseSettings" /> object representing the database settings.</returns>
     </member>
     <member name="T:SnapDB.Snap.Services.Net.ServerCommand">
       <summary>
@@ -14812,374 +14762,170 @@
             A node for a <see cref="T:SnapDB.Snap.Tree.SortedTree" /> that is encoded in a fixed width. 
             This allows binary searches and faster writing.
             </summary>
-      <typeparam name="TKey"></typeparam>
-      <typeparam name="TValue"></typeparam>
+      <typeparam name="TKey">The type of keys stored in the nodes.</typeparam>
+      <typeparam name="TValue">The type of values stored in the nodes.</typeparam>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNode`2.#ctor(System.Byte)">
       <summary>
-            Creates a new class
+            Creates a new class.
             </summary>
-      <param name="level">the level of this node.</param>
+      <param name="level">The level of this node.</param>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNode`2.AppendSequentialStream(SnapDB.Snap.Tree.InsertStreamHelper{`0,`1},System.Boolean@)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.AppendSequentialStream(SnapDB.Snap.Tree.InsertStreamHelper{`0,`1},System.Boolean@)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.AppendSequentialStream(SnapDB.Snap.Tree.InsertStreamHelper{`0,`1},System.Boolean@)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="isFull">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>isFull</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.AppendSequentialStream(SnapDB.Snap.Tree.InsertStreamHelper{`0,`1},System.Boolean@)</parameter>
-          </include>
-        </markup>
-      </param>
+            Appends a sequential stream of key-value pairs to the node.
+            </summary>
+      <param name="stream">The stream containing key-value pairs to append.</param>
+      <param name="isFull">A boolean indicating whether the node is full after the append operation.</param>
+      <remarks>
+            This method appends a sequential stream of key-value pairs to the node. It keeps adding pairs
+            until the node reaches its maximum capacity. If the node becomes full, the <paramref name="isFull" />
+            parameter is set to <c>true</c>; otherwise, it's set to <c>false</c>.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNode`2.Clone(System.Byte)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.Clone(System.Byte)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="level">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>level</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.Clone(System.Byte)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.Clone(System.Byte)</parameter>
-          </include>
-        </markup>
-      </returns>
+            Creates a new instance of the same node type as a clone with the specified <paramref name="level" />.
+            </summary>
+      <param name="level">The level of the new node.</param>
+      <returns>A new node instance with the same type and the specified level.</returns>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNode`2.CreateTreeScanner">
       <summary>
             Returns a <see cref="T:SnapDB.Snap.Tree.SortedTreeScannerBase`2" /></summary>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.CreateTreeScanner</parameter>
-          </include>
-        </markup>
-      </returns>
+      <returns>A new tree scanner instance.</returns>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNode`2.GetIndexOf(`0)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.GetIndexOf(`0)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.GetIndexOf(`0)</parameter>
-          </include>
-        </markup>
-      </param>
+            Searches for the index of the specified key within the node.
+            </summary>
+      <param name="key">The key to search for.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.GetIndexOf(`0)</parameter>
-          </include>
-        </markup>
-      </returns>
+            The index of the specified key within the node, or a negative value if the key is not found.
+            </returns>
+      <remarks>
+            This method performs a binary search to find the index of the specified key within the node's keys.
+            If the key is found, its index is returned; otherwise, a negative value is returned to indicate that
+            the key is not present in the node.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNode`2.InitializeType">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.InitializeType</parameter>
-          </include>
-        </markup>
-      </summary>
+            Initializes the type-specific properties of the node, such as the maximum records per node.
+            </summary>
+      <remarks>
+            This method calculates the maximum number of records that can be stored in a node based on the block size and key-value size.
+            It checks if the tree meets the minimum requirement of having at least 4 records per node and throws an exception if not.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNode`2.InsertUnlessFull(System.Int32,`0,`1)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.InsertUnlessFull(System.Int32,`0,`1)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="index">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>index</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.InsertUnlessFull(System.Int32,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.InsertUnlessFull(System.Int32,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.InsertUnlessFull(System.Int32,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
+            Inserts a key-value pair at the specified index unless the node is already full.
+            </summary>
+      <param name="index">The index at which to insert the key-value pair.</param>
+      <param name="key">The key to insert.</param>
+      <param name="value">The value to insert.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.InsertUnlessFull(System.Int32,`0,`1)</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if the key-value pair was successfully inserted; otherwise, <c>false</c>.
+            </returns>
+      <remarks>
+            This method inserts the specified key-value pair at the specified index within the node, unless
+            the node is already full and can't accommodate the insertion while maintaining its size constraints.
+            </remarks>
     </member>
     <member name="P:SnapDB.Snap.Tree.FixedSizeNode`2.MaxOverheadWithCombineNodes">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>P:SnapDB.Snap.Tree.FixedSizeNode`2.MaxOverheadWithCombineNodes</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets the maximum overhead (additional space used) when combining nodes.
+            </summary>
+      <remarks>
+            This property specifies the maximum additional space that can be used when nodes are combined during tree operations.
+            The value is typically 0, indicating that combining nodes doesn't introduce any additional overhead.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNode`2.Read(System.Int32,`0,`1)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.Read(System.Int32,`0,`1)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="index">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>index</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.Read(System.Int32,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.Read(System.Int32,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.Read(System.Int32,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
+            Reads the key-value pair at the specified index in the node.
+            </summary>
+      <param name="index">The index at which to read the key-value pair.</param>
+      <param name="key">The key to be read from the node.</param>
+      <param name="value">The value to be read from the node.</param>
+      <remarks>
+            This method reads both the key and value stored at the specified index within the node's storage.
+            It is typically used during tree operations to retrieve key-value pairs.
+            </remarks>
+      <exception cref="T:System.IndexOutOfRangeException">Thrown if the provided index is out of range.</exception>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNode`2.Read(System.Int32,`1)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.Read(System.Int32,`1)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="index">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>index</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.Read(System.Int32,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.Read(System.Int32,`1)</parameter>
-          </include>
-        </markup>
-      </param>
+            Reads the value at the specified index in the node.
+            </summary>
+      <param name="index">The index at which to read the value.</param>
+      <param name="value">The value to be read from the node.</param>
+      <remarks>
+            This method reads the value stored at the specified index within the node's storage.
+            It is typically used during tree operations to retrieve values associated with keys.
+            </remarks>
+      <exception cref="T:System.IndexOutOfRangeException">Thrown if the provided index is out of range.</exception>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNode`2.RemoveUnlessOverflow(System.Int32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.RemoveUnlessOverflow(System.Int32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="index">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>index</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.RemoveUnlessOverflow(System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Removes a key-value pair at the specified index unless it would cause an overflow.
+            </summary>
+      <param name="index">The index of the key-value pair to be removed.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.RemoveUnlessOverflow(System.Int32)</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if the key-value pair was successfully removed; otherwise, <c>false</c>.
+            </returns>
+      <remarks>
+            This method removes the key-value pair at the specified index unless removing it would result in an overflow,
+            in which case, it will not remove the pair. Overflow occurs when the node can't accommodate the removal
+            while maintaining its size constraints.
+            </remarks>
+      <exception cref="T:System.IndexOutOfRangeException">Thrown if the provided index is out of range.</exception>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNode`2.Split(System.UInt32,`0)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.Split(System.UInt32,`0)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="newNodeIndex">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>newNodeIndex</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.Split(System.UInt32,`0)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="dividingKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>dividingKey</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.Split(System.UInt32,`0)</parameter>
-          </include>
-        </markup>
-      </param>
+            Splits the node into two nodes and redistributes its key-value pairs.
+            </summary>
+      <param name="newNodeIndex">The index of the new node created during the split.</param>
+      <param name="dividingKey">The key that determines the split point.</param>
+      <remarks>
+            This method splits the current node into two nodes and redistributes its key-value pairs.
+            The splitting point is determined by the <paramref name="dividingKey" />. Half of the records
+            remain in the original node, and the other half is moved to the new node.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNode`2.TransferRecordsFromLeftToRight(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.TransferRecordsFromLeftToRight(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="left">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>left</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.TransferRecordsFromLeftToRight(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="right">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>right</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.TransferRecordsFromLeftToRight(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="bytesToTransfer">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>bytesToTransfer</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.TransferRecordsFromLeftToRight(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Transfers a specified number of key-value records from the left node to the right node during a redistribution operation.
+            </summary>
+      <param name="left">The left node from which records are transferred.</param>
+      <param name="right">The right node to which records are transferred.</param>
+      <param name="bytesToTransfer">The total number of bytes to transfer, including header bytes.</param>
+      <remarks>
+            This method is used during a redistribution operation between two nodes. It transfers a specified number of key-value
+            records, as well as updates record counts and valid bytes for both nodes. The records are moved from the left node
+            to the right node while preserving their order.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNode`2.TransferRecordsFromRightToLeft(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.TransferRecordsFromRightToLeft(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="left">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>left</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.TransferRecordsFromRightToLeft(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="right">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>right</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.TransferRecordsFromRightToLeft(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="bytesToTransfer">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>bytesToTransfer</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNode`2.TransferRecordsFromRightToLeft(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Transfers a specified number of key-value records from the right node to the left node during a redistribution operation.
+            </summary>
+      <param name="left">The left node to which records are transferred.</param>
+      <param name="right">The right node from which records are transferred.</param>
+      <param name="bytesToTransfer">The total number of bytes to transfer, including header bytes.</param>
+      <remarks>
+            This method is used during a redistribution operation between two nodes. It transfers a specified number of key-value
+            records, as well as updates record counts and valid bytes for both nodes. The records are moved from the right node
+            to the left node while preserving their order.
+            </remarks>
     </member>
     <member name="T:SnapDB.Snap.Tree.FixedSizeNodeScanner`2">
       <summary>
             The treescanner for a fixed size node.
             </summary>
-      <typeparam name="TKey">The type of keys in the tree.</typeparam>
-      <typeparam name="TValue">The type of values associated with keys in the tree.</typeparam>
+      <typeparam name="TKey">The type of keys in the node.</typeparam>
+      <typeparam name="TValue">The type of values associated with keys in the node.</typeparam>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.#ctor(System.Byte,System.Int32,SnapDB.IO.BinaryStreamPointerBase,System.Func{`0,System.Byte,System.UInt32})">
       <summary>
@@ -15198,104 +14944,43 @@
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.InternalPeek(`0,`1)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.InternalPeek(`0,`1)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.InternalPeek(`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.InternalPeek(`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
+            Peeks at the next key-value pair in the internal byte buffer without advancing the read pointer.
+            </summary>
+      <param name="key">The key to read the value into.</param>
+      <param name="value">The value to read from the buffer.</param>
+      <remarks>
+            This method reads the key and value of the next key-value pair in the internal byte buffer.
+            It deserializes the key and value without changing the state of the read pointer or index.
+            The method is used for inspecting the next key-value pair in the buffer without consuming it.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.InternalRead(`0,`1)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.InternalRead(`0,`1)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.InternalRead(`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.InternalRead(`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
+            Reads the next key-value pair from the internal byte buffer and advances the read pointer.
+            </summary>
+      <param name="key">The key to read the value into.</param>
+      <param name="value">The value to read from the buffer.</param>
+      <remarks>
+            This method reads the next key-value pair from the internal byte buffer.
+            It deserializes the key and value, advances the read pointer, and increments the index of the next key-value pair.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.InternalRead(`0,`1,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.InternalRead(`0,`1,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.InternalRead(`0,`1,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.InternalRead(`0,`1,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="filter">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>filter</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.InternalRead(`0,`1,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
+            Reads and filters key-value pairs from the internal byte buffer, advancing the read pointer.
+            </summary>
+      <param name="key">The key to read the value into.</param>
+      <param name="value">The value to read from the buffer.</param>
+      <param name="filter">Optional filter to determine if the key-value pair is accepted.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.InternalRead(`0,`1,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if a matching key-value pair is found; otherwise, <c>false</c>.
+            </returns>
+      <remarks>
+            This method reads key-value pairs from the internal byte buffer.
+            It deserializes the key and value, advances the read pointer, and increments the index of the next key-value pair.
+            If a <paramref name="filter" /> is provided, it is used to determine if the key-value pair should be accepted.
+            If a matching pair is found, the method returns <c>true</c>; otherwise, it continues reading until a match is found or the end of the buffer is reached, returning <c>false</c>.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.InternalReadWhile(`0,`1,`0)">
       <summary>
@@ -15390,35 +15075,20 @@
       <summary>
             A TreeNode abstract class that is used for linearly encoding a class.
             </summary>
-      <typeparam name="TKey"></typeparam>
-      <typeparam name="TValue"></typeparam>
+      <typeparam name="TKey">The type of keys stored in the nodes.</typeparam>
+      <typeparam name="TValue">The type of values stored in the nodes.</typeparam>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.#ctor(SnapDB.Snap.Encoding.PairEncodingBase{`0,`1},System.Byte)">
       <summary>
-        <markup>
-          <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Snap.Tree.GenericEncodedNode`2</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="encoding">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>encoding</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.#ctor(SnapDB.Snap.Encoding.PairEncodingBase{`0,`1},System.Byte)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="level">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>level</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.#ctor(SnapDB.Snap.Encoding.PairEncodingBase{`0,`1},System.Byte)</parameter>
-          </include>
-        </markup>
-      </param>
+            Initializes a new instance of the <see cref="T:SnapDB.Snap.Tree.GenericEncodedNode`2" /> class.
+            </summary>
+      <param name="encoding">The encoding method used for key-value pairs in the node.</param>
+      <param name="level">The level of the node within the tree structure.</param>
+      <remarks>
+            This constructor creates a new node with the specified level and initializes key and value instances for use in the node.
+            It associates the provided encoding method with the node and sets up event handlers for node index changes and cache clearing.
+            The level should typically be 0, as this type of node is typically used at the leaf level of the tree.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.AppendSequentialStream(SnapDB.Snap.Tree.InsertStreamHelper{`0,`1},System.Boolean@)">
       <summary>
@@ -15431,211 +15101,77 @@
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.Clone(System.Byte)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.Clone(System.Byte)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="level">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>level</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.Clone(System.Byte)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.Clone(System.Byte)</parameter>
-          </include>
-        </markup>
-      </returns>
+            Creates a new instance of <see cref="T:SnapDB.Snap.Tree.GenericEncodedNode`2" /> as a clone of the current node.
+            </summary>
+      <param name="level">The level of the new node within the tree structure.</param>
+      <returns>A new node instance cloned from the current node with the specified level.</returns>
+      <remarks>
+            This method is used to create a clone of the current node, replicating its contents and configuration.
+            The clone has the same encoding method as the original node, and the specified level within the tree structure.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.CreateTreeScanner">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.CreateTreeScanner</parameter>
-          </include>
-        </markup>
-      </summary>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.CreateTreeScanner</parameter>
-          </include>
-        </markup>
-      </returns>
+            Creates a tree scanner specific to <see cref="T:SnapDB.Snap.Tree.GenericEncodedNode`2" /> nodes.
+            </summary>
+      <returns>A new instance of a tree scanner designed to work with nodes of the current type.</returns>
+      <remarks>
+            This method is used to create a tree scanner specifically tailored to work with nodes of the <see cref="T:SnapDB.Snap.Tree.GenericEncodedNode`2" /> type.
+            The scanner is configured with the current node's encoding method, level, block size, associated stream, and sparse index retrieval function.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.DecodeRecord(System.Byte*,`0,`1,`0,`1)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.DecodeRecord(System.Byte*,`0,`1,`0,`1)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.DecodeRecord(System.Byte*,`0,`1,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="prevKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>prevKey</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.DecodeRecord(System.Byte*,`0,`1,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="prevValue">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>prevValue</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.DecodeRecord(System.Byte*,`0,`1,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="currentKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>currentKey</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.DecodeRecord(System.Byte*,`0,`1,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="currentValue">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>currentValue</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.DecodeRecord(System.Byte*,`0,`1,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.DecodeRecord(System.Byte*,`0,`1,`0,`1)</parameter>
-          </include>
-        </markup>
-      </returns>
+            Decodes a key-value record from a binary stream.
+            </summary>
+      <param name="stream">A pointer to the binary stream containing the encoded record.</param>
+      <param name="prevKey">The previous key in the sequence.</param>
+      <param name="prevValue">The previous value in the sequence.</param>
+      <param name="currentKey">The current key to be decoded.</param>
+      <param name="currentValue">The current value to be decoded.</param>
+      <returns>The number of bytes read from the binary stream as a result of the decoding.</returns>
+      <remarks>
+            This method decodes a key-value record from the specified binary stream using the configured decoding method.
+            It takes the previous key and value as well as the current key and value, which can be used for delta decoding.
+            The method returns the number of bytes read from the stream during decoding.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.EncodeRecord(System.Byte*,`0,`1,`0,`1)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.EncodeRecord(System.Byte*,`0,`1,`0,`1)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.EncodeRecord(System.Byte*,`0,`1,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="prevKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>prevKey</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.EncodeRecord(System.Byte*,`0,`1,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="prevValue">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>prevValue</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.EncodeRecord(System.Byte*,`0,`1,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="currentKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>currentKey</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.EncodeRecord(System.Byte*,`0,`1,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="currentValue">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>currentValue</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.EncodeRecord(System.Byte*,`0,`1,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.EncodeRecord(System.Byte*,`0,`1,`0,`1)</parameter>
-          </include>
-        </markup>
-      </returns>
+            Encodes a key-value record into a binary stream.
+            </summary>
+      <param name="stream">A pointer to the binary stream where the record will be encoded.</param>
+      <param name="prevKey">The previous key in the sequence.</param>
+      <param name="prevValue">The previous value in the sequence.</param>
+      <param name="currentKey">The current key to be encoded.</param>
+      <param name="currentValue">The current value to be encoded.</param>
+      <returns>The number of bytes written to the binary stream as a result of the encoding.</returns>
+      <remarks>
+            This method encodes a key-value record into the specified binary stream using the configured encoding method.
+            It takes the previous key and value as well as the current key and value, which can be used for delta encoding.
+            The method returns the number of bytes written to the stream during encoding.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.GetIndexOf(`0)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.GetIndexOf(`0)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.GetIndexOf(`0)</parameter>
-          </include>
-        </markup>
-      </param>
+            Searches for the index of a specific key within the node.
+            </summary>
+      <param name="key">The key to search for.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.GetIndexOf(`0)</parameter>
-          </include>
-        </markup>
-      </returns>
+            The index of the key if found within the node; otherwise, the bitwise complement of the index where the key should be inserted
+            (if not found, the insertion point to maintain sorted order).
+            </returns>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.InitializeType">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.InitializeType</parameter>
-          </include>
-        </markup>
-      </summary>
+            Initializes the node type, including buffer allocation and storage size calculation.
+            </summary>
+      <remarks>
+            This method initializes the node type by calculating the maximum storage size required for encoding a single
+            key-value pair, allocating two byte buffers for encoding and decoding operations, and verifying that the tree
+            has a sufficient number of records per node to ensure efficient operation. If the required records per node
+            condition is not met, an exception is thrown.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.InsertUnlessFull(System.Int32,`0,`1)">
       <summary>
@@ -15679,479 +15215,140 @@
     </member>
     <member name="P:SnapDB.Snap.Tree.GenericEncodedNode`2.MaximumStorageSize">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>P:SnapDB.Snap.Tree.GenericEncodedNode`2.MaximumStorageSize</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets the maximum storage size, in bytes, required for encoding a single key-value pair.
+            </summary>
+      <remarks>
+            This property returns the maximum storage size, in bytes, required to encode a single key-value pair
+            using the configured encoding method. It reflects the maximum amount of space that a single pair
+            can occupy in the data store, which can be useful for calculating storage requirements.
+            </remarks>
     </member>
     <member name="P:SnapDB.Snap.Tree.GenericEncodedNode`2.MaxOverheadWithCombineNodes">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>P:SnapDB.Snap.Tree.GenericEncodedNode`2.MaxOverheadWithCombineNodes</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets the maximum overhead expected when combining two nodes of this type.
+            </summary>
+      <remarks>
+            The maximum overhead includes the storage required for the data in both nodes, plus one additional byte.
+            This property is used in node combining operations to estimate the maximum storage needed for the resulting node.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.Read(System.Int32,`0,`1)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.Read(System.Int32,`0,`1)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="index">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>index</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.Read(System.Int32,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.Read(System.Int32,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.Read(System.Int32,`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
+            Reads the key and value at the specified index within the node.
+            </summary>
+      <param name="index">The index of the key and value to read.</param>
+      <param name="key">The key object where the read key will be copied.</param>
+      <param name="value">The value object where the read value will be copied.</param>
+      <exception cref="T:System.Exception">Thrown if the provided index is equal to the record count, indicating an invalid access.</exception>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.Read(System.Int32,`1)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.Read(System.Int32,`1)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="index">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>index</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.Read(System.Int32,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.Read(System.Int32,`1)</parameter>
-          </include>
-        </markup>
-      </param>
+            Reads the value at the specified index within the node.
+            </summary>
+      <param name="index">The index of the value to read.</param>
+      <param name="value">The value object where the read value will be copied.</param>
+      <exception cref="T:System.Exception">Thrown if the provided index is equal to the record count, indicating an invalid access.</exception>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.RemoveUnlessOverflow(System.Int32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.RemoveUnlessOverflow(System.Int32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="index">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>index</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.RemoveUnlessOverflow(System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Removes the key and value at the specified index within the node, unless doing so causes underflow (i.e., less than the minimum required records).
+            </summary>
+      <param name="index">The index of the key and value to remove.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.RemoveUnlessOverflow(System.Int32)</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if the removal was successful without causing underflow; otherwise, <c>false</c>.</returns>
+      <exception cref="T:System.NotImplementedException">Thrown if this method is not implemented in the derived class.</exception>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.Split(System.UInt32,`0)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.Split(System.UInt32,`0)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="newNodeIndex">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>newNodeIndex</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.Split(System.UInt32,`0)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="dividingKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>dividingKey</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.Split(System.UInt32,`0)</parameter>
-          </include>
-        </markup>
-      </param>
+            Splits the current node into two nodes to accommodate a new entry with the specified dividing key.
+            </summary>
+      <param name="newNodeIndex">The index of the new node created as a result of the split.</param>
+      <param name="dividingKey">The key that determines the split point between the two nodes.</param>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.TransferRecordsFromLeftToRight(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.TransferRecordsFromLeftToRight(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="left">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>left</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.TransferRecordsFromLeftToRight(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="right">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>right</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.TransferRecordsFromLeftToRight(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="bytesToTransfer">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>bytesToTransfer</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.TransferRecordsFromLeftToRight(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Transfers records from the left sibling node to the right sibling node during a node split operation.
+            </summary>
+      <param name="left">The left sibling node from which records are transferred.</param>
+      <param name="right">The right sibling node that receives the transferred records.</param>
+      <param name="bytesToTransfer">The total number of bytes to transfer from the left to the right sibling node.</param>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.TransferRecordsFromRightToLeft(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.TransferRecordsFromRightToLeft(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="left">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>left</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.TransferRecordsFromRightToLeft(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="right">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>right</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.TransferRecordsFromRightToLeft(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="bytesToTransfer">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>bytesToTransfer</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNode`2.TransferRecordsFromRightToLeft(SnapDB.Snap.Tree.Node{`0},SnapDB.Snap.Tree.Node{`0},System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Transfers records from the right sibling node to the left sibling node during a node merge operation.
+            </summary>
+      <param name="left">The left sibling node that receives the transferred records.</param>
+      <param name="right">The right sibling node from which records are transferred.</param>
+      <param name="bytesToTransfer">The total number of bytes to transfer from the right to the left sibling node.</param>
     </member>
     <member name="T:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2">
       <summary>
             Base class for reading from a node that is encoded and must be read sequentially through the node.
             </summary>
-      <typeparam name="TKey">The type of keys stored in the sorted tree.</typeparam>
-      <typeparam name="TValue">The type of values associated with the keys in the sorted tree.</typeparam>
+      <typeparam name="TKey">The type of keys stored in the nodes.</typeparam>
+      <typeparam name="TValue">The type of values stored in the nodes.</typeparam>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.#ctor(SnapDB.Snap.Encoding.PairEncodingBase{`0,`1},System.Byte,System.Int32,SnapDB.IO.BinaryStreamPointerBase,System.Func{`0,System.Byte,System.UInt32})">
       <summary>
-            Creates a new class
+            Initializes a new instance of the <see cref="T:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2" /> class with the specified encoding, node level, block size, binary stream, and key lookup function.
             </summary>
-      <param name="level">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>level</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.#ctor(SnapDB.Snap.Encoding.PairEncodingBase{`0,`1},System.Byte,System.Int32,SnapDB.IO.BinaryStreamPointerBase,System.Func{`0,System.Byte,System.UInt32})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="blockSize">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>blockSize</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.#ctor(SnapDB.Snap.Encoding.PairEncodingBase{`0,`1},System.Byte,System.Int32,SnapDB.IO.BinaryStreamPointerBase,System.Func{`0,System.Byte,System.UInt32})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.#ctor(SnapDB.Snap.Encoding.PairEncodingBase{`0,`1},System.Byte,System.Int32,SnapDB.IO.BinaryStreamPointerBase,System.Func{`0,System.Byte,System.UInt32})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="lookupKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>lookupKey</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.#ctor(SnapDB.Snap.Encoding.PairEncodingBase{`0,`1},System.Byte,System.Int32,SnapDB.IO.BinaryStreamPointerBase,System.Func{`0,System.Byte,System.UInt32})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="encoding">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>encoding</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.#ctor(SnapDB.Snap.Encoding.PairEncodingBase{`0,`1},System.Byte,System.Int32,SnapDB.IO.BinaryStreamPointerBase,System.Func{`0,System.Byte,System.UInt32})</parameter>
-          </include>
-        </markup>
-      </param>
+      <param name="encoding">The encoding method used for key and value pairs.</param>
+      <param name="level">The level of the node (0 for leaf nodes).</param>
+      <param name="blockSize">The size of a block or node in bytes.</param>
+      <param name="stream">The binary stream from which to read data.</param>
+      <param name="lookupKey">A function for looking up keys based on an input key and direction.</param>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.FindKey(`0)">
       <summary>
-            Using <see cref="P:SnapDB.Snap.Tree.SortedTreeScannerBase`2.Pointer" /> advance to the search location of the provided <see cref="!:key" /></summary>
-      <param name="key">the key to advance to</param>
+            Finds the specified key within the node and positions the scanner at the first key-value pair that matches or is greater than the specified key.
+            </summary>
+      <param name="key">The key to find within the node.</param>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalPeek(`0,`1)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalPeek(`0,`1)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalPeek(`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalPeek(`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
+            Reads and decodes the next key-value pair at the current position for peeking without advancing the position.
+            </summary>
+      <param name="key">The key to be populated with the peeked key data.</param>
+      <param name="value">The value to be populated with the peeked value data.</param>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalRead(`0,`1)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalRead(`0,`1)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalRead(`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalRead(`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
+            Reads and decodes the next key-value pair at the current position and advances the position.
+            </summary>
+      <param name="key">The key to be populated with the read key data.</param>
+      <param name="value">The value to be populated with the read value data.</param>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalRead(`0,`1,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalRead(`0,`1,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalRead(`0,`1,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalRead(`0,`1,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="filter">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>filter</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalRead(`0,`1,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
+            Reads and decodes the next key-value pair at the current position, advances the position, and checks if it matches the specified filter.
+            </summary>
+      <param name="key">The key to be populated with the read key data.</param>
+      <param name="value">The value to be populated with the read value data.</param>
+      <param name="filter">An optional filter to check if the key-value pair matches certain criteria.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalRead(`0,`1,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if the key-value pair matches the filter; otherwise, <c>false</c>.</returns>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalReadWhile(`0,`1,`0)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalReadWhile(`0,`1,`0)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalReadWhile(`0,`1,`0)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalReadWhile(`0,`1,`0)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="upperBounds">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>upperBounds</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalReadWhile(`0,`1,`0)</parameter>
-          </include>
-        </markup>
-      </param>
+            Reads and decodes the next key-value pair at the current position, advances the position,
+            and continues reading as long as the key is less than the specified upper bounds.
+            </summary>
+      <param name="key">The key to be populated with the read key data.</param>
+      <param name="value">The value to be populated with the read value data.</param>
+      <param name="upperBounds">The upper bounds for keys, reading continues as long as the key is less than this value.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalReadWhile(`0,`1,`0)</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if the key-value pair matches the condition; otherwise, <c>false</c>.</returns>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalReadWhile(`0,`1,`0,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalReadWhile(`0,`1,`0,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalReadWhile(`0,`1,`0,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalReadWhile(`0,`1,`0,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="upperBounds">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>upperBounds</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalReadWhile(`0,`1,`0,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="filter">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>filter</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalReadWhile(`0,`1,`0,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.InternalReadWhile(`0,`1,`0,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})</parameter>
-          </include>
-        </markup>
-      </returns>
+            Reads and decodes the next key-value pair at the current position, advances the position,
+            and continues reading as long as the key is less than the specified upper bounds and matches the filter condition.
+            </summary>
+      <param name="key">The key to be populated with the read key data.</param>
+      <param name="value">The value to be populated with the read value data.</param>
+      <param name="upperBounds">The upper bounds for keys, reading continues as long as the key is less than this value.</param>
+      <param name="filter">An optional filter to apply to the read key-value pairs.</param>
+      <returns>True if the key-value pair matches the condition; otherwise, false.</returns>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.OnNoadReload">
       <summary>
@@ -18677,13 +17874,8 @@
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.BlockSize">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.BlockSize</parameter>
-          </include>
-        </markup>
-      </summary>
+            The size, in bytes, of the node block.
+            </summary>
     </member>
     <member name="P:SnapDB.Snap.Tree.Specialized.NodeHeader`1.HeaderSize">
       <summary>
@@ -18692,330 +17884,136 @@
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.IndexSize">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.IndexSize</parameter>
-          </include>
-        </markup>
-      </summary>
+            The size, in bytes, of an index field.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.KeySize">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.KeySize</parameter>
-          </include>
-        </markup>
-      </summary>
+            The size, in bytes, of a key.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.LeftSiblingNodeIndex">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.LeftSiblingNodeIndex</parameter>
-          </include>
-        </markup>
-      </summary>
+            The index of the left sibling node.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.Level">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.Level</parameter>
-          </include>
-        </markup>
-      </summary>
+            The level of the node within the B-tree structure.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.LowerKey">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.LowerKey</parameter>
-          </include>
-        </markup>
-      </summary>
+            The lower key associated with the node.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.NodeIndex">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.NodeIndex</parameter>
-          </include>
-        </markup>
-      </summary>
+            The index of the node.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.OffsetOfLeftSibling">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.OffsetOfLeftSibling</parameter>
-          </include>
-        </markup>
-      </summary>
+            The offset of the left sibling node index field within the node header.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.OffsetOfLowerBounds">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.OffsetOfLowerBounds</parameter>
-          </include>
-        </markup>
-      </summary>
+            The offset of the lower bounds field within the node header.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.OffsetOfNodeLevel">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.OffsetOfNodeLevel</parameter>
-          </include>
-        </markup>
-      </summary>
+            The offset of the node level field within the node header.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.OffsetOfRecordCount">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.OffsetOfRecordCount</parameter>
-          </include>
-        </markup>
-      </summary>
+            The offset of the record count field within the node header.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.OffsetOfRightSibling">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.OffsetOfRightSibling</parameter>
-          </include>
-        </markup>
-      </summary>
+            The offset of the right sibling node index field within the node header.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.OffsetOfValidBytes">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.OffsetOfValidBytes</parameter>
-          </include>
-        </markup>
-      </summary>
+            The offset of the valid bytes field within the node header.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.OffsetOfVersion">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.OffsetOfVersion</parameter>
-          </include>
-        </markup>
-      </summary>
+            The offset of the version field within the node header.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.RecordCount">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.RecordCount</parameter>
-          </include>
-        </markup>
-      </summary>
+            The number of records within the node.
+            </summary>
     </member>
     <member name="P:SnapDB.Snap.Tree.Specialized.NodeHeader`1.RemainingBytes">
       <summary>
-            Gets/Sets the number of unused bytes in the node.
+            Initializes a new instance of the <see cref="T:SnapDB.Snap.Tree.Specialized.NodeHeader`1" /> class.
             </summary>
+      <param name="level">The level of the node within the B-tree structure.</param>
+      <param name="blockSize">The size, in bytes, of the node block.</param>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.RightSiblingNodeIndex">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.RightSiblingNodeIndex</parameter>
-          </include>
-        </markup>
-      </summary>
+            The index of the right sibling node.
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Tree.Specialized.NodeHeader`1.Save(System.Byte*)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.Specialized.NodeHeader`1.Save(System.Byte*)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="ptr">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>ptr</parameter>
-            <parameter>M:SnapDB.Snap.Tree.Specialized.NodeHeader`1.Save(System.Byte*)</parameter>
-          </include>
-        </markup>
-      </param>
+            Saves the node header data to a memory location pointed to by a byte pointer.
+            </summary>
+      <param name="ptr">A pointer to the memory location where the node header data should be saved.</param>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.UpperKey">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.UpperKey</parameter>
-          </include>
-        </markup>
-      </summary>
+            The upper key associated with the node.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.ValidBytes">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.ValidBytes</parameter>
-          </include>
-        </markup>
-      </summary>
+            The number of valid bytes within the node.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.Version">
       <summary>
-            Header data
+            The version of the node header.
             </summary>
     </member>
     <member name="T:SnapDB.Snap.Tree.Specialized.NodeWriter`2">
       <summary>
-            A class to write data to a node in sequential order only.
+            Provides methods for writing sequential-order nodes in a tree structure.
             </summary>
-      <typeparam name="TKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>typeparam</parameter>
-            <parameter>TKey</parameter>
-            <parameter>T:SnapDB.Snap.Tree.Specialized.NodeWriter`2</parameter>
-          </include>
-        </markup>
-      </typeparam>
-      <typeparam name="TValue">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>typeparam</parameter>
-            <parameter>TValue</parameter>
-            <parameter>T:SnapDB.Snap.Tree.Specialized.NodeWriter`2</parameter>
-          </include>
-        </markup>
-      </typeparam>
+      <typeparam name="TKey">The type of keys stored in the nodes.</typeparam>
+      <typeparam name="TValue">The type of values stored in the nodes.</typeparam>
+      <remarks>
+            This class is designed for writing nodes in a tree structure, and it is typically used to create or modify tree nodes.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.Specialized.NodeWriter`2.Create(SnapDB.Snap.EncodingDefinition,SnapDB.IO.BinaryStreamPointerBase,System.Int32,System.Byte,System.UInt32,System.Func{System.UInt32},SnapDB.Snap.Tree.Specialized.SparseIndexWriter{`0},SnapDB.Snap.TreeStream{`0,`1})">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.Specialized.NodeWriter`2.Create(SnapDB.Snap.EncodingDefinition,SnapDB.IO.BinaryStreamPointerBase,System.Int32,System.Byte,System.UInt32,System.Func{System.UInt32},SnapDB.Snap.Tree.Specialized.SparseIndexWriter{`0},SnapDB.Snap.TreeStream{`0,`1})</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="encodingMethod">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>encodingMethod</parameter>
-            <parameter>M:SnapDB.Snap.Tree.Specialized.NodeWriter`2.Create(SnapDB.Snap.EncodingDefinition,SnapDB.IO.BinaryStreamPointerBase,System.Int32,System.Byte,System.UInt32,System.Func{System.UInt32},SnapDB.Snap.Tree.Specialized.SparseIndexWriter{`0},SnapDB.Snap.TreeStream{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Tree.Specialized.NodeWriter`2.Create(SnapDB.Snap.EncodingDefinition,SnapDB.IO.BinaryStreamPointerBase,System.Int32,System.Byte,System.UInt32,System.Func{System.UInt32},SnapDB.Snap.Tree.Specialized.SparseIndexWriter{`0},SnapDB.Snap.TreeStream{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="blockSize">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>blockSize</parameter>
-            <parameter>M:SnapDB.Snap.Tree.Specialized.NodeWriter`2.Create(SnapDB.Snap.EncodingDefinition,SnapDB.IO.BinaryStreamPointerBase,System.Int32,System.Byte,System.UInt32,System.Func{System.UInt32},SnapDB.Snap.Tree.Specialized.SparseIndexWriter{`0},SnapDB.Snap.TreeStream{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="level">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>level</parameter>
-            <parameter>M:SnapDB.Snap.Tree.Specialized.NodeWriter`2.Create(SnapDB.Snap.EncodingDefinition,SnapDB.IO.BinaryStreamPointerBase,System.Int32,System.Byte,System.UInt32,System.Func{System.UInt32},SnapDB.Snap.Tree.Specialized.SparseIndexWriter{`0},SnapDB.Snap.TreeStream{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="startingNodeIndex">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>startingNodeIndex</parameter>
-            <parameter>M:SnapDB.Snap.Tree.Specialized.NodeWriter`2.Create(SnapDB.Snap.EncodingDefinition,SnapDB.IO.BinaryStreamPointerBase,System.Int32,System.Byte,System.UInt32,System.Func{System.UInt32},SnapDB.Snap.Tree.Specialized.SparseIndexWriter{`0},SnapDB.Snap.TreeStream{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="getNextNewNodeIndex">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>getNextNewNodeIndex</parameter>
-            <parameter>M:SnapDB.Snap.Tree.Specialized.NodeWriter`2.Create(SnapDB.Snap.EncodingDefinition,SnapDB.IO.BinaryStreamPointerBase,System.Int32,System.Byte,System.UInt32,System.Func{System.UInt32},SnapDB.Snap.Tree.Specialized.SparseIndexWriter{`0},SnapDB.Snap.TreeStream{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="sparseIndex">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>sparseIndex</parameter>
-            <parameter>M:SnapDB.Snap.Tree.Specialized.NodeWriter`2.Create(SnapDB.Snap.EncodingDefinition,SnapDB.IO.BinaryStreamPointerBase,System.Int32,System.Byte,System.UInt32,System.Func{System.UInt32},SnapDB.Snap.Tree.Specialized.SparseIndexWriter{`0},SnapDB.Snap.TreeStream{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="treeStream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>treeStream</parameter>
-            <parameter>M:SnapDB.Snap.Tree.Specialized.NodeWriter`2.Create(SnapDB.Snap.EncodingDefinition,SnapDB.IO.BinaryStreamPointerBase,System.Int32,System.Byte,System.UInt32,System.Func{System.UInt32},SnapDB.Snap.Tree.Specialized.SparseIndexWriter{`0},SnapDB.Snap.TreeStream{`0,`1})</parameter>
-          </include>
-        </markup>
-      </param>
+            Creates a new node with the specified parameters and initializes its header and encoding.
+            </summary>
+      <param name="encodingMethod">The encoding method to be used for the node.</param>
+      <param name="stream">The binary stream where the node will be created.</param>
+      <param name="blockSize">The size of the node's data block.</param>
+      <param name="level">The level of the node in the tree.</param>
+      <param name="startingNodeIndex">The index of the starting node.</param>
+      <param name="getNextNewNodeIndex">A function to get the next new node index.</param>
+      <param name="sparseIndex">The sparse index writer for the tree.</param>
+      <param name="treeStream">The tree stream.</param>
     </member>
     <member name="T:SnapDB.Snap.Tree.Specialized.SequentialSortedTreeWriter`2">
       <summary>
             A specialized serialization method for writing data to a disk in the SortedTreeStore method.
             </summary>
-      <typeparam name="TKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>typeparam</parameter>
-            <parameter>TKey</parameter>
-            <parameter>T:SnapDB.Snap.Tree.Specialized.SequentialSortedTreeWriter`2</parameter>
-          </include>
-        </markup>
-      </typeparam>
-      <typeparam name="TValue">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>typeparam</parameter>
-            <parameter>TValue</parameter>
-            <parameter>T:SnapDB.Snap.Tree.Specialized.SequentialSortedTreeWriter`2</parameter>
-          </include>
-        </markup>
-      </typeparam>
+      <typeparam name="TKey">The type of keys stored in the tree.</typeparam>
+      <typeparam name="TValue">The type of values stored in the tree.</typeparam>
     </member>
     <member name="M:SnapDB.Snap.Tree.Specialized.SequentialSortedTreeWriter`2.Create(SnapDB.IO.BinaryStreamPointerBase,System.Int32,SnapDB.Snap.EncodingDefinition,SnapDB.Snap.TreeStream{`0,`1})">
       <summary>
@@ -19094,23 +18092,21 @@
     </member>
     <member name="P:SnapDB.Snap.Tree.Specialized.SparseIndexWriter`1.IsAlwaysSequential">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>P:SnapDB.Snap.Tree.Specialized.SparseIndexWriter`1.IsAlwaysSequential</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets a value indicating whether the data source is always sequential.
+            </summary>
+      <remarks>
+            When this property is <c>true</c>, it means that the data source maintains a sequential order for its elements.
+            In other words, the elements are stored and retrieved in a fixed order that does not change.
+            </remarks>
     </member>
     <member name="P:SnapDB.Snap.Tree.Specialized.SparseIndexWriter`1.NeverContainsDuplicates">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>P:SnapDB.Snap.Tree.Specialized.SparseIndexWriter`1.NeverContainsDuplicates</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets a value indicating whether the data source never contains duplicate elements.
+            </summary>
+      <remarks>
+            When this property is <c>true</c>, it means that the data source does not allow duplicate elements.
+            Each key in the data source is unique, and attempts to add duplicate keys may be ignored or overwritten.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.Specialized.SparseIndexWriter`1.SwitchToReading">
       <summary>
@@ -20251,7 +19247,7 @@
             Gets or sets a value indicating whether the timer is enabled.
             </summary>
       <remarks>
-            When setting to true, it starts the timer; when setting to false, it stops the timer.
+            When setting to <c>true</c>, it starts the timer; when setting to <c>false</c>, it stops the timer.
             </remarks>
     </member>
     <member name="M:SnapDB.Threading.EventTimer.Start">
@@ -20439,7 +19435,7 @@
             while object can be removed from the list. Once an object has been
             removed, is garenteed not to be called again by a seperate thread. 
             </summary>
-      <typeparam name="T"></typeparam>
+      <typeparam name="T">The type of elements in the list.</typeparam>
     </member>
     <member name="M:SnapDB.Threading.ThreadSafeList`1.#ctor">
       <summary>
@@ -20456,15 +19452,7 @@
       <summary>
             Calls a foreach iterator on the supplied action.
             </summary>
-      <param name="action">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>action</parameter>
-            <parameter>M:SnapDB.Threading.ThreadSafeList`1.ForEach(System.Action{`0})</parameter>
-          </include>
-        </markup>
-      </param>
+      <param name="action">The action to perform on each element of the list.</param>
     </member>
     <member name="M:SnapDB.Threading.ThreadSafeList`1.GetEnumerator">
       <summary>
@@ -20479,15 +19467,7 @@
       <summary>
             Removes an item from the list. 
             </summary>
-      <param name="item">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>item</parameter>
-            <parameter>M:SnapDB.Threading.ThreadSafeList`1.Remove(`0)</parameter>
-          </include>
-        </markup>
-      </param>
+      <param name="item">The item to remove from the list.</param>
       <returns>
         <markup>
           <include item="SMCMissingTag">
@@ -20505,47 +19485,20 @@
             DO NOT call this function from within a ForEach loop as it will block indefinately
             since the for each loop reads all items.
             </summary>
-      <param name="item">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>item</parameter>
-            <parameter>M:SnapDB.Threading.ThreadSafeList`1.RemoveAndWait(`0)</parameter>
-          </include>
-        </markup>
-      </param>
+      <param name="item">The item to remove from the list.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Threading.ThreadSafeList`1.RemoveAndWait(`0)</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if the item was successfully removed; otherwise, <c>false</c>.</returns>
     </member>
     <member name="M:SnapDB.Threading.ThreadSafeList`1.RemoveIf(System.Func{`0,System.Boolean})">
       <summary>
             Removes the specified item if the lambda expression is true.
             </summary>
-      <param name="condition">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>condition</parameter>
-            <parameter>M:SnapDB.Threading.ThreadSafeList`1.RemoveIf(System.Func{`0,System.Boolean})</parameter>
-          </include>
-        </markup>
-      </param>
+      <param name="condition">A condition delegate used to determine which items to remove.</param>
     </member>
     <member name="T:SnapDB.Threading.TimeoutOperation">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Threading.TimeoutOperation</parameter>
-          </include>
-        </markup>
-      </summary>
+            Represents an operation with a timeout that can execute a callback.
+            </summary>
     </member>
     <member name="M:SnapDB.Threading.TimeoutOperation.#ctor">
       <summary>

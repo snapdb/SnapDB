@@ -33,29 +33,99 @@ namespace SnapDB.Snap.Tree.Specialized;
 public unsafe class NodeHeader<TKey>
     where TKey : SnapTypeBase<TKey>, new()
 {
+    /// <summary>
+    /// The offset of the version field within the node header.
+    /// </summary>
     protected const int OffsetOfVersion = 0;
+
+    /// <summary>
+    /// The offset of the node level field within the node header.
+    /// </summary>
     protected const int OffsetOfNodeLevel = OffsetOfVersion + 1;
+
+    /// <summary>
+    /// The offset of the record count field within the node header.
+    /// </summary>
     protected const int OffsetOfRecordCount = OffsetOfNodeLevel + sizeof(byte);
+
+    /// <summary>
+    /// The offset of the valid bytes field within the node header.
+    /// </summary>
     protected const int OffsetOfValidBytes = OffsetOfRecordCount + sizeof(ushort);
+
+    /// <summary>
+    /// The offset of the left sibling node index field within the node header.
+    /// </summary>
     protected const int OffsetOfLeftSibling = OffsetOfValidBytes + sizeof(ushort);
+
+    /// <summary>
+    /// The offset of the right sibling node index field within the node header.
+    /// </summary>
     protected const int OffsetOfRightSibling = OffsetOfLeftSibling + IndexSize;
+
+    /// <summary>
+    /// The offset of the lower bounds field within the node header.
+    /// </summary>
     protected const int OffsetOfLowerBounds = OffsetOfRightSibling + IndexSize;
+
+    /// <summary>
+    /// The size, in bytes, of an index field.
+    /// </summary>
     protected const int IndexSize = sizeof(uint);
 
     /// <summary>
-    /// Header data
+    /// The version of the node header.
     /// </summary>
     public const byte Version = 0;
+
+    /// <summary>
+    /// The level of the node within the B-tree structure.
+    /// </summary>
     public readonly byte Level;
+
+    /// <summary>
+    /// The number of records within the node.
+    /// </summary>
     public ushort RecordCount;
+
+    /// <summary>
+    /// The number of valid bytes within the node.
+    /// </summary>
     public ushort ValidBytes;
+
+    /// <summary>
+    /// The index of the left sibling node.
+    /// </summary>
     public uint LeftSiblingNodeIndex;
+
+    /// <summary>
+    /// The index of the right sibling node.
+    /// </summary>
     public uint RightSiblingNodeIndex;
+
+    /// <summary>
+    /// The lower key associated with the node.
+    /// </summary>
     public TKey LowerKey;
+
+    /// <summary>
+    /// The upper key associated with the node.
+    /// </summary>
     public TKey UpperKey;
 
+    /// <summary>
+    /// The size, in bytes, of a key.
+    /// </summary>
     public int KeySize;
+
+    /// <summary>
+    /// The index of the node.
+    /// </summary>
     public uint NodeIndex;
+
+    /// <summary>
+    /// The size, in bytes, of the node block.
+    /// </summary>
     public int BlockSize;
 
     /// <summary>
@@ -73,7 +143,7 @@ public unsafe class NodeHeader<TKey>
     }
 
     /// <summary>
-    /// Gets the byte offset of the upper bounds key
+    /// Gets the byte offset of the upper bounds key.
     /// </summary>
     private int OffsetOfUpperBounds => OffsetOfLowerBounds + KeySize;
 
@@ -83,10 +153,16 @@ public unsafe class NodeHeader<TKey>
     public int HeaderSize => OffsetOfLowerBounds + KeySize * 2;
 
     /// <summary>
-    /// Gets/Sets the number of unused bytes in the node.
+    /// Initializes a new instance of the <see cref="NodeHeader{TKey}"/> class.
     /// </summary>
+    /// <param name="level">The level of the node within the B-tree structure.</param>
+    /// <param name="blockSize">The size, in bytes, of the node block.</param>
     public ushort RemainingBytes => (ushort)(BlockSize - ValidBytes);
 
+    /// <summary>
+    /// Saves the node header data to a memory location pointed to by a byte pointer.
+    /// </summary>
+    /// <param name="ptr">A pointer to the memory location where the node header data should be saved.</param>
     public void Save(byte* ptr)
     {
         ptr[0] = Version;

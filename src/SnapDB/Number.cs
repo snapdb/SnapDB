@@ -5,6 +5,9 @@ namespace SnapDB;
 //Got code ideas from http://code.google.com/p/stringencoders/
 //specifically from: http://code.google.com/p/stringencoders/source/browse/trunk/src/modp_numtoa.c
 
+/// <summary>
+/// Provides utility methods for working with numbers.
+/// </summary>
 public static class Number
 {
     private static readonly double[] s_powersOf10d = new double[] { 1f, 10f, 100f, 1000f, 10000f, 100000f, 1000000f, 10000000f, 100000000f, 1000000000f, 10000000000f, 100000000000f };
@@ -74,14 +77,12 @@ public static class Number
             return T.Length;
         }
 
-
         if (value < 0)
         {
             str[pos] = '-';
             value = -value;
             pos++;
         }
-
 
         int r = value >= 999999.5f ? 7 : value >= 99999.95f ? 6 : value >= 9999.995f ? 5 :
             value >= 999.9995f ? 4 : value >= 99.99995f ? 3 : value >= 9.999995f ? 2 :

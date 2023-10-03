@@ -174,6 +174,10 @@ public class AdvancedServerDatabaseConfig<TKey, TValue>
 
     #region [ IToServerDatabaseSettings ]
 
+    /// <summary>
+    /// Converts the current instance of the database settings to a <see cref="ServerDatabaseSettings"/> object.
+    /// </summary>
+    /// <returns>A <see cref="ServerDatabaseSettings"/> object representing the database settings.</returns>
     public ServerDatabaseSettings ToServerDatabaseSettings()
     {
         ServerDatabaseSettings settings = new()

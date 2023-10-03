@@ -44,8 +44,8 @@ public class EventTimer
     public event Action Elapsed;
 
     private ScheduledTask m_timer;
-    private TimeSpan m_period;
-    private TimeSpan m_dayOffset;
+    private readonly TimeSpan m_period;
+    private readonly TimeSpan m_dayOffset;
     private readonly object m_syncRoot;
     private bool m_isRunning;
     private bool m_stopping;
@@ -73,14 +73,13 @@ public class EventTimer
     /// <summary>
     /// This timer will reliably fire the directory polling every interval.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
     private void m_timer_Running(object sender, EventArgs<ScheduledTaskRunningReason> e)
     {
         //This cannot be combined with m_directoryPolling because 
         //Scheduled task does not support managing multiple conflicting timers.
         if (e.Argument == ScheduledTaskRunningReason.Disposing)
             return;
+
         if (m_stopping)
             return;
 
@@ -109,7 +108,7 @@ public class EventTimer
     /// Gets or sets a value indicating whether the timer is enabled.
     /// </summary>
     /// <remarks>
-    /// When setting to true, it starts the timer; when setting to false, it stops the timer.
+    /// When setting to <c>true</c>, it starts the timer; when setting to <c>false</c>, it stops the timer.
     /// </remarks>
     public bool Enabled
     {
@@ -118,6 +117,7 @@ public class EventTimer
         {
             if (value)
                 Start();
+
             else
                 Stop();
         }
@@ -149,6 +149,7 @@ public class EventTimer
         long subtractOffset = current - m_dayOffset.Ticks;
         long remainderTicks = m_period.Ticks - subtractOffset % m_period.Ticks;
         int delay = (int)(remainderTicks / TimeSpan.TicksPerMillisecond) + 1;
+
         if (delay < 10)
             delay += (int)m_period.TotalMilliseconds;
 
@@ -176,6 +177,7 @@ public class EventTimer
             m_timer.Running += m_timer_Running;
             RestartTimer();
         }
+
         Log.Publish(MessageLevel.Info, "EventTimer Started");
     }
 
@@ -192,10 +194,12 @@ public class EventTimer
         {
             if (!m_isRunning)
                 return;
+
             if (m_stopping)
                 return;
             m_stopping = true;
         }
+
         m_timer.Dispose();
         lock (m_syncRoot)
         {

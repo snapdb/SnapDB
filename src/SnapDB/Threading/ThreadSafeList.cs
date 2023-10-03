@@ -32,7 +32,7 @@ namespace SnapDB.Threading;
 /// while object can be removed from the list. Once an object has been
 /// removed, is garenteed not to be called again by a seperate thread. 
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">The type of elements in the list.</typeparam>
 public partial class ThreadSafeList<T>
     : IEnumerable<T>
 {
@@ -84,7 +84,8 @@ public partial class ThreadSafeList<T>
     /// DO NOT call this function from within a ForEach loop as it will block indefinately
     /// since the for each loop reads all items.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="item">The item to remove from the list.</param>
+    /// <returns><c>true</c> if the item was successfully removed; otherwise, <c>false</c>.</returns>
     public bool RemoveAndWait(T item)
     {
         SpinWait wait = new();
@@ -116,7 +117,7 @@ public partial class ThreadSafeList<T>
     /// <summary>
     /// Removes an item from the list. 
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="item">The item to remove from the list.</param>
     public bool Remove(T item)
     {
         Wrapper itemToRemove = null;
@@ -143,7 +144,7 @@ public partial class ThreadSafeList<T>
     /// <summary>
     /// Removes the specified item if the lambda expression is true.
     /// </summary>
-    /// <param name="condition"></param>
+    /// <param name="condition">A condition delegate used to determine which items to remove.</param>
     public void RemoveIf(Func<T, bool> condition)
     {
         lock (m_syncRoot)
@@ -162,7 +163,7 @@ public partial class ThreadSafeList<T>
     /// <summary>
     /// Calls a foreach iterator on the supplied action.
     /// </summary>
-    /// <param name="action"></param>
+    /// <param name="action">The action to perform on each element of the list.</param>
     public void ForEach(Action<T> action)
     {
         foreach (T item in this)

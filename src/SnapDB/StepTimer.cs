@@ -65,6 +65,12 @@ public static class StepTimer
         s_allStopwatches = new SortedList<string, RunCount>();
     }
 
+    /// <summary>
+    /// Starts a named timer and optionally forces garbage collection before starting.
+    /// </summary>
+    /// <param name="name">The name of the timer.</param>
+    /// <param name="runGc">Indicates whether to force garbage collection before starting the timer.</param>
+    /// <returns>An object implementing the ITimer interface that represents the started timer.</returns>
     public static ITimer Start(string name, bool runGc = false)
     {
         if (!s_allStopwatches.ContainsKey(name))
@@ -81,6 +87,9 @@ public static class StepTimer
         return sw;
     }
 
+    /// <summary>
+    /// Resets all timers, clearing their recorded data.
+    /// </summary>
     public static void Reset()
     {
         s_allStopwatches.Clear();

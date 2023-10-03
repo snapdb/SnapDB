@@ -32,8 +32,8 @@ namespace SnapDB.Snap.Tree.Specialized;
 /// <summary>
 /// A specialized serialization method for writing data to a disk in the SortedTreeStore method.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TKey">The type of keys stored in the tree.</typeparam>
+/// <typeparam name="TValue">The type of values stored in the tree.</typeparam>
 public static class SequentialSortedTreeWriter<TKey, TValue>
     where TKey : SnapTypeBase<TKey>, new()
     where TValue : SnapTypeBase<TValue>, new()

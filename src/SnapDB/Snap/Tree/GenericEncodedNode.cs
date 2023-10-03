@@ -32,8 +32,8 @@ namespace SnapDB.Snap.Tree;
 /// <summary>
 /// A TreeNode abstract class that is used for linearly encoding a class.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TKey">The type of keys stored in the nodes.</typeparam>
+/// <typeparam name="TValue">The type of values stored in the nodes.</typeparam>
 public unsafe class GenericEncodedNode<TKey, TValue>
     : SortedTreeNodeBase<TKey, TValue>
     where TKey : SnapTypeBase<TKey>, new()
@@ -53,6 +53,16 @@ public unsafe class GenericEncodedNode<TKey, TValue>
     private byte[] m_buffer1;
     private byte[] m_buffer2;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GenericEncodedNode{TKey, TValue}"/> class.
+    /// </summary>
+    /// <param name="encoding">The encoding method used for key-value pairs in the node.</param>
+    /// <param name="level">The level of the node within the tree structure.</param>
+    /// <remarks>
+    /// This constructor creates a new node with the specified level and initializes key and value instances for use in the node.
+    /// It associates the provided encoding method with the node and sets up event handlers for node index changes and cache clearing.
+    /// The level should typically be 0, as this type of node is typically used at the leaf level of the tree.
+    /// </remarks>
     public GenericEncodedNode(PairEncodingBase<TKey, TValue> encoding, byte level)
         : base(level)
     {
@@ -74,56 +84,147 @@ public unsafe class GenericEncodedNode<TKey, TValue>
 
     }
 
+    /// <summary>
+    /// Creates a new instance of <see cref="GenericEncodedNode{TKey, TValue}"/> as a clone of the current node.
+    /// </summary>
+    /// <param name="level">The level of the new node within the tree structure.</param>
+    /// <returns>A new node instance cloned from the current node with the specified level.</returns>
+    /// <remarks>
+    /// This method is used to create a clone of the current node, replicating its contents and configuration.
+    /// The clone has the same encoding method as the original node, and the specified level within the tree structure.
+    /// </remarks>
     public override SortedTreeNodeBase<TKey, TValue> Clone(byte level)
     {
         return new GenericEncodedNode<TKey, TValue>(m_encoding.Clone(), level);
     }
 
+    /// <summary>
+    /// Creates a tree scanner specific to <see cref="GenericEncodedNode{TKey, TValue}"/> nodes.
+    /// </summary>
+    /// <returns>A new instance of a tree scanner designed to work with nodes of the current type.</returns>
+    /// <remarks>
+    /// This method is used to create a tree scanner specifically tailored to work with nodes of the <see cref="GenericEncodedNode{TKey, TValue}"/> type.
+    /// The scanner is configured with the current node's encoding method, level, block size, associated stream, and sparse index retrieval function.
+    /// </remarks>
     public override SortedTreeScannerBase<TKey, TValue> CreateTreeScanner()
     {
         return new GenericEncodedNodeScanner<TKey, TValue>(m_encoding, Level, BlockSize, Stream, SparseIndex.Get);
     }
 
+    /// <summary>
+    /// Gets the maximum overhead expected when combining two nodes of this type.
+    /// </summary>
+    /// <remarks>
+    /// The maximum overhead includes the storage required for the data in both nodes, plus one additional byte.
+    /// This property is used in node combining operations to estimate the maximum storage needed for the resulting node.
+    /// </remarks>
     protected override int MaxOverheadWithCombineNodes => MaximumStorageSize * 2 + 1;
 
+    /// <summary>
+    /// Encodes a key-value record into a binary stream.
+    /// </summary>
+    /// <param name="stream">A pointer to the binary stream where the record will be encoded.</param>
+    /// <param name="prevKey">The previous key in the sequence.</param>
+    /// <param name="prevValue">The previous value in the sequence.</param>
+    /// <param name="currentKey">The current key to be encoded.</param>
+    /// <param name="currentValue">The current value to be encoded.</param>
+    /// <returns>The number of bytes written to the binary stream as a result of the encoding.</returns>
+    /// <remarks>
+    /// This method encodes a key-value record into the specified binary stream using the configured encoding method.
+    /// It takes the previous key and value as well as the current key and value, which can be used for delta encoding.
+    /// The method returns the number of bytes written to the stream during encoding.
+    /// </remarks>
     protected int EncodeRecord(byte* stream, TKey prevKey, TValue prevValue, TKey currentKey, TValue currentValue)
     {
         return m_encoding.Encode(stream, prevKey, prevValue, currentKey, currentValue);
     }
 
+    /// <summary>
+    /// Decodes a key-value record from a binary stream.
+    /// </summary>
+    /// <param name="stream">A pointer to the binary stream containing the encoded record.</param>
+    /// <param name="prevKey">The previous key in the sequence.</param>
+    /// <param name="prevValue">The previous value in the sequence.</param>
+    /// <param name="currentKey">The current key to be decoded.</param>
+    /// <param name="currentValue">The current value to be decoded.</param>
+    /// <returns>The number of bytes read from the binary stream as a result of the decoding.</returns>
+    /// <remarks>
+    /// This method decodes a key-value record from the specified binary stream using the configured decoding method.
+    /// It takes the previous key and value as well as the current key and value, which can be used for delta decoding.
+    /// The method returns the number of bytes read from the stream during decoding.
+    /// </remarks>
     protected int DecodeRecord(byte* stream, TKey prevKey, TValue prevValue, TKey currentKey, TValue currentValue)
     {
         return m_encoding.Decode(stream, prevKey, prevValue, currentKey, currentValue, out _);
     }
 
+    /// <summary>
+    /// Gets the maximum storage size, in bytes, required for encoding a single key-value pair.
+    /// </summary>
+    /// <remarks>
+    /// This property returns the maximum storage size, in bytes, required to encode a single key-value pair
+    /// using the configured encoding method. It reflects the maximum amount of space that a single pair
+    /// can occupy in the data store, which can be useful for calculating storage requirements.
+    /// </remarks>
     protected int MaximumStorageSize => m_encoding.MaxCompressionSize;
 
+    /// <summary>
+    /// Initializes the node type, including buffer allocation and storage size calculation.
+    /// </summary>
+    /// <remarks>
+    /// This method initializes the node type by calculating the maximum storage size required for encoding a single
+    /// key-value pair, allocating two byte buffers for encoding and decoding operations, and verifying that the tree
+    /// has a sufficient number of records per node to ensure efficient operation. If the required records per node
+    /// condition is not met, an exception is thrown.
+    /// </remarks>
     protected override void InitializeType()
     {
         m_maximumStorageSize = MaximumStorageSize;
         m_buffer1 = new byte[MaximumStorageSize];
         m_buffer2 = new byte[MaximumStorageSize];
+
         if ((BlockSize - HeaderSize) / MaximumStorageSize < 4)
             throw new Exception("Tree must have at least 4 records per node. Increase the block size or decrease the size of the records.");
     }
 
+    /// <summary>
+    /// Reads the value at the specified index within the node.
+    /// </summary>
+    /// <param name="index">The index of the value to read.</param>
+    /// <param name="value">The value object where the read value will be copied.</param>
+    /// <exception cref="Exception">Thrown if the provided index is equal to the record count, indicating an invalid access.</exception>
     protected override void Read(int index, TValue value)
     {
         if (index == RecordCount)
             throw new Exception();
+
         SeekTo(index);
         m_currentValue.CopyTo(value);
     }
 
+    /// <summary>
+    /// Reads the key and value at the specified index within the node.
+    /// </summary>
+    /// <param name="index">The index of the key and value to read.</param>
+    /// <param name="key">The key object where the read key will be copied.</param>
+    /// <param name="value">The value object where the read value will be copied.</param>
+    /// <exception cref="Exception">Thrown if the provided index is equal to the record count, indicating an invalid access.</exception>
     protected override void Read(int index, TKey key, TValue value)
     {
         if (index == RecordCount)
             throw new Exception();
+
         SeekTo(index);
         m_currentKey.CopyTo(key);
         m_currentValue.CopyTo(value);
     }
 
+    /// <summary>
+    /// Removes the key and value at the specified index within the node, unless doing so causes underflow (i.e., less than the minimum required records).
+    /// </summary>
+    /// <param name="index">The index of the key and value to remove.</param>
+    /// <returns><c>true</c> if the removal was successful without causing underflow; otherwise, <c>false</c>.</returns>
+    /// <exception cref="NotImplementedException">Thrown if this method is not implemented in the derived class.</exception>
     protected override bool RemoveUnlessOverflow(int index)
     {
         throw new NotImplementedException();
@@ -339,22 +440,39 @@ public unsafe class GenericEncodedNode<TKey, TValue>
     //    return true;
     //}
 
+    /// <summary>
+    /// Searches for the index of a specific key within the node.
+    /// </summary>
+    /// <param name="key">The key to search for.</param>
+    /// <returns>
+    /// The index of the key if found within the node; otherwise, the bitwise complement of the index where the key should be inserted
+    /// (if not found, the insertion point to maintain sorted order).
+    /// </returns>
     protected override int GetIndexOf(TKey key)
     {
         fixed (byte* buffer = m_buffer1)
             SeekTo(key, buffer);
-        if (m_currentIndex == RecordCount) //Beyond the end of the list
+
+        if (m_currentIndex == RecordCount) // Beyond the end of the list
             return ~RecordCount;
+
         if (m_currentKey.IsEqualTo(key))
             return m_currentIndex;
+       
         return ~m_currentIndex;
     }
 
+    /// <summary>
+    /// Splits the current node into two nodes to accommodate a new entry with the specified dividing key.
+    /// </summary>
+    /// <param name="newNodeIndex">The index of the new node created as a result of the split.</param>
+    /// <param name="dividingKey">The key that determines the split point between the two nodes.</param>
     protected override void Split(uint newNodeIndex, TKey dividingKey)
     {
         fixed (byte* buffer = m_buffer1)
         {
             ClearNodeCache();
+
             while (m_currentOffset < BlockSize >> 1)
             {
                 Read();
@@ -362,32 +480,32 @@ public unsafe class GenericEncodedNode<TKey, TValue>
 
             int storageSize = EncodeRecord(buffer, m_nullKey, m_nullValue, m_currentKey, m_currentValue);
 
-            //Determine how many entries to shift on the split.
+            // Determine how many entries to shift on the split.
             int recordsInTheFirstNode = m_currentIndex; // divide by 2.
             int recordsInTheSecondNode = RecordCount - m_currentIndex;
             long sourceStartingAddress = NodePosition + m_nextOffset;
             long targetStartingAddress = newNodeIndex * BlockSize + HeaderSize + storageSize;
             int bytesToMove = ValidBytes - m_nextOffset;
 
-            //lookup the dividing key
+            // Lookup the dividing key
             m_currentKey.CopyTo(dividingKey);
 
-            //do the copy
+            // Do the copy
             Stream.Copy(sourceStartingAddress, targetStartingAddress, bytesToMove);
 
             Stream.Position = targetStartingAddress - storageSize;
             Stream.Write(buffer, storageSize);
 
-            //Create the header of the second node.
+            // Create the header of the second node.
             CreateNewNode(newNodeIndex, (ushort)recordsInTheSecondNode,
                           (ushort)(HeaderSize + bytesToMove + storageSize),
                           NodeIndex, RightSiblingNodeIndex, dividingKey, UpperKey);
 
-            //update the node that was the old right sibling
+            // Update the node that was the old right sibling
             if (RightSiblingNodeIndex != uint.MaxValue)
                 SetLeftSiblingProperty(RightSiblingNodeIndex, NodeIndex, newNodeIndex);
 
-            //update the original header
+            // Update the original header
             RecordCount = (ushort)recordsInTheFirstNode;
             ValidBytes = (ushort)m_currentOffset;
             RightSiblingNodeIndex = newNodeIndex;
@@ -437,6 +555,12 @@ public unsafe class GenericEncodedNode<TKey, TValue>
     //    }
     //}
 
+    /// <summary>
+    /// Transfers records from the right sibling node to the left sibling node during a node merge operation.
+    /// </summary>
+    /// <param name="left">The left sibling node that receives the transferred records.</param>
+    /// <param name="right">The right sibling node from which records are transferred.</param>
+    /// <param name="bytesToTransfer">The total number of bytes to transfer from the right to the left sibling node.</param>
     protected override void TransferRecordsFromRightToLeft(Node<TKey> left, Node<TKey> right, int bytesToTransfer)
     {
         throw new NotImplementedException();
@@ -457,6 +581,12 @@ public unsafe class GenericEncodedNode<TKey, TValue>
         //right.ValidBytes -= (ushort)(recordsToTransfer * KeyValueSize);
     }
 
+    /// <summary>
+    /// Transfers records from the left sibling node to the right sibling node during a node split operation.
+    /// </summary>
+    /// <param name="left">The left sibling node from which records are transferred.</param>
+    /// <param name="right">The right sibling node that receives the transferred records.</param>
+    /// <param name="bytesToTransfer">The total number of bytes to transfer from the left to the right sibling node.</param>
     protected override void TransferRecordsFromLeftToRight(Node<TKey> left, Node<TKey> right, int bytesToTransfer)
     {
         throw new NotImplementedException();
@@ -481,7 +611,7 @@ public unsafe class GenericEncodedNode<TKey, TValue>
 
     /// <summary>
     /// Continue to seek until the end of the list is found or 
-    /// until the <see cref="m_currentKey"/> >= <see cref="key"/>
+    /// until the <see cref="m_currentKey"/> >= <paramref name="key"/>
     /// </summary>
     /// <param name="key"></param>
     /// <param name="buffer"></param>
@@ -494,9 +624,7 @@ public unsafe class GenericEncodedNode<TKey, TValue>
         if (m_currentIndex >= 0 && m_prevKey.IsLessThan(key))
         {
             if (!m_currentKey.IsLessThan(key) || m_currentIndex == RecordCount)
-            {
                 return;
-            }
 
             while (Read() && m_currentKey.IsLessThan(key))
             {
@@ -513,10 +641,9 @@ public unsafe class GenericEncodedNode<TKey, TValue>
     }
 
     /// <summary>
-    /// Continue to seek until the end of the list is found or 
-    /// until the <see cref="m_currentKey"/> >= <see cref="key"/>
+    /// Seeks to a specific record index within the node and loads the corresponding key and value into the node's current key and value.
     /// </summary>
-    /// <param name="index"></param>
+    /// <param name="index">The index of the record to seek to within the node.</param>
     private void SeekTo(int index)
     {
         //Reset();

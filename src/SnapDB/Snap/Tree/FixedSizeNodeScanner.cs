@@ -32,8 +32,8 @@ namespace SnapDB.Snap.Tree;
 /// <summary>
 /// The treescanner for a fixed size node.
 /// </summary>
-/// <typeparam name="TKey">The type of keys in the tree.</typeparam>
-/// <typeparam name="TValue">The type of values associated with keys in the tree.</typeparam>
+/// <typeparam name="TKey">The type of keys in the node.</typeparam>
+/// <typeparam name="TValue">The type of values associated with keys in the node.</typeparam>
 public class FixedSizeNodeScanner<TKey, TValue>
     : SortedTreeScannerBase<TKey, TValue>
     where TKey : SnapTypeBase<TKey>, new()
@@ -54,7 +54,15 @@ public class FixedSizeNodeScanner<TKey, TValue>
         m_keyValueSize = KeySize + ValueSize;
     }
 
-
+    /// <summary>
+    /// Reads the next key-value pair from the internal byte buffer and advances the read pointer.
+    /// </summary>
+    /// <param name="key">The key to read the value into.</param>
+    /// <param name="value">The value to read from the buffer.</param>
+    /// <remarks>
+    /// This method reads the next key-value pair from the internal byte buffer.
+    /// It deserializes the key and value, advances the read pointer, and increments the index of the next key-value pair.
+    /// </remarks>
     protected override unsafe void InternalRead(TKey key, TValue value)
     {
         byte* ptr = Pointer + IndexOfNextKeyValue * m_keyValueSize;
@@ -63,6 +71,21 @@ public class FixedSizeNodeScanner<TKey, TValue>
         IndexOfNextKeyValue++;
     }
 
+    /// <summary>
+    /// Reads and filters key-value pairs from the internal byte buffer, advancing the read pointer.
+    /// </summary>
+    /// <param name="key">The key to read the value into.</param>
+    /// <param name="value">The value to read from the buffer.</param>
+    /// <param name="filter">Optional filter to determine if the key-value pair is accepted.</param>
+    /// <returns>
+    /// <c>true</c> if a matching key-value pair is found; otherwise, <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    /// This method reads key-value pairs from the internal byte buffer.
+    /// It deserializes the key and value, advances the read pointer, and increments the index of the next key-value pair.
+    /// If a <paramref name="filter"/> is provided, it is used to determine if the key-value pair should be accepted.
+    /// If a matching pair is found, the method returns <c>true</c>; otherwise, it continues reading until a match is found or the end of the buffer is reached, returning <c>false</c>.
+    /// </remarks>
     protected override unsafe bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue>? filter)
     {
     TryAgain:
@@ -80,6 +103,16 @@ public class FixedSizeNodeScanner<TKey, TValue>
         goto TryAgain;
     }
 
+    /// <summary>
+    /// Peeks at the next key-value pair in the internal byte buffer without advancing the read pointer.
+    /// </summary>
+    /// <param name="key">The key to read the value into.</param>
+    /// <param name="value">The value to read from the buffer.</param>
+    /// <remarks>
+    /// This method reads the key and value of the next key-value pair in the internal byte buffer.
+    /// It deserializes the key and value without changing the state of the read pointer or index.
+    /// The method is used for inspecting the next key-value pair in the buffer without consuming it.
+    /// </remarks>
     protected override unsafe void InternalPeek(TKey key, TValue value)
     {
         byte* ptr = Pointer + IndexOfNextKeyValue * m_keyValueSize;

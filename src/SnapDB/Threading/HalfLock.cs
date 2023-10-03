@@ -69,7 +69,7 @@ public class HalfLock
     
     public HalfLockRelease Lock()
     {
-        if (Interlocked.Exchange(ref m_lock, Locked) != Unlocked) //If I successfully changed the state from unlocked to locked, then I now acquire the lock.
+        if (Interlocked.Exchange(ref m_lock, Locked) != Unlocked) // If I successfully changed the state from unlocked to locked, then I now acquire the lock.
             LockSlower();
         
         return m_release;
@@ -88,7 +88,7 @@ public class HalfLock
     /// <summary>
     /// Represents a release token for a <see cref="HalfLock"/> and provides a mechanism to release the lock.
     /// </summary>
-    public struct HalfLockRelease : IDisposable
+    public readonly struct HalfLockRelease : IDisposable
     {
         private readonly HalfLock m_halfLock;
         internal HalfLockRelease(HalfLock halfLock)
@@ -106,7 +106,7 @@ public class HalfLock
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
-            //A volatile write implies that even if this is inlined, the unlock will never be reordered above its current location.
+            // A volatile write implies that even if this is inlined, the unlock will never be reordered above its current location.
             m_halfLock.m_lock = Unlocked;
         }
     }

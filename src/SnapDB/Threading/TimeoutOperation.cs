@@ -26,7 +26,9 @@
 
 namespace SnapDB.Threading;
 
-
+/// <summary>
+/// Represents an operation with a timeout that can execute a callback.
+/// </summary>
 public class TimeoutOperation
 {
     // ToDo: Figure out how to allow for a weak referenced callback.

@@ -30,15 +30,28 @@ using SnapDB.Snap.Encoding;
 namespace SnapDB.Snap.Tree.Specialized;
 
 /// <summary>
-/// A class to write data to a node in sequential order only.
+/// Provides methods for writing sequential-order nodes in a tree structure.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TKey">The type of keys stored in the nodes.</typeparam>
+/// <typeparam name="TValue">The type of values stored in the nodes.</typeparam>
+/// <remarks>
+/// This class is designed for writing nodes in a tree structure, and it is typically used to create or modify tree nodes.
+/// </remarks>
 public unsafe static class NodeWriter<TKey, TValue>
     where TKey : SnapTypeBase<TKey>, new()
     where TValue : SnapTypeBase<TValue>, new()
 {
-
+    /// <summary>
+    /// Creates a new node with the specified parameters and initializes its header and encoding.
+    /// </summary>
+    /// <param name="encodingMethod">The encoding method to be used for the node.</param>
+    /// <param name="stream">The binary stream where the node will be created.</param>
+    /// <param name="blockSize">The size of the node's data block.</param>
+    /// <param name="level">The level of the node in the tree.</param>
+    /// <param name="startingNodeIndex">The index of the starting node.</param>
+    /// <param name="getNextNewNodeIndex">A function to get the next new node index.</param>
+    /// <param name="sparseIndex">The sparse index writer for the tree.</param>
+    /// <param name="treeStream">The tree stream.</param>
     public static void Create(EncodingDefinition encodingMethod, BinaryStreamPointerBase stream, int blockSize, byte level, uint startingNodeIndex, Func<uint> getNextNewNodeIndex, SparseIndexWriter<TKey> sparseIndex, TreeStream<TKey, TValue> treeStream)
     {
         NodeHeader<TKey> header = new(level, blockSize);
@@ -51,7 +64,7 @@ public unsafe static class NodeWriter<TKey, TValue>
         if ((header.BlockSize - header.HeaderSize) / maximumStorageSize < 4)
             throw new Exception("Tree must have at least 4 records per node. Increase the block size or decrease the size of the records.");
 
-        //InsideNodeBoundary = m_BoundsFalse;
+        // InsideNodeBoundary = m_BoundsFalse;
         header.NodeIndex = startingNodeIndex;
         header.RecordCount = 0;
         header.ValidBytes = (ushort)header.HeaderSize;
@@ -126,17 +139,17 @@ public unsafe static class NodeWriter<TKey, TValue>
     /// <param name="header"></param>
     private static void NewNodeThenInsert(NodeHeader<TKey> header, SparseIndexWriter<TKey> sparseIndex, uint newNodeIndex, byte* writePointer, TKey key)
     {
-        TKey dividingKey = new(); //m_tempKey;
+        TKey dividingKey = new(); // m_tempKey;
         key.CopyTo(dividingKey);
 
         uint currentNode = header.NodeIndex;
 
-        //Finish this header.
+        // Finish this header.
         header.RightSiblingNodeIndex = newNodeIndex;
         key.CopyTo(header.UpperKey);
         header.Save(writePointer);
 
-        //Prepare the next header
+        // Prepare the next header
         header.NodeIndex = newNodeIndex;
         header.RecordCount = 0;
         header.ValidBytes = (ushort)header.HeaderSize;

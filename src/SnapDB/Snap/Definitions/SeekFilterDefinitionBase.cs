@@ -35,15 +35,14 @@ namespace SnapDB.Snap.Definitions;
 public abstract class SeekFilterDefinitionBase
 {
     /// <summary>
-    /// The filter guid 
+    /// The filter GUID. 
     /// </summary>
     public abstract Guid FilterType { get; }
 
     /// <summary>
-    /// Determines if a Key/Value is contained in the filter
+    /// Determines if a key-value is contained in the filter
     /// </summary>
-    /// <param name="stream">the value to check</param>
-    /// <returns></returns>
+    /// <param name="stream">The value to check.</param>
     public abstract SeekFilterBase<TKey> Create<TKey>(BinaryStreamBase stream);
 
 }

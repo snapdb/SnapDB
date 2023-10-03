@@ -57,7 +57,7 @@ public abstract class IndividualEncodingBase<T>
     public abstract int MaxCompressionSize { get; }
 
     /// <summary>
-    /// Encodes <see cref="value"/> and writes it to the specified binary <see cref="stream"/>.
+    /// Encodes <paramref name="value"/> and writes it to the specified binary <paramref name="stream"/>.
     /// </summary>
     /// <param name="stream">The binary stream to write to.</param>
     /// <param name="prevValue">The previous value for encoding reference, if required by <see cref="UsesPreviousValue"/>; otherwise, <c>null</c>.</param>
@@ -66,7 +66,7 @@ public abstract class IndividualEncodingBase<T>
     public abstract void Encode(BinaryStreamBase stream, T prevValue, T value);
 
     /// <summary>
-    /// Decodes <see cref="value"/> from the specified binary <see cref="stream"/>.
+    /// Decodes <paramref name="value"/> from the specified binary <paramref name="stream"/>.
     /// </summary>
     /// <param name="stream">The binary stream to read from.</param>
     /// <param name="prevValue">The previous value used for decoding reference, if required by <see cref="UsesPreviousValue"/>; otherwise, <c>null</c>.</param>
@@ -76,7 +76,7 @@ public abstract class IndividualEncodingBase<T>
     public abstract void Decode(BinaryStreamBase stream, T prevValue, T value, out bool isEndOfStream);
 
     /// <summary>
-    /// Encodes <see cref="value"/> and writes it to the specified memory <see cref="stream"/>, returning the encoded data length.
+    /// Encodes <paramref name="value"/> and writes it to the specified memory <paramref name="stream"/>, returning the encoded data length.
     /// </summary>
     /// <param name="stream">A pointer to the memory stream.</param>
     /// <param name="prevValue">The previous value for encoding reference, if required by <see cref="UsesPreviousValue"/>; otherwise, <c>null</c>.</param>
@@ -90,7 +90,7 @@ public abstract class IndividualEncodingBase<T>
     }
 
     /// <summary>
-    /// Decodes <see cref="value"/> from the specified memory <see cref="stream"/>, returning the decoded data length.
+    /// Decodes <paramref name="value"/> from the specified memory <paramref name="stream"/>, returning the decoded data length.
     /// </summary>
     /// <param name="stream">A pointer to the memory stream.</param>
     /// <param name="prevValue">The previous value used for decoding reference, if required by <see cref="UsesPreviousValue"/>; otherwise, <c>null</c>.</param>
