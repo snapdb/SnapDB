@@ -44,7 +44,7 @@ public abstract class ClientDatabaseBase<TKey, TValue>
     /// <param name="keySeekFilter">A seek based filter to follow. Can be <c>null</c>.</param>
     /// <param name="keyMatchFilter">A match based filter to follow. Can be <c>null</c>.</param>
     /// <returns>A stream that will read the specified data.</returns>
-    public abstract TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions readerOptions, SeekFilterBase<TKey> keySeekFilter, MatchFilterBase<TKey, TValue> keyMatchFilter);
+    public abstract TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions, SeekFilterBase<TKey> keySeekFilter, MatchFilterBase<TKey, TValue>? keyMatchFilter);
 
     /// <summary>
     /// Writes the tree stream to the database. 

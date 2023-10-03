@@ -39,7 +39,7 @@ namespace SnapDB.Snap.Services.Writer;
 /// </summary>
 public class RolloverLogFile
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(RolloverLogFile), MessageClass.Framework);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(RolloverLogFile), MessageClass.Framework);
 
     /// <summary>
     /// Gets if the file is valid and not corrupt.
@@ -49,7 +49,7 @@ public class RolloverLogFile
     /// <summary>
     /// Gets all of the source files.
     /// </summary>
-    public readonly List<Guid> SourceFiles = new List<Guid>();
+    public readonly List<Guid> SourceFiles = new();
     /// <summary>
     /// Gets the destination file
     /// </summary>
@@ -73,8 +73,8 @@ public class RolloverLogFile
         IsValid = true;
         FileName = fileName;
 
-        MemoryStream stream = new MemoryStream();
-        stream.Write(Header);
+        MemoryStream stream = new();
+        stream.Write(s_header);
         stream.Write((byte)1);
         stream.Write(SourceFiles.Count);
         foreach (Guid file in SourceFiles)
@@ -102,16 +102,16 @@ public class RolloverLogFile
         try
         {
             byte[] data = File.ReadAllBytes(fileName);
-            if (data.Length < Header.Length + 1 + 20) //Header + Version + SHA1
+            if (data.Length < s_header.Length + 1 + 20) //Header + Version + SHA1
             {
-                Log.Publish(MessageLevel.Warning, "Failed to load file.", "Expected file length is not long enough", fileName);
+                s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Expected file length is not long enough", fileName);
                 return;
             }
-            for (int x = 0; x < Header.Length; x++)
+            for (int x = 0; x < s_header.Length; x++)
             {
-                if (data[x] != Header[x])
+                if (data[x] != s_header[x])
                 {
-                    Log.Publish(MessageLevel.Warning, "Failed to load file.", "Incorrect File Header", fileName);
+                    s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Incorrect File Header", fileName);
                     return;
                 }
             }
@@ -123,14 +123,14 @@ public class RolloverLogFile
                 byte[] checksum = sha.ComputeHash(data, 0, data.Length - 20);
                 if (!hash.SequenceEqual(checksum))
                 {
-                    Log.Publish(MessageLevel.Warning, "Failed to load file.", "Hash sum failed.", fileName);
+                    s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Hash sum failed.", fileName);
                     return;
                 }
             }
 
-            MemoryStream stream = new MemoryStream(data);
+            MemoryStream stream = new(data);
 
-            stream.Position = Header.Length;
+            stream.Position = s_header.Length;
 
             int version = stream.ReadNextByte();
             switch (version)
@@ -146,14 +146,14 @@ public class RolloverLogFile
                     IsValid = true;
                     return;
                 default:
-                    Log.Publish(MessageLevel.Warning, "Failed to load file.", "Version Not Recognized.", fileName);
+                    s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Version Not Recognized.", fileName);
                     SourceFiles.Clear();
                     return;
             }
         }
         catch (Exception ex)
         {
-            Log.Publish(MessageLevel.Warning, "Failed to load file.", "Unexpected Error", fileName, ex);
+            s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Unexpected Error", fileName, ex);
             SourceFiles.Clear();
         }
     }
@@ -192,13 +192,13 @@ public class RolloverLogFile
         }
         catch (Exception ex)
         {
-            Log.Publish(MessageLevel.Error, "Error Deleting File", "Could not delete file: " + FileName, null, ex);
+            s_log.Publish(MessageLevel.Error, "Error Deleting File", "Could not delete file: " + FileName, null, ex);
         }
     }
 
-    private static readonly byte[] Header;
+    private static readonly byte[] s_header;
     static RolloverLogFile()
     {
-        Header = System.Text.Encoding.UTF8.GetBytes("Historian 2.0 Rollover Log");
+        s_header = System.Text.Encoding.UTF8.GetBytes("Historian 2.0 Rollover Log");
     }
 }

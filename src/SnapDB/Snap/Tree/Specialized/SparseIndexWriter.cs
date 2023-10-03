@@ -39,11 +39,10 @@ public sealed class SparseIndexWriter<TKey>
 {
     #region [ Members ]
 
-    private long m_count;
     private long m_readingCount;
     private readonly BinaryStreamPointerBase m_stream;
     private bool m_isReading;
-    private readonly SnapUInt32 m_value = new SnapUInt32();
+    private readonly SnapUInt32 m_value = new();
 
     #endregion
 
@@ -62,7 +61,7 @@ public sealed class SparseIndexWriter<TKey>
     /// <summary>
     /// Gets the number of nodes in the sparse index.
     /// </summary>
-    public long Count => m_count;
+    public long Count { get; private set; }
 
     #region [ Methods ]
 
@@ -78,19 +77,19 @@ public sealed class SparseIndexWriter<TKey>
     {
         if (m_isReading)
             throw new Exception("This sparse index writer has already be set in reading mode.");
-        if (m_count == 0)
+        if (Count == 0)
         {
-            TKey tmpKey = new TKey();
+            TKey tmpKey = new();
             tmpKey.SetMin();
             tmpKey.Write(m_stream);
             m_value.Value = leftPointer;
             m_value.Write(m_stream);
-            m_count++;
+            Count++;
         }
         nodeKey.Write(m_stream);
         m_value.Value = pointer;
         m_value.Write(m_stream);
-        m_count++;
+        Count++;
     }
 
     public void SwitchToReading()
@@ -117,7 +116,7 @@ public sealed class SparseIndexWriter<TKey>
     {
         if (!m_isReading)
             throw new Exception("Must call SwitchToReading() first.");
-        if (m_readingCount < m_count)
+        if (m_readingCount < Count)
         {
             m_readingCount++;
             key.Read(m_stream);

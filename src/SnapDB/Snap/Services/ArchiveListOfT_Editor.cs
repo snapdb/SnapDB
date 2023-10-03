@@ -75,7 +75,7 @@ public partial class ArchiveList<TKey, TValue>
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
-            ArchiveTableSummary<TKey, TValue> summary = new ArchiveTableSummary<TKey, TValue>(sortedTree);
+            ArchiveTableSummary<TKey, TValue> summary = new(sortedTree);
             m_list.m_fileSummaries.Add(sortedTree.ArchiveId, summary);
         }
 

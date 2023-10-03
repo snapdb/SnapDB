@@ -50,7 +50,7 @@ public class SnapSocketListenerSettings
     /// <summary>
     /// Defines the default network IP address for the <see cref="SnapSocketListener"/>.
     /// </summary>
-    public const string DefaultIPAddress = "";
+    public const string DefaultIpAddress = "";
 
     /// <summary>
     /// A server name that must be supplied at startup before a key exchange occurs.
@@ -60,7 +60,7 @@ public class SnapSocketListenerSettings
     /// <summary>
     /// The local IP address to host on. Leave empty to bind to all local interfaces.
     /// </summary>
-    private string m_localIpAddress = DefaultIPAddress;
+    private string m_localIpAddress = DefaultIpAddress;
 
     /// <summary>
     /// The local TCP port to host on. 

@@ -31,16 +31,22 @@ public class TimeoutOperation
 {
     // ToDo: Figure out how to allow for a weak referenced callback.
 
-    private readonly object m_syncRoot = new object();
+    private readonly object m_syncRoot = new();
     private RegisteredWaitHandle m_registeredHandle;
     private ManualResetEvent m_resetEvent;
     private Action m_callback;
 
+    /// <summary>
+    /// Registers a timeout callback to be executed at specified intervals.
+    /// </summary>
+    /// <param name="interval">The time interval between callback executions.</param>
+    /// <param name="callback">The callback action to be executed.</param>
+    /// <exception cref="Exception">Thrown if a duplicate registration is attempted.</exception>
     public void RegisterTimeout(TimeSpan interval, Action callback)
     {
         lock (m_syncRoot)
         {
-            if (m_callback != null)
+            if (m_callback is not null)
                 throw new Exception("Duplicate calls are not permitted");
 
             m_callback = callback;
@@ -55,6 +61,7 @@ public class TimeoutOperation
         {
             if (m_registeredHandle is null)
                 return;
+            
             m_registeredHandle.Unregister(null);
             m_resetEvent.Dispose();
             m_callback();
@@ -64,11 +71,14 @@ public class TimeoutOperation
         }
     }
 
+    /// <summary>
+    /// Cancels a previously registered timeout callback.
+    /// </summary>
     public void Cancel()
     {
         lock (m_syncRoot)
         {
-            if (m_registeredHandle != null)
+            if (m_registeredHandle is not null)
             {
                 m_registeredHandle.Unregister(null);
                 m_resetEvent.Dispose();

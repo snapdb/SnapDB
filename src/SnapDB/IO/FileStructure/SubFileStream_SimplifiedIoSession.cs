@@ -55,7 +55,7 @@ public partial class SubFileStream
         public SimplifiedIoSession(SubFileStream stream)
         {
             m_stream = stream;
-            m_dataIoSession = stream.m_dataReader.CreateDiskIoSession(stream.m_fileHeaderBlock, stream.m_subFile);
+            m_dataIoSession = stream.m_dataReader.CreateDiskIoSession(stream.m_fileHeaderBlock, stream.SubFile);
             m_blockDataLength = m_stream.m_blockSize - FileStructureConstants.BlockFooterLength;
         }
 
@@ -132,10 +132,10 @@ public partial class SubFileStream
             }
 
             // Reading
-            if (indexPosition >= m_stream.m_subFile.DataBlockCount)
+            if (indexPosition >= m_stream.SubFile.DataBlockCount)
                 throw new ArgumentOutOfRangeException("position", "position reaches past the end of the file.");
             
-            var physicalBlockIndex = m_stream.m_subFile.DirectBlock + indexPosition;
+            var physicalBlockIndex = m_stream.SubFile.DirectBlock + indexPosition;
 
             m_dataIoSession.Read(physicalBlockIndex, BlockType.DataBlock, indexPosition);
             args.FirstPointer = (IntPtr)m_dataIoSession.Pointer;

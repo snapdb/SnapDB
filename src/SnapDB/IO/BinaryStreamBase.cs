@@ -518,7 +518,7 @@ public abstract unsafe class BinaryStreamBase
                 Write(value);
                 return;
         }
-        throw new ArgumentOutOfRangeException("bytes", "must be between 0 and 8 inclusive.");
+        throw new ArgumentOutOfRangeException(nameof(bytes), "must be between 0 and 8 inclusive.");
     }
     /// <summary>
     /// Writes the specifed <see cref="value"/> to the underlying stream in little-endian format.
@@ -683,7 +683,7 @@ public abstract unsafe class BinaryStreamBase
             case 8:
                 return ReadUInt64();
         }
-        throw new ArgumentOutOfRangeException("bytes", "must be between 0 and 8 inclusive.");
+        throw new ArgumentOutOfRangeException(nameof(bytes), "must be between 0 and 8 inclusive.");
     }
     /// <summary>
     /// Reads from the underlying stream in little-endian format. Advancing the position.

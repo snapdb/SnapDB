@@ -37,7 +37,7 @@ namespace SnapDB.IO.FileStructure;
 public sealed class TransactionalEdit
     : IDisposable
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(TransactionalEdit), MessageClass.Component);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(TransactionalEdit), MessageClass.Component);
 
     #region [ Members ]
 
@@ -101,7 +101,7 @@ public sealed class TransactionalEdit
 #if DEBUG
     ~TransactionalEdit()
     {
-        Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
+        s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
     }
 #endif
 
@@ -197,8 +197,7 @@ public sealed class TransactionalEdit
         {
             // TODO: First commit the data, then the file system.
             m_dataReader.CommitChanges(m_fileHeaderBlock);
-            if (m_delHasBeenCommitted is not null)
-                m_delHasBeenCommitted.Invoke();
+            m_delHasBeenCommitted?.Invoke();
         }
         finally
         {
@@ -227,8 +226,7 @@ public sealed class TransactionalEdit
         try
         {
             m_dataReader.RollbackChanges();
-            if (m_delHasBeenRolledBack is not null)
-                m_delHasBeenRolledBack.Invoke();
+            m_delHasBeenRolledBack?.Invoke();
         }
 
         finally

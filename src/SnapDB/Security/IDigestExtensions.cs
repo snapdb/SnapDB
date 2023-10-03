@@ -31,7 +31,7 @@ namespace SnapDB.Security;
 /// <summary>
 /// Helper extensions for <see cref="IDigest"/> types.
 /// </summary>
-public static class IDigestExtensions
+public static class DigestExtensions
 {
     /// <summary>
     /// Computes the hash of the supplied words.

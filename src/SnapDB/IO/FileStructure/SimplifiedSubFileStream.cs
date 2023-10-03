@@ -59,12 +59,6 @@ internal sealed class SimplifiedSubFileStream
     /// </summary>
     private readonly FileStream m_stream;
 
-    /// <summary>
-    /// The file used by the stream.
-    /// </summary>
-    private readonly SubFileHeader? m_subFile;
-
-
     #endregion
 
     #region [ Constructors ]
@@ -93,7 +87,7 @@ internal sealed class SimplifiedSubFileStream
 
         m_blockSize = fileHeaderBlock.BlockSize;
         m_stream = stream;
-        m_subFile = subFile;
+        SubFile = subFile;
         m_fileHeaderBlock = fileHeaderBlock;
     }
 
@@ -101,7 +95,10 @@ internal sealed class SimplifiedSubFileStream
 
     #region [ Properties ]
 
-    internal SubFileHeader? SubFile => m_subFile;
+    /// <summary>
+    /// The file used by the stream.
+    /// </summary>
+    internal SubFileHeader? SubFile { get; }
 
     /// <summary>
     /// Gets if this file was opened in "read only" mode.
@@ -183,7 +180,7 @@ internal sealed class SimplifiedSubFileStream
         if (RemainingSupportedIoSessions == 0)
             throw new Exception("There are not any remaining IO Sessions");
 
-        m_ioStream1 = new SimplifiedSubFileStreamIoSession(m_stream, m_subFile, m_fileHeaderBlock);
+        m_ioStream1 = new SimplifiedSubFileStreamIoSession(m_stream, SubFile, m_fileHeaderBlock);
         return m_ioStream1;
     }
 

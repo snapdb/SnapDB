@@ -77,9 +77,9 @@ public class IntegratedSecurityClient
         if (additionalChallenge is null)
             additionalChallenge = new byte[] { };
         if (additionalChallenge.Length > short.MaxValue)
-            throw new ArgumentOutOfRangeException("additionalChallenge", "Must be less than 32767 bytes");
+            throw new ArgumentOutOfRangeException(nameof(additionalChallenge), "Must be less than 32767 bytes");
 
-        using (NegotiateStream negotiateStream = new NegotiateStream(stream, true))
+        using (NegotiateStream negotiateStream = new(stream, true))
         {
             try
             {

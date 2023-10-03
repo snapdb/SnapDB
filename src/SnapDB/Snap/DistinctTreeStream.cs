@@ -27,10 +27,10 @@
 namespace SnapDB.Snap;
 
 /// <summary>
-/// Ensures that a stream is distinct (Never repeats a value).
+/// Represents a stream that filters out duplicate entries from a base <see cref="TreeStream{TKey,TValue}"/>.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TKey">The type of keys in the stream.</typeparam>
+/// <typeparam name="TValue">The type of values in the stream.</typeparam>
 public class DistinctTreeStream<TKey, TValue>
     : TreeStream<TKey, TValue>
     where TKey : SnapTypeBase<TKey>, new()
@@ -43,24 +43,27 @@ public class DistinctTreeStream<TKey, TValue>
     private readonly TreeStream<TKey, TValue> m_baseStream;
 
     /// <summary>
-    /// Creates a <see cref="DistinctTreeStream{TKey,Value}"/>
+    /// Initializes a new instance of the <see cref="DistinctTreeStream{TKey, TValue}"/> class.
     /// </summary>
-    /// <param name="baseStream">Must be sequential</param>
+    /// <param name="baseStream">The base stream to filter duplicates from.</param>
+    /// <exception cref="ArgumentException">Thrown if the <paramref name="baseStream"/> is not sequential.</exception>
     public DistinctTreeStream(TreeStream<TKey, TValue> baseStream)
     {
         if (!baseStream.IsAlwaysSequential)
-            throw new ArgumentException("Must be sequential access", "baseStream");
+            throw new ArgumentException("Must be sequential access", nameof(baseStream));
 
         m_lastKey = new TKey();
         m_lastValue = new TValue();
         m_isLastValueValid = false;
         m_baseStream = baseStream;
     }
-
+    /// <inheritdoc/>
     public override bool IsAlwaysSequential => true;
 
+    /// <inheritdoc/>
     public override bool NeverContainsDuplicates => true;
 
+    /// <inheritdoc/>
     protected override void Dispose(bool disposing)
     {
         if (disposing)
@@ -68,11 +71,12 @@ public class DistinctTreeStream<TKey, TValue>
         base.Dispose(disposing);
     }
 
+    /// <inheritdoc/>
     protected override void EndOfStreamReached()
     {
-
     }
 
+    /// <inheritdoc/>
     protected override bool ReadNext(TKey key, TValue value)
     {
     TryAgain:

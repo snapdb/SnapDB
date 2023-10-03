@@ -41,7 +41,7 @@ public unsafe static class NodeWriter<TKey, TValue>
 
     public static void Create(EncodingDefinition encodingMethod, BinaryStreamPointerBase stream, int blockSize, byte level, uint startingNodeIndex, Func<uint> getNextNewNodeIndex, SparseIndexWriter<TKey> sparseIndex, TreeStream<TKey, TValue> treeStream)
     {
-        NodeHeader<TKey> header = new NodeHeader<TKey>(level, blockSize);
+        NodeHeader<TKey> header = new(level, blockSize);
         PairEncodingBase<TKey, TValue> encoding = Library.Encodings.GetEncodingMethod<TKey, TValue>(encodingMethod);
 
         SparseIndexWriter<TKey> sparseIndex1 = sparseIndex;
@@ -63,10 +63,10 @@ public unsafe static class NodeWriter<TKey, TValue>
         byte* writePointer = stream.GetWritePointer(blockSize * header.NodeIndex, blockSize);
         fixed (byte* buffer = buffer1)
         {
-            TKey key1 = new TKey();
-            TKey key2 = new TKey();
-            TValue value1 = new TValue();
-            TValue value2 = new TValue();
+            TKey key1 = new();
+            TKey key2 = new();
+            TValue value1 = new();
+            TValue value2 = new();
 
             key1.Clear();
             key2.Clear();
@@ -126,7 +126,7 @@ public unsafe static class NodeWriter<TKey, TValue>
     /// <param name="header"></param>
     private static void NewNodeThenInsert(NodeHeader<TKey> header, SparseIndexWriter<TKey> sparseIndex, uint newNodeIndex, byte* writePointer, TKey key)
     {
-        TKey dividingKey = new TKey(); //m_tempKey;
+        TKey dividingKey = new(); //m_tempKey;
         key.CopyTo(dividingKey);
 
         uint currentNode = header.NodeIndex;

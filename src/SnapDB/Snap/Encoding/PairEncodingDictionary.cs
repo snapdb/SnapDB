@@ -58,7 +58,7 @@ internal class PairEncodingDictionary
     public void Register(PairEncodingDefinitionBase encoding)
     {
         if (encoding is null)
-            throw new ArgumentNullException("encoding");
+            throw new ArgumentNullException(nameof(encoding));
 
         lock (m_syncRoot)
         {
@@ -66,11 +66,11 @@ internal class PairEncodingDictionary
             {
                 m_combinedEncoding.Add(encoding.Method, encoding);
             }
-            else if (encoding.KeyTypeIfNotGeneric != null && encoding.ValueTypeIfNotGeneric is null)
+            else if (encoding.KeyTypeIfNotGeneric is not null && encoding.ValueTypeIfNotGeneric is null)
             {
                 m_keyTypedCombinedEncoding.Add(Tuple.Create(encoding.Method, encoding.KeyTypeIfNotGeneric), encoding);
             }
-            else if (encoding.KeyTypeIfNotGeneric is null && encoding.ValueTypeIfNotGeneric != null)
+            else if (encoding.KeyTypeIfNotGeneric is null && encoding.ValueTypeIfNotGeneric is not null)
             {
                 m_valueTypedCombinedEncoding.Add(Tuple.Create(encoding.Method, encoding.ValueTypeIfNotGeneric), encoding);
             }
@@ -94,7 +94,7 @@ internal class PairEncodingDictionary
         where TValue : SnapTypeBase<TValue>, new()
     {
         if (encodingMethod is null)
-            throw new ArgumentNullException("encodingMethod");
+            throw new ArgumentNullException(nameof(encodingMethod));
 
         Type keyType = typeof(TKey);
         Type valueType = typeof(TValue);

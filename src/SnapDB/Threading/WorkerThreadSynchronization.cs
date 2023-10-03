@@ -61,7 +61,7 @@ public class WorkerThreadSynchronization
         /// <summary>
         /// Creates a callback request.
         /// </summary>
-        /// <param name="callback">the action to perform.</param>
+        /// <param name="callback">The action to perform.</param>
         public CallbackRequest(Action callback)
         {
             m_callback = callback;

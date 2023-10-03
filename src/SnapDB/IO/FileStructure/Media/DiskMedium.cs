@@ -37,7 +37,7 @@ internal class DiskMedium
     : IDisposable
 {
 
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(DiskMedium), MessageClass.Component);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(DiskMedium), MessageClass.Component);
 
     #region [ Members ]
 
@@ -79,7 +79,7 @@ internal class DiskMedium
 #if DEBUG
     ~DiskMedium()
     {
-        Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
+        s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
     }
 #endif
 

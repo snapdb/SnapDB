@@ -28,6 +28,8 @@ using System.Security.Principal;
 
 namespace SnapDB.Security.Authentication;
 
+#pragma warning disable CA1416
+
 /// <summary>
 /// Provides simple password based authentication that uses Secure Remote Password.
 /// </summary>
@@ -60,11 +62,11 @@ public class CertificateUserCredentials
     /// <returns></returns>
     public bool Exists(IIdentity identity)
     {
-        WindowsIdentity i = identity as WindowsIdentity;
-        if (i is null)
+        if (identity is not WindowsIdentity i)
             return false;
+
         lock (m_users)
-            return m_users.ContainsKey(i.User.Value);
+            return m_users.ContainsKey(i.User?.Value ?? string.Empty);
     }
 
     /// <summary>
@@ -74,12 +76,10 @@ public class CertificateUserCredentials
     public void AddUser(string username)
     {
         CertificateUserCredential user = new(username);
+
         lock (m_users)
         {
-            m_users.Add(user.UserID, user);
+            m_users.Add(user.UserId, user);
         }
     }
-
 }
-
-

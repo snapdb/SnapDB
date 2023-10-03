@@ -37,7 +37,7 @@ internal partial class BufferedFile
     private class IoSession
         : PageReplacementAlgorithm.PageLock
     {
-        private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(IoSession), MessageClass.Component);
+        private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(IoSession), MessageClass.Component);
 
         /// <summary>
         /// The base stream
@@ -63,7 +63,7 @@ internal partial class BufferedFile
         /// </summary>
         ~IoSession()
         {
-            Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
+            s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
             Dispose(false);
         }
 #endif
@@ -76,6 +76,7 @@ internal partial class BufferedFile
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             m_stream.GetBlock(this, args);
         }
 
@@ -84,9 +85,11 @@ internal partial class BufferedFile
             if (!m_disposed)
             {
                 m_disposed = true;
+
                 if (disposing)
                     m_stream.m_queue.Close();
             }
+
             base.Dispose(disposing);
         }
     }

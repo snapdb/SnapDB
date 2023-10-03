@@ -33,7 +33,7 @@ namespace SnapDB.Collections;
 /// Implementation that utilizes a jagged array structure and 
 /// array expansion optimization to improve performance.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">Array type.</typeparam>
 public class LargeArray<T>
 {
     // Since large arrays expand slowly, this class can quickly grow an array with millions of elements.
@@ -42,8 +42,7 @@ public class LargeArray<T>
     private readonly int m_size;
     private readonly int m_bitShift;
     private readonly int m_mask;
-    private T[][] m_array;
-    private int m_capacity;
+    private T[]?[] m_array;
 
     /// <summary>
     /// Creates a <see cref="LargeArray{T}"/> with a jagged array depth of 1024 elements.
@@ -60,8 +59,8 @@ public class LargeArray<T>
         m_size = (int)BitMath.RoundUpToNearestPowerOfTwo((uint)jaggedArrayDepth);
         m_mask = m_size - 1;
         m_bitShift = BitMath.CountBitsSet((uint)m_mask);
-        m_array = Array.Empty<T[]>();
-        m_capacity = 0;
+        m_array = Array.Empty<T[]?>();
+        Capacity = 0;
     }
 
     /// <summary>
@@ -74,19 +73,19 @@ public class LargeArray<T>
         get
         {
             Validate(index);
-            return m_array[index >> m_bitShift][index & m_mask];
+            return m_array[index >> m_bitShift]![index & m_mask];
         }
         set
         {
             Validate(index);
-            m_array[index >> m_bitShift][index & m_mask] = value;
+            m_array[index >> m_bitShift]![index & m_mask] = value;
         }
     }
 
     /// <summary>
     /// Gets the number of items in the array.
     /// </summary>
-    public int Capacity => m_capacity;
+    public int Capacity { get; private set; }
 
     /// <summary>
     /// Sets the capacity of the array to at least the given length. Will not reduce the size.
@@ -96,7 +95,7 @@ public class LargeArray<T>
     public int SetCapacity(int length)
     {
         // Variable to store the number of arrays needed to accommodate the specified length.
-        int arrayCount = 0;
+        int arrayCount;
 
         // Check if the specified length does not align with the mask (bitwise check).
         if ((length & m_mask) != 0)
@@ -119,11 +118,11 @@ public class LargeArray<T>
 
             // Update the reference to the array of arrays and the total capacity.
             m_array = newArray;
-            m_capacity = m_array.Length * m_size;
+            Capacity = m_array.Length * m_size;
         }
 
         // Return the updated capacity of the data structure.
-        return m_capacity;
+        return Capacity;
     }
 
     // Validates whether a given index is within the valid range of positions in the data structure.
@@ -131,7 +130,7 @@ public class LargeArray<T>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void Validate(int index)
     {
-        if (index < 0 || index >= m_capacity)
+        if (index < 0 || index >= Capacity)
             ThrowException(index);
     }
 
@@ -142,7 +141,7 @@ public class LargeArray<T>
         if (index < 0)
             throw new ArgumentOutOfRangeException(nameof(index), "Must be greater than or equal to zero.");
             
-        if (index >= m_capacity)
+        if (index >= Capacity)
             throw new ArgumentOutOfRangeException(nameof(index), "exceeds the length of the array.");
     }
 
@@ -151,7 +150,7 @@ public class LargeArray<T>
     /// </summary>
     public void Clear()
     {
-        foreach (T[] items in m_array)
+        foreach (T[]? items in m_array)
         {
             if (items is not null)
                 Array.Clear(items, 0, items.Length);

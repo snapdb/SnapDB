@@ -42,7 +42,7 @@ public partial class UnionTreeStream<TKey, TValue>
         /// <summary>
         /// Creates a new custom sort helper and presorts the list.
         /// </summary>
-        /// <param name="items"></param>
+        /// <param name="items">The items to initialize the helper with.</param>
         public UnionTreeStreamSortHelper(IEnumerable<BufferedTreeStream> items)
         {
             Items = items.ToArray();
@@ -53,8 +53,8 @@ public partial class UnionTreeStream<TKey, TValue>
         /// <summary>
         /// Indexer to get the specified item out of the list
         /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
+        /// <param name="index">The index of the item to retrieve.</param>
+        /// <returns>The <see cref="BufferedTreeStream"/> at the specified index.</returns>
         public BufferedTreeStream this[int index] => Items[index];
 
         /// <summary>
@@ -62,15 +62,15 @@ public partial class UnionTreeStream<TKey, TValue>
         /// </summary>
         public void Sort()
         {
-            //A insertion sort routine.
+            // An insertion sort routine.
 
-            //Skip first item in list since it will always be sorted correctly
+            // Skip first item in list since it will always be sorted correctly.
             for (int itemToInsertIndex = 1; itemToInsertIndex < m_validRecords; itemToInsertIndex++)
             {
                 BufferedTreeStream itemToInsert = Items[itemToInsertIndex];
 
                 int currentIndex = itemToInsertIndex - 1;
-                //While the current item is greater than itemToInsert, shift the value
+                // While the current item is greater than itemToInsert, shift the value.
                 while (currentIndex >= 0 && IsLessThan(itemToInsert, Items[currentIndex]))
                 {
                     Items[currentIndex + 1] = Items[currentIndex];
@@ -97,9 +97,9 @@ public partial class UnionTreeStream<TKey, TValue>
         /// <summary>
         /// Resorts only the item at the specified index assuming:
         /// 1) all other items are properly sorted
-        /// 2) this items's value increased.
+        /// 2) this item's value increased.
         /// </summary>
-        /// <param name="index">the index of the item to resort.</param>
+        /// <param name="index">The index of the item to resort.</param>
         public void SortAssumingIncreased(int index)
         {
             BufferedTreeStream itemToMove = Items[index];
@@ -114,7 +114,7 @@ public partial class UnionTreeStream<TKey, TValue>
                 return;
             }
 
-            //ToDo: Consider an exponential search algorithm.
+            // ToDo: Consider an exponential search algorithm.
             int currentIndex = index + 1;
             while (currentIndex < m_validRecords && Items[currentIndex].CacheKey.IsLessThan(itemToMove.CacheKey))
             {
@@ -128,10 +128,13 @@ public partial class UnionTreeStream<TKey, TValue>
         {
             if (!item1.IsValid && !item2.IsValid)
                 return false;
+                
             if (!item1.IsValid)
                 return false;
+                
             if (!item2.IsValid)
                 return true;
+                
             return item1.CacheKey.IsLessThan(item2.CacheKey);// item1.CurrentKey.CompareTo(item2.CurrentKey);
         }
     }

@@ -51,8 +51,8 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     public virtual void TryInsertSequentialStream(InsertStreamHelper<TKey, TValue> stream)
     {
         //First check to see if the sequentail insertion is valid.
-        TKey key = new TKey();
-        TValue value = new TValue();
+        TKey key = new();
+        TValue value = new();
 
         //Exit if stream is not valid or not sequentail.
         if (!stream.IsValid || !stream.IsStillSequential)
@@ -128,7 +128,7 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     /// </summary>
     private void NewNodeThenInsert(TKey key, TValue value)
     {
-        TKey dividingKey = new TKey(); //m_tempKey;
+        TKey dividingKey = new(); //m_tempKey;
         key.CopyTo(dividingKey);
 
         uint newNodeIndex = m_getNextNewNodeIndex();
@@ -154,7 +154,7 @@ public partial class SortedTreeNodeBase<TKey, TValue>
         uint currentNode = NodeIndex;
         uint newNodeIndex = m_getNextNewNodeIndex();
 
-        TKey dividingKey = new TKey(); //m_tempKey;
+        TKey dividingKey = new(); //m_tempKey;
 
         Split(newNodeIndex, dividingKey);
 

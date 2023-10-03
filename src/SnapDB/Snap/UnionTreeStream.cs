@@ -27,11 +27,10 @@
 namespace SnapDB.Snap;
 
 /// <summary>
-/// Does a union of <see cref="TreeStream{TKey,TValue}"/>.
-/// Ensures that the data is read sequentially and duplicates are removed.
+/// Represents a partial union of multiple tree streams of the same TKey and TValue types.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TKey">The key type.</typeparam>
+/// <typeparam name="TValue">The value type.</typeparam>
 public partial class UnionTreeStream<TKey, TValue>
     : TreeStream<TKey, TValue>
     where TKey : SnapTypeBase<TKey>, new()
@@ -42,19 +41,15 @@ public partial class UnionTreeStream<TKey, TValue>
     private TreeStream<TKey, TValue> m_firstStream;
     private BufferedTreeStream m_firstTable;
 
-    private readonly TKey m_readWhileUpperBounds = new TKey();
-    private readonly TKey m_nextArchiveStreamLowerBounds = new TKey();
+    private readonly TKey m_readWhileUpperBounds = new();
+    private readonly TKey m_nextArchiveStreamLowerBounds = new();
     private readonly bool m_ownsStreams;
 
-
-
-
     /// <summary>
-    /// Creates a union stream reader from the supplied data.
+    /// Initializes a new instance of the <see cref="UnionTreeStream{TKey, TValue}"/> class.
     /// </summary>
-    /// <param name="streams">all of the tables to combine in the union</param>
-    /// <param name="ownsStream">if this class owns the streams, it will call dispose when <see cref="Dispose"/> is called.
-    /// Otherwise, the streams will not be disposed.</param>
+    /// <param name="streams">An enumerable collection of tree streams to be partially unioned.</param>
+    /// <param name="ownsStream">A flag indicating whether this instance should own the input streams.</param>
     public UnionTreeStream(IEnumerable<TreeStream<TKey, TValue>> streams, bool ownsStream)
     {
         m_firstStream = null;
@@ -85,9 +80,13 @@ public partial class UnionTreeStream<TKey, TValue>
         SetReadWhileUpperBoundsValue();
     }
 
+    /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="UnionTreeStream{TKey, TValue}"/> and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected override void Dispose(bool disposing)
     {
-        if (m_tablesOrigList != null && m_ownsStreams)
+        if (m_tablesOrigList is not null && m_ownsStreams)
         {
             foreach (BufferedTreeStream table in m_tablesOrigList)
             {
@@ -98,13 +97,25 @@ public partial class UnionTreeStream<TKey, TValue>
         base.Dispose(disposing);
     }
 
+    /// <summary>
+    /// Gets a value indicating whether this stream is always sequential.
+    /// </summary>
     public override bool IsAlwaysSequential => true;
 
+    /// <summary>
+    /// Gets a value indicating that this stream never contains duplicate values.
+    /// </summary>
     public override bool NeverContainsDuplicates => true;
-
+        
+    /// <summary>
+    /// Reads the next key-value pair from the stream.
+    /// </summary>
+    /// <param name="key">The key to read.</param>
+    /// <param name="value">The value to read.</param>
+    /// <returns><see langword="true"/> if a key-value pair was successfully read; otherwise, <see langword="false"/>.</returns>
     protected override bool ReadNext(TKey key, TValue value)
     {
-        if (m_firstStream != null && m_firstStream.Read(key, value))
+        if (m_firstStream is not null && m_firstStream.Read(key, value))
         {
             if (key.IsLessThan(m_readWhileUpperBounds))
             {
@@ -120,33 +131,33 @@ public partial class UnionTreeStream<TKey, TValue>
     TryAgain:
         if (m_firstStream is null)
         {
-            //If m_firstStream is null, this means either: 
-            //  the value is cached.
+            // If m_firstStream is null, this means either: 
+            // the value is cached.
             // or
-            //  the end of the stream has occured.
-            if (m_firstTable != null && m_firstTable.IsValid)
+            // the end of the stream has occured.
+            if (m_firstTable is not null && m_firstTable.IsValid)
             {
-                //The value is cached.
+                // The value is cached.
                 m_firstTable.Read(key, value);
                 m_firstStream = m_firstTable.Stream;
                 return true;
             }
-            //The end of the steam has been reached.
+            // The end of the steam has been reached.
             return false;
         }
 
-        //Condition 1:
+        // Condition 1:
         //  The archive stream may no longer be in order and needs to be checked
-        //Response:
+        // Response:
         //  Resort the archive stream
         //
-        //Condition 2:
+        // Condition 2:
         //  The end of the frame has been reached
-        //Response:
+        // Response:
         //  Advance to the next frame
         //  Also test the edge case where the current point might be equal to the end of the frame
-        //      since this is an inclusive filter and ReadWhile is exclusive.
-        //      If it's part of the frame, return true after Advancing the frame and the point.
+        //  since this is an inclusive filter and ReadWhile is exclusive.
+        //  If it's part of the frame, return true after Advancing the frame and the point.
         //
 
         //Since condition 1 and 2 can occur at the same time, verifying the sort of the Archive Stream is a good thing to do.
@@ -191,11 +202,16 @@ public partial class UnionTreeStream<TKey, TValue>
 
 
     /// <summary>
-    /// Compares two Archive Streams together for proper sorting.
+    /// Compares two <see cref="BufferedTreeStream"/> instances based on their cache keys.
     /// </summary>
-    /// <param name="item1"></param>
-    /// <param name="item2"></param>
-    /// <returns></returns>
+    /// <param name="item1">The first <see cref="BufferedTreeStream"/> to compare.</param>
+    /// <param name="item2">The second <see cref="BufferedTreeStream"/> to compare.</param>
+    /// <returns>
+    /// 0 if both <paramref name="item1"/> and <paramref name="item2"/> are not valid;
+    /// 1 if only <paramref name="item1"/> is valid and <paramref name="item2"/> is not valid;
+    /// -1 if only <paramref name="item2"/> is valid and <paramref name="item1"/> is not valid;
+    /// The result of comparing the cache keys of <paramref name="item1"/> and <paramref name="item2"/> otherwise.
+    /// </returns>
     private int CompareStreams(BufferedTreeStream item1, BufferedTreeStream item2)
     {
         if (!item1.IsValid && !item2.IsValid)

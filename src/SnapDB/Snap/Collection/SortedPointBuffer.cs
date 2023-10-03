@@ -121,7 +121,7 @@ public class SortedPointBuffer<TKey, TValue>
     /// Gets if the stream will never return duplicate keys. Do not return <c>true</c> unless it is guaranteed that 
     /// the data read from this stream will never contain duplicates.
     /// </summary>
-    public override bool NeverContainsDuplicates => m_removeDuplicates || (object)m_duplicateHandler != null;
+    public override bool NeverContainsDuplicates => m_removeDuplicates || (object)m_duplicateHandler is not null;
 
     /// <summary>
     /// Gets if the stream is always in sequential order. Do not return <c>true</c> unless it is guaranteed that 
@@ -179,7 +179,7 @@ public class SortedPointBuffer<TKey, TValue>
     private void SetCapacity(int capacity)
     {
         if (capacity <= 0)
-            throw new ArgumentOutOfRangeException("capacity", "must be greater than 0");
+            throw new ArgumentOutOfRangeException(nameof(capacity), "must be greater than 0");
 
         m_capacity = capacity;
         m_sortingBlocks1 = new int[capacity];

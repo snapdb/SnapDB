@@ -30,10 +30,10 @@ namespace SnapDB.Immutables;
 
 /// <summary>
 /// Represents an object that can be configured as read only and thus made immutable.  
-/// The origional contents of this class will not be editable once <see cref="IsReadOnly"/> is set to true.
+/// The original contents of this class will not be editable once <see cref="IsReadOnly"/> is set to true.
 /// In order to modify the contest of this object, a clone of the object must be created with <see cref="CloneEditable"/>.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">Object type.</typeparam>
 /// <remarks>
 /// For a classes that implement this, all setters should call <see cref="TestForEditable"/> before 
 /// setting the value. 
@@ -73,7 +73,7 @@ public abstract class ImmutableObjectBase<T>
             ThrowReadOnly();
     }
 
-    void ThrowReadOnly()
+    private static void ThrowReadOnly()
     {
         throw new ReadOnlyException("Object has been set as read only");
     }

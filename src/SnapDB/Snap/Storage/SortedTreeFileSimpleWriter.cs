@@ -52,13 +52,12 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue>
     /// <param name="flags"></param>
     public static void Create(string pendingFileName, string completeFileName, int blockSize, Action<Guid> archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, params Guid[] flags)
     {
-        using (SimplifiedFileWriter writer = new SimplifiedFileWriter(pendingFileName, completeFileName, blockSize, flags))
+        using (SimplifiedFileWriter writer = new(pendingFileName, completeFileName, blockSize, flags))
         {
-            if (archiveIdCallback != null)
-                archiveIdCallback(writer.ArchiveId);
+            archiveIdCallback?.Invoke(writer.ArchiveId);
 
             using (ISupportsBinaryStream file = writer.CreateFile(GetFileName()))
-            using (BinaryStream bs = new BinaryStream(file))
+            using (BinaryStream bs = new(file))
             {
                 SequentialSortedTreeWriter<TKey, TValue>.Create(bs, blockSize - 32, treeNodeType, treeStream);
             }
@@ -68,32 +67,31 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue>
 
     public static void CreateNonSequential(string pendingFileName, string completeFileName, int blockSize, Action<Guid> archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, params Guid[] flags)
     {
-        SortedPointBuffer<TKey, TValue> m_queue;
-        m_queue = new SortedPointBuffer<TKey, TValue>(100000, true);
-        m_queue.IsReadingMode = false;
+        SortedPointBuffer<TKey, TValue> queue = new(100000, true);
+        queue.IsReadingMode = false;
 
-        TKey key = new TKey();
-        TValue value = new TValue();
+        TKey key = new();
+        TValue value = new();
 
-        List<SortedTreeTable<TKey, TValue>> pendingFiles = new List<SortedTreeTable<TKey, TValue>>();
+        List<SortedTreeTable<TKey, TValue>> pendingFiles = new();
 
         try
         {
             while (treeStream.Read(key, value))
             {
-                if (m_queue.IsFull)
+                if (queue.IsFull)
                 {
-                    pendingFiles.Add(CreateMemoryFile(treeNodeType, m_queue));
+                    pendingFiles.Add(CreateMemoryFile(treeNodeType, queue));
                 }
-                m_queue.TryEnqueue(key, value);
+                queue.TryEnqueue(key, value);
             }
 
-            if (m_queue.Count > 0)
+            if (queue.Count > 0)
             {
-                pendingFiles.Add(CreateMemoryFile(treeNodeType, m_queue));
+                pendingFiles.Add(CreateMemoryFile(treeNodeType, queue));
             }
 
-            using (UnionTreeStream<TKey, TValue> reader = new UnionTreeStream<TKey, TValue>(pendingFiles.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), false))
+            using (UnionTreeStream<TKey, TValue> reader = new(pendingFiles.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), false))
             {
                 Create(pendingFileName, completeFileName, blockSize, archiveIdCallback, treeNodeType, reader, flags);
             }

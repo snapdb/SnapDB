@@ -40,7 +40,6 @@ public class ArchiveListSettings
 {
     private readonly ImmutableList<string> m_importPaths;
     private readonly ImmutableList<string> m_importExtensions;
-    private readonly ArchiveListLogSettings m_logSettings;
 
     /// <summary>
     /// Creates a new instance of <see cref="ArchiveListSettings"/>.
@@ -54,13 +53,13 @@ public class ArchiveListSettings
             return x;
         });
         m_importExtensions = new ImmutableList<string>(PathHelpers.FormatExtension);
-        m_logSettings = new ArchiveListLogSettings();
+        LogSettings = new ArchiveListLogSettings();
     }
 
     /// <summary>
     /// The log settings to use for logging deletions.
     /// </summary>
-    public ArchiveListLogSettings LogSettings => m_logSettings;
+    public ArchiveListLogSettings LogSettings { get; }
 
     /// <summary>
     /// A set of all import paths to load upon initialization.
@@ -125,7 +124,7 @@ public class ArchiveListSettings
         foreach (string extensions in m_importExtensions)
             stream.Write(extensions);
 
-        m_logSettings.Save(stream);
+        LogSettings.Save(stream);
     }
 
     public override void Load(Stream stream)
@@ -154,7 +153,7 @@ public class ArchiveListSettings
                     m_importPaths.Add(stream.ReadString());
                 }
 
-                m_logSettings.Load(stream);
+                LogSettings.Load(stream);
 
                 break;
 
@@ -169,6 +168,6 @@ public class ArchiveListSettings
         if (m_importPaths.Count > 0 && m_importExtensions.Count == 0)
             throw new Exception("Path specified but no extension specified.");
 
-        m_logSettings.Validate();
+        LogSettings.Validate();
     }
 }

@@ -44,7 +44,6 @@ public class SortedTreeTableReadSnapshot<TKey, TValue>
     private SubFileStream m_subStream;
     private BinaryStream m_binaryStream;
     private SortedTree<TKey, TValue> m_tree;
-    private bool m_disposed;
 
     #endregion
 
@@ -72,7 +71,7 @@ public class SortedTreeTableReadSnapshot<TKey, TValue>
     /// <summary>
     /// Determines if this read snapshot has been disposed.
     /// </summary>
-    public bool IsDisposed => m_disposed;
+    public bool IsDisposed { get; private set; }
 
     #endregion
 
@@ -104,25 +103,19 @@ public class SortedTreeTableReadSnapshot<TKey, TValue>
     /// <filterpriority>2</filterpriority>
     public void Dispose()
     {
-        if (!m_disposed)
+        if (!IsDisposed)
         {
             try
             {
-                if (m_binaryStream is not null)
-                {
-                    m_binaryStream.Dispose();
-                }
-                if (m_subStream is not null)
-                {
-                    m_subStream.Dispose();
-                }
+                m_binaryStream?.Dispose();
+                m_subStream?.Dispose();
             }
             finally
             {
                 m_subStream = null;
                 m_binaryStream = null;
                 m_tree = null;
-                m_disposed = true;
+                IsDisposed = true;
             }
         }
     }

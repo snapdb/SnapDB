@@ -27,24 +27,24 @@
 namespace SnapDB.Snap;
 
 /// <summary>
-/// Provides extension methods for <see cref="TreeStream{TKey, TValue}"/>.
+/// Provides extension methods for <see cref="TreeStream{TKey, TValue}"/> instances.
 /// </summary>
 public static class TreeStreamExtensions
 {
     /// <summary>
-    /// Parses an entire stream to count the number of points. Notice, this will
-    /// enumerate the list and the list will have to be reset to be enumerated again.
+    /// Parses an entire stream to count the number of items. Notice, this will
+    /// enumerate the stream, and the stream will have to be reset to be enumerated again.
     /// </summary>
-    /// <typeparam name="TKey">The key type</typeparam>
-    /// <typeparam name="TValue">The value type</typeparam>
-    /// <param name="stream">The stream to enumerate</param>
-    /// <returns>the number of items in the stream.</returns>
+    /// <typeparam name="TKey">The key type.</typeparam>
+    /// <typeparam name="TValue">The value type.</typeparam>
+    /// <param name="stream">The stream to enumerate.</param>
+    /// <returns>The number of items in the stream.</returns>
     public static long Count<TKey, TValue>(this TreeStream<TKey, TValue> stream)
         where TKey : class, new()
         where TValue : class, new()
     {
-        TKey key = new TKey();
-        TValue value = new TValue();
+        TKey key = new();
+        TValue value = new();
         long cnt = 0;
         while (stream.Read(key, value))
             cnt++;

@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Topics>
-  <Topic id="About" visible="True" isDefault="true" isSelected="true" apiParentMode="InsertAfter" title="Gemstone GemTem Library Documentation" tocTitle="About" linkText="https://github.com/gemstone/gemtem">
+  <Topic id="About" visible="True" isDefault="true" isSelected="true" apiParentMode="InsertAfter" title="SnapDB Library Documentation" tocTitle="About" linkText="https://github.com/snapdb/SnapDB">
     <HelpKeywords>
-      <HelpKeyword index="K" term="welcome, getting started, root, gemstone" />
+      <HelpKeyword index="K" term="welcome, getting started, root, snapdb" />
     </HelpKeywords>
   </Topic>
 </Topics>

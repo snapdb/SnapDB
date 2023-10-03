@@ -33,15 +33,15 @@ namespace Org.BouncyCastle.Crypto.Agreement.Srp;
  */
 internal class Srp6Server
 {
-    private readonly SrpConstants param;
-    protected BigInteger v;
+    private readonly SrpConstants m_param;
+    protected BigInteger V;
 
     protected BigInteger A;
 
-    protected BigInteger privB;
-    protected BigInteger pubB;
+    protected BigInteger PrivB;
+    protected BigInteger PubB;
 
-    protected BigInteger u;
+    protected BigInteger U;
     protected BigInteger S;
 
     /**
@@ -54,11 +54,11 @@ internal class Srp6Server
     */
     public Srp6Server(SrpConstants param, BigInteger v)
     {
-        this.param = param;
-        this.v = v;
+        this.m_param = param;
+        this.V = v;
 
 #pragma warning disable CS0436 // Type conflicts with imported type
-        this.privB = Srp6Utilities.GeneratePrivateValue(param.N, new SecureRandom());
+        this.PrivB = Srp6Utilities.GeneratePrivateValue(param.N, new SecureRandom());
 #pragma warning restore CS0436 // Type conflicts with imported type
     }
 
@@ -68,8 +68,8 @@ internal class Srp6Server
      */
     public virtual BigInteger GenerateServerCredentials()
     {
-        this.pubB = param.k.Multiply(v).Mod(param.N).Add(param.g.ModPow(privB, param.N)).Mod(param.N);
-        return pubB;
+        this.PubB = m_param.K.Multiply(V).Mod(m_param.N).Add(m_param.G.ModPow(PrivB, m_param.N)).Mod(m_param.N);
+        return PubB;
     }
 
     /**
@@ -80,9 +80,9 @@ internal class Srp6Server
      */
     public virtual BigInteger CalculateSecret(IDigest digest, BigInteger clientA)
     {
-        this.A = Srp6Utilities.ValidatePublicValue(param.N, clientA);
-        this.u = Srp6Utilities.CalculateU(digest, param.N, A, pubB);
-        this.S = v.ModPow(u, param.N).Multiply(A).Mod(param.N).ModPow(privB, param.N);
+        this.A = Srp6Utilities.ValidatePublicValue(m_param.N, clientA);
+        this.U = Srp6Utilities.CalculateU(digest, m_param.N, A, PubB);
+        this.S = V.ModPow(U, m_param.N).Multiply(A).Mod(m_param.N).ModPow(PrivB, m_param.N);
         return S;
     }
 

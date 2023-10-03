@@ -40,19 +40,12 @@ namespace SnapDB.IO.FileStructure.Media;
 internal sealed class CustomFileStream
     : IDisposable
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(CustomFileStream), MessageClass.Component);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(CustomFileStream), MessageClass.Component);
 
-
-    /// <summary>
-    /// Needed since this class computes footer checksums.
-    /// </summary>
+    // Needed since this class computes footer check-sums.
     private bool m_disposed;
-    private string m_fileName;
-    private bool m_isReadOnly;
-    private bool m_isSharingEnabled;
-    private readonly int m_ioSize;
-    private readonly int m_fileStructureBlockSize;
-    private FileStream m_stream;
+
+    private FileStream m_stream = default!;
     private int m_streamUsers;
     private readonly ResourceQueue<byte[]>? m_bufferQueue;
 
@@ -71,7 +64,6 @@ internal sealed class CustomFileStream
     /// <summary>
     /// Creates a new CustomFileStream
     /// </summary>
-    /// <param name="stream">The filestream to use as the base stream.</param>
     /// <param name="ioSize">The size of a buffer pool entry.</param>
     /// <param name="fileStructureBlockSize">The size of an individual block.</param>
     /// <param name="fileName">The filename.</param>
@@ -91,12 +83,12 @@ internal sealed class CustomFileStream
         if (!BitMath.IsPowerOfTwo(fileStructureBlockSize))
             throw new ArgumentException("Must be a power of 2", nameof(fileStructureBlockSize));
 
-        m_ioSize = ioSize;
-        m_fileName = fileName;
-        m_isReadOnly = isReadOnly;
-        m_isSharingEnabled = isSharingEnabled;
-        m_fileStructureBlockSize = fileStructureBlockSize;
-        m_bufferQueue = ResourceList.GetResourceQueue(ioSize);
+        IoSize = ioSize;
+        FileName = fileName;
+        IsReadOnly = isReadOnly;
+        IsSharingEnabled = isSharingEnabled;
+        FileStructureBlockSize = fileStructureBlockSize;
+        m_bufferQueue = s_resourceList.GetResourceQueue(ioSize);
         m_syncRoot = new object();
 
         FileInfo fileInfo = new(fileName);
@@ -106,7 +98,7 @@ internal sealed class CustomFileStream
 #if DEBUG
     ~CustomFileStream()
     {
-        Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
+        s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
     }
 #endif
 
@@ -115,27 +107,27 @@ internal sealed class CustomFileStream
     /// <summary>
     /// Gets if the file was opened read-only.
     /// </summary>
-    public bool IsReadOnly => m_isReadOnly;
+    public bool IsReadOnly { get; private set; }
 
     /// <summary>
     /// Gets if the file was opened allowing shared read access.
     /// </summary>
-    public bool IsSharingEnabled => m_isSharingEnabled;
+    public bool IsSharingEnabled { get; private set; }
 
     /// <summary>
     /// Gets the name of the file.
     /// </summary>
-    public string FileName => m_fileName;
+    public string FileName { get; private set; }
 
     /// <summary>
     /// Gets the number of bytes in a file structure block.
     /// </summary>
-    public int FileStructureBlockSize => m_fileStructureBlockSize;
+    public int FileStructureBlockSize { get; }
 
     /// <summary>
     /// Gets the number of bytes in each I/O operation.
     /// </summary>
-    public int IOSize => m_ioSize;
+    public int IoSize { get; }
 
     /// <summary>
     /// Gets the length of the stream.
@@ -154,7 +146,7 @@ internal sealed class CustomFileStream
         using (m_isUsingStream.EnterWriteLock())
         {
             if (m_streamUsers == 0)
-                m_stream = new FileStream(m_fileName, FileMode.Open, m_isReadOnly ? FileAccess.Read : FileAccess.ReadWrite, m_isSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
+                m_stream = new FileStream(FileName, FileMode.Open, IsReadOnly ? FileAccess.Read : FileAccess.ReadWrite, IsSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
 
             m_streamUsers++;
         }
@@ -224,7 +216,7 @@ internal sealed class CustomFileStream
 
                 else
                 {
-                    Log.Publish(MessageLevel.Warning, "File Read Error", $"The OS has closed the following file {m_stream.Name}. Attempting to reopen.");
+                    s_log.Publish(MessageLevel.Warning, "File Read Error", $"The OS has closed the following file {m_stream.Name}. Attempting to reopen.");
                     ReopenFile();
                 }
             }
@@ -292,7 +284,7 @@ internal sealed class CustomFileStream
 
         m_bufferQueue.Enqueue(buffer);
 
-        Footer.WriteChecksumResultsToFooter(locationToCopyData, m_fileStructureBlockSize, buffer.Length);
+        Footer.WriteChecksumResultsToFooter(locationToCopyData, FileStructureBlockSize, buffer.Length);
     }
 
 
@@ -320,7 +312,7 @@ internal sealed class CustomFileStream
             {
                 stream.ReadBlock(currentPosition, out IntPtr ptr, out int streamLength);
                 int subLength = (int)Math.Min(streamLength, endPosition - currentPosition);
-                Footer.ComputeChecksumAndClearFooter(ptr, m_fileStructureBlockSize, subLength);
+                Footer.ComputeChecksumAndClearFooter(ptr, FileStructureBlockSize, subLength);
                 Marshal.Copy(ptr, buffer, 0, subLength);
                 WriteRaw(currentPosition, buffer, subLength);
 
@@ -376,7 +368,7 @@ internal sealed class CustomFileStream
     {
         using (m_isUsingStream.EnterWriteLock())
         {
-            string oldFileName = m_fileName;
+            string oldFileName = FileName;
             string newFileName = Path.ChangeExtension(oldFileName, extension);
 
             if (File.Exists(newFileName))
@@ -389,9 +381,9 @@ internal sealed class CustomFileStream
 
             if (openStream)
                 m_stream = new FileStream(newFileName, FileMode.Open, isReadOnly ? FileAccess.Read : FileAccess.ReadWrite, isSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
-            m_fileName = newFileName;
-            m_isSharingEnabled = isSharingEnabled;
-            m_isReadOnly = isReadOnly;
+            FileName = newFileName;
+            IsSharingEnabled = isSharingEnabled;
+            IsReadOnly = isReadOnly;
         }
     }
 
@@ -409,9 +401,9 @@ internal sealed class CustomFileStream
 
             catch (Exception e)
             {
-                Log.Publish(MessageLevel.Info, "Error when disposing stream", null, null, e);
+                s_log.Publish(MessageLevel.Info, "Error when disposing stream", null, null, e);
             }
-            m_stream = new FileStream(fileName, FileMode.Open, m_isReadOnly ? FileAccess.Read : FileAccess.ReadWrite, m_isSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
+            m_stream = new FileStream(fileName, FileMode.Open, IsReadOnly ? FileAccess.Read : FileAccess.ReadWrite, IsSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
         }
     }
 
@@ -427,10 +419,10 @@ internal sealed class CustomFileStream
             if (m_stream is not null)
             {
                 m_stream.Dispose();
-                m_stream = new FileStream(m_fileName, FileMode.Open, isReadOnly ? FileAccess.Read : FileAccess.ReadWrite, isSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
+                m_stream = new FileStream(FileName, FileMode.Open, isReadOnly ? FileAccess.Read : FileAccess.ReadWrite, isSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
             }
-            m_isSharingEnabled = isSharingEnabled;
-            m_isReadOnly = isReadOnly;
+            IsSharingEnabled = isSharingEnabled;
+            IsReadOnly = isReadOnly;
         }
     }
 
@@ -467,7 +459,7 @@ internal sealed class CustomFileStream
     /// </summary>
     /// <param name="fileName">The name of the file.</param>
     /// <param name="ioBlockSize">The number of bytes to do all io with.</param>
-    /// <param name="fileStructureBlockSize">The number of bytes in the file structure so checksums can be properly computed.</param>
+    /// <param name="fileStructureBlockSize">The number of bytes in the file structure so check-sums can be properly computed.</param>
     /// <returns>A new <see cref="CustomFileStream"/> instance representing the specified file.</returns>
     public static CustomFileStream CreateFile(string fileName, int ioBlockSize, int fileStructureBlockSize)
     {
@@ -496,14 +488,14 @@ internal sealed class CustomFileStream
     /// <summary>
     /// Queues byte[] blocks.
     /// </summary>
-    private static readonly ResourceQueueCollection<int, byte[]> ResourceList;
+    private static readonly ResourceQueueCollection<int, byte[]> s_resourceList;
 
     /// <summary>
     /// Creates a resource list that everyone shares.
     /// </summary>
     static CustomFileStream()
     {
-        ResourceList = new ResourceQueueCollection<int, byte[]>(blockSize => () => new byte[blockSize], 10, 20);
+        s_resourceList = new ResourceQueueCollection<int, byte[]>(blockSize => () => new byte[blockSize], 10, 20);
     }
 
     #endregion

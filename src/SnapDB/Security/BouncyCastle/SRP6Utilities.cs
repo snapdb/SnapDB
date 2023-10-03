@@ -28,17 +28,17 @@ namespace Org.BouncyCastle.Crypto.Agreement.Srp;
 
 internal static class Srp6Utilities
 {
-    public static BigInteger CalculateK(IDigest digest, BigInteger N, BigInteger g)
+    public static BigInteger CalculateK(IDigest digest, BigInteger n, BigInteger g)
     {
-        return HashPaddedPair(digest, N, N, g);
+        return HashPaddedPair(digest, n, n, g);
     }
 
-    public static BigInteger CalculateU(IDigest digest, BigInteger N, BigInteger A, BigInteger B)
+    public static BigInteger CalculateU(IDigest digest, BigInteger n, BigInteger a, BigInteger b)
     {
-        return HashPaddedPair(digest, N, A, B);
+        return HashPaddedPair(digest, n, a, b);
     }
 
-    public static BigInteger CalculateX(IDigest digest, BigInteger N, byte[] salt, byte[] identity, byte[] password)
+    public static BigInteger CalculateX(IDigest digest, BigInteger n, byte[] salt, byte[] identity, byte[] password)
     {
         byte[] output = new byte[digest.GetDigestSize()];
 
@@ -51,21 +51,21 @@ internal static class Srp6Utilities
         digest.BlockUpdate(output, 0, output.Length);
         digest.DoFinal(output, 0);
 
-        return new BigInteger(1, output).Mod(N);
+        return new BigInteger(1, output).Mod(n);
     }
 
-    public static BigInteger GeneratePrivateValue(BigInteger N, SecureRandom random)
+    public static BigInteger GeneratePrivateValue(BigInteger n, SecureRandom random)
     {
-        int minBits = System.Math.Min(256, N.BitLength / 2);
+        int minBits = System.Math.Min(256, n.BitLength / 2);
         BigInteger min = BigInteger.One.ShiftLeft(minBits - 1);
-        BigInteger max = N.Subtract(BigInteger.One);
+        BigInteger max = n.Subtract(BigInteger.One);
 
         return BigIntegers.CreateRandomInRange(min, max, random);
     }
 
-    public static BigInteger ValidatePublicValue(BigInteger N, BigInteger val)
+    public static BigInteger ValidatePublicValue(BigInteger n, BigInteger val)
     {
-        val = val.Mod(N);
+        val = val.Mod(n);
 
         // Check that val % N != 0
         if (val.Equals(BigInteger.Zero))
@@ -78,20 +78,20 @@ internal static class Srp6Utilities
     /// Pads n1 and n2 to the same number of bytes as N. Then hashes them.
     /// </summary>
     /// <returns>The hash Mod N</returns>
-    private static BigInteger HashPaddedPair(IDigest digest, BigInteger N, BigInteger n1, BigInteger n2)
+    private static BigInteger HashPaddedPair(IDigest digest, BigInteger n, BigInteger n1, BigInteger n2)
     {
-        int padLength = (N.BitLength + 7) / 8;
+        int padLength = (n.BitLength + 7) / 8;
 
-        byte[] n1_bytes = GetPadded(n1, padLength);
-        byte[] n2_bytes = GetPadded(n2, padLength);
+        byte[] n1Bytes = GetPadded(n1, padLength);
+        byte[] n2Bytes = GetPadded(n2, padLength);
 
-        digest.BlockUpdate(n1_bytes, 0, n1_bytes.Length);
-        digest.BlockUpdate(n2_bytes, 0, n2_bytes.Length);
+        digest.BlockUpdate(n1Bytes, 0, n1Bytes.Length);
+        digest.BlockUpdate(n2Bytes, 0, n2Bytes.Length);
 
         byte[] output = new byte[digest.GetDigestSize()];
         digest.DoFinal(output, 0);
 
-        return new BigInteger(1, output).Mod(N);
+        return new BigInteger(1, output).Mod(n);
     }
 
     /// <summary>

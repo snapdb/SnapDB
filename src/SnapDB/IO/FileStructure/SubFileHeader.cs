@@ -38,8 +38,6 @@ public class SubFileHeader
     #region [ Members ]
 
     private readonly bool m_isSimplified;
-    private readonly SubFileName m_fileName;
-    private readonly ushort m_fileIdNumber;
     private uint m_dataBlockCount;
     private uint m_totalBlocksCount;
     private uint m_directBlock;
@@ -61,8 +59,8 @@ public class SubFileHeader
     public SubFileHeader(BinaryReader dataReader, bool isImmutable, bool isSimplified)
     {
         m_isSimplified = isSimplified;
-        m_fileName = SubFileName.Load(dataReader);
-        m_fileIdNumber = dataReader.ReadUInt16();
+        FileName = SubFileName.Load(dataReader);
+        FileIdNumber = dataReader.ReadUInt16();
         m_dataBlockCount = dataReader.ReadUInt32();
         if (!isSimplified)
         {
@@ -92,8 +90,8 @@ public class SubFileHeader
             throw new ArgumentException("The feature type cannot be an empty GUID value", nameof(fileName));
         m_isSimplified = isSimplified;
         IsReadOnly = isImmutable;
-        m_fileIdNumber = fileId;
-        m_fileName = fileName;
+        FileIdNumber = fileId;
+        FileName = fileName;
     }
 
     #endregion
@@ -103,12 +101,12 @@ public class SubFileHeader
     /// <summary>
     /// Gets the unique file identifier for this file.
     /// </summary>
-    public ushort FileIdNumber => m_fileIdNumber;
+    public ushort FileIdNumber { get; }
 
     /// <summary>
     /// Gets the <see cref="SubFileName"/> that represents what type of data is contained in this file.
     /// </summary>
-    public SubFileName FileName => m_fileName;
+    public SubFileName FileName { get; }
 
     /// <summary>
     /// Gets the number of blocks the data portion of this file contains.
@@ -239,8 +237,8 @@ public class SubFileHeader
     /// <param name="dataWriter">The stream to write to.</param>
     public void Save(BinaryWriter dataWriter)
     {
-        m_fileName.Save(dataWriter);
-        dataWriter.Write(m_fileIdNumber);
+        FileName.Save(dataWriter);
+        dataWriter.Write(FileIdNumber);
         dataWriter.Write(m_dataBlockCount);
         if (!m_isSimplified)
         {

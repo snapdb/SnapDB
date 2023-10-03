@@ -3,13 +3,13 @@
   <developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
     <introduction>
       <para>
-        The Gemstone GemTem Library is a useful collection of open source classes and methods for gemtem.
+        The SNAPdb Engine is a high-performance key/value pair archiving technology.
       </para>
       <para>
         Return to
         <externalLink>
           <linkText>documentation home</linkText>
-          <linkUri>https://gemstone.github.io/gemtem/</linkUri>
+          <linkUri>https://snapdb.github.io/SnapDB/</linkUri>
           <linkTarget>_self</linkTarget>
         </externalLink>.
       </para>

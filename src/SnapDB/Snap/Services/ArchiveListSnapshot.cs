@@ -47,8 +47,6 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
 
     private ManualResetEvent m_connectionDisposed;
 
-    private bool m_disposed;
-
     /// <summary>
     /// A callback to tell <see cref="ArchiveList{TKey,TValue}"/> when resources are no longer being used.
     /// </summary>
@@ -58,8 +56,6 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     /// A callback to get the latest list of resources from <see cref="ArchiveList{TKey,TValue}"/>.
     /// </summary>
     private Action<ArchiveListSnapshot<TKey, TValue>> m_acquireResources;
-
-    private bool m_isDisposeRequested;
 
     /// <summary>
     /// Contains an array of all of the resources currently used by this transaction.
@@ -89,13 +85,13 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     {
         get
         {
-            if (m_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
             return m_tables;
         }
         set
         {
-            if (m_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
             if (value is null)
                 m_tables = new ArchiveTableSummary<TKey, TValue>[0];
@@ -110,11 +106,11 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     /// <returns>Null if not found</returns>
     public ArchiveTableSummary<TKey, TValue> TryGetFile(Guid fileId)
     {
-        if (m_disposed)
+        if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
         foreach (ArchiveTableSummary<TKey, TValue> table in m_tables)
         {
-            if (table != null)
+            if (table is not null)
             {
                 if (table.FileId == fileId)
                     return table;
@@ -128,35 +124,34 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     /// if this is true this means the engine is waiting for the release
     /// of this object before it can continue its next task.
     /// </summary>
-    public bool IsDisposeRequested => m_isDisposeRequested;
+    public bool IsDisposeRequested { get; private set; }
 
     /// <summary>
     /// Gets if this class has been disposed.
     /// </summary>
-    public bool IsDisposed => m_disposed;
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Disposes this class, releasing all resource locks.
     /// </summary>
     public void Dispose()
     {
-        if (!m_disposed)
+        if (!IsDisposed)
         {
             m_connectionDisposed.Set();
             lock (m_syncDisposing)
             {
-                if (m_connectionDisposed != null)
+                if (m_connectionDisposed is not null)
                 {
                     m_connectionDisposed.Dispose();
                     m_connectionDisposed = null;
                 }
             }
 
-            if (m_onDisposed != null)
-                m_onDisposed.Invoke(this);
+            m_onDisposed?.Invoke(this);
             m_onDisposed = null;
             m_acquireResources = null;
-            m_disposed = true;
+            IsDisposed = true;
         }
     }
 
@@ -165,24 +160,23 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     /// </summary>
     public void UpdateSnapshot()
     {
-        if (m_disposed)
+        if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
         m_acquireResources.Invoke(this);
     }
 
     internal void Engine_BeginDropConnection()
     {
-        m_isDisposeRequested = true;
+        IsDisposeRequested = true;
         Thread.MemoryBarrier();
-        if (DisposeRequested != null)
-            DisposeRequested();
+        DisposeRequested?.Invoke();
     }
 
     internal void Engine_EndDropConnection()
     {
         lock (m_syncDisposing)
         {
-            if (m_connectionDisposed != null)
+            if (m_connectionDisposed is not null)
             {
                 m_connectionDisposed.WaitOne();
                 m_connectionDisposed.Dispose();

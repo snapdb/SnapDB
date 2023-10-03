@@ -59,7 +59,6 @@ public unsafe class Node<TKey>
     protected byte Level;
     protected int BlockSize;
     protected BinaryStreamPointerBase Stream;
-    private uint m_nodeIndex;
     private ushort m_recordCount;
     private ushort m_validBytes;
     private uint m_leftSiblingNodeIndex;
@@ -123,7 +122,7 @@ public unsafe class Node<TKey>
     /// <summary>
     /// Gets the node index of this current node.
     /// </summary>
-    public uint NodeIndex => m_nodeIndex;
+    public uint NodeIndex { get; private set; }
 
     /// <summary>
     /// Gets/Sets the number of records in this node.
@@ -258,10 +257,9 @@ public unsafe class Node<TKey>
     /// </summary>
     public void Clear()
     {
-        if (NodeIndexChanged != null)
-            NodeIndexChanged(this, EventArgs.Empty);
+        NodeIndexChanged?.Invoke(this, EventArgs.Empty);
         //InsideNodeBoundary = m_BoundsFalse;
-        m_nodeIndex = uint.MaxValue;
+        NodeIndex = uint.MaxValue;
         m_pointerReadVersion = -1;
         m_pointerWriteVersion = -1;
         m_recordCount = 0;
@@ -281,11 +279,10 @@ public unsafe class Node<TKey>
     {
         if (nodeIndex == uint.MaxValue)
             throw new Exception("Invalid Node Index");
-        if (m_nodeIndex != nodeIndex)
+        if (NodeIndex != nodeIndex)
         {
-            if (NodeIndexChanged != null)
-                NodeIndexChanged(this, EventArgs.Empty);
-            m_nodeIndex = nodeIndex;
+            NodeIndexChanged?.Invoke(this, EventArgs.Empty);
+            NodeIndex = nodeIndex;
             m_pointerReadVersion = -1;
             m_pointerWriteVersion = -1;
             byte* ptr = GetReadPointer();
@@ -306,7 +303,7 @@ public unsafe class Node<TKey>
     /// <param name="newNodeIndex"></param>
     public void CreateEmptyNode(uint newNodeIndex)
     {
-        TKey key = new TKey();
+        TKey key = new();
         byte* ptr = Stream.GetWritePointer(newNodeIndex * BlockSize, BlockSize);
         ptr[OffsetOfVersion] = Version;
         ptr[OffsetOfNodeLevel] = Level;

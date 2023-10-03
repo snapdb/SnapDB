@@ -32,7 +32,7 @@ namespace SnapDB.Collections;
 /// Creates a list of items that will be weak referenced.
 /// This list is thread-safe and allows enumeration while adding and removing from the list.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">List type.</typeparam>
 public class WeakList<T> : IEnumerable<T>
     where T : class
 {
@@ -162,7 +162,6 @@ public class WeakList<T> : IEnumerable<T>
         private readonly WeakReference?[] m_items;
         private readonly int m_lastItem;
         private int m_currentIndex;
-        private T? m_current;
 
         /// <summary>
         /// Creates a <see cref="Enumerator"/>.
@@ -174,7 +173,7 @@ public class WeakList<T> : IEnumerable<T>
             m_items = items;
             m_lastItem = count - 1;
             m_currentIndex = -1;
-            m_current = null;
+            Current = null;
         }
 
         /// <summary>
@@ -183,7 +182,7 @@ public class WeakList<T> : IEnumerable<T>
         /// <returns>
         /// The element in the collection at the current position of the enumerator.
         /// </returns>
-        public T? Current => m_current;
+        public T? Current { get; private set; }
 
         /// <summary>
         /// Gets the current element in the collection.
@@ -191,7 +190,7 @@ public class WeakList<T> : IEnumerable<T>
         /// <returns>
         /// The current element in the collection.
         /// </returns>
-        object? IEnumerator.Current => Current;
+        readonly object? IEnumerator.Current => Current;
 
         /// <summary>
         /// Advances the enumerator to the next valid item in the collection.
@@ -215,7 +214,7 @@ public class WeakList<T> : IEnumerable<T>
                 if (reference.Target is T item)
                 {
                     // If the weak reference can be resolved to an item of type T, set the current item and return true.
-                    m_current = item;
+                    Current = item;
                     
                     return true;
                 }
@@ -234,14 +233,14 @@ public class WeakList<T> : IEnumerable<T>
         /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created. </exception><filterpriority>2</filterpriority>
         public void Reset()
         {
-            m_current = null;
+            Current = null;
             m_currentIndex = -1;
         }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        public void Dispose() => m_current = null;
+        public void Dispose() => Current = null;
     }
 
     private readonly object m_syncRoot;

@@ -34,7 +34,7 @@ namespace SnapDB.Security.Authentication;
 /// </summary>
 public class CertificateUserCredential
 {
-    public string UserID;
+    public string UserId;
 
     /// <summary>
     /// Creates user credentials.
@@ -46,7 +46,7 @@ public class CertificateUserCredential
         SecurityIdentifier sid = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
         UserID = sid.ToString();
 #else
-        UserID = UserInfo.UserNameToSID(username);
+        UserId = UserInfo.UserNameToSID(username);
 #endif
     }
 

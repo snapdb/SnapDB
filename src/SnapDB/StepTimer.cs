@@ -29,81 +29,111 @@ using System.Text;
 
 namespace SnapDB;
 
+/// <summary>
+/// A utility class for measuring and analyzing the execution time of code segments.
+/// </summary>
 public static class StepTimer
 {
+    /// <summary>
+    /// Represents an interface for measuring and recording the execution time of code segments.
+    /// </summary>
     public interface ITimer
     {
+        /// <summary>
+        /// Stops the timer and records the elapsed time for the code segment.
+        /// </summary>
+        /// <param name="loopCount">The number of times the code segment was executed (default is 1).</param>
         void Stop(int loopCount = 1);
     }
 
     private class RunCount : ITimer
     {
-        public readonly List<double> RunResults = new List<double>();
-        public readonly Stopwatch SW = new Stopwatch();
+        public readonly List<double> RunResults = new();
+        public readonly Stopwatch Sw = new();
 
         public void Stop(int loopCount = 1)
         {
-            SW.Stop();
-            RunResults.Add(SW.Elapsed.TotalSeconds / loopCount);
+            Sw.Stop();
+            RunResults.Add(Sw.Elapsed.TotalSeconds / loopCount);
         }
     }
 
-    private static readonly SortedList<string, RunCount> AllStopwatches;
+    private static readonly SortedList<string, RunCount> s_allStopwatches;
 
     static StepTimer()
     {
-        AllStopwatches = new SortedList<string, RunCount>();
+        s_allStopwatches = new SortedList<string, RunCount>();
     }
 
-    public static ITimer Start(string name, bool runGC = false)
+    public static ITimer Start(string name, bool runGc = false)
     {
-        if (!AllStopwatches.ContainsKey(name))
-            AllStopwatches.Add(name, new RunCount());
+        if (!s_allStopwatches.ContainsKey(name))
+            s_allStopwatches.Add(name, new RunCount());
 
-        if (runGC)
+        if (runGc)
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }
-        RunCount sw = AllStopwatches[name];
-        sw.SW.Restart();
+        RunCount sw = s_allStopwatches[name];
+        sw.Sw.Restart();
         
         return sw;
     }
 
     public static void Reset()
     {
-        AllStopwatches.Clear();
+        s_allStopwatches.Clear();
     }
 
-    public static double GetAverage(string Name)
+    /// <summary>
+    /// Calculates and returns the average execution time recorded by a timer with the specified name.
+    /// </summary>
+    /// <param name="name">The name of the timer for which to calculate the average.</param>
+    /// <returns>The average execution time in seconds.</returns>
+    public static double GetAverage(string name)
     {
-        RunCount kvp = AllStopwatches[Name];
+        RunCount kvp = s_allStopwatches[name];
         kvp.RunResults.Sort();
 
         return kvp.RunResults[kvp.RunResults.Count >> 1];
     }
 
-    public static double GetNanoSeconds(string Name, int loopCount)
+    /// <summary>
+    /// Calculates and returns the average execution time in nanoseconds recorded by a timer with the specified name.
+    /// </summary>
+    /// <param name="name">The name of the timer for which to calculate the average.</param>
+    /// <param name="loopCount">The number of iterations or loops used during measurements.</param>
+    /// <returns>The average execution time in nanoseconds.</returns>
+    public static double GetNanoSeconds(string name, int loopCount)
     {
-        RunCount kvp = AllStopwatches[Name];
+        RunCount kvp = s_allStopwatches[name];
         kvp.RunResults.Sort();
 
         return kvp.RunResults[kvp.RunResults.Count >> 1] * 1000000000.0 / loopCount;
     }
 
-    public static double GetSlowest(string Name)
+    /// <summary>
+    /// Calculates and returns the slowest recorded execution time (90th percentile) in seconds by a timer with the specified name.
+    /// </summary>
+    /// <param name="name">The name of the timer for which to calculate the slowest execution time.</param>
+    /// <returns>The slowest recorded execution time in seconds.</returns>
+    public static double GetSlowest(string name)
     {
-        RunCount kvp = AllStopwatches[Name];
+        RunCount kvp = s_allStopwatches[name];
         kvp.RunResults.Sort();
 
         return kvp.RunResults[(int)(kvp.RunResults.Count * 0.9)];
     }
 
+    /// <summary>
+    /// Generates a summary of recorded execution times for all timers and returns the results as a formatted string.
+    /// </summary>
+    /// <returns>A string containing the summary of recorded execution times for all timers.</returns>
     public static string GetResults()
     {
-        StringBuilder sb = new StringBuilder();
-        foreach (KeyValuePair<string, RunCount> kvp in AllStopwatches)
+        StringBuilder sb = new();
+        foreach (KeyValuePair<string, RunCount> kvp in s_allStopwatches)
         {
             kvp.Value.RunResults.Sort();
             double rate = kvp.Value.RunResults[kvp.Value.RunResults.Count >> 1];
@@ -113,9 +143,15 @@ public static class StepTimer
         return sb.ToString();
     }
 
+    /// <summary>
+    /// Measures the execution time of an action and returns the median execution time in microseconds.
+    /// </summary>
+    /// <param name="internalLoopCount">The number of internal loops used for timing.</param>
+    /// <param name="del">The action to be timed.</param>
+    /// <returns>The median execution time of the action in microseconds.</returns>
     public static string Time(int internalLoopCount, Action del)
     {
-        Stopwatch sw = new Stopwatch();
+        Stopwatch sw = new();
 
         int innerLoopCount = 1;
 
@@ -130,7 +166,7 @@ public static class StepTimer
         while (TimeLoop(sw, del, innerLoopCount) < 3)
             innerLoopCount *= 2;
 
-        List<double> list = new List<double>();
+        List<double> list = new();
 
         for (int x = 0; x < 100; x++)
         {
@@ -156,9 +192,16 @@ public static class StepTimer
         return sw.Elapsed.TotalMilliseconds;
     }
 
+    /// <summary>
+    /// Measures the execution time of an action that takes a Stopwatch parameter 
+    /// and returns the median execution time in microseconds.
+    /// </summary>
+    /// <param name="internalLoopCount">The number of internal loops used for timing.</param>
+    /// <param name="del">The action to be timed, which takes a Stopwatch parameter.</param>
+    /// <returns>The median execution time of the action in microseconds.</returns>
     public static string Time(int internalLoopCount, Action<Stopwatch> del)
     {
-        Stopwatch sw = new Stopwatch();
+        Stopwatch sw = new();
 
         int innerLoopCount = 1;
 
@@ -173,7 +216,7 @@ public static class StepTimer
         while (TimeLoop(sw, del, innerLoopCount) < 3)
             innerLoopCount *= 2;
 
-        List<double> list = new List<double>();
+        List<double> list = new();
 
         for (int x = 0; x < 100; x++)
         {

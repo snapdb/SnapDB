@@ -40,7 +40,7 @@ namespace SnapDB.IO.Unmanaged;
 internal class MemoryPoolPageList
     : IDisposable
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(MemoryPoolPageList), MessageClass.Component);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(MemoryPoolPageList), MessageClass.Component);
 
     #region [ Members ]
 
@@ -118,7 +118,7 @@ internal class MemoryPoolPageList
 
         if (!Environment.Is64BitProcess)
         {
-            Log.Publish(MessageLevel.Info, "Process running in 32-bit mode. Memory Pool is Limited in size.");
+            s_log.Publish(MessageLevel.Info, "Process running in 32-bit mode. Memory Pool is Limited in size.");
             totalMemory = Math.Min(int.MaxValue, totalMemory); // Clip at 2GB
             availableMemory = Math.Min(int.MaxValue - GC.GetTotalMemory(false), availableMemory); // Clip at 2GB
         }
@@ -138,7 +138,7 @@ internal class MemoryPoolPageList
         {
             MaximumPoolSize = Math.Max(Math.Min(MemoryPoolCeiling, maximumBufferSize), MemoryPool.MinimumTestedSupportedMemoryFloor);
         }
-        Log.Publish(MessageLevel.Info, "Memory Pool Maximum Defaulted To: " + MaximumPoolSize / 1024 / 1024 + "MB of Ram");
+        s_log.Publish(MessageLevel.Info, "Memory Pool Maximum Defaulted To: " + MaximumPoolSize / 1024 / 1024 + "MB of Ram");
 
         m_memoryBlockAllocations = 0;
         m_usedPageCount = 0;
@@ -152,7 +152,7 @@ internal class MemoryPoolPageList
 #if DEBUG
     ~MemoryPoolPageList()
     {
-        Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
+        s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
     }
 #endif
 
@@ -228,12 +228,12 @@ internal class MemoryPoolPageList
             Memory block = m_memoryBlocks[allocationIndex];
             if (block is null)
             {
-                Log.Publish(MessageLevel.Warning, MessageFlags.BugReport, "Memory Block inside Memory Pool is null. Possible race condition.");
+                s_log.Publish(MessageLevel.Warning, MessageFlags.BugReport, "Memory Block inside Memory Pool is null. Possible race condition.");
                 throw new NullReferenceException("Memory Block is null");
             }
             if (block.Address == IntPtr.Zero)
             {
-                Log.Publish(MessageLevel.Warning, MessageFlags.BugReport, "Memory Block inside Memory Pool was released prematurely. Possible race condition.");
+                s_log.Publish(MessageLevel.Warning, MessageFlags.BugReport, "Memory Block inside Memory Pool was released prematurely. Possible race condition.");
                 throw new NullReferenceException("Memory Block is null");
             }
 
@@ -270,7 +270,7 @@ internal class MemoryPoolPageList
             }
         }
 
-        Log.Publish(MessageLevel.Warning, MessageFlags.BugReport, "A page has been released twice. Some code somewhere could create memory corruption");
+        s_log.Publish(MessageLevel.Warning, MessageFlags.BugReport, "A page has been released twice. Some code somewhere could create memory corruption");
 
         throw new Exception("Cannot have duplicate calls to release pages.");
     }

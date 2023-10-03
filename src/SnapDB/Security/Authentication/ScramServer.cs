@@ -37,7 +37,7 @@ public class ScramServer
     /// Contains the user credentials database
     /// </summary>
     public readonly ScramUserCredentials Users;
-    private readonly NonceGenerator m_nonce = new NonceGenerator(16);
+    private readonly NonceGenerator m_nonce = new(16);
 
     /// <summary>
     /// 
@@ -77,7 +77,7 @@ public class ScramServer
         byte[] serverSignature = user.ComputeServerSignature(authMessage);
         byte[] clientProof = stream.ReadBytes();
 
-        byte[] clientKeyVerify = Scram.XOR(clientProof, clientSignature);
+        byte[] clientKeyVerify = Scram.Xor(clientProof, clientSignature);
         byte[] storedKeyVerify = user.ComputeStoredKey(clientKeyVerify);
 
         if (storedKeyVerify.SecureEquals(user.StoredKey))

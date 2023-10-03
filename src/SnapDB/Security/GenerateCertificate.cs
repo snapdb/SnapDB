@@ -66,41 +66,35 @@ public static class GenerateCertificate
     /// </summary>
     public static void CreateSelfSignedCertificate(string subjectDirName, DateTime startDate, DateTime endDate, int signatureBits, int keyStrength, string password, string fileName)
     {
-        string signatureAlgorithm;
         switch (signatureBits)
         {
             case 160:
-                signatureAlgorithm = "SHA1withRSA";
                 break;
             case 224:
-                signatureAlgorithm = "SHA224withRSA";
                 break;
             case 256:
-                signatureAlgorithm = "SHA256withRSA";
                 break;
             case 384:
-                signatureAlgorithm = "SHA384withRSA";
                 break;
             case 512:
-                signatureAlgorithm = "SHA512withRSA";
                 break;
             default:
                 throw new ArgumentException("Invalid signature bit size.", nameof(signatureBits));
         }
 
         // Generating Random Numbers
-        CryptoApiRandomGenerator randomGenerator = new CryptoApiRandomGenerator();
-        SecureRandom random = new SecureRandom(randomGenerator);
+        CryptoApiRandomGenerator randomGenerator = new();
+        SecureRandom random = new(randomGenerator);
 
         // Generate public/private keys.
 
-        KeyGenerationParameters keyGenerationParameters = new KeyGenerationParameters(random, keyStrength);
-        RsaKeyPairGenerator keyPairGenerator = new RsaKeyPairGenerator();
+        KeyGenerationParameters keyGenerationParameters = new(random, keyStrength);
+        RsaKeyPairGenerator keyPairGenerator = new();
         keyPairGenerator.Init(keyGenerationParameters);
         AsymmetricCipherKeyPair encryptionKeys = keyPairGenerator.GenerateKeyPair();
 
         // The Certificate Generator
-        X509V3CertificateGenerator certificateGenerator = new X509V3CertificateGenerator();
+        X509V3CertificateGenerator certificateGenerator = new();
         certificateGenerator.SetSerialNumber(BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(Int64.MaxValue), random));
         
         // TODO: JRC - check to see what has changed here and if this is necessary
@@ -150,31 +144,26 @@ public static class GenerateCertificate
     {
         DateTime startDate = DateTime.UtcNow.AddYears(-1);
         DateTime endDate = DateTime.UtcNow.AddYears(100);
-
-        string signatureAlgorithm;
         switch (signatureBits)
         {
             case 160:
-                signatureAlgorithm = "SHA1withRSA";
                 break;
             case 256:
-                signatureAlgorithm = "SHA256withRSA";
                 break;
             case 384:
-                signatureAlgorithm = "SHA384withRSA";
                 break;
             default:
                 throw new ArgumentException("Invalid signature bit size.", nameof(signatureBits));
         }
 
         // Generating Random Numbers
-        CryptoApiRandomGenerator randomGenerator = new CryptoApiRandomGenerator();
-        SecureRandom random = new SecureRandom(randomGenerator);
+        CryptoApiRandomGenerator randomGenerator = new();
+        SecureRandom random = new(randomGenerator);
 
         // Generate public/private keys.
 
-        KeyGenerationParameters keyGenerationParameters = new KeyGenerationParameters(random, keyStrength);
-        RsaKeyPairGenerator keyPairGenerator = new RsaKeyPairGenerator();
+        KeyGenerationParameters keyGenerationParameters = new(random, keyStrength);
+        RsaKeyPairGenerator keyPairGenerator = new();
         keyPairGenerator.Init(keyGenerationParameters);
         AsymmetricCipherKeyPair encryptionKeys = keyPairGenerator.GenerateKeyPair();
 

@@ -55,8 +55,8 @@ public class FirstStageWriter<TKey, TValue>
     private readonly FirstStageWriterSettings m_settings;
     private bool m_stopped;
     private bool m_disposed;
-    private readonly AtomicInt64 m_lastCommitedSequenceNumber = new AtomicInt64();
-    private readonly AtomicInt64 m_lastRolledOverSequenceNumber = new AtomicInt64();
+    private readonly AtomicInt64 m_lastCommitedSequenceNumber = new();
+    private readonly AtomicInt64 m_lastRolledOverSequenceNumber = new();
 
     private readonly ScheduledTask m_rolloverTask;
     private readonly object m_syncRoot;
@@ -74,7 +74,7 @@ public class FirstStageWriter<TKey, TValue>
         : base(MessageClass.Framework)
     {
         if (settings is null)
-            throw new ArgumentNullException("settings");
+            throw new ArgumentNullException(nameof(settings));
         m_settings = settings.CloneReadonly();
         m_settings.Validate();
         m_createNextStageFile = new SimplifiedArchiveInitializer<TKey, TValue>(m_settings.FinalSettings);
@@ -143,7 +143,7 @@ public class FirstStageWriter<TKey, TValue>
 
             if (m_pendingTables1.Count == 10)
             {
-                using (UnionTreeStream<TKey, TValue> reader = new UnionTreeStream<TKey, TValue>(m_pendingTables1.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true))
+                using (UnionTreeStream<TKey, TValue> reader = new(m_pendingTables1.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true))
                 {
                     SortedTreeFile file1 = SortedTreeFile.CreateInMemory(4096);
                     SortedTreeTable<TKey, TValue> table1 = file1.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
@@ -171,7 +171,7 @@ public class FirstStageWriter<TKey, TValue>
 
             if (m_pendingTables2.Count == 10)
             {
-                using (UnionTreeStream<TKey, TValue> reader = new UnionTreeStream<TKey, TValue>(m_pendingTables2.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true))
+                using (UnionTreeStream<TKey, TValue> reader = new(m_pendingTables2.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true))
                 {
                     SortedTreeFile file1 = SortedTreeFile.CreateInMemory(4096);
                     SortedTreeTable<TKey, TValue> table1 = file1.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
@@ -216,8 +216,7 @@ public class FirstStageWriter<TKey, TValue>
             }
         }
 
-        if (SequenceNumberCommitted != null)
-            SequenceNumberCommitted(args.TransactionId);
+        SequenceNumberCommitted?.Invoke(args.TransactionId);
 
         if (shouldWait)
         {
@@ -255,17 +254,17 @@ public class FirstStageWriter<TKey, TValue>
             m_rolloverComplete.Set();
         }
 
-        TKey startKey = new TKey();
-        TKey endKey = new TKey();
+        TKey startKey = new();
+        TKey endKey = new();
         startKey.SetMax();
         endKey.SetMin();
 
         Log.Publish(MessageLevel.Info, "Pending Tables Report", "Pending Tables V1: " + pendingTables1.Count + " V2: " + pendingTables2.Count + " V3: " + pendingTables3.Count);
 
-        List<ArchiveTableSummary<TKey, TValue>> summaryTables = new List<ArchiveTableSummary<TKey, TValue>>();
+        List<ArchiveTableSummary<TKey, TValue>> summaryTables = new();
         foreach (SortedTreeTable<TKey, TValue> table in pendingTables1)
         {
-            ArchiveTableSummary<TKey, TValue> summary = new ArchiveTableSummary<TKey, TValue>(table);
+            ArchiveTableSummary<TKey, TValue> summary = new(table);
             if (!summary.IsEmpty)
             {
                 summaryTables.Add(summary);
@@ -277,7 +276,7 @@ public class FirstStageWriter<TKey, TValue>
         }
         foreach (SortedTreeTable<TKey, TValue> table in pendingTables2)
         {
-            ArchiveTableSummary<TKey, TValue> summary = new ArchiveTableSummary<TKey, TValue>(table);
+            ArchiveTableSummary<TKey, TValue> summary = new(table);
             if (!summary.IsEmpty)
             {
                 summaryTables.Add(summary);
@@ -289,7 +288,7 @@ public class FirstStageWriter<TKey, TValue>
         }
         foreach (SortedTreeTable<TKey, TValue> table in pendingTables3)
         {
-            ArchiveTableSummary<TKey, TValue> summary = new ArchiveTableSummary<TKey, TValue>(table);
+            ArchiveTableSummary<TKey, TValue> summary = new(table);
             if (!summary.IsEmpty)
             {
                 summaryTables.Add(summary);
@@ -305,7 +304,7 @@ public class FirstStageWriter<TKey, TValue>
 
         if (summaryTables.Count > 0)
         {
-            using (UnionTreeStream<TKey, TValue> reader = new UnionTreeStream<TKey, TValue>(summaryTables.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true))
+            using (UnionTreeStream<TKey, TValue> reader = new(summaryTables.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true))
             {
                 SortedTreeTable<TKey, TValue> newTable = m_createNextStageFile.CreateArchiveFile(startKey, endKey, size, reader, null);
 
@@ -335,8 +334,7 @@ public class FirstStageWriter<TKey, TValue>
 
         m_lastRolledOverSequenceNumber.Value = sequenceNumber;
 
-        if (RolloverComplete != null)
-            RolloverComplete(sequenceNumber);
+        RolloverComplete?.Invoke(sequenceNumber);
     }
 
     /// <summary>

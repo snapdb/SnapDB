@@ -47,9 +47,8 @@ public class WeakActionFast
     /// <summary>
     /// Creates a high speed weak action 
     /// </summary>
-    /// <param name="target">the callback</param>
-    /// <param name="localStrongReference">a strong reference that must be 
-    /// maintained in the class that is the target of the action</param>
+    /// <param name="target">The action to create a weak reference to.</param>
+    /// <param name="localStrongReference">An out parameter that receives a local strong reference to the action.</param>
     public WeakActionFast(Action target, out object localStrongReference)
         : base(target)
     {
@@ -59,7 +58,7 @@ public class WeakActionFast
     /// <summary>
     /// Attempts to invoke the delegate to a weak reference object.
     /// </summary>
-    /// <returns>True if successful, false if not</returns>
+    /// <returns><c>true</c> if successful, <c>false</c> if not.</returns>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public bool TryInvoke()
     {
@@ -93,7 +92,7 @@ public class WeakActionFast<T>
     : WeakReference
 {
     /// <summary>
-    /// Creates a high speed weak action 
+    /// Creates a high speed weak action. 
     /// </summary>
     /// <param name="target">the callback</param>
     /// <param name="localStrongReference">a strong reference that must be 
@@ -105,9 +104,48 @@ public class WeakActionFast<T>
     }
 
     /// <summary>
-    /// Attempts to invoke the delegate to a weak reference object.
+    /// Attempts to invoke the delegate associated with this weak reference object.
     /// </summary>
-    /// <returns>True if successful, false if not</returns>
+    /// <param name="args">The argument to be passed to the delegate.</param>
+    /// <returns><c>true</c> if successful, <c>false</c> if the delegate has been garbage collected.</returns>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public bool TryInvoke(T args)
+    {
+        Action<T> target = (Action<T>)Target;
+        if (target is null)
+            return false;
+            
+        target(args);
+        return true;
+    }
+
+
+Here's structured comments for the WeakActionFast<T> class:
+
+csharp
+Copy code
+/// <summary>
+/// Represents a high-speed weak action with a specified delegate type.
+/// </summary>
+/// <typeparam name="T">The type of the delegate's parameter.</typeparam>
+public class WeakActionFast<T> : WeakReference
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WeakActionFast{T}"/> class with the specified action target.
+    /// </summary>
+    /// <param name="target">The callback action.</param>
+    /// <param name="localStrongReference">A strong reference that must be maintained in the class that is the target of the action.</param>
+    public WeakActionFast(Action<T> target, out object localStrongReference)
+        : base(target)
+    {
+        localStrongReference = target;
+    }
+
+    /// <summary>
+    /// Attempts to invoke the delegate associated with this weak reference object.
+    /// </summary>
+    /// <param name="args">The argument to be passed to the delegate.</param>
+    /// <returns>True if successful, false if the delegate has been garbage collected.</returns>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public bool TryInvoke(T args)
     {
@@ -118,6 +156,9 @@ public class WeakActionFast<T>
         return true;
     }
 
+    /// <summary>
+    /// Clears the weak reference to the delegate.
+    /// </summary>
     public void Clear()
     {
         Target = null;

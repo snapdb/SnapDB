@@ -43,12 +43,11 @@ namespace SnapDB.IO.Unmanaged;
 public sealed class Memory
     : IDisposable
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(Memory), MessageClass.Component);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(Memory), MessageClass.Component);
 
     #region [ Members ]
 
     private IntPtr m_address;
-    private int m_size;
 
     #endregion
 
@@ -66,7 +65,7 @@ public sealed class Memory
             throw new ArgumentOutOfRangeException(nameof(requestedSize), "must be greater than zero");
 
         m_address = Marshal.AllocHGlobal(requestedSize);
-        m_size = requestedSize;
+        Size = requestedSize;
     }
 
     /// <summary>
@@ -75,7 +74,7 @@ public sealed class Memory
     ~Memory()
     {
         Dispose();
-        Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
+        s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
     }
 
     #endregion
@@ -91,7 +90,7 @@ public sealed class Memory
     /// <summary>
     /// The number of bytes in this allocation.
     /// </summary>
-    public int Size => m_size;
+    public int Size { get; private set; }
 
     #endregion
 
@@ -111,7 +110,7 @@ public sealed class Memory
     /// </summary>
     public void Dispose()
     {
-        m_size = 0;
+        Size = 0;
         IntPtr value = Interlocked.Exchange(ref m_address, IntPtr.Zero);
         if (value != IntPtr.Zero)
         {
@@ -121,7 +120,7 @@ public sealed class Memory
             }
             catch (Exception ex)
             {
-                Log.Publish(MessageLevel.Error, "Unexpected Exception while releasing unmanaged memory", null, null, ex);
+                s_log.Publish(MessageLevel.Error, "Unexpected Exception while releasing unmanaged memory", null, null, ex);
             }
             finally
             {

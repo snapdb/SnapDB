@@ -154,7 +154,7 @@ public unsafe class FixedSizeNode<TKey, TValue>
             return;
         }
 
-        if (stream.IsKVP1)
+        if (stream.IsKvp1)
         {
             //Key1,Value1 are the current record
             if (RemainingBytes - additionalValidBytes < KeyValueSize)
@@ -173,7 +173,7 @@ public unsafe class FixedSizeNode<TKey, TValue>
             //Inlined stream.Next()
             stream.IsValid = stream.Stream.Read(stream.Key2, stream.Value2);
             stream.IsStillSequential = stream.Key1.IsLessThan(stream.Key2);
-            stream.IsKVP1 = false;
+            stream.IsKvp1 = false;
             //End Inlined
             goto TryAgain;
         }
@@ -196,7 +196,7 @@ public unsafe class FixedSizeNode<TKey, TValue>
             //Inlined stream.Next()
             stream.IsValid = stream.Stream.Read(stream.Key1, stream.Value1);
             stream.IsStillSequential = stream.Key2.IsLessThan(stream.Key1);
-            stream.IsKVP1 = true;
+            stream.IsKvp1 = true;
             //End Inlined
 
             goto TryAgain;
@@ -232,7 +232,7 @@ public unsafe class FixedSizeNode<TKey, TValue>
         if (RightSiblingNodeIndex != uint.MaxValue)
             SetLeftSiblingProperty(RightSiblingNodeIndex, NodeIndex, newNodeIndex);
 
-        //update the origional header
+        //update the original header
         RecordCount = (ushort)recordsInTheFirstNode;
         ValidBytes = (ushort)(HeaderSize + recordsInTheFirstNode * KeyValueSize);
         RightSiblingNodeIndex = newNodeIndex;

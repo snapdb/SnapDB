@@ -37,7 +37,7 @@ namespace SnapDB.IO.FileStructure;
 internal class SubFileDiskIoSessionPool
     : IDisposable
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(SubFileDiskIoSessionPool), MessageClass.Component);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(SubFileDiskIoSessionPool), MessageClass.Component);
 
     public DiskIoSession SourceData;
     /// <summary>
@@ -122,7 +122,7 @@ internal class SubFileDiskIoSessionPool
 #if DEBUG
     ~SubFileDiskIoSessionPool()
     {
-        Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
+        s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
     }
 #endif
 
@@ -156,17 +156,13 @@ internal class SubFileDiskIoSessionPool
     /// </summary>
     public void Clear()
     {
-        if (SourceData is not null)
-            SourceData.Clear();
+        SourceData?.Clear();
 
-        if (DestinationData is not null)
-            DestinationData.Clear();
+        DestinationData?.Clear();
 
-        if (SourceIndex is not null)
-            SourceIndex.Clear();
+        SourceIndex?.Clear();
 
-        if (DestinationIndex is not null)
-            DestinationIndex.Clear();
+        DestinationIndex?.Clear();
     }
 
     /// <summary>

@@ -7,7 +7,7 @@ namespace SnapDB;
 
 public static class Number
 {
-    private static readonly double[] PowersOf10d = new double[] { 1f, 10f, 100f, 1000f, 10000f, 100000f, 1000000f, 10000000f, 100000000f, 1000000000f, 10000000000f, 100000000000f };
+    private static readonly double[] s_powersOf10d = new double[] { 1f, 10f, 100f, 1000f, 10000f, 100000f, 1000000f, 10000000f, 100000000f, 1000000000f, 10000000000f, 100000000000f };
 
     /// <summary>
     /// Writes a floating-point value to a character array.
@@ -57,12 +57,12 @@ public static class Number
 
         // Any number outside of this range will take the exponent form,
         // and I'd rather not have to deal with this.
-        const float MaxValue = 9999999f;
-        const float MinValue = -9999999f;
-        const float ZeroMax = 0.0001f;
-        const float ZeroMin = -0.0001f;
+        const float maxValue = 9999999f;
+        const float minValue = -9999999f;
+        const float zeroMax = 0.0001f;
+        const float zeroMin = -0.0001f;
 
-        if (value > MaxValue || value < MinValue || value < ZeroMax && value > ZeroMin)
+        if (value > maxValue || value < minValue || value < zeroMax && value > zeroMin)
         {
             // Not worth coding for this case.
             string T = value.ToString(CultureInfo.InvariantCulture);
@@ -91,7 +91,7 @@ public static class Number
         int wholePrecision = r;
         int fracPrecision = 7 - r;
 
-        double scaled = value * PowersOf10d[fracPrecision];
+        double scaled = value * s_powersOf10d[fracPrecision];
         uint number = (uint)scaled;
 
         // Do the rounding
@@ -104,7 +104,7 @@ public static class Number
         }
 
         // Write the number
-        ulong bcd = BinToReverseBCD(number);
+        ulong bcd = BinToReverseBcd(number);
 
         if (wholePrecision <= 0)
         {
@@ -143,75 +143,82 @@ public static class Number
 
     private static int MeasureDigits(uint value)
     {
-        const uint Digits2 = 10;
-        const uint Digits3 = 100;
-        const uint Digits4 = 1000;
-        const uint Digits5 = 10000;
-        const uint Digits6 = 100000;
-        const uint Digits7 = 1000000;
-        const uint Digits8 = 10000000;
-        const uint Digits9 = 100000000;
-        const uint Digits10 = 1000000000;
+        const uint digits2 = 10;
+        const uint digits3 = 100;
+        const uint digits4 = 1000;
+        const uint digits5 = 10000;
+        const uint digits6 = 100000;
+        const uint digits7 = 1000000;
+        const uint digits8 = 10000000;
+        const uint digits9 = 100000000;
+        const uint digits10 = 1000000000;
 
-        if (value >= Digits5)
+        if (value >= digits5)
         {
-            if (value >= Digits8)
+            if (value >= digits8)
             {
-                if (value >= Digits10)
+                if (value >= digits10)
                     return 10;
 
-                if (value >= Digits9)
+                if (value >= digits9)
                     return 9;
 
                 return 8;
             }
 
-            if (value >= Digits7)
+            if (value >= digits7)
                 return 7;
 
-            if (value >= Digits6)
+            if (value >= digits6)
                 return 6;
 
             return 5;
         }
 
-        if (value >= Digits3)
+        if (value >= digits3)
         {
-            if (value >= Digits4)
+            if (value >= digits4)
                 return 4;
             
             return 3;
         }
 
-        if (value >= Digits2)
+        if (value >= digits2)
             return 2;
 
         return 1;
     }
 
-    public static unsafe int WriteToChars2(this uint value, char[] destination, int position)
+    /// <summary>
+    /// Writes an unsigned integer value to a character array.
+    /// </summary>
+    /// <param name="value">The uint value to be written.</param>
+    /// <param name="destination">The character array where the value will be written.</param>
+    /// <param name="position">The starting position in the character array.</param>
+    /// <returns>The number of characters written to the array.</returns>
+        public static unsafe int WriteToChars2(this uint value, char[] destination, int position)
     {
         uint temp;
         int digits;
 
-        const uint Digits2 = 10;
-        const uint Digits3 = 100;
-        const uint Digits4 = 1000;
-        const uint Digits5 = 10000;
-        const uint Digits6 = 100000;
-        const uint Digits7 = 1000000;
-        const uint Digits8 = 10000000;
-        const uint Digits9 = 100000000;
-        const uint Digits10 = 1000000000;
+        const uint digits2 = 10;
+        const uint digits3 = 100;
+        const uint digits4 = 1000;
+        const uint digits5 = 10000;
+        const uint digits6 = 100000;
+        const uint digits7 = 1000000;
+        const uint digits8 = 10000000;
+        const uint digits9 = 100000000;
+        const uint digits10 = 1000000000;
 
-        if (value >= Digits5)
+        if (value >= digits5)
         {
-            if (value >= Digits8)
+            if (value >= digits8)
             {
-                if (value >= Digits10)
+                if (value >= digits10)
                     digits = 10;
 
-                else if (value >= Digits9)
+                else if (value >= digits9)
                     digits = 9;
 
                 else
@@ -219,10 +226,10 @@ public static class Number
             }
             else
             {
-                if (value >= Digits7)
+                if (value >= digits7)
                     digits = 7;
 
-                else if (value >= Digits6)
+                else if (value >= digits6)
                     digits = 6;
 
                 else
@@ -231,9 +238,9 @@ public static class Number
         }
         else
         {
-            if (value >= Digits3)
+            if (value >= digits3)
             {
-                if (value >= Digits4)
+                if (value >= digits4)
                     digits = 4;
 
                 else
@@ -241,7 +248,7 @@ public static class Number
             }
             else
             {
-                if (value >= Digits2)
+                if (value >= digits2)
                     digits = 2;
 
                 else
@@ -270,8 +277,7 @@ public static class Number
         }
     }
 
-
-    private static unsafe void strreverse(char* begin, char* end)
+    private static unsafe void Strreverse(char* begin, char* end)
     {
         char aux;
         while (end > begin)
@@ -282,19 +288,25 @@ public static class Number
         }
     }
 
-
+    /// <summary>
+    /// Writes an unsigned integer value to a character array using optimized digit extraction.
+    /// </summary>
+    /// <param name="value">The uint value to be written.</param>
+    /// <param name="destination">The character array where the value will be written.</param>
+    /// <param name="position">The starting position in the character array.</param>
+    /// <returns>The number of characters written to the array.</returns>
     public static unsafe int WriteToChars(this uint value, char[] destination, int position)
     {
-        const uint Digits1 = 1;
-        const uint Digits2 = 10;
-        const uint Digits3 = 100;
-        const uint Digits4 = 1000;
-        const uint Digits5 = 10000;
-        const uint Digits6 = 100000;
-        const uint Digits7 = 1000000;
-        const uint Digits8 = 10000000;
-        const uint Digits9 = 100000000;
-        const uint Digits10 = 1000000000;
+        const uint digits1 = 1;
+        const uint digits2 = 10;
+        const uint digits3 = 100;
+        const uint digits4 = 1000;
+        const uint digits5 = 10000;
+        const uint digits6 = 100000;
+        const uint digits7 = 1000000;
+        const uint digits8 = 10000000;
+        const uint digits9 = 100000000;
+        const uint digits10 = 1000000000;
 
         byte digit = 48;
         int pos = 0;
@@ -305,40 +317,40 @@ public static class Number
         fixed (char* str = &destination[position])
         {
 
-            if (value >= Digits5)
+            if (value >= digits5)
             {
                 // 5,6,7,8,9,10
 
-                if (value >= Digits8)
+                if (value >= digits8)
                 {
                     // 8,9,10
-                    if (value >= Digits10)
+                    if (value >= digits10)
                         goto Digits10;
-                    if (value >= Digits9)
+                    if (value >= digits9)
                         goto Digits9;
                     goto Digits8;
 
                 }
 
                 // 5,6,7
-                if (value >= Digits7)
+                if (value >= digits7)
                     goto Digits7;
-                if (value >= Digits6)
+                if (value >= digits6)
                     goto Digits6;
                 goto Digits5;
             }
 
             // 1,2,3,4
-            if (value >= Digits3)
+            if (value >= digits3)
             {
                 // 3 or 4
-                if (value >= Digits4)
+                if (value >= digits4)
                     goto Digits4;
                 goto Digits3;
             }
 
             // 1 or 2
-            if (value >= Digits2)
+            if (value >= digits2)
                 goto Digits2;
             goto Digits1;
 
@@ -346,72 +358,72 @@ public static class Number
 
             Digits10:
 
-            if (value >= 4 * Digits10) { value -= 4 * Digits10; digit += 4; }
-            if (value >= 2 * Digits10) { value -= 2 * Digits10; digit += 2; }
-            if (value >= 1 * Digits10) { value -= 1 * Digits10; digit += 1; }
+            if (value >= 4 * digits10) { value -= 4 * digits10; digit += 4; }
+            if (value >= 2 * digits10) { value -= 2 * digits10; digit += 2; }
+            if (value >= 1 * digits10) { value -= 1 * digits10; digit += 1; }
             str[pos] = (char)digit; pos += 1; digit = 48;
 
         Digits9:
-            if (value >= 8 * Digits9) { value -= 8 * Digits9; digit += 8; }
-            if (value >= 4 * Digits9) { value -= 4 * Digits9; digit += 4; }
-            if (value >= 2 * Digits9) { value -= 2 * Digits9; digit += 2; }
-            if (value >= 1 * Digits9) { value -= 1 * Digits9; digit += 1; }
+            if (value >= 8 * digits9) { value -= 8 * digits9; digit += 8; }
+            if (value >= 4 * digits9) { value -= 4 * digits9; digit += 4; }
+            if (value >= 2 * digits9) { value -= 2 * digits9; digit += 2; }
+            if (value >= 1 * digits9) { value -= 1 * digits9; digit += 1; }
             str[pos] = (char)digit; pos += 1; digit = 48;
 
         Digits8:
-            if (value >= 8 * Digits8) { value -= 8 * Digits8; digit += 8; }
-            if (value >= 4 * Digits8) { value -= 4 * Digits8; digit += 4; }
-            if (value >= 2 * Digits8) { value -= 2 * Digits8; digit += 2; }
-            if (value >= 1 * Digits8) { value -= 1 * Digits8; digit += 1; }
+            if (value >= 8 * digits8) { value -= 8 * digits8; digit += 8; }
+            if (value >= 4 * digits8) { value -= 4 * digits8; digit += 4; }
+            if (value >= 2 * digits8) { value -= 2 * digits8; digit += 2; }
+            if (value >= 1 * digits8) { value -= 1 * digits8; digit += 1; }
             str[pos] = (char)digit; pos += 1; digit = 48;
 
         Digits7:
-            if (value >= 8 * Digits7) { value -= 8 * Digits7; digit += 8; }
-            if (value >= 4 * Digits7) { value -= 4 * Digits7; digit += 4; }
-            if (value >= 2 * Digits7) { value -= 2 * Digits7; digit += 2; }
-            if (value >= 1 * Digits7) { value -= 1 * Digits7; digit += 1; }
+            if (value >= 8 * digits7) { value -= 8 * digits7; digit += 8; }
+            if (value >= 4 * digits7) { value -= 4 * digits7; digit += 4; }
+            if (value >= 2 * digits7) { value -= 2 * digits7; digit += 2; }
+            if (value >= 1 * digits7) { value -= 1 * digits7; digit += 1; }
             str[pos] = (char)digit; pos += 1; digit = 48;
 
         Digits6:
-            if (value >= 8 * Digits6) { value -= 8 * Digits6; digit += 8; }
-            if (value >= 4 * Digits6) { value -= 4 * Digits6; digit += 4; }
-            if (value >= 2 * Digits6) { value -= 2 * Digits6; digit += 2; }
-            if (value >= 1 * Digits6) { value -= 1 * Digits6; digit += 1; }
+            if (value >= 8 * digits6) { value -= 8 * digits6; digit += 8; }
+            if (value >= 4 * digits6) { value -= 4 * digits6; digit += 4; }
+            if (value >= 2 * digits6) { value -= 2 * digits6; digit += 2; }
+            if (value >= 1 * digits6) { value -= 1 * digits6; digit += 1; }
             str[pos] = (char)digit; pos += 1; digit = 48;
 
         Digits5:
-            if (value >= 8 * Digits5) { value -= 8 * Digits5; digit += 8; }
-            if (value >= 4 * Digits5) { value -= 4 * Digits5; digit += 4; }
-            if (value >= 2 * Digits5) { value -= 2 * Digits5; digit += 2; }
-            if (value >= 1 * Digits5) { value -= 1 * Digits5; digit += 1; }
+            if (value >= 8 * digits5) { value -= 8 * digits5; digit += 8; }
+            if (value >= 4 * digits5) { value -= 4 * digits5; digit += 4; }
+            if (value >= 2 * digits5) { value -= 2 * digits5; digit += 2; }
+            if (value >= 1 * digits5) { value -= 1 * digits5; digit += 1; }
             str[pos] = (char)digit; pos += 1; digit = 48;
 
         Digits4:
-            if (value >= 8 * Digits4) { value -= 8 * Digits4; digit += 8; }
-            if (value >= 4 * Digits4) { value -= 4 * Digits4; digit += 4; }
-            if (value >= 2 * Digits4) { value -= 2 * Digits4; digit += 2; }
-            if (value >= 1 * Digits4) { value -= 1 * Digits4; digit += 1; }
+            if (value >= 8 * digits4) { value -= 8 * digits4; digit += 8; }
+            if (value >= 4 * digits4) { value -= 4 * digits4; digit += 4; }
+            if (value >= 2 * digits4) { value -= 2 * digits4; digit += 2; }
+            if (value >= 1 * digits4) { value -= 1 * digits4; digit += 1; }
             str[pos] = (char)digit; pos += 1; digit = 48;
 
         Digits3:
-            if (value >= 8 * Digits3) { value -= 8 * Digits3; digit += 8; }
-            if (value >= 4 * Digits3) { value -= 4 * Digits3; digit += 4; }
-            if (value >= 2 * Digits3) { value -= 2 * Digits3; digit += 2; }
-            if (value >= 1 * Digits3) { value -= 1 * Digits3; digit += 1; }
+            if (value >= 8 * digits3) { value -= 8 * digits3; digit += 8; }
+            if (value >= 4 * digits3) { value -= 4 * digits3; digit += 4; }
+            if (value >= 2 * digits3) { value -= 2 * digits3; digit += 2; }
+            if (value >= 1 * digits3) { value -= 1 * digits3; digit += 1; }
             str[pos] = (char)digit; pos += 1; digit = 48;
 
         Digits2:
-            if (value >= 8 * Digits2) { value -= 8 * Digits2; digit += 8; }
-            if (value >= 4 * Digits2) { value -= 4 * Digits2; digit += 4; }
-            if (value >= 2 * Digits2) { value -= 2 * Digits2; digit += 2; }
-            if (value >= 1 * Digits2) { value -= 1 * Digits2; digit += 1; }
+            if (value >= 8 * digits2) { value -= 8 * digits2; digit += 8; }
+            if (value >= 4 * digits2) { value -= 4 * digits2; digit += 4; }
+            if (value >= 2 * digits2) { value -= 2 * digits2; digit += 2; }
+            if (value >= 1 * digits2) { value -= 1 * digits2; digit += 1; }
             str[pos] = (char)digit; pos += 1; digit = 48;
 
         Digits1:
-            if (value >= 8 * Digits1) { value -= 8 * Digits1; digit += 8; }
-            if (value >= 4 * Digits1) { value -= 4 * Digits1; digit += 4; }
-            if (value >= 2 * Digits1) { value -= 2 * Digits1; digit += 2; }
-            if (value >= 1 * Digits1) { value -= 1 * Digits1; digit += 1; }
+            if (value >= 8 * digits1) { value -= 8 * digits1; digit += 8; }
+            if (value >= 4 * digits1) { value -= 4 * digits1; digit += 4; }
+            if (value >= 2 * digits1) { value -= 2 * digits1; digit += 2; }
+            if (value >= 1 * digits1) { value -= 1 * digits1; digit += 1; }
             str[pos] = (char)digit; pos += 1; digit = 48;
 
             return pos;
@@ -424,7 +436,7 @@ public static class Number
     /// This means what was the Most Significant Digit is now the lease significant digit.
     /// </summary>
     /// <param name="value"></param>
-    private static ulong BinToReverseBCD(this uint value)
+    private static ulong BinToReverseBcd(this uint value)
     {
         ulong result = 0;
         do

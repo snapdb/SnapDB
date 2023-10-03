@@ -27,20 +27,17 @@
 namespace SnapDB.Snap;
 
 /// <summary>
-/// Represents an empty tree scanner. 
+/// Represents a specialized implementation of SeekableTreeStream that acts as a null stream, providing no data and always returning false on reads.
 /// </summary>
-/// <remarks>
-/// This can be useful to return instead of null at times. Seeks will not throw exceptions and 
-/// scans will yield no results.
-/// To use this class. Call the static property <see cref="Instance"/>.
-/// </remarks>
+/// <typeparam name="TKey">The type of keys in the stream (must be a reference type).</typeparam>
+/// <typeparam name="TValue">The type of values in the stream (must be a reference type).</typeparam>
 public class NullTreeScanner<TKey, TValue>
     : SeekableTreeStream<TKey, TValue>
     where TKey : class, new()
     where TValue : class, new()
 {
     /// <summary>
-    /// Returns a static instance of this class
+    /// Gets a static instance of the <see cref="NullTreeScanner{TKey, TValue}"/> class for convenience.
     /// </summary>
     public static SeekableTreeStream<TKey, TValue> Instance
     {
@@ -48,24 +45,38 @@ public class NullTreeScanner<TKey, TValue>
         private set;
     }
 
+    /// <summary>
+    /// Static constructor to initialize the static instance of the <see cref="NullTreeScanner{TKey, TValue}"/> class.
+    /// </summary>
     static NullTreeScanner()
     {
         Instance = new NullTreeScanner<TKey, TValue>();
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NullTreeScanner{TKey, TValue}"/> class.
+    /// </summary>
     public NullTreeScanner()
     {
         Dispose();
     }
 
+    /// <summary>
+    /// Reads the next key-value pair (always returns false since this is a null stream).
+    /// </summary>
+    /// <param name="key">The key to read (not used).</param>
+    /// <param name="value">The value to read (not used).</param>
+    /// <returns>Always returns false, indicating the end of the stream.</returns>
     protected override bool ReadNext(TKey key, TValue value)
     {
         return false;
     }
 
+    /// <summary>
+    /// Seeks to the specified key (not implemented, as this is a null stream).
+    /// </summary>
+    /// <param name="key">The key to seek to (not used).</param>
     public override void SeekToKey(TKey key)
     {
     }
-
-
 }

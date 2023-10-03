@@ -35,7 +35,7 @@ namespace SnapDB.IO.FileStructure.Media;
 /// </summary>
 internal unsafe class DiskIoSession : IDisposable
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(DiskIoSession), MessageClass.Component);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(DiskIoSession), MessageClass.Component);
 
     #region [ Members ]
 
@@ -93,7 +93,7 @@ internal unsafe class DiskIoSession : IDisposable
 #if DEBUG
     ~DiskIoSession()
     {
-        Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
+        s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
     }
 #endif
 

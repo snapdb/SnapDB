@@ -57,8 +57,8 @@ public class BufferedArchiveStream<TKey, TValue>
     }
 
     public bool CacheIsValid;
-    public TKey CacheKey = new TKey();
-    public TValue CacheValue = new TValue();
+    public TKey CacheKey = new();
+    public TValue CacheValue = new();
 
     public void UpdateCachedValue()
     {
@@ -79,7 +79,7 @@ public class BufferedArchiveStream<TKey, TValue>
 
     public void Dispose()
     {
-        if (m_snapshot != null)
+        if (m_snapshot is not null)
         {
             m_snapshot.Dispose();
             m_snapshot = null;

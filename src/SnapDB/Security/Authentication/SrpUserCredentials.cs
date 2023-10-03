@@ -36,7 +36,7 @@ namespace SnapDB.Security.Authentication;
 /// </remarks>
 public class SrpUserCredentials
 {
-    private readonly Dictionary<string, SrpUserCredential> m_users = new Dictionary<string, SrpUserCredential>();
+    private readonly Dictionary<string, SrpUserCredential> m_users = new();
 
     /// <summary>
     /// Looks up the username from the database.
@@ -61,7 +61,7 @@ public class SrpUserCredentials
     /// <param name="iterations"></param>
     public void AddUser(string username, string password, SrpStrength strength = SrpStrength.Bits1024, int saltSize = 32, int iterations = 4000)
     {
-        SrpUserCredential user = new SrpUserCredential(username, password, strength, saltSize, iterations);
+        SrpUserCredential user = new(username, password, strength, saltSize, iterations);
         lock (m_users)
         {
             m_users.Add(username, user);
@@ -78,7 +78,7 @@ public class SrpUserCredentials
     /// <param name="strength"></param>
     public void AddUser(string username, byte[] verifier, byte[] passwordSalt, int iterations, SrpStrength strength)
     {
-        SrpUserCredential user = new SrpUserCredential(username, passwordSalt, verifier, iterations, strength);
+        SrpUserCredential user = new(username, passwordSalt, verifier, iterations, strength);
         lock (m_users)
         {
             m_users.Add(username, user);

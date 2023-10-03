@@ -39,7 +39,7 @@ public class InsertStreamHelper<TKey, TValue>
     /// Determines if Key1 and Value1 are the current keys.
     /// Otherwise Key1 and Value2 are.
     /// </summary>
-    public bool IsKVP1;
+    public bool IsKvp1;
     public TKey Key1;
     public TKey Key2;
     public TValue Value1;
@@ -47,13 +47,13 @@ public class InsertStreamHelper<TKey, TValue>
 
     public TreeStream<TKey, TValue> Stream;
 
-    public TKey Key => IsKVP1 ? Key1 : Key2;
+    public TKey Key => IsKvp1 ? Key1 : Key2;
 
-    public TValue Value => IsKVP1 ? Value1 : Value2;
+    public TValue Value => IsKvp1 ? Value1 : Value2;
 
-    public TKey PrevKey => IsKVP1 ? Key2 : Key1;
+    public TKey PrevKey => IsKvp1 ? Key2 : Key1;
 
-    public TValue PrevValue => IsKVP1 ? Value2 : Value1;
+    public TValue PrevValue => IsKvp1 ? Value2 : Value1;
 
     public InsertStreamHelper(TreeStream<TKey, TValue> stream)
     {
@@ -62,49 +62,49 @@ public class InsertStreamHelper<TKey, TValue>
         Key2 = new TKey();
         Value1 = new TValue();
         Value2 = new TValue();
-        IsKVP1 = false;
+        IsKvp1 = false;
         IsStillSequential = true;
 
-        if (IsKVP1)
+        if (IsKvp1)
         {
             IsValid = Stream.Read(Key2, Value2);
-            IsKVP1 = false;
+            IsKvp1 = false;
         }
         else
         {
             IsValid = Stream.Read(Key1, Value1);
-            IsKVP1 = true;
+            IsKvp1 = true;
         }
     }
 
     public void Next()
     {
-        if (IsKVP1)
+        if (IsKvp1)
         {
             IsValid = Stream.Read(Key2, Value2);
             IsStillSequential = Key1.IsLessThan(Key2);
-            IsKVP1 = false;
+            IsKvp1 = false;
         }
         else
         {
             IsValid = Stream.Read(Key1, Value1);
             IsStillSequential = Key2.IsLessThan(Key1);
-            IsKVP1 = true;
+            IsKvp1 = true;
         }
     }
     public void NextDoNotCheckSequential()
     {
-        if (IsKVP1)
+        if (IsKvp1)
         {
             IsValid = Stream.Read(Key2, Value2);
             IsStillSequential = false;
-            IsKVP1 = false;
+            IsKvp1 = false;
         }
         else
         {
             IsValid = Stream.Read(Key1, Value1);
             IsStillSequential = false;
-            IsKVP1 = true;
+            IsKvp1 = true;
         }
     }
 

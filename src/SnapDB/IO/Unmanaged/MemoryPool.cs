@@ -66,7 +66,7 @@ public enum TargetUtilizationLevels
 public class MemoryPool
     : IDisposable
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(MemoryPool), MessageClass.Component);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(MemoryPool), MessageClass.Component);
 
     #region [ Members ]
 
@@ -91,7 +91,6 @@ public class MemoryPool
     private long m_levelNormal;
     private long m_levelHigh;
     private long m_levelVeryHigh;
-    private bool m_disposed;
 
     private volatile int m_releasePageVersion;
 
@@ -186,7 +185,7 @@ public class MemoryPool
 #if DEBUG
     ~MemoryPool()
     {
-        Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
+        s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
     }
 #endif
 
@@ -220,7 +219,7 @@ public class MemoryPool
     /// <summary>
     /// Gets if this pool has been disposed.
     /// </summary>
-    public bool IsDisposed => m_disposed;
+    public bool IsDisposed { get; private set; }
 
     #endregion
 
@@ -262,7 +261,8 @@ public class MemoryPool
                 RequestMoreFreeBlocks();
                 if (releasePageVersion == m_releasePageVersion)
                 {
-                    Log.Publish(MessageLevel.Critical, MessageFlags.PerformanceIssue, "Out Of Memory", string.Format("Memory pool has run out of memory: Current Usage: {0}MB", CurrentCapacity / 1024 / 1024));
+                    s_log.Publish(MessageLevel.Critical, MessageFlags.PerformanceIssue, "Out Of Memory",
+                        $"Memory pool has run out of memory: Current Usage: {CurrentCapacity / 1024 / 1024}MB");
                     throw new OutOfMemoryException("Memory pool is full");
                 }
 
@@ -308,13 +308,14 @@ public class MemoryPool
     {
         lock (m_syncRoot)
         {
-            if (m_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
             long rv = m_pageList.SetMaximumPoolSize(value);
             CalculateThresholds(rv, TargetUtilizationLevel);
 
-            Log.Publish(MessageLevel.Info, MessageFlags.PerformanceIssue, "Pool Size Changed", string.Format("Memory pool maximum set to: {0}MB", rv >> 20));
+            s_log.Publish(MessageLevel.Info, MessageFlags.PerformanceIssue, "Pool Size Changed",
+                $"Memory pool maximum set to: {rv >> 20}MB");
 
             return rv;
         }
@@ -328,7 +329,7 @@ public class MemoryPool
     {
         lock (m_syncRoot)
         {
-            if (m_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
             TargetUtilizationLevel = utilizationLevel;
             CalculateThresholds(MaximumPoolSize, utilizationLevel);
@@ -342,7 +343,7 @@ public class MemoryPool
     {
         lock (m_syncRoot)
         {
-            if (!m_disposed)
+            if (!IsDisposed)
             {
                 try
                 {
@@ -350,7 +351,7 @@ public class MemoryPool
                 }
                 finally
                 {
-                    m_disposed = true; // Prevent duplicate dispose.
+                    IsDisposed = true; // Prevent duplicate dispose.
                 }
             }
         }
@@ -417,7 +418,8 @@ public class MemoryPool
                 sb.AppendFormat("* Emergency Collection Occuring. Attempting to release {0} pages.", pagesToBeReleased);
                 sb.AppendLine();
 
-                Log.Publish(MessageLevel.Warning, MessageFlags.PerformanceIssue, "Pool Emergency", string.Format("Memory pool is reaching an Emergency level. Desiring Pages To Release: {0}", pagesToBeReleased));
+                s_log.Publish(MessageLevel.Warning, MessageFlags.PerformanceIssue, "Pool Emergency",
+                    $"Memory pool is reaching an Emergency level. Desiring Pages To Release: {pagesToBeReleased}");
 
                 CollectionEventArgs eventArgs = new(ReleasePage, MemoryPoolCollectionMode.Emergency, pagesToBeReleased);
 
@@ -437,7 +439,8 @@ public class MemoryPool
                     sb.AppendFormat("** Critical Collection Occuring. Attempting to release {0} pages.", pagesToBeReleased);
                     sb.AppendLine();
 
-                    Log.Publish(MessageLevel.Warning, MessageFlags.PerformanceIssue, "Pool Critical", string.Format("Memory pool is reaching an Critical level. Desiring Pages To Release: {0}", eventArgs.DesiredPageReleaseCount));
+                    s_log.Publish(MessageLevel.Warning, MessageFlags.PerformanceIssue, "Pool Critical",
+                        $"Memory pool is reaching an Critical level. Desiring Pages To Release: {eventArgs.DesiredPageReleaseCount}");
 
                     eventArgs = new CollectionEventArgs(ReleasePage, MemoryPoolCollectionMode.Critical, eventArgs.DesiredPageReleaseCount);
 
@@ -456,7 +459,7 @@ public class MemoryPool
 
             sw.Stop();
             sb.AppendFormat("Elapsed Time: {0}ms", sw.Elapsed.TotalMilliseconds.ToString("0.0"));
-            Log.Publish(MessageLevel.Info, "Memory Pool Collection Occured", sb.ToString());
+            s_log.Publish(MessageLevel.Info, "Memory Pool Collection Occured", sb.ToString());
 
             RemoveDeadEvents();
         }

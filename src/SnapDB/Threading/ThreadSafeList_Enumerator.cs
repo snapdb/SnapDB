@@ -40,6 +40,10 @@ public partial class ThreadSafeList<T>
         private bool m_nextItemExists;
         private Iterator m_iterator;
 
+        /// <summary>
+        /// Initializes a new instance of the Enumerator class with the provided iterator.
+        /// </summary>
+        /// <param name="iterator">The iterator to associate with the enumerator.</param>
         public Enumerator(Iterator iterator)
         {
             m_iterator = iterator;
@@ -58,6 +62,7 @@ public partial class ThreadSafeList<T>
             {
                 if (!m_nextItemExists)
                     throw new InvalidOperationException("Past the end of the array, or never called MoveNext()");
+                    
                 return m_nextItem;
             }
         }
@@ -100,6 +105,7 @@ public partial class ThreadSafeList<T>
         {
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
+                
             if (m_nextItemExists)
                 m_iterator.UnsafeUnregisterItem();
 

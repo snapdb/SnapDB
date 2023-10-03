@@ -39,8 +39,8 @@ internal class UnionReader<TKey, TValue>
     private readonly CustomSortHelper<BufferedArchiveStream<TKey, TValue>> m_sortedArchiveStreams;
     private BufferedArchiveStream<TKey, TValue> m_firstTable;
     private SortedTreeScannerBase<TKey, TValue> m_firstTableScanner;
-    private readonly TKey m_readWhileUpperBounds = new TKey();
-    private readonly TKey m_nextArchiveStreamLowerBounds = new TKey();
+    private readonly TKey m_readWhileUpperBounds = new();
+    private readonly TKey m_nextArchiveStreamLowerBounds = new();
 
     public UnionReader(List<ArchiveTableSummary<TKey, TValue>> tables)
     {
@@ -60,7 +60,7 @@ internal class UnionReader<TKey, TValue>
 
     protected override void Dispose(bool disposing)
     {
-        if (m_tablesOrigList != null)
+        if (m_tablesOrigList is not null)
         {
             m_tablesOrigList.ForEach(x => x.Dispose());
             m_tablesOrigList = null;
@@ -74,7 +74,7 @@ internal class UnionReader<TKey, TValue>
 
     protected override bool ReadNext(TKey key, TValue value)
     {
-        if (m_firstTableScanner != null)
+        if (m_firstTableScanner is not null)
         {
             if (m_firstTableScanner.ReadWhile(key, value, m_readWhileUpperBounds))
             {
@@ -143,7 +143,7 @@ internal class UnionReader<TKey, TValue>
     /// </summary>
     private void VerifyArchiveStreamSortingOrder()
     {
-        if (EOS)
+        if (Eos)
             return;
 
         m_sortedArchiveStreams[0].UpdateCachedValue();

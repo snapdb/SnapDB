@@ -31,46 +31,45 @@ using System.ComponentModel;
 namespace SnapDB.Security.Authentication;
 
 /// <summary>
-/// Supplies the base constants of SRP (Secure Remote Passord) as supplied in RFC 5054 Appendix A.
+/// Supplies the base constants of SRP (Secure Remote Password) as supplied in RFC 5054 Appendix A.
 /// </summary>
 /// <remarks>
 /// This implementation of SRP uses SHA-512 as the performance difference between 
-/// SHA1 and SHA-512 is negligable.
+/// SHA1 and SHA-512 is negligible.
 /// </remarks>
 internal class SrpConstants
 {
     public BigInteger N;
-    public BigInteger g;
-    public BigInteger k;
+    public BigInteger G;
+    public BigInteger K;
     public byte[] Nb;
-    public byte[] gb;
-    public byte[] kb;
+    public byte[] Gb;
+    public byte[] Kb;
     /// <summary>
     /// H(N) xor H(g)
     /// </summary>
-    public byte[] kb2;
+    public byte[] Kb2;
 
     private SrpConstants(string hexN, string decG)
     {
         N = new BigInteger(hexN, 16);
         Nb = N.ToByteArrayUnsigned();
-        g = new BigInteger(decG, 10);
-        gb = g.ToByteArrayUnsigned();
-        kb = ComputeHash(Nb, gb);
-        k = new BigInteger(1, kb);
-        kb2 = Xor(ComputeHash(Nb), ComputeHash(gb));
+        G = new BigInteger(decG, 10);
+        Gb = G.ToByteArrayUnsigned();
+        Kb = ComputeHash(Nb, Gb);
+        K = new BigInteger(1, Kb);
+        Kb2 = Xor(ComputeHash(Nb), ComputeHash(Gb));
     }
 
     /// <summary>
     /// Contains the standard N, g, k parameters depending on the bit size
     /// as specified in RFC 5054 Appendix A.
     /// </summary>
-    private static readonly Dictionary<int, SrpConstants> s_groupParameters = new Dictionary<int, SrpConstants>();
+    private static readonly Dictionary<int, SrpConstants> s_groupParameters = new();
 
     static SrpConstants()
     {
-        SrpConstants c;
-        c = new SrpConstants(
+        SrpConstants c = new(
             "EEAF0AB9ADB38DD69C33F80AFA8FC5E86072618775FF3C0B9EA2314C" +
             "9C256576D674DF7496EA81D3383B4813D692C6E0E0D5D8E250B98BE4" +
             "8E495C1D6089DAD15DC7D7B46154D6B6CE8EF4AD69B15D4982559B29" +
@@ -251,7 +250,7 @@ internal class SrpConstants
     /// <returns></returns>
     private static byte[] ComputeHash(params byte[][] words)
     {
-        Sha512Digest hash = new Sha512Digest();
+        Sha512Digest hash = new();
         hash.Reset();
         foreach (byte[] w in words)
         {

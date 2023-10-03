@@ -36,15 +36,15 @@ namespace SnapDB.Security;
 /// <summary>
 /// A series of HMAC implementations supported by .NET
 /// </summary>
-public enum HMACMethod
+public enum HmacMethod
 {
-    MD5,
-    TripleDES,
-    RIPEMD160,
-    SHA1,
-    SHA256,
-    SHA384,
-    SHA512
+    Md5,
+    TripleDes,
+    Ripemd160,
+    Sha1,
+    Sha256,
+    Sha384,
+    Sha512
 }
 /// <summary>
 /// Implements a generic PBKDF2 <see cref="DeriveBytes"/> that will work from a custom cryptographic transform.
@@ -54,7 +54,7 @@ public enum HMACMethod
 /// It is recommended to use one of the HMAC-SHA implementations unless you understand the implications
 /// of using something differently.
 /// </remarks>
-public class PBKDF2
+public class Pbkdf2
     : DeriveBytes
 {
     //See defintion in: http://tools.ietf.org/html/rfc2898
@@ -77,42 +77,42 @@ public class PBKDF2
     private uint m_iterations;
 
     /// <summary>
-    /// Implements a <see cref="PBKDF2"/> algorthim with a user definded MAC method.
+    /// Implements a <see cref="Pbkdf2"/> algorthim with a user definded MAC method.
     /// </summary>
     /// <param name="method">the HMAC method to use.</param>
     /// <param name="password">the password to use</param>
     /// <param name="salt">the salt. recommended to be at least 64-bit</param>
     /// <param name="iterations">the number of iterations. Recommended to be at least 1000</param>
-    public PBKDF2(HMACMethod method, byte[] password, byte[] salt, int iterations)
+    public Pbkdf2(HmacMethod method, byte[] password, byte[] salt, int iterations)
     {
         if (password is null)
             throw new ArgumentNullException(nameof(password));
 
         switch (method)
         {
-            case HMACMethod.MD5:
+            case HmacMethod.Md5:
                 Initialize(new HMac(new MD5Digest()), password, salt, iterations);
                 break;
-            case HMACMethod.TripleDES:
+            case HmacMethod.TripleDes:
                 // Initialize(new MACTripleDES(password), salt, iterations);
                 break;
-            case HMACMethod.RIPEMD160:
+            case HmacMethod.Ripemd160:
                 Initialize(new HMac(new RipeMD160Digest()), password, salt, iterations);
                 // Initialize(new HMACRIPEMD160(password), salt, iterations);
                 break;
-            case HMACMethod.SHA1:
+            case HmacMethod.Sha1:
                 Initialize(new HMac(new Sha1Digest()), password, salt, iterations);
                 // Initialize(new HMAC<SHA1Core>(password), salt, iterations);
                 break;
-            case HMACMethod.SHA256:
+            case HmacMethod.Sha256:
                 Initialize(new HMac(new Sha256Digest()), password, salt, iterations);
                 // Initialize(new HMAC<SHA256Core>(password), salt, iterations);
                 break;
-            case HMACMethod.SHA384:
+            case HmacMethod.Sha384:
                 Initialize(new HMac(new Sha384Digest()), password, salt, iterations);
                 // Initialize(new HMACSHA384(password), salt, iterations);
                 break;
-            case HMACMethod.SHA512:
+            case HmacMethod.Sha512:
                 Initialize(new HMac(new Sha512Digest()), password, salt, iterations);
                 // Initialize(new HMAC<SHA512Core>(password), salt, iterations);
                 // Initialize(new HMACSHA512(password), salt, iterations);
@@ -222,7 +222,7 @@ public class PBKDF2
 
 
     /// <summary>
-    /// Implements a <see cref="PBKDF2"/> algorthim with a user definded MAC method.
+    /// Implements a <see cref="Pbkdf2"/> algorthim with a user definded MAC method.
     /// </summary>
     /// <param name="method">the HMAC method to use.</param>
     /// <param name="password">the password to use</param>
@@ -232,9 +232,9 @@ public class PBKDF2
     /// <returns>
     /// A salted password based on the specified length.
     /// </returns>
-    public static byte[] ComputeSaltedPassword(HMACMethod method, byte[] password, byte[] salt, int iterations, int length)
+    public static byte[] ComputeSaltedPassword(HmacMethod method, byte[] password, byte[] salt, int iterations, int length)
     {
-        using PBKDF2 kdf = new(method, password, salt, iterations);
+        using Pbkdf2 kdf = new(method, password, salt, iterations);
         return kdf.GetBytes(length);
     }
 

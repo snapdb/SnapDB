@@ -42,9 +42,9 @@ public sealed class SparseIndex<TKey>
     private readonly int m_keySize;
     private readonly TKey m_tmpKey;
     private readonly SnapUInt32 m_tmpValue;
-    private BinaryStreamPointerBase m_stream;
-    private Func<uint> m_getNextNewNodeIndex;
-    private SortedTreeNodeBase<TKey, SnapUInt32>[] m_nodes;
+    private BinaryStreamPointerBase m_stream = default!;
+    private Func<uint> m_getNextNewNodeIndex = default!;
+    private SortedTreeNodeBase<TKey, SnapUInt32>[] m_nodes = default!;
     private readonly SortedTreeNodeBase<TKey, SnapUInt32> m_initializer;
 
     /// <summary>
@@ -53,7 +53,7 @@ public sealed class SparseIndex<TKey>
     public uint RootNodeIndexAddress
     {
         get;
-        protected set;
+        private set;
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public sealed class SparseIndex<TKey>
     public byte RootNodeLevel
     {
         get;
-        protected set;
+        private set;
     }
 
     /// <summary>
@@ -70,16 +70,15 @@ public sealed class SparseIndex<TKey>
     /// thus <see cref="RootNodeIndexAddress"/> and <see cref="RootNodeLevel"/> 
     /// need to be saved to the header.
     /// </summary>
-    public event EventHandler RootHasChanged;
+    public event EventHandler? RootHasChanged;
 
     /// <summary>
     /// Raises the event
     /// </summary>
     private void OnRootHasChanged()
     {
-        EventHandler handler = RootHasChanged;
-        if (handler != null)
-            handler(this, EventArgs.Empty);
+        EventHandler? handler = RootHasChanged;
+        handler?.Invoke(this, EventArgs.Empty);
     }
 
     #endregion
@@ -111,6 +110,7 @@ public sealed class SparseIndex<TKey>
     {
         if (m_isInitialized)
             throw new Exception("Duplicate calls to Initialize");
+
         m_isInitialized = true;
         RootNodeLevel = rootNodeLevel;
         RootNodeIndexAddress = rootNodeIndexAddress;
@@ -119,8 +119,10 @@ public sealed class SparseIndex<TKey>
         m_blockSize = blockSize;
 
         int minSize = (m_keySize + sizeof(uint)) * 4 + 12 + 2 * m_keySize; // (4 key pointers) + (Header Size))
+        
         if (blockSize < minSize)
-            throw new ArgumentOutOfRangeException("blockSize", string.Format("Must hold at least 4 elements which is {0}", minSize));
+            throw new ArgumentOutOfRangeException(nameof(blockSize),
+                $"Must hold at least 4 elements which is {minSize}");
 
         SetCapacity(Math.Max((int)rootNodeLevel, 6));
     }
@@ -201,24 +203,27 @@ public sealed class SparseIndex<TKey>
     private SortedTreeNodeBase<TKey, SnapUInt32> FindNode(TKey key, int level)
     {
         if (level <= 0)
-            throw new ArgumentOutOfRangeException("level", "Cannot be <= 0");
+            throw new ArgumentOutOfRangeException(nameof(level), "Cannot be <= 0");
         if (level > RootNodeLevel)
-            throw new ArgumentOutOfRangeException("level", "Cannot be greater than the root node level.");
+            throw new ArgumentOutOfRangeException(nameof(level), "Cannot be greater than the root node level.");
 
-        SortedTreeNodeBase<TKey, SnapUInt32> currentNode;
-        //Shortcut
-        currentNode = GetNode(level);
+        // Shortcut
+        SortedTreeNodeBase<TKey, SnapUInt32> currentNode = GetNode(level);
+
         if (currentNode.IsKeyInsideBounds(key))
             return currentNode;
 
         uint nodeIndexAddress = RootNodeIndexAddress;
         byte nodeLevel = RootNodeLevel;
+        
         while (true)
         {
             currentNode = GetNode(nodeLevel);
             currentNode.SetNodeIndex(nodeIndexAddress);
+            
             if (nodeLevel == level)
                 return currentNode;
+            
             currentNode.GetOrGetNext(key, m_tmpValue);
             nodeIndexAddress = m_tmpValue.Value;
             nodeLevel--;
@@ -243,13 +248,9 @@ public sealed class SparseIndex<TKey>
     public void UpdateKey(TKey oldKey, TKey newKey, byte level)
     {
         if (level <= RootNodeLevel)
-        {
             GetNode(level).UpdateKey(oldKey, newKey);
-        }
         else
-        {
             throw new Exception("Cannot update key of root");
-        }
     }
 
     /// <summary>
@@ -261,13 +262,9 @@ public sealed class SparseIndex<TKey>
     public void UpdateValue(TKey key, SnapUInt32 value, byte level)
     {
         if (level <= RootNodeLevel)
-        {
             GetNode(level).UpdateValue(key, value);
-        }
         else
-        {
             throw new Exception("Cannot update value of root");
-        }
     }
 
     /// <summary>
@@ -280,20 +277,21 @@ public sealed class SparseIndex<TKey>
         if (level <= RootNodeLevel)
         {
             SortedTreeNodeBase<TKey, SnapUInt32> node = GetNode(level);
+            
             if (!node.TryRemove(key))
                 throw new KeyNotFoundException();
-            if (level == RootNodeLevel)
-            {
-                if (node.RightSiblingNodeIndex == uint.MaxValue &&
-                    node.LeftSiblingNodeIndex == uint.MaxValue &&
-                    node.RecordCount == 1)
-                {
-                    RootNodeLevel--;
-                    node.TryGetFirstRecord(m_tmpKey, m_tmpValue);
-                    RootNodeIndexAddress = m_tmpValue.Value;
-                    node.Clear();
-                }
-            }
+
+            if (level != RootNodeLevel)
+                return;
+
+            if (node.RightSiblingNodeIndex != uint.MaxValue || node.LeftSiblingNodeIndex != uint.MaxValue || node.RecordCount != 1)
+                return;
+            
+            RootNodeLevel--;
+            node.TryGetFirstRecord(m_tmpKey, m_tmpValue);
+
+            RootNodeIndexAddress = m_tmpValue.Value;
+            node.Clear();
         }
         else
         {
@@ -311,13 +309,9 @@ public sealed class SparseIndex<TKey>
     public void CanCombineWithSiblings(TKey key, byte level, out bool canCombineLeft, out bool canCombineRight)
     {
         if (level <= RootNodeLevel)
-        {
             GetNode(level).CanCombineWithSiblings(key, out canCombineLeft, out canCombineRight);
-        }
         else
-        {
             throw new Exception("Cannot update value of root");
-        }
     }
 
     /// <summary>
@@ -332,7 +326,7 @@ public sealed class SparseIndex<TKey>
     {
         if (level <= RootNodeLevel)
         {
-            SnapUInt32 value = new SnapUInt32(pointer);
+            SnapUInt32 value = new(pointer);
             GetNode(level).TryInsert(nodeKey, value);
         }
         else //A new root node needs to be created.
@@ -351,30 +345,33 @@ public sealed class SparseIndex<TKey>
     private void CreateNewRootNode(TKey leafKey, uint leafNodeIndex)
     {
         if (RootNodeLevel + 1 > 250)
-            throw new Exception("Tree is full. Tree cannot exceede 250 levels in depth.");
+            throw new Exception("Tree is full. Tree cannot exceed 250 levels in depth.");
+
         int nodeLevel = RootNodeLevel + 1;
+        
         if (nodeLevel > m_nodes.Length)
             SetCapacity(nodeLevel);
 
-        //Get the ID for the new root node.
+        // Get the ID for the new root node.
         uint oldRootNode = RootNodeIndexAddress;
         RootNodeIndexAddress = m_getNextNewNodeIndex();
         RootNodeLevel += 1;
 
-        //Create the empty node
+        // Create the empty node
         SortedTreeNodeBase<TKey, SnapUInt32> rootNode = GetNode(RootNodeLevel);
         rootNode.CreateEmptyNode(RootNodeIndexAddress);
 
-        //Insert the first entry in the root node.
+        // Insert the first entry in the root node.
         m_tmpKey.SetMin();
         m_tmpValue.Value = oldRootNode;
         rootNode.TryInsert(m_tmpKey, m_tmpValue);
 
-        //Insert the second entry in the root node.
+        // Insert the second entry in the root node.
         m_tmpValue.Value = leafNodeIndex;
         rootNode.TryInsert(leafKey, m_tmpValue);
 
         OnRootHasChanged();
+        
         //foreach (var node in m_nodes)
         //    node.Clear();
     }
@@ -386,6 +383,7 @@ public sealed class SparseIndex<TKey>
     private void SetCapacity(int count)
     {
         m_nodes = new SortedTreeNodeBase<TKey, SnapUInt32>[count];
+        
         for (int x = 0; x < m_nodes.Length; x++)
         {
             m_nodes[x] = m_initializer.Clone((byte)(x + 1));

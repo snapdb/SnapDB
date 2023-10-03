@@ -113,8 +113,8 @@ internal class StreamingServerDatabase<TKey, TValue>
     private bool ProcessRead()
     {
         SeekFilterBase<TKey> key1Parser = null;
-        MatchFilterBase<TKey, TValue> key2Parser = null;
-        SortedTreeEngineReaderOptions readerOptions = null;
+        MatchFilterBase<TKey, TValue>? key2Parser = null;
+        SortedTreeEngineReaderOptions? readerOptions = null;
 
         if (m_stream.ReadBoolean())
         {
@@ -201,8 +201,8 @@ internal class StreamingServerDatabase<TKey, TValue>
 
     private bool ProcessRead(TreeStream<TKey, TValue> scanner)
     {
-        TKey key = new TKey();
-        TValue value = new TValue();
+        TKey key = new();
+        TValue value = new();
 
         while (scanner.Read(key, value))
             m_encodingMethod.Encode(m_stream, key, value);
@@ -212,8 +212,8 @@ internal class StreamingServerDatabase<TKey, TValue>
 
     private void ProcessWrite()
     {
-        TKey key = new TKey();
-        TValue value = new TValue();
+        TKey key = new();
+        TValue value = new();
         m_encodingMethod.ResetEncoder();
 
         while (m_encodingMethod.TryDecode(m_stream, key, value))

@@ -97,7 +97,7 @@ public abstract class PairEncodingBase<TKey, TValue>
     /// <returns>the number of bytes necessary to encode this key/value.</returns>
     public unsafe virtual int Encode(byte* stream, TKey prevKey, TValue prevValue, TKey key, TValue value)
     {
-        BinaryStreamPointerWrapper bs = new BinaryStreamPointerWrapper(stream, MaxCompressionSize);
+        BinaryStreamPointerWrapper bs = new(stream, MaxCompressionSize);
         Encode(bs, prevKey, prevValue, key, value);
         return (int)bs.Position;
     }
@@ -114,7 +114,7 @@ public abstract class PairEncodingBase<TKey, TValue>
     /// <returns>the number of bytes necessary to decode the next key/value.</returns>
     public unsafe virtual int Decode(byte* stream, TKey prevKey, TValue prevValue, TKey key, TValue value, out bool isEndOfStream)
     {
-        BinaryStreamPointerWrapper bs = new BinaryStreamPointerWrapper(stream, MaxCompressionSize);
+        BinaryStreamPointerWrapper bs = new(stream, MaxCompressionSize);
         Decode(bs, prevKey, prevValue, key, value, out isEndOfStream);
         return (int)bs.Position;
     }

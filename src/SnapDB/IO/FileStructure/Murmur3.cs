@@ -52,8 +52,8 @@ internal static unsafe class Murmur3
 
         // Constants used in the MurmurHash3 algorithm.
         const uint seed = 0;
-        const ulong C1 = 0x87c37b91114253d5L;
-        const ulong C2 = 0x4cf5ad432745937fL;
+        const ulong c1 = 0x87c37b91114253d5L;
+        const ulong c2 = 0x4cf5ad432745937fL;
 
         // Cast the byte data to ulong blocks for processing.
         ulong* blocks = (ulong*)bb;
@@ -67,18 +67,18 @@ internal static unsafe class Murmur3
             ulong k2 = blocks[2 * i + 1];
 
             // Mix and combine hash values using bitwise operations and constants.
-            k1 *= C1;
+            k1 *= c1;
             k1 = (k1 << 31) | (k1 >> (64 - 31));
-            k1 *= C2;
+            k1 *= c2;
             h1 ^= k1;
 
             h1 = (h1 << 27) | (h1 >> (64 - 27));
             h1 += h2;
             h1 = h1 * 5 + 0x52dce729;
 
-            k2 *= C2;
+            k2 *= c2;
             k2 = (k2 << 33) | (k2 >> (64 - 33));
-            k2 *= C1;
+            k2 *= c1;
             h2 ^= k2;
 
 
@@ -110,7 +110,7 @@ internal static unsafe class Murmur3
         h1 += h2;
         h2 += h1;
 
-        // Set the computed checksums.
+        // Set the computed check-sums.
         checksum1 = h1;
         checksum2 = h2;
     }
@@ -165,43 +165,43 @@ internal class Murmur3Orig
 {
     // 128 bit output, 64 bit platform version
 
-    public static ulong READ_SIZE = 16;
-    private static readonly ulong C1 = 0x87c37b91114253d5L;
-    private static readonly ulong C2 = 0x4cf5ad432745937fL;
+    public static ulong ReadSize = 16;
+    private static readonly ulong s_c1 = 0x87c37b91114253d5L;
+    private static readonly ulong s_c2 = 0x4cf5ad432745937fL;
 
-    private ulong length;
-    private uint seed; // If want to start with a seed, create a constructor.
-    private ulong h1;
-    private ulong h2;
+    private ulong m_length;
+    private uint m_seed; // If want to start with a seed, create a constructor.
+    private ulong m_h1;
+    private ulong m_h2;
 
     private void MixBody(ulong k1, ulong k2)
     {
-        h1 ^= MixKey1(k1);
+        m_h1 ^= MixKey1(k1);
 
-        h1 = h1.RotateLeft(27);
-        h1 += h2;
-        h1 = h1 * 5 + 0x52dce729;
+        m_h1 = m_h1.RotateLeft(27);
+        m_h1 += m_h2;
+        m_h1 = m_h1 * 5 + 0x52dce729;
 
-        h2 ^= MixKey2(k2);
+        m_h2 ^= MixKey2(k2);
 
-        h2 = h2.RotateLeft(31);
-        h2 += h1;
-        h2 = h2 * 5 + 0x38495ab5;
+        m_h2 = m_h2.RotateLeft(31);
+        m_h2 += m_h1;
+        m_h2 = m_h2 * 5 + 0x38495ab5;
     }
 
     private static ulong MixKey1(ulong k1)
     {
-        k1 *= C1;
+        k1 *= s_c1;
         k1 = k1.RotateLeft(31);
-        k1 *= C2;
+        k1 *= s_c2;
         return k1;
     }
 
     private static ulong MixKey2(ulong k2)
     {
-        k2 *= C2;
+        k2 *= s_c2;
         k2 = k2.RotateLeft(33);
-        k2 *= C1;
+        k2 *= s_c1;
         return k2;
     }
 
@@ -225,15 +225,15 @@ internal class Murmur3Orig
 
     private void ProcessBytes(byte[] bb)
     {
-        h1 = seed;
-        h2 = seed;
-        length = 0L;
+        m_h1 = m_seed;
+        m_h2 = m_seed;
+        m_length = 0L;
 
         int pos = 0;
         ulong remaining = (ulong)bb.Length;
 
         // Read 128 bits, 16 bytes, 2 longs in eacy cycle.
-        while (remaining >= READ_SIZE)
+        while (remaining >= ReadSize)
         {
             ulong k1 = bb.GetUInt64(pos);
             pos += 8;
@@ -241,8 +241,8 @@ internal class Murmur3Orig
             ulong k2 = bb.GetUInt64(pos);
             pos += 8;
 
-            length += READ_SIZE;
-            remaining -= READ_SIZE;
+            m_length += ReadSize;
+            remaining -= ReadSize;
 
             MixBody(k1, k2);
         }
@@ -256,7 +256,7 @@ internal class Murmur3Orig
     {
         ulong k1 = 0;
         ulong k2 = 0;
-        length += remaining;
+        m_length += remaining;
 
         // Little endian (x86) processing.
         switch (remaining)
@@ -310,8 +310,8 @@ internal class Murmur3Orig
                 throw new Exception("Something went wrong with remaining bytes calculation.");
         }
 
-        h1 ^= MixKey1(k1);
-        h2 ^= MixKey2(k2);
+        m_h1 ^= MixKey1(k1);
+        m_h2 ^= MixKey2(k2);
     }
 
     /// <summary>
@@ -322,24 +322,24 @@ internal class Murmur3Orig
         get
         {
             // Finalize the hash values by XORing and mixing.
-            h1 ^= length;
-            h2 ^= length;
+            m_h1 ^= m_length;
+            m_h2 ^= m_length;
 
-            h1 += h2;
-            h2 += h1;
+            m_h1 += m_h2;
+            m_h2 += m_h1;
 
-            h1 = MixFinal(h1);
-            h2 = MixFinal(h2);
+            m_h1 = MixFinal(m_h1);
+            m_h2 = MixFinal(m_h2);
 
-            h1 += h2;
-            h2 += h1;
+            m_h1 += m_h2;
+            m_h2 += m_h1;
 
             // Create a byte array to store the hash result.
-            byte[] hash = new byte[READ_SIZE];
+            byte[] hash = new byte[ReadSize];
 
             // Copy the 64-bit hash values into the byte array.
-            Array.Copy(BitConverter.GetBytes(h1), 0, hash, 0, 8);
-            Array.Copy(BitConverter.GetBytes(h2), 0, hash, 8, 8);
+            Array.Copy(BitConverter.GetBytes(m_h1), 0, hash, 0, 8);
+            Array.Copy(BitConverter.GetBytes(m_h2), 0, hash, 8, 8);
 
             return hash;
         }

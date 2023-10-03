@@ -83,7 +83,7 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
         IndexOfNextKeyValue++;
     }
 
-    protected override bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue> filter)
+    protected override bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue>? filter)
     {
     TryAgain:
         byte* stream = Pointer + m_nextOffset;
@@ -119,7 +119,7 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
         return false;
     }
 
-    protected override bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue> filter)
+    protected override bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue>? filter)
     {
     TryAgain:
 

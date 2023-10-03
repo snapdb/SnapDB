@@ -138,7 +138,7 @@ public class ServerSettings
                 while (databaseCount > 0)
                 {
                     databaseCount--;
-                    ServerDatabaseSettings database = new ServerDatabaseSettings();
+                    ServerDatabaseSettings database = new();
                     database.Load(stream);
                     m_databases.Add(database);
                 }
@@ -149,7 +149,7 @@ public class ServerSettings
                 while (listenerCount > 0)
                 {
                     listenerCount--;
-                    SnapSocketListenerSettings listener = new SnapSocketListenerSettings();
+                    SnapSocketListenerSettings listener = new();
                     listener.Load(stream);
                     m_listeners.Add(listener);
                 }

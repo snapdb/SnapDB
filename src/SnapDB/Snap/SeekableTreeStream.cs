@@ -26,12 +26,11 @@
 
 namespace SnapDB.Snap;
 
-
 /// <summary>
-/// Provides ability to seek and stream KeyValues.
+/// Represents an abstract base class for a seekable stream that allows seeking to a specific key within a sorted tree.
 /// </summary>
-/// <typeparam name="TKey">The key of the pair.</typeparam>
-/// <typeparam name="TValue">The value of the pair.</typeparam>
+/// <typeparam name="TKey">The type of keys in the stream (must be a reference type).</typeparam>
+/// <typeparam name="TValue">The type of values in the stream (must be a reference type).</typeparam>
 public abstract class SeekableTreeStream<TKey, TValue>
     : TreeStream<TKey, TValue>
     where TKey : class, new()
@@ -39,8 +38,8 @@ public abstract class SeekableTreeStream<TKey, TValue>
 {
 
     /// <summary>
-    /// Seeks the stream to the first value greater than or equal to <see cref="key"/>.
+    /// Seeks the stream to the first value greater than or equal to <paramref name="key"/>.
     /// </summary>
-    /// <param name="key">the key to seek to.</param>
+    /// <param name="key">The key to seek to.</param>
     public abstract void SeekToKey(TKey key);
 }

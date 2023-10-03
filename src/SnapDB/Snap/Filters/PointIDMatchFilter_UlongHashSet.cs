@@ -36,7 +36,7 @@ public partial class PointIdMatchFilter
     /// </summary>
     private class ULongHashSet<TKey, TValue>
         : MatchFilterBase<TKey, TValue>
-        where TKey : TimestampPointIDBase<TKey>, new()
+        where TKey : TimestampPointIdBase<TKey>, new()
     {
         private readonly ulong m_maxValue;
         private readonly HashSet<ulong> m_points;
@@ -85,7 +85,7 @@ public partial class PointIdMatchFilter
 
         public override bool Contains(TKey key, TValue value)
         {
-            return m_points.Contains(key.PointID);
+            return m_points.Contains(key.PointId);
         }
 
     }

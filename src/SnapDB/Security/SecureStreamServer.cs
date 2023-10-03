@@ -75,7 +75,7 @@ public class SecureStreamServer<T>
     private class State
     {
         public Guid ServerKeyName;
-        public byte[] ServerHMACKey;
+        public byte[] ServerHmacKey;
         public byte[] ServerEncryptionkey;
         public bool ContainsDefaultCredentials;
         public Guid DefaultUserToken;
@@ -127,7 +127,7 @@ public class SecureStreamServer<T>
         {
             State state = m_state.Clone();
             state.ServerKeyName = Guid.NewGuid();
-            state.ServerHMACKey = SaltGenerator.Create(32);
+            state.ServerHmacKey = SaltGenerator.Create(32);
             state.ServerEncryptionkey = SaltGenerator.Create(32);
             m_state = state;
         }
@@ -225,8 +225,7 @@ public class SecureStreamServer<T>
                     if (!state.ContainsDefaultCredentials)
                     {
                         stream2.Write(false);
-                        if (ssl is not null)
-                            ssl.Dispose();
+                        ssl?.Dispose();
                         return false;
                     }
                     stream2.Write(true);
@@ -238,8 +237,7 @@ public class SecureStreamServer<T>
                 case AuthenticationMode.Integrated: //Integrated
                     if (!m_integrated.TryAuthenticateAsServer(stream2, out userToken, certSignatures))
                     {
-                        if (ssl is not null)
-                            ssl.Dispose();
+                        ssl?.Dispose();
                         return false;
                     }
                     break;
@@ -289,8 +287,7 @@ public class SecureStreamServer<T>
         catch (Exception ex)
         {
             Log.Publish(MessageLevel.Info, "Authentication Failed: Unknown Exception", null, null, ex);
-            if (ssl is not null)
-                ssl.Dispose();
+            ssl?.Dispose();
             return false;
         }
     }
@@ -431,7 +428,7 @@ public class SecureStreamServer<T>
             //Verify the signature if everything else looks good.
             //This is last because it is the most computationally complex.
             //This limits denial of service attacks.
-            byte[] hmac = HMAC<Sha256Digest>.Compute(state.ServerHMACKey, ticket, 0, ticket.Length - 32);
+            byte[] hmac = Hmac<Sha256Digest>.Compute(state.ServerHmacKey, ticket, 0, ticket.Length - 32);
             if (!hmac.SecureEquals(ticket, ticket.Length - 32, 32))
                 return false;
 
@@ -497,7 +494,7 @@ public class SecureStreamServer<T>
             stream.Write(DateTime.UtcNow.RoundDownToNearestMinute());
             stream.Write(initializationVector);
             stream.Write(encryptedData); //Encrypted data, 32 byte session key, n byte user token
-            stream.Write(HMAC<Sha256Digest>.Compute(state.ServerHMACKey, ticket, 0, ticket.Length - 32));
+            stream.Write(Hmac<Sha256Digest>.Compute(state.ServerHmacKey, ticket, 0, ticket.Length - 32));
         }
 
 #endif

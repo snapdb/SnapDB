@@ -38,7 +38,6 @@ public class FirstStageWriterSettings
     private int m_rolloverInterval = 10000;
     private int m_rolloverSizeMb = 80;
     private int m_maximumAllowedMb = 100;
-    private readonly SimplifiedArchiveInitializerSettings m_finalSettings = new SimplifiedArchiveInitializerSettings();
     private EncodingDefinition m_encodingMethod = EncodingDefinition.FixedSizeCombinedEncoding;
 
     /// <summary>
@@ -135,7 +134,7 @@ public class FirstStageWriterSettings
         {
             TestForEditable();
             if (value is null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             m_encodingMethod = value;
         }
     }
@@ -143,7 +142,7 @@ public class FirstStageWriterSettings
     /// <summary>
     /// The settings that will be used for the rolled over files.
     /// </summary>
-    public SimplifiedArchiveInitializerSettings FinalSettings => m_finalSettings;
+    public SimplifiedArchiveInitializerSettings FinalSettings { get; } = new();
 
     public override void Save(Stream stream)
     {
@@ -151,7 +150,7 @@ public class FirstStageWriterSettings
         stream.Write(m_rolloverInterval);
         stream.Write(m_rolloverSizeMb);
         stream.Write(m_maximumAllowedMb);
-        m_finalSettings.Save(stream);
+        FinalSettings.Save(stream);
         m_encodingMethod.Save(stream);
     }
 
@@ -165,7 +164,7 @@ public class FirstStageWriterSettings
                 m_rolloverInterval = stream.ReadInt32();
                 m_rolloverSizeMb = stream.ReadInt32();
                 m_maximumAllowedMb = stream.ReadInt32();
-                m_finalSettings.Load(stream);
+                FinalSettings.Load(stream);
                 m_encodingMethod = new EncodingDefinition(stream);
                 break;
             default:
@@ -175,6 +174,6 @@ public class FirstStageWriterSettings
 
     public override void Validate()
     {
-        m_finalSettings.Validate();
+        FinalSettings.Validate();
     }
 }

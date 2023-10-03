@@ -47,7 +47,7 @@ public class FileHeaderBlock
     /// <summary>
     /// The file header bytes which equals: "openHistorian 2.0 Archive\00"
     /// </summary>
-    private static readonly byte[] FileAllocationTableHeaderBytes = "openHistorian 2.0 Archive\0"u8.ToArray();
+    private static readonly byte[] s_fileAllocationTableHeaderBytes = "openHistorian 2.0 Archive\0"u8.ToArray();
 
     private const short FileAllocationReadTableVersion = 2;
     private const short FileAllocationWriteTableVersion = 2;
@@ -339,7 +339,7 @@ public class FileHeaderBlock
         MemoryStream stream = new(dataBytes);
         BinaryWriter dataWriter = new(stream);
 
-        dataWriter.Write(FileAllocationTableHeaderBytes);
+        dataWriter.Write(s_fileAllocationTableHeaderBytes);
         dataWriter.Write(BitConverter.IsLittleEndian ? 'L' : 'B');
         dataWriter.Write((byte)BitMath.CountBitsSet((uint)(m_blockSize - 1)));
         dataWriter.Write(FileAllocationReadTableVersion);
@@ -412,7 +412,7 @@ public class FileHeaderBlock
         MemoryStream stream = new(buffer);
         BinaryReader dataReader = new(stream);
 
-        if (!dataReader.ReadBytes(26).SequenceEqual(FileAllocationTableHeaderBytes))
+        if (!dataReader.ReadBytes(26).SequenceEqual(s_fileAllocationTableHeaderBytes))
             throw new Exception("This file is not an archive file system, or the file is corrupt, or this file system major version is not recognized by this version of the historian");
 
         char endian = (char)dataReader.ReadByte();
@@ -635,7 +635,7 @@ public class FileHeaderBlock
         long oldPosition = stream.Position;
         stream.Position = 0;
 
-        if (!stream.ReadBytes(26).SequenceEqual(FileAllocationTableHeaderBytes))
+        if (!stream.ReadBytes(26).SequenceEqual(s_fileAllocationTableHeaderBytes))
             throw new Exception("This file is not an archive file system, or the file is corrupt, or this file system major version is not recognized by this version of the historian");
 
         char endian = (char)stream.ReadNextByte();

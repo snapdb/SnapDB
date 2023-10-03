@@ -18,19 +18,26 @@
     <HtmlHelpName>Library Documentation</HtmlHelpName>
     <Language>en-US</Language>
     <TransformComponentArguments>
-      <Argument Key="logoFile" Value="gemstone-square-48.png" />
-      <Argument Key="logoHeight" Value="" />
-      <Argument Key="logoWidth" Value="" />
-      <Argument Key="logoAltText" Value="GPA Gemstone Library" />
-      <Argument Key="logoPlacement" Value="left" />
-      <Argument Key="logoAlignment" Value="left" />
-      <Argument Key="maxVersionParts" Value="" />
-      <Argument Key="defaultLanguage" Value="cs" />
-      <Argument Key="includeEnumValues" Value="true" />
-      <Argument Key="baseSourceCodeUrl" Value="https://github.com/gemstone/gemtem/blob/master/src/" />
-      <Argument Key="requestExampleUrl" Value="Create a new issue: https://github.com/gemstone/gemtem/issues/new " />
-      <Argument Key="LogoUrl" Value="https://gemstone.github.io/gemtem/" />
+      <Argument Key="RobotsMetadata" Value="" />
+      <Argument Key="BibliographyDataFile" Value="" />
+      <Argument Key="RootBreadcrumbTitleText" Value="Docs" />
+      <Argument Key="ResizableTocColumn" Value="False" />
       <Argument Key="CollapsibleSections" Value="True" />
+      <Argument Key="LogoFile" Value="gemstone-square-48.png" />
+      <Argument Key="LogoHeight" Value="" />
+      <Argument Key="LogoWidth" Value="" />
+      <Argument Key="LogoAltText" Value="GPA Gemstone Library" />
+      <Argument Key="LogoPlacement" Value="left" />
+      <Argument Key="LogoAlignment" Value="left" />
+      <Argument Key="LogoUrl" Value="https://gemstone.github.io/common/" />
+      <Argument Key="MaxVersionParts" Value="" />
+      <Argument Key="DefaultLanguage" Value="cs" />
+      <Argument Key="IncludeEnumValues" Value="true" />
+      <Argument Key="EnumMemberSortOrder" Value="Value" />
+      <Argument Key="FlagsEnumValueFormat" Value="IntegerValue" />
+      <Argument Key="FlagsEnumSeparatorSize" Value="0" />
+      <Argument Key="BaseSourceCodeUrl" Value="https://github.com/snapdb/SnapDB/blob/main/src" />
+      <Argument Key="RequestExampleUrl" Value="Create a new issue: https://github.com/snapdb/SnapDB/issues/new" />
     </TransformComponentArguments>
     <HelpFileFormat>Website</HelpFileFormat>
     <SyntaxFilters>C#, Visual Basic, Managed C++, JavaScript</SyntaxFilters>
@@ -52,56 +59,12 @@
           <colorizer syntaxFile="{@CoreComponentsFolder}Colorizer\highlight.xml" styleFile="{@CoreComponentsFolder}Colorizer\highlight.xsl" stylesheet="{@CoreComponentsFolder}Colorizer\highlight.css" scriptFile="{@CoreComponentsFolder}Colorizer\highlight.js" disabled="{@DisableCodeBlockComponent}" language="cs" tabSize="0" numberLines="false" outlining="false" keepSeeTags="false" defaultTitle="true" />
         </component>
       </ComponentConfig>
-      <ComponentConfig id="Resolve ThirdParty Reference Links" enabled="True">
-        <component id="Resolve ThirdParty Reference Links">
-          <configuration>
-            <urlProviders>
-              <!-- Add Gemstone root namespace last because it has the widest match criteria -->
-              <!-- Pattern excludes target namespace so local memmbers are not redirected to common -->
-              <formattedProvider title="Gemstone Common URL Provider">
-                <targetMatcher pattern=".:Gemstone\.(?!GemTem(\.|$)).*" fullyQualifiedMemberName="false" sandcastleTarget="true" />
-                <urlFormatter format="https://gemstone.github.io/common/help/html/{target}.htm" target="_self" />
-              </formattedProvider>
-            </urlProviders>
-          </configuration>
-        </component>
-      </ComponentConfig>
-      <ComponentConfig id="API Token Resolution" enabled="True">
-        <component id="API Token Resolution">{@TokenFiles}
-<replace elements="/*//token" item="string(.)" /></component>
-      </ComponentConfig>
-      <ComponentConfig id="IntelliSense Component" enabled="True">
-        <component id="IntelliSense Component">
-          <output includeNamespaces="false" namespacesFile="Namespaces" folder="{@OutputFolder}" boundedCapacity="100" />
-        </component>
-      </ComponentConfig>
-      <ComponentConfig id="Syntax Component" enabled="True">
-        <component id="Syntax Component">
-          <syntax input="/document/reference" output="/document/syntax" renderReferenceLinks="true" />
-          <generators>
+<ComponentConfig id="API Token Resolution" enabled="True"><component id="API Token Resolution">{@TokenFiles}
+<replace elements="/*//token" item="string(.)" /></component></ComponentConfig>
+<ComponentConfig id="IntelliSense Component" enabled="True"><component id="IntelliSense Component"><output includeNamespaces="false" namespacesFile="Namespaces" folder="{@OutputFolder}" boundedCapacity="100" /></component></ComponentConfig>
+<ComponentConfig id="Syntax Component" enabled="True"><component id="Syntax Component"><syntax input="/document/reference" output="/document/syntax" renderReferenceLinks="true" /><generators>
     {@SyntaxFilters}
-</generators>
-          <containerElement name="codeSnippetGroup" addNoExampleTabs="true" includeOnSingleSnippets="false" groupingEnabled="{@CodeSnippetGrouping}" />
-          <configurations>
-            <generator id="C#" />
-            <generator id="Visual Basic">
-              <includeLineContinuation value="false" />
-            </generator>
-            <generator id="Visual Basic Usage">
-              <includeLineContinuation value="false" />
-            </generator>
-            <generator id="Managed C++" />
-            <generator id="F#" />
-            <generator id="J#" />
-            <generator id="JScript" />
-            <generator id="JavaScript" />
-            <generator id="XAML Usage" />
-            <generator id="ASP.NET" />
-            <generator id="X#" />
-          </configurations>
-        </component>
-      </ComponentConfig>
-    </ComponentConfigurations>
+</generators><containerElement name="codeSnippetGroup" addNoExampleTabs="true" includeOnSingleSnippets="false" groupingEnabled="{@CodeSnippetGrouping}" /><configurations><generator id="C#" /><generator id="Visual Basic"><includeLineContinuation value="false" /></generator><generator id="Visual Basic Usage"><includeLineContinuation value="false" /></generator><generator id="Managed C++" /><generator id="F#" /><generator id="J#" /><generator id="JScript" /><generator id="JavaScript" /><generator id="XAML Usage" /><generator id="ASP.NET" /><generator id="X#" /></configurations></component></ComponentConfig></ComponentConfigurations>
     <PlugInConfigurations>
       <PlugInConfig id="Table of Contents Exclusion" enabled="True">
         <configuration />
@@ -118,14 +81,14 @@
     <MaximumGroupParts>6</MaximumGroupParts>
     <Preliminary>False</Preliminary>
     <SdkLinkTarget>Blank</SdkLinkTarget>
-    <CopyrightHref>https://github.com/gemstone/gemtem/blob/master/LICENSE</CopyrightHref>
+    <CopyrightHref>https://github.com/snapdb/SnapDB/blob/main/LICENSE</CopyrightHref>
     <CopyrightText>Copyright &amp;#169%3b 2020 Grid Protection Alliance</CopyrightText>
     <FeedbackEMailAddress>support%40gridprotectionalliance.org</FeedbackEMailAddress>
     <FeedbackEMailLinkText>GPA Support</FeedbackEMailLinkText>
     <HeaderText>
     </HeaderText>
     <FooterText>&amp;lt%3bspan class=&amp;quot%3bsite-footer-credits&amp;quot%3b&amp;gt%3b
-&amp;lt%3ba href=&amp;quot%3bhttps://gemstone.github.io/gemtem/&amp;quot%3b target=&amp;quot%3b_self&amp;quot%3b&amp;gt%3bDocumentation Home&amp;lt%3b/a&amp;gt%3b &amp;#160%3b•&amp;#160%3b &amp;lt%3ba href=&amp;quot%3bhttps://www.nuget.org/packages/Gemstone.GemTem/&amp;quot%3b target=&amp;quot%3b_blank&amp;quot%3b&amp;gt%3bGemstone GemTem Library on NuGet&amp;lt%3b/a&amp;gt%3b&amp;lt%3bbr/&amp;gt%3b&amp;lt%3bbr/&amp;gt%3b
+&amp;lt%3ba href=&amp;quot%3bhttps://snapdb.github.io/SnapDB/&amp;quot%3b target=&amp;quot%3b_self&amp;quot%3b&amp;gt%3bDocumentation Home&amp;lt%3b/a&amp;gt%3b &amp;#160%3b•&amp;#160%3b &amp;lt%3ba href=&amp;quot%3bhttps://www.nuget.org/packages/Gemstone.GemTem/&amp;quot%3b target=&amp;quot%3b_blank&amp;quot%3b&amp;gt%3bGemstone GemTem Library on NuGet&amp;lt%3b/a&amp;gt%3b&amp;lt%3bbr/&amp;gt%3b&amp;lt%3bbr/&amp;gt%3b
 Generated by &amp;lt%3ba href=&amp;quot%3bhttps://github.com/EWSoftware/SHFB&amp;quot%3b target=&amp;quot%3b_blank&amp;quot%3b&amp;gt%3bSandcastle Help File Builder&amp;lt%3b/a&amp;gt%3b
 &amp;lt%3b/span&amp;gt%3b</FooterText>
     <RootNamespaceTitle>

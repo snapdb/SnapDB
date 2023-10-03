@@ -38,7 +38,6 @@ public class ArchiveInitializer<TKey, TValue>
     where TKey : SnapTypeBase<TKey>, new()
     where TValue : SnapTypeBase<TValue>, new()
 {
-    private ArchiveInitializerSettings m_settings;
     private readonly ReaderWriterLockEasy m_lock;
 
     /// <summary>
@@ -47,15 +46,15 @@ public class ArchiveInitializer<TKey, TValue>
     /// <param name="settings"></param>
     public ArchiveInitializer(ArchiveInitializerSettings settings)
     {
-        m_settings = settings.CloneReadonly();
-        m_settings.Validate();
+        Settings = settings.CloneReadonly();
+        Settings.Validate();
         m_lock = new ReaderWriterLockEasy();
     }
 
     /// <summary>
     /// Gets current settings.
     /// </summary>
-    public ArchiveInitializerSettings Settings => m_settings;
+    public ArchiveInitializerSettings Settings { get; private set; }
 
     /// <summary>
     /// Replaces the existing settings with this new set.
@@ -65,9 +64,10 @@ public class ArchiveInitializer<TKey, TValue>
     {
         settings = settings.CloneReadonly();
         settings.Validate();
+
         using (m_lock.EnterWriteLock())
         {
-            m_settings = settings;
+            Settings = settings;
         }
     }
 
@@ -81,16 +81,16 @@ public class ArchiveInitializer<TKey, TValue>
     {
         using (m_lock.EnterReadLock())
         {
-            if (m_settings.IsMemoryArchive)
+            if (Settings.IsMemoryArchive)
             {
-                SortedTreeFile af = SortedTreeFile.CreateInMemory(blockSize: 4096, flags: m_settings.Flags.ToArray());
-                return af.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
+                SortedTreeFile af = SortedTreeFile.CreateInMemory(blockSize: 4096, flags: Settings.Flags.ToArray());
+                return af.OpenOrCreateTable<TKey, TValue>(Settings.EncodingMethod);
             }
             else
             {
                 string fileName = CreateArchiveName(GetPathWithEnoughSpace(estimatedSize));
-                SortedTreeFile af = SortedTreeFile.CreateFile(fileName, blockSize: 4096, flags: m_settings.Flags.ToArray());
-                return af.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
+                SortedTreeFile af = SortedTreeFile.CreateFile(fileName, blockSize: 4096, flags: Settings.Flags.ToArray());
+                return af.OpenOrCreateTable<TKey, TValue>(Settings.EncodingMethod);
             }
         }
 
@@ -108,16 +108,16 @@ public class ArchiveInitializer<TKey, TValue>
     {
         using (m_lock.EnterReadLock())
         {
-            if (m_settings.IsMemoryArchive)
+            if (Settings.IsMemoryArchive)
             {
-                SortedTreeFile af = SortedTreeFile.CreateInMemory(blockSize: 4096, flags: m_settings.Flags.ToArray());
-                return af.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
+                SortedTreeFile af = SortedTreeFile.CreateInMemory(blockSize: 4096, flags: Settings.Flags.ToArray());
+                return af.OpenOrCreateTable<TKey, TValue>(Settings.EncodingMethod);
             }
             else
             {
                 string fileName = CreateArchiveName(GetPathWithEnoughSpace(estimatedSize), startKey, endKey);
-                SortedTreeFile af = SortedTreeFile.CreateFile(fileName, blockSize: 4096, flags: m_settings.Flags.ToArray());
-                return af.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
+                SortedTreeFile af = SortedTreeFile.CreateFile(fileName, blockSize: 4096, flags: Settings.Flags.ToArray());
+                return af.OpenOrCreateTable<TKey, TValue>(Settings.EncodingMethod);
             }
         }
     }
@@ -129,7 +129,7 @@ public class ArchiveInitializer<TKey, TValue>
     private string CreateArchiveName(string path)
     {
         path = GetPath(path, DateTime.Now);
-        return Path.Combine(path, m_settings.Prefix.ToLower() + "-" + Guid.NewGuid() + "-" + DateTime.UtcNow.Ticks + m_settings.FileExtension);
+        return Path.Combine(path, Settings.Prefix.ToLower() + "-" + Guid.NewGuid() + "-" + DateTime.UtcNow.Ticks + Settings.FileExtension);
     }
 
     /// <summary>
@@ -138,22 +138,20 @@ public class ArchiveInitializer<TKey, TValue>
     /// <returns></returns>
     private string CreateArchiveName(string path, TKey startKey, TKey endKey)
     {
-        IHasTimestampField startTime = startKey as IHasTimestampField;
-        IHasTimestampField endTime = endKey as IHasTimestampField;
-
-        if (startTime is null || endTime is null)
+        if (startKey is not IHasTimestampField startTime || endKey is not IHasTimestampField endTime)
             return CreateArchiveName(path);
 
         if (!startTime.TryGetDateTime(out DateTime startDate) || !endTime.TryGetDateTime(out DateTime endDate))
             return CreateArchiveName(path);
 
         path = GetPath(path, startDate);
-        return Path.Combine(path, m_settings.Prefix.ToLower() + "-" + startDate.ToString("yyyy-MM-dd HH.mm.ss.fff") + "_to_" + endDate.ToString("yyyy-MM-dd HH.mm.ss.fff") + "-" + DateTime.UtcNow.Ticks + m_settings.FileExtension);
+
+        return Path.Combine(path, Settings.Prefix.ToLower() + "-" + startDate.ToString("yyyy-MM-dd HH.mm.ss.fff") + "_to_" + endDate.ToString("yyyy-MM-dd HH.mm.ss.fff") + "-" + DateTime.UtcNow.Ticks + Settings.FileExtension);
     }
 
     private string GetPath(string rootPath, DateTime time)
     {
-        switch (m_settings.DirectoryMethod)
+        switch (Settings.DirectoryMethod)
         {
             case ArchiveDirectoryMethod.TopDirectoryOnly:
                 break;
@@ -167,24 +165,28 @@ public class ArchiveInitializer<TKey, TValue>
                 rootPath = Path.Combine(rootPath, time.Year.ToString() + '\\' + time.Month.ToString("00"));
                 break;
         }
+
         if (!Directory.Exists(rootPath))
             Directory.CreateDirectory(rootPath);
+        
         return rootPath;
     }
 
     private string GetPathWithEnoughSpace(long estimatedSize)
     {
         if (estimatedSize < 0)
-            return m_settings.WritePath.First();
-        long remainingSpace = m_settings.DesiredRemainingSpace;
-        foreach (string path in m_settings.WritePath)
+            return Settings.WritePath.FirstOrDefault() ?? throw new InvalidOperationException("No write path defined");
+        
+        long remainingSpace = Settings.DesiredRemainingSpace;
+        
+        foreach (string path in Settings.WritePath)
         {
             FilePath.GetAvailableFreeSpace(path, out long freeSpace, out _);
+
             if (freeSpace - estimatedSize > remainingSpace)
                 return path;
         }
-        throw new Exception("Out of free space");
+        
+        throw new InvalidOperationException("Out of free space");
     }
-
-
 }

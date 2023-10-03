@@ -44,7 +44,7 @@ public class SnapSocketListener
     private readonly TcpListener m_listener;
     private SnapServer m_server;
     private bool m_disposed;
-    private readonly List<SnapNetworkServer> m_clients = new List<SnapNetworkServer>();
+    private readonly List<SnapNetworkServer> m_clients = new();
     private readonly SnapSocketListenerSettings m_settings;
     private readonly SecureStreamServer<SocketUserPermissions> m_authenticator;
 
@@ -195,8 +195,7 @@ public class SnapSocketListener
 
                 m_isRunning = false;
 
-                if (m_listener != null)
-                    m_listener.Stop();
+                m_listener?.Stop();
 
                 m_server = null;
 

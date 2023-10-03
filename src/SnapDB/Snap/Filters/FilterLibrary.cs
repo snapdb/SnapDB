@@ -35,7 +35,7 @@ namespace SnapDB.Snap.Filters;
 /// </summary>
 public class FilterLibrary
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(FilterLibrary), MessageClass.Framework);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(FilterLibrary), MessageClass.Framework);
 
     private readonly object m_syncRoot;
     private readonly Dictionary<Guid, MatchFilterDefinitionBase> m_filters;
@@ -88,10 +88,12 @@ public class FilterLibrary
         }
         catch (Exception ex)
         {
-            Log.Publish(MessageLevel.Error, "Match Filter Exception", string.Format("ID: {0} Key: {1} Value: {2}", filter.ToString(), typeof(TKey).ToString(), typeof(TValue).ToString()), null, ex);
+            s_log.Publish(MessageLevel.Error, "Match Filter Exception",
+                $"ID: {filter.ToString()} Key: {typeof(TKey).ToString()} Value: {typeof(TValue).ToString()}", null, ex);
             throw;
         }
-        Log.Publish(MessageLevel.Info, "Missing Match Filter", string.Format("ID: {0} Key: {1} Value: {2}", filter.ToString(), typeof(TKey).ToString(), typeof(TValue).ToString()));
+        s_log.Publish(MessageLevel.Info, "Missing Match Filter",
+            $"ID: {filter.ToString()} Key: {typeof(TKey).ToString()} Value: {typeof(TValue).ToString()}");
         throw new Exception("Filter not found");
     }
 
@@ -110,11 +112,12 @@ public class FilterLibrary
         }
         catch (Exception ex)
         {
-            Log.Publish(MessageLevel.Error, "Seek Filter Exception", string.Format("ID: {0} Key: {1}", filter.ToString(), typeof(TKey).ToString()), null, ex);
+            s_log.Publish(MessageLevel.Error, "Seek Filter Exception",
+                $"ID: {filter.ToString()} Key: {typeof(TKey).ToString()}", null, ex);
             throw;
         }
 
-        Log.Publish(MessageLevel.Info, "Missing Seek Filter", string.Format("ID: {0} Key: {1}", filter.ToString(), typeof(TKey).ToString()));
+        s_log.Publish(MessageLevel.Info, "Missing Seek Filter", $"ID: {filter.ToString()} Key: {typeof(TKey).ToString()}");
         throw new Exception("Filter not found");
     }
 }

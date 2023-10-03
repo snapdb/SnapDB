@@ -37,7 +37,7 @@ namespace SnapDB.IO.FileStructure;
 public class SimplifiedFileWriter
     : IDisposable
 {
-    private static readonly LogPublisher Log = Logger.CreatePublisher(typeof(SimplifiedFileWriter), MessageClass.Component);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(SimplifiedFileWriter), MessageClass.Component);
 
     private bool m_disposed;
 
@@ -45,7 +45,7 @@ public class SimplifiedFileWriter
 
     private SimplifiedSubFileStream m_subFileStream;
 
-    public FileStream m_stream;
+    public FileStream Stream;
 
     private readonly string m_pendingFileName;
     private readonly string m_completeFileName;
@@ -63,13 +63,13 @@ public class SimplifiedFileWriter
         m_completeFileName = completeFileName;
         m_fileHeaderBlock = FileHeaderBlock.CreateNewSimplified(blockSize, flags).CloneEditable();
         m_fileHeaderBlock.ArchiveType = SortedTreeFile.FileType;
-        m_stream = new FileStream(pendingFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+        Stream = new FileStream(pendingFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
     }
 
 #if DEBUG
     ~SimplifiedFileWriter()
     {
-        Log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
+        s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
     }
 #endif
 
@@ -96,7 +96,7 @@ public class SimplifiedFileWriter
 
         SubFileHeader? subFile = m_fileHeaderBlock.CreateNewFile(fileName);
         subFile.DirectBlock = m_fileHeaderBlock.LastAllocatedBlock + 1;
-        m_subFileStream = new SimplifiedSubFileStream(m_stream, subFile, m_fileHeaderBlock);
+        m_subFileStream = new SimplifiedSubFileStream(Stream, subFile, m_fileHeaderBlock);
         return m_subFileStream;
     }
 
@@ -108,12 +108,12 @@ public class SimplifiedFileWriter
         if (m_disposed)
             return;
         CloseCurrentFile();
-        m_stream.Position = 0;
-        m_stream.Write(m_fileHeaderBlock.GetBytes());
-        m_stream.Flush(true);
-        WinApi.FlushFileBuffers(m_stream.SafeFileHandle);
-        m_stream.Dispose();
-        m_stream = null;
+        Stream.Position = 0;
+        Stream.Write(m_fileHeaderBlock.GetBytes());
+        Stream.Flush(true);
+        WinApi.FlushFileBuffers(Stream.SafeFileHandle);
+        Stream.Dispose();
+        Stream = null;
         File.Move(m_pendingFileName, m_completeFileName);
         m_disposed = true;
         Dispose();
@@ -147,10 +147,8 @@ public class SimplifiedFileWriter
                         m_subFileStream.Dispose();
                         m_subFileStream = null;
                     }
-                    if (m_stream is not null)
-                    {
-                        m_stream.Dispose();
-                    }
+
+                    Stream?.Dispose();
                     File.Delete(m_pendingFileName);
                     // This will be done only when the object is disposed by calling Dispose().
                 }

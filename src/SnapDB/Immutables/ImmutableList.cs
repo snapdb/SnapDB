@@ -33,7 +33,7 @@ namespace SnapDB.Immutables;
 /// the list itself can no longer be modified.  Remember, this does not cause objects contained in this class to be Immutable 
 /// unless they implement <see cref="IImmutableObject"/>.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">List type.</typeparam>
 public class ImmutableList<T>
     : ImmutableObjectBase<ImmutableList<T?>>, IList<T?>
 {
@@ -222,11 +222,7 @@ public class ImmutableList<T>
     public void Insert(int index, T? item)
     {
         TestForEditable();
-
-        if (m_formatter is null)
-            m_list.Insert(index, item);
-        else
-            m_list.Insert(index, m_formatter(item));
+        m_list.Insert(index, m_formatter is null ? item : m_formatter(item));
     }
 
     /// <summary>
@@ -244,12 +240,13 @@ public class ImmutableList<T>
     /// </summary>
     /// <returns>The element at the specified index.</returns>
     /// <param name="index">The zero-based index of the element to get or set.</param>
-    public T this[int index]
+    public T? this[int index]
     {
         get => m_list[index];
         set
         {
             TestForEditable();
+
             if (m_formatter is null)
                 m_list[index] = value;
             else

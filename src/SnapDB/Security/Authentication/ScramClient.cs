@@ -36,7 +36,7 @@ namespace SnapDB.Security.Authentication;
 /// </summary>
 public class ScramClient
 {
-    private readonly NonceGenerator m_nonce = new NonceGenerator(16);
+    private readonly NonceGenerator m_nonce = new(16);
     private readonly byte[] m_usernameBytes;
     private readonly byte[] m_passwordBytes;
     private byte[] m_salt;
@@ -146,7 +146,7 @@ public class ScramClient
 
         byte[] authMessage = Scram.ComputeAuthMessage(serverNonce, clientNonce, salt, m_usernameBytes, iterations, additionalChallenge);
         byte[] clientSignature = ComputeClientSignature(authMessage);
-        byte[] clientProof = Scram.XOR(m_clientKey, clientSignature);
+        byte[] clientProof = Scram.Xor(m_clientKey, clientSignature);
         stream.WriteWithLength(clientProof);
         stream.Flush();
 

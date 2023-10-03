@@ -48,6 +48,9 @@ public class SynchronousEvent<T>
     public event EventHandler<T> CustomEvent;
     private readonly AsyncOperation m_asyncEventHelper;
 
+    /// <summary>
+    /// Initializes a new instance of the SynchronousEvent class.
+    /// </summary>
     public SynchronousEvent()
     {
         m_waiting = new ManualResetEvent(false);
@@ -55,21 +58,21 @@ public class SynchronousEvent<T>
     }
 
     /// <summary>
-    /// Posts an event on the constructing thread.
-    /// This call blocks until the custom event 
-    /// Not thread safe.
+    /// Raises the custom event with the provided event arguments.
     /// </summary>
-    /// <param name="args"></param>
+    /// <param name="args">The event arguments to pass to event subscribers.</param>
     public void RaiseEvent(T args)
     {
         if (m_disposed)
             return;
-        if (CustomEvent != null)
+            
+        if (CustomEvent is not null)
         {
             m_waiting.Reset();
             Thread.MemoryBarrier();
             if (m_disposed)
                 return;
+                
             m_asyncEventHelper.Post(Callback, args);
             m_waiting.WaitOne();
         }
@@ -81,10 +84,7 @@ public class SynchronousEvent<T>
             return;
         try
         {
-            if (CustomEvent != null)
-            {
-                CustomEvent(this, (T)sender);
-            }
+            CustomEvent?.Invoke(this, (T)sender);
         }
         finally
         {

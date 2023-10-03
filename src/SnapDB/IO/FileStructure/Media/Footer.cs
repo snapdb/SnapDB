@@ -91,7 +91,7 @@ internal static unsafe class Footer
     /// <remarks>
     /// This method computes checksum values for the data stored in an unmanaged memory block
     /// specified by the <paramref name="data"/> pointer. It uses the Murmur3 hashing algorithm
-    /// to calculate the checksums. The computed checksums are returned as <paramref name="checksum1"/>
+    /// to calculate the check-sums. The computed check-sums are returned as <paramref name="checksum1"/>
     /// (64 bits) and <paramref name="checksum2"/> (32 bits).
     /// </remarks>
     /// <param name="data">A pointer to the start of the data to compute checksum for.</param>
@@ -213,7 +213,7 @@ internal static unsafe class Footer
     /// <remarks>
     /// This method computes the checksum for the data block pointed to by <paramref name="data"/> and clears
     /// the footer of the data block. It is designed to work with blocks of data within a larger data structure.
-    /// The method iterates over the specified data blocks, computes checksums for each, and clears their footers.
+    /// The method iterates over the specified data blocks, computes check-sums for each, and clears their footers.
     /// </remarks>
     /// <param name="data">A pointer to the data block.</param>
     /// <param name="blockSize">The size of the data block, in bytes.</param>
