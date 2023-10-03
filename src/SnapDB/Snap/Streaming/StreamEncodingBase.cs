@@ -28,13 +28,13 @@ using SnapDB.IO;
 
 namespace SnapDB.Snap.Streaming;
 
-    /// <summary>
-    /// Encoding that is stream based. This encoding is similar to <see cref="PairEncodingBase{TKey,TValue}"/>
-    /// except it contains end of stream data.
-    /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    public abstract class StreamEncodingBase<TKey, TValue>
+/// <summary>
+/// An abstract base class for defining stream encoding methods used to encode and decode
+/// key-value pairs of types <typeparamref name="TKey"/> and <typeparamref name="TValue"/>.
+/// </summary>
+/// <typeparam name="TKey">The type of the keys to be encoded and decoded.</typeparam>
+/// <typeparam name="TValue">The type of the values to be encoded and decoded.</typeparam>
+public abstract class StreamEncodingBase<TKey, TValue>
         where TKey : SnapTypeBase<TKey>, new()
         where TValue : SnapTypeBase<TValue>, new()
     {
@@ -45,13 +45,13 @@ namespace SnapDB.Snap.Streaming;
         public abstract EncodingDefinition EncodingMethod { get; }
 
         /// <summary>
-        /// Writes the end of the stream symbol to the <see cref="stream"/>.
+        /// Writes the end of the stream symbol to the <paramref name="stream"/>.
         /// </summary>
-        /// <param name="stream">the stream to write to</param>
+        /// <param name="stream">The stream to write to.</param>
         public abstract void WriteEndOfStream(BinaryStreamBase stream);
 
         /// <summary>
-        /// Encodes the current key/value to the stream.
+        /// Encodes the current key-value to the stream.
         /// </summary>
         /// <param name="stream">The stream to write to.</param>
         /// <param name="currentKey">The key to write.</param>

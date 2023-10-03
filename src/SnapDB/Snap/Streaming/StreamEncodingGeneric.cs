@@ -43,7 +43,7 @@ where TValue : SnapTypeBase<TValue>, new()
     private readonly TValue m_prevValue;
 
     /// <summary>
-    /// Creates a new <see cref="StreamEncodingGeneric{TKey,TValue}"/> based on the supplied <see cref="encodingMethod"/>
+    /// Creates a new <see cref="StreamEncodingGeneric{TKey,TValue}"/> based on the supplied <paramref name="encodingMethod"/>
     /// </summary>
     /// <param name="encodingMethod">the encoding method to use for the streaming</param>
     public StreamEncodingGeneric(EncodingDefinition encodingMethod)
@@ -59,13 +59,14 @@ where TValue : SnapTypeBase<TValue>, new()
     public override EncodingDefinition EncodingMethod => m_encoding.EncodingMethod;
 
     /// <summary>
-    /// Writes the end of the stream symbol to the <see cref="stream"/>.
+    /// Writes the end of the stream symbol to the <paramref name="stream"/>.
     /// </summary>
     /// <param name="stream">the stream to write to</param>
     public override void WriteEndOfStream(BinaryStreamBase stream)
     {
         if (m_encoding.ContainsEndOfStreamSymbol)
             stream.Write(m_encoding.EndOfStreamSymbol);
+
         else
             stream.Write((byte)0);
     }
@@ -102,6 +103,7 @@ where TValue : SnapTypeBase<TValue>, new()
         m_encoding.Decode(stream, m_prevKey, m_prevValue, key, value, out bool endOfStream);
         key.CopyTo(m_prevKey);
         value.CopyTo(m_prevValue);
+
         return !endOfStream;
     }
 
