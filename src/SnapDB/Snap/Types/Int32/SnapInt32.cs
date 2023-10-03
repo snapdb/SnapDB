@@ -28,6 +28,9 @@ using SnapDB.IO;
 
 namespace SnapDB.Snap.Types;
 
+/// <summary>
+/// Represents a 32-bit integer value that can be serialized.
+/// </summary>
 public class SnapInt32
     : SnapTypeBase<SnapInt32>
 {

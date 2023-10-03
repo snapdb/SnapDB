@@ -68,7 +68,7 @@ public class TinyLock
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TinyLockRelease Lock()
     {
-        if (Interlocked.Exchange(ref m_lock, Locked) != Unlocked) //If I successfully changed the state from unlocked to locked, then I now acquire the lock.
+        if (Interlocked.Exchange(ref m_lock, Locked) != Unlocked) // If I successfully changed the state from unlocked to locked, then I now acquire the lock.
             LockSlower();
         
         return m_release;
