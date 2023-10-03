@@ -32,7 +32,7 @@ namespace SnapDB.Threading;
 public struct DisposableReadLock
     : IDisposable
 {
-    private ReaderWriterLock m_l;
+    private ReaderWriterLock? m_l;
     
     /// <summary>
     /// Initializes a new instance of the DisposableReadLock class and acquires a reader lock.
@@ -49,11 +49,11 @@ public struct DisposableReadLock
     /// </summary>
     public void Dispose()
     {
-        if (m_l is not null)
-        {
-            m_l.ReleaseReaderLock();
-            m_l = null;
-        }
+        if (m_l is null)
+            return;
+        
+        m_l.ReleaseReaderLock();
+        m_l = null;
     }
 }
 
@@ -63,7 +63,7 @@ public struct DisposableReadLock
 public struct DisposableWriteLock
     : IDisposable
 {
-    private ReaderWriterLock m_l;
+    private ReaderWriterLock? m_l;
     
     /// <summary>
     /// Initializes a new instance of the DisposableWriteLock class and acquires a writer lock on the specified ReaderWriterLock.
@@ -80,11 +80,11 @@ public struct DisposableWriteLock
     /// </summary>
     public void Dispose()
     {
-        if (m_l is not null)
-        {
-            m_l.ReleaseWriterLock();
-            m_l = null;
-        }
+        if (m_l is null)
+            return;
+        
+        m_l.ReleaseWriterLock();
+        m_l = null;
     }
 }
 

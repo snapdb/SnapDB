@@ -53,14 +53,14 @@ public class UnmanagedMemoryStreamCore : IDisposable
         }
 
         // Array to store IntPtr pointers for memory management.
-        private IntPtr[][] m_pagePointer;
+        private nint[][] m_pagePointer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Settings"/> class.
         /// </summary>
         public Settings()
         {
-            m_pagePointer = new IntPtr[4][];
+            m_pagePointer = new nint[4][];
             PageCount = 0;
         }
 
@@ -69,7 +69,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
         /// </summary>
         /// <param name="page">The index of the page.</param>
         /// <returns>The IntPtr pointer at the specified page index.</returns>
-        public IntPtr GetPointer(int page)
+        public nint GetPointer(int page)
         {
             return m_pagePointer[page >> ShiftBits][page & Mask];
         }
@@ -86,16 +86,16 @@ public class UnmanagedMemoryStreamCore : IDisposable
         {
             if (AddingRequiresClone)
             {
-                IntPtr[][] oldPointer = m_pagePointer;
+                nint[][] oldPointer = m_pagePointer;
 
-                m_pagePointer = new IntPtr[m_pagePointer.Length * 2][];
+                m_pagePointer = new nint[m_pagePointer.Length * 2][];
                 oldPointer.CopyTo(m_pagePointer, 0);
             }
 
             int bigIndex = PageCount >> ShiftBits;
             if (m_pagePointer[bigIndex] is null)
             {
-                m_pagePointer[bigIndex] = new IntPtr[ElementsPerRow];
+                m_pagePointer[bigIndex] = new nint[ElementsPerRow];
             }
         }
 
@@ -103,7 +103,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
         /// Adds a new page represented by an IntPtr pointer to the memory manager.
         /// </summary>
         /// <param name="pagePointer">The IntPtr pointer of the new page.</param>
-        public void AddNewPage(IntPtr pagePointer)
+        public void AddNewPage(nint pagePointer)
         {
             EnsureCapacity();
             int index = PageCount;
@@ -300,7 +300,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// </remarks>
     /// <param name="position">The position for which to retrieve the memory page.</param>
     /// <returns>A pointer to the memory page corresponding to the specified position.</returns>
-    private IntPtr GetPage(long position)
+    private nint GetPage(long position)
     {
         Settings settings = m_settings;
 
@@ -365,7 +365,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// <param name="position">The starting position of the read.</param>
     /// <param name="pointer">An output pointer to <see cref="position"/>.</param>
     /// <param name="validLength">The number of bytes that are valid after this position.</param>
-    public void ReadBlock(long position, out IntPtr pointer, out int validLength)
+    public void ReadBlock(long position, out nint pointer, out int validLength)
     {
         if (m_disposed)
             throw new ObjectDisposedException("MemoryStream");

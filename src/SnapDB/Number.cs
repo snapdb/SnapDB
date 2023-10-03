@@ -25,7 +25,7 @@ public static class Number
         if (str.Length - position < 32)
             throw new Exception("Insufficient buffer space");
 
-        if (Single.IsNaN(value))
+        if (float.IsNaN(value))
         {
             str[0] = 'n';
             str[1] = 'a';
@@ -33,7 +33,7 @@ public static class Number
 
             return 3;
         }
-        if (Single.IsNegativeInfinity(value))
+        if (float.IsNegativeInfinity(value))
         {
             str[0] = 'n';
             str[1] = 'a';
@@ -41,7 +41,7 @@ public static class Number
 
             return 3;
         }
-        if (Single.IsPositiveInfinity(value))
+        if (float.IsPositiveInfinity(value))
         {
             str[0] = 'n';
             str[1] = 'a';

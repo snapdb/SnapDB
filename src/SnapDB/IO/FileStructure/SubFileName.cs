@@ -89,17 +89,19 @@ public class SubFileName
     /// This object is equal to <paramref name="other"/>. Greater than zero This object is greater than <paramref name="other"/>. 
     /// </returns>
     /// <param name="other">An object to compare with this object.</param>
-    public int CompareTo(SubFileName other)
+    public int CompareTo(SubFileName? other)
     {
-        if (ReferenceEquals(other, null))
+        if (other is null)
             return 1;
+
         int compare = RawValue1.CompareTo(other.RawValue1);
+
         if (compare != 0)
             return compare;
+
         compare = RawValue2.CompareTo(other.RawValue2);
-        if (compare != 0)
-            return compare;
-        return RawValue3.CompareTo(other.RawValue3);
+
+        return compare != 0 ? compare : RawValue3.CompareTo(other.RawValue3);
     }
 
     /// <summary>
@@ -110,13 +112,12 @@ public class SubFileName
     /// </returns>
     /// <param name="obj">The object to compare with the current object.</param>
     /// <filterpriority>2</filterpriority>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(obj, null))
+        if (obj is null)
             return false;
-        if (ReferenceEquals(obj, this))
-            return true;
-        return Equals(obj as SubFileName);
+
+        return ReferenceEquals(obj, this) || Equals(obj as SubFileName);
     }
 
     /// <summary>
@@ -126,7 +127,7 @@ public class SubFileName
     /// <c>true</c> if the current object is equal to the <paramref name="other"/> parameter; otherwise, <c>false</c>.
     /// </returns>
     /// <param name="other">An object to compare with this object.</param>
-    public bool Equals(SubFileName other)
+    public bool Equals(SubFileName? other)
     {
         return this == other;
     }
@@ -170,12 +171,14 @@ public class SubFileName
     public static unsafe SubFileName Create(Guid fileType, Guid keyType, Guid valueType)
     {
         byte[] data = new byte[16 * 3];
+
         fixed (byte* lp = data)
         {
             *(Guid*)lp = fileType;
             *(Guid*)(lp + 16) = keyType;
             *(Guid*)(lp + 32) = valueType;
         }
+
         return Create(data);
     }
 
@@ -189,11 +192,13 @@ public class SubFileName
     public static unsafe SubFileName Create(string fileName, Guid keyType, Guid valueType)
     {
         byte[] data = new byte[16 * 2 + fileName.Length * 2];
+
         fixed (byte* lp = data)
         {
             *(Guid*)lp = keyType;
             *(Guid*)(lp + 16) = valueType;
         }
+
         Encoding.Unicode.GetBytes(fileName, 0, fileName.Length, data, 32);
 
         return Create(data);
@@ -205,13 +210,11 @@ public class SubFileName
     /// <param name="data"></param>
     public static unsafe SubFileName Create(byte[] data)
     {
-        using (SHA1 sha1 = SHA1.Create()) 
+        byte[] hash = SHA1.HashData(data);
+
+        fixed (byte* lp = hash)
         {
-            byte[] hash = sha1.ComputeHash(data);
-            fixed (byte* lp = hash)
-            {
-                return new SubFileName(*(long*)lp, *(long*)(lp + 8), *(int*)(lp + 16));
-            }
+            return new SubFileName(*(long*)lp, *(long*)(lp + 8), *(int*)(lp + 16));
         }
     }
 
@@ -225,6 +228,7 @@ public class SubFileName
         long value1 = reader.ReadInt64();
         long value2 = reader.ReadInt64();
         int value3 = reader.ReadInt32();
+
         return new SubFileName(value1, value2, value3);
     }
 
@@ -234,12 +238,14 @@ public class SubFileName
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns><c>true</c>if they are equal, <c>false</c> if they are not.</returns>
-    public static bool operator ==(SubFileName a, SubFileName b)
+    public static bool operator ==(SubFileName? a, SubFileName? b)
     {
         if (ReferenceEquals(a, b))
             return true;
-        if (ReferenceEquals(a, null) || ReferenceEquals(b, null))
+
+        if (a is null || b is null)
             return false;
+
         return a.RawValue1 == b.RawValue1 && a.RawValue2 == b.RawValue2 && a.RawValue3 == b.RawValue3;
     }
 
@@ -249,12 +255,10 @@ public class SubFileName
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns>The two files.</returns>
-    public static bool operator !=(SubFileName a, SubFileName b)
+    public static bool operator !=(SubFileName? a, SubFileName? b)
     {
         return !(a == b);
     }
 
     #endregion
-
-
 }

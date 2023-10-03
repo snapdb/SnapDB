@@ -156,16 +156,14 @@ public class TransactionTracker<TKey, TValue>
         }
         m_prebuffer.Commit(transactionId);
 
-        using (WaitForCommit wait = new(transactionId))
+        using WaitForCommit wait = new(transactionId);
+        lock (m_syncRoot)
         {
-            lock (m_syncRoot)
-            {
-                if (m_transactionSoftCommitted > transactionId)
-                    return;
-                m_waitingForSoftCommit.Add(wait);
-            }
-            wait.Wait();
+            if (m_transactionSoftCommitted > transactionId)
+                return;
+            m_waitingForSoftCommit.Add(wait);
         }
+        wait.Wait();
     }
 
     /// <summary>
@@ -187,16 +185,13 @@ public class TransactionTracker<TKey, TValue>
         m_firstStageWriter.Commit(transactionId);
 
 
-        using (WaitForCommit wait = new(transactionId))
+        using WaitForCommit wait = new(transactionId);
+        lock (m_syncRoot)
         {
-            lock (m_syncRoot)
-            {
-                if (m_transactionHardCommitted > transactionId)
-                    return;
-                m_waitingForHardCommit.Add(wait);
-            }
-            wait.Wait();
+            if (m_transactionHardCommitted > transactionId)
+                return;
+            m_waitingForHardCommit.Add(wait);
         }
-
+        wait.Wait();
     }
 }

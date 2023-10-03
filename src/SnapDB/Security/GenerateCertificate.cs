@@ -95,7 +95,7 @@ public static class GenerateCertificate
 
         // The Certificate Generator
         X509V3CertificateGenerator certificateGenerator = new();
-        certificateGenerator.SetSerialNumber(BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(Int64.MaxValue), random));
+        certificateGenerator.SetSerialNumber(BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(long.MaxValue), random));
         
         // TODO: JRC - check to see what has changed here and if this is necessary
         //certificateGenerator.SetSignatureAlgorithm(signatureAlgorithm);

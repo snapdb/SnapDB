@@ -71,8 +71,6 @@ internal sealed class SimplifiedSubFileStream
     /// <param name="fileHeaderBlock">The FileAllocationTable.</param>
     internal SimplifiedSubFileStream(FileStream stream, SubFileHeader? subFile, FileHeaderBlock fileHeaderBlock)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
         if (subFile is null)
             throw new ArgumentNullException(nameof(subFile));
         if (fileHeaderBlock is null)
@@ -86,7 +84,7 @@ internal sealed class SimplifiedSubFileStream
             throw new ArgumentException("This parameter cannot be read only when opening for writing", nameof(subFile));
 
         m_blockSize = fileHeaderBlock.BlockSize;
-        m_stream = stream;
+        m_stream = stream ?? throw new ArgumentNullException(nameof(stream));
         SubFile = subFile;
         m_fileHeaderBlock = fileHeaderBlock;
     }

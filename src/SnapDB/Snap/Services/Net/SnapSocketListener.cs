@@ -57,13 +57,10 @@ public class SnapSocketListener
     public SnapSocketListener(SnapSocketListenerSettings settings, SnapServer server)
         : base(MessageClass.Framework)
     {
-        if (server is null)
-            throw new ArgumentNullException(nameof(server));
-
         if (settings is null)
             throw new ArgumentNullException(nameof(settings));
 
-        m_server = server;
+        m_server = server ?? throw new ArgumentNullException(nameof(server));
         m_settings = settings.CloneReadonly();
         m_settings.Validate();
 

@@ -242,7 +242,7 @@ public class MemoryPool
     /// The page allocated will not be initialized, 
     /// so assume that the data is garbage.
     /// </remarks>
-    public void AllocatePage(out int index, out IntPtr addressPointer)
+    public void AllocatePage(out int index, out nint addressPointer)
     {
         if (m_pageList.TryGetNextPage(out index, out addressPointer))
             return;

@@ -44,7 +44,7 @@ public sealed class SafeManualResetEvent
     /// <summary>
     /// A place to report exception logs associated with this class.
     /// </summary>
-    private readonly static LogPublisher s_log = Logger.CreatePublisher(typeof(SafeManualResetEvent), MessageClass.Component);
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(SafeManualResetEvent), MessageClass.Component);
     private bool m_disposed;
     private readonly object m_syncRoot;
 

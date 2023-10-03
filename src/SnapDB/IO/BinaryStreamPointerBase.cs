@@ -33,7 +33,7 @@ namespace SnapDB.IO;
 /// <summary>
 /// An implementation of <see cref="BinaryStreamBase"/> that is pointer based.
 /// </summary>
-public unsafe abstract class BinaryStreamPointerBase
+public abstract unsafe class BinaryStreamPointerBase
     : BinaryStreamBase
 {
     /// <summary>
@@ -475,7 +475,7 @@ public unsafe abstract class BinaryStreamPointerBase
     {
         if (Current + count <= LastWrite)
         {
-            Marshal.Copy(value, offset, (IntPtr)Current, count);
+            Marshal.Copy(value, offset, (nint)Current, count);
             Current += count;
 
             return;
@@ -491,7 +491,7 @@ public unsafe abstract class BinaryStreamPointerBase
                 UpdateLocalBuffer(true);
             int availableLength = Math.Min((int)RemainingWriteLength, count);
 
-            Marshal.Copy(value, offset, (IntPtr)Current, availableLength);
+            Marshal.Copy(value, offset, (nint)Current, availableLength);
             Current += availableLength;
 
             count -= availableLength;
@@ -699,7 +699,7 @@ public unsafe abstract class BinaryStreamPointerBase
     {
         if (RemainingReadLength >= count)
         {
-            Marshal.Copy((IntPtr)Current, value, offset, count);
+            Marshal.Copy((nint)Current, value, offset, count);
             Current += count;
 
             return count;
@@ -716,7 +716,7 @@ public unsafe abstract class BinaryStreamPointerBase
                 UpdateLocalBuffer(false);
 
             int availableLength = Math.Min((int)RemainingReadLength, count);
-            Marshal.Copy((IntPtr)Current, value, offset, availableLength);
+            Marshal.Copy((nint)Current, value, offset, availableLength);
 
             Current += availableLength;
             count -= availableLength;

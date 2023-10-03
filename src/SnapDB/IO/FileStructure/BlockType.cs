@@ -24,7 +24,6 @@
 //
 //******************************************************************************************************
 
-
 namespace SnapDB.IO.FileStructure;
 
 /// <summary>
@@ -36,22 +35,27 @@ internal enum BlockType : byte
     /// The first few pages of a file system.
     /// </summary>
     FileAllocationTable = 1,
+
     /// <summary>
     /// Contains the actual data.
     /// </summary>
     DataBlock = 2,
+
     /// <summary>
     /// A metadata block. Contains a set of pointer blocks that point to <see cref="IndexIndirect2"/> blocks.
     /// </summary>
     IndexIndirect1 = 3,
+
     /// <summary>
     /// A metadata block. Contains a set of pointer blocks that point to <see cref="IndexIndirect3"/> blocks.
     /// </summary>
     IndexIndirect2 = 4,
+
     /// <summary>
     /// A metadata block. Contains a set of pointer blocks that point to <see cref="IndexIndirect4"/> blocks.
     /// </summary>
     IndexIndirect3 = 5,
+
     /// <summary>
     /// A metadata block. Contains a set of pointer blocks that point to the actual data.
     /// </summary>

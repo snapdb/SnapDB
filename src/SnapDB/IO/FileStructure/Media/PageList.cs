@@ -39,12 +39,9 @@ internal sealed unsafe class PageList
 {
     private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(PageList), MessageClass.Component);
 
-
     #region [ Members ]
 
-    /// <summary>
-    /// The internal data stored about each page. This is address information and position information
-    /// </summary>
+    // The internal data stored about each page. This is address information and position information
     private struct InternalPageMetaData
     {
         /// <summary>
@@ -63,21 +60,15 @@ internal sealed unsafe class PageList
         public int ReferencedCount;
     }
 
-    /// <summary>
-    /// Note: Memory pool must not be used to allocate memory since this is a blocking method.
-    /// Otherwise, there exists the potential to deadlock.
-    /// </summary>
+    // Note: Memory pool must not be used to allocate memory since this is a blocking method.
+    // Otherwise, there exists the potential to deadlock.
     private readonly MemoryPool m_memoryPool;
 
-    /// <summary>
-    /// Contains all of the pages that are cached for the file stream.
-    /// Map is PositionIndex and PageIndex
-    /// </summary>
+    // Contains all of the pages that are cached for the file stream.
+    // Map is PositionIndex and PageIndex
     private readonly SortedList<int, int> m_pageIndexLookupByPositionIndex;
 
-    /// <summary>
-    /// A list of all pages that have been cached.
-    /// </summary>
+    // A list of all pages that have been cached.
     private NullableLargeArray<InternalPageMetaData> m_listOfPages;
 
     private bool m_disposed;
@@ -102,10 +93,6 @@ internal sealed unsafe class PageList
         s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
         Dispose();
     }
-
-    #endregion
-
-    #region [ Properties ]
 
     #endregion
 
@@ -139,7 +126,7 @@ internal sealed unsafe class PageList
     /// location of the page in memory. The method returns the index of the newly added
     /// page in the cache.
     /// </remarks>
-    public int AddNewPage(int positionIndex, IntPtr locationOfPage, int memoryPoolIndex)
+    public int AddNewPage(int positionIndex, nint locationOfPage, int memoryPoolIndex)
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
@@ -171,12 +158,13 @@ internal sealed unsafe class PageList
     /// Optionally, you can specify <paramref name="incrementReferencedCount"/> to increment the reference count of the page.
     /// If the reference count exceeds <see cref="int.MaxValue"/> or goes below 0, it's clamped to the respective boundary.
     /// </remarks>
-    public IntPtr GetPointerToPage(int pageIndex, int incrementReferencedCount)
+    public nint GetPointerToPage(int pageIndex, int incrementReferencedCount)
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
 
-        InternalPageMetaData metaData = m_listOfPages.GetValue(pageIndex);
+        InternalPageMetaData metaData = m_listOfPages.GetValue(pageIndex)
+
         if (incrementReferencedCount > 0)
         {
             long newValue = metaData.ReferencedCount + (long)incrementReferencedCount;
@@ -193,7 +181,7 @@ internal sealed unsafe class PageList
             m_listOfPages.OverwriteValue(pageIndex, metaData);
         }
 
-        return (IntPtr)metaData.LocationOfPage;
+        return (nint)metaData.LocationOfPage;
     }
 
     /// <summary>
@@ -222,10 +210,9 @@ internal sealed unsafe class PageList
 
         int collectionCount = 0;
         int maxCollectCount = -1;
+
         if (e.CollectionMode is MemoryPoolCollectionMode.Emergency or MemoryPoolCollectionMode.Critical)
-        {
             maxCollectCount = e.DesiredPageReleaseCount;
-        }
 
         for (int x = 0; x < m_pageIndexLookupByPositionIndex.Count; x++)
         {
@@ -234,20 +221,22 @@ internal sealed unsafe class PageList
             InternalPageMetaData block = m_listOfPages.GetValue(pageIndex);
             block.ReferencedCount >>= shiftLevel;
             m_listOfPages.OverwriteValue(pageIndex, block);
-            if (block.ReferencedCount == 0)
-            {
-                if (maxCollectCount != collectionCount)
-                {
-                    if (!excludedList.Contains(pageIndex))
-                    {
-                        collectionCount++;
-                        m_pageIndexLookupByPositionIndex.RemoveAt(x);
-                        x--;
-                        m_listOfPages.SetNull(pageIndex);
-                        e.ReleasePage(block.MemoryPoolIndex);
-                    }
-                }
-            }
+
+            if (block.ReferencedCount != 0)
+                continue;
+            
+            if (maxCollectCount == collectionCount)
+                continue;
+            
+            if (excludedList.Contains(pageIndex))
+                continue;
+            
+            collectionCount++;
+            m_pageIndexLookupByPositionIndex.RemoveAt(x);
+            x--;
+            
+            m_listOfPages.SetNull(pageIndex);
+            e.ReleasePage(block.MemoryPoolIndex);
         }
 
         return collectionCount;
@@ -258,27 +247,25 @@ internal sealed unsafe class PageList
     /// </summary>
     public void Dispose()
     {
-        if (!m_disposed)
+        if (m_disposed)
+            return;
+        
+        try
         {
-            try
-            {
-                if (!m_memoryPool.IsDisposed)
-                {
-                    m_memoryPool.ReleasePages(m_listOfPages.Select(x => x.MemoryPoolIndex));
-                    m_listOfPages = null;
-                }
-            }
-
-            catch (Exception ex)
-            {
-                s_log.Publish(MessageLevel.Critical, "Unhandled exception when returning resources to the memory pool", null, null, ex);
-            }
-
-            finally
-            {
-                GC.SuppressFinalize(this);
-                m_disposed = true; // Prevent duplicate dispose.
-            }
+            if (m_memoryPool.IsDisposed)
+                return;
+            
+            m_memoryPool.ReleasePages(m_listOfPages.Select(x => x.MemoryPoolIndex));
+            m_listOfPages = null!;
+        }
+        catch (Exception ex)
+        {
+            s_log.Publish(MessageLevel.Critical, "Unhandled exception when returning resources to the memory pool", null, null, ex);
+        }
+        finally
+        {
+            GC.SuppressFinalize(this);
+            m_disposed = true; // Prevent duplicate dispose.
         }
     }
 

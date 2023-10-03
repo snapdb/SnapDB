@@ -71,20 +71,16 @@ internal unsafe class SimplifiedSubFileStreamIoSession
     public SimplifiedSubFileStreamIoSession(FileStream stream, SubFileHeader? subFile, FileHeaderBlock header)
     {
         // Check for null arguments.
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
         if (subFile is null)
             throw new ArgumentNullException(nameof(subFile));
-        if (header is null)
-            throw new ArgumentNullException(nameof(header));
 
         // Check for a valid direct block assignment in the subFile.
         if (subFile.DirectBlock == 0)
             throw new Exception("Must assign subFile.DirectBlock");
 
         // Initialize the instance fields with provided values.
-        m_stream = stream;
-        m_header = header;
+        m_stream = stream ?? throw new ArgumentNullException(nameof(stream));
+        m_header = header ?? throw new ArgumentNullException(nameof(header));
         m_blockSize = header.BlockSize;
         m_subFile = subFile;
         m_memory = new Memory(m_blockSize);

@@ -188,7 +188,7 @@ public partial class SubFileStream
                     throw new Exception("Failure to shadow copy the page.");
 
                 DataIoSession.WriteToExistingBlock(physicalBlockIndex, BlockType.DataBlock, indexPosition);
-                args.FirstPointer = (IntPtr)DataIoSession.Pointer;
+                args.FirstPointer = (nint)DataIoSession.Pointer;
                 args.SupportsWriting = true;
             }
 
@@ -201,7 +201,7 @@ public partial class SubFileStream
                     throw new Exception("Page does not exist");
 
                 DataIoSession.Read(physicalBlockIndex, BlockType.DataBlock, indexPosition);
-                args.FirstPointer = (IntPtr)DataIoSession.Pointer;
+                args.FirstPointer = (nint)DataIoSession.Pointer;
                 args.SupportsWriting = !m_isReadOnly && physicalBlockIndex > m_lastEditedBlock;
             }
         }

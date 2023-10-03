@@ -163,27 +163,25 @@ internal class StreamingServerDatabase<TKey, TValue>
 
         try
         {
-            using (TreeStream<TKey, TValue> scanner = m_sortedTreeEngine.Read(readerOptions, key1Parser, key2Parser))
-            {
-                m_stream.Write((byte)ServerResponse.SerializingPoints);
+            using TreeStream<TKey, TValue> scanner = m_sortedTreeEngine.Read(readerOptions, key1Parser, key2Parser);
+            m_stream.Write((byte)ServerResponse.SerializingPoints);
 
-                m_encodingMethod.ResetEncoder();
+            m_encodingMethod.ResetEncoder();
 
-                needToFinishStream = true;
-                bool wasCanceled = !ProcessRead(scanner);
-                m_encodingMethod.WriteEndOfStream(m_stream);
-                needToFinishStream = false;
+            needToFinishStream = true;
+            bool wasCanceled = !ProcessRead(scanner);
+            m_encodingMethod.WriteEndOfStream(m_stream);
+            needToFinishStream = false;
 
-                if (wasCanceled)
-                    m_stream.Write((byte)ServerResponse.CanceledRead);
+            if (wasCanceled)
+                m_stream.Write((byte)ServerResponse.CanceledRead);
 
-                else
-                    m_stream.Write((byte)ServerResponse.ReadComplete);
+            else
+                m_stream.Write((byte)ServerResponse.ReadComplete);
 
-                m_stream.Flush();
+            m_stream.Flush();
 
-                return true;
-            }
+            return true;
         }
 
         catch (Exception ex)

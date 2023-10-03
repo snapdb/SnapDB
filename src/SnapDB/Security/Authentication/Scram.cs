@@ -34,9 +34,9 @@ namespace SnapDB.Security.Authentication;
 internal static class Scram
 {
     internal const int PasswordSize = 64;
-    internal readonly static UTF8Encoding Utf8 = new(true);
-    internal readonly static byte[] StringClientKey = Utf8.GetBytes("Client Key");
-    internal readonly static byte[] StringServerKey = Utf8.GetBytes("Server Key");
+    internal static readonly UTF8Encoding Utf8 = new(true);
+    internal static readonly byte[] StringClientKey = Utf8.GetBytes("Client Key");
+    internal static readonly byte[] StringServerKey = Utf8.GetBytes("Server Key");
 
     internal static IDigest CreateDigest(HashMethod hashMethod)
     {
@@ -110,10 +110,8 @@ internal static class Scram
 
     internal static byte[] GenerateSaltedPassword(byte[] passwordBytes, byte[] salt, int iterations)
     {
-        using (Pbkdf2 pass = new(HmacMethod.Sha512, passwordBytes, salt, iterations))
-        {
-            return pass.GetBytes(PasswordSize);
-        }
+        using Pbkdf2 pass = new(HmacMethod.Sha512, passwordBytes, salt, iterations);
+        return pass.GetBytes(PasswordSize);
     }
 }
 

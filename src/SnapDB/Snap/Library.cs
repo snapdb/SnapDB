@@ -142,7 +142,7 @@ public static class Library
                                 {
                                     s_log.Publish(MessageLevel.Debug, "Reflection Load Error Occurred",
                                         assembly.GetName().Name, ex.ToString() + Environment.NewLine +
-                                        String.Join(Environment.NewLine, ex.LoaderExceptions.Select(x => x.ToString())));
+                                        string.Join(Environment.NewLine, ex.LoaderExceptions.Select(x => x.ToString())));
                                     types = ex.Types;
                                 }
                                 foreach (Type assemblyType in types)

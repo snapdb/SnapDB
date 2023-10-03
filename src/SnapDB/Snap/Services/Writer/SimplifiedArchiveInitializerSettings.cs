@@ -152,10 +152,7 @@ public class SimplifiedArchiveInitializerSettings
         {
             TestForEditable();
 
-            if (value is null)
-                throw new ArgumentNullException(nameof(value));
-
-            m_encodingMethod = value;
+            m_encodingMethod = value ?? throw new ArgumentNullException(nameof(value));
         }
     }
 

@@ -37,7 +37,7 @@ public abstract class SnapTypeBase
     /// <summary>
     /// Ensures that only <see cref="SnapTypeBase{T}"/> inherits from this class.
     /// </summary>
-    internal protected SnapTypeBase()
+    protected internal SnapTypeBase()
     {
 
     }

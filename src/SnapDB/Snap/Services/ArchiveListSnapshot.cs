@@ -23,6 +23,8 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
+// ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace SnapDB.Snap.Services;
 
@@ -41,7 +43,7 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     /// registers this event. Therefore, be sure to check <see cref="IsDisposeRequested"/>
     /// after assigning the event handler.
     /// </remarks>
-    public event Action DisposeRequested;
+    public event Action? DisposeRequested;
 
     private readonly object m_syncDisposing;
 
@@ -61,7 +63,7 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     /// Contains an array of all of the resources currently used by this transaction.
     /// This field can be null or any element of this array can also be null.
     /// </summary>
-    private ArchiveTableSummary<TKey, TValue>[] m_tables;
+    private ArchiveTableSummary<TKey, TValue>?[] m_tables;
 
     /// <summary>
     /// Creates an <see cref="ArchiveListSnapshot{TKey,TValue}"/>.
@@ -73,7 +75,7 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
         m_syncDisposing = new object();
         m_onDisposed = onDisposed;
         m_acquireResources = acquireResources;
-        m_tables = new ArchiveTableSummary<TKey, TValue>[0];
+        m_tables = Array.Empty<ArchiveTableSummary<TKey, TValue>>();
         m_connectionDisposed = new ManualResetEvent(false);
     }
 
@@ -81,21 +83,21 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     /// Gets the list of all partitions that are currently in use.  Set partition to null to indicate
     /// that is is no longer needed.  Set the entire array to null to release all partitions.
     /// </summary>
-    public ArchiveTableSummary<TKey, TValue>[] Tables
+    public ArchiveTableSummary<TKey, TValue>?[]? Tables
     {
         get
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             return m_tables;
         }
         set
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
-            if (value is null)
-                m_tables = new ArchiveTableSummary<TKey, TValue>[0];
-            m_tables = value;
+
+            m_tables = value ?? Array.Empty<ArchiveTableSummary<TKey, TValue>>();
         }
     }
 
@@ -104,19 +106,12 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     /// </summary>
     /// <param name="fileId"></param>
     /// <returns>Null if not found</returns>
-    public ArchiveTableSummary<TKey, TValue> TryGetFile(Guid fileId)
+    public ArchiveTableSummary<TKey, TValue>? TryGetFile(Guid fileId)
     {
         if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
-        foreach (ArchiveTableSummary<TKey, TValue> table in m_tables)
-        {
-            if (table is not null)
-            {
-                if (table.FileId == fileId)
-                    return table;
-            }
-        }
-        return null;
+
+        return m_tables.Where(table => table is not null).FirstOrDefault(table => table!.FileId == fileId);
     }
 
     /// <summary>
@@ -136,23 +131,22 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (!IsDisposed)
-        {
-            m_connectionDisposed.Set();
-            lock (m_syncDisposing)
-            {
-                if (m_connectionDisposed is not null)
-                {
-                    m_connectionDisposed.Dispose();
-                    m_connectionDisposed = null;
-                }
-            }
+        if (IsDisposed)
+            return;
+        
+        m_connectionDisposed.Set();
 
-            m_onDisposed?.Invoke(this);
-            m_onDisposed = null;
-            m_acquireResources = null;
-            IsDisposed = true;
+        lock (m_syncDisposing)
+        {
+            m_connectionDisposed?.Dispose();
+            m_connectionDisposed = null!;
         }
+
+        m_onDisposed?.Invoke(this);
+        m_onDisposed = null!;
+        
+        m_acquireResources = null!;
+        IsDisposed = true;
     }
 
     /// <summary>
@@ -162,6 +156,7 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     {
         if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         m_acquireResources.Invoke(this);
     }
 
@@ -176,12 +171,12 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     {
         lock (m_syncDisposing)
         {
-            if (m_connectionDisposed is not null)
-            {
-                m_connectionDisposed.WaitOne();
-                m_connectionDisposed.Dispose();
-                m_connectionDisposed = null;
-            }
+            if (m_connectionDisposed is null)
+                return;
+            
+            m_connectionDisposed.WaitOne();
+            m_connectionDisposed.Dispose();
+            m_connectionDisposed = null!;
         }
     }
 }

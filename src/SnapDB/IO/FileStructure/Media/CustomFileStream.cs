@@ -45,9 +45,9 @@ internal sealed class CustomFileStream
     // Needed since this class computes footer check-sums.
     private bool m_disposed;
 
-    private FileStream m_stream = default!;
+    private FileStream? m_stream;
     private int m_streamUsers;
-    private readonly ResourceQueue<byte[]>? m_bufferQueue;
+    private readonly ResourceQueue<byte[]> m_bufferQueue;
 
     /// <summary>
     /// Lock this first. Allows the <see cref="m_stream"/> item to be replaced in 
@@ -186,20 +186,24 @@ internal sealed class CustomFileStream
                 Open();
 
             int totalLengthRead = 0;
-            int len = 0;
 
             while (length > 0)
             {
+                int len;
+
                 using (m_isUsingStream.EnterReadLock())
                 {
                     Task<int> results;
+
                     lock (m_syncRoot)
                     {
-                        m_stream.Position = position;
+                        m_stream!.Position = position;
                         results = m_stream.ReadAsync(buffer, 0, length);
                     }
+
                     len = results.Result;
                 }
+                
                 totalLengthRead += len;
 
                 if (len == length)
@@ -213,7 +217,6 @@ internal sealed class CustomFileStream
                     position += len;
                     length -= len; // Keep Reading
                 }
-
                 else
                 {
                     s_log.Publish(MessageLevel.Warning, "File Read Error", $"The OS has closed the following file {m_stream.Name}. Attempting to reopen.");
@@ -223,7 +226,6 @@ internal sealed class CustomFileStream
 
             return length;
         }
-
         finally
         {
             if (needsOpen)
@@ -240,8 +242,8 @@ internal sealed class CustomFileStream
     public void WriteRaw(long position, byte[] buffer, int length)
     {
         bool needsOpen = m_stream is null;
-        try
 
+        try
         {
             if (needsOpen)
                 Open();
@@ -249,9 +251,10 @@ internal sealed class CustomFileStream
             using (m_isUsingStream.EnterReadLock())
             {
                 Task results;
+
                 lock (m_syncRoot)
                 {
-                    m_stream.Position = position;
+                    m_stream!.Position = position;
                     results = m_stream.WriteAsync(buffer, 0, length);
                 }
 
@@ -259,7 +262,6 @@ internal sealed class CustomFileStream
                 m_length.Value = m_stream.Length;
             }
         }
-
         finally
         {
             if (needsOpen)
@@ -272,7 +274,7 @@ internal sealed class CustomFileStream
     /// </summary>
     /// <param name="position">The stream position. May be any position inside the desired block.</param>
     /// <param name="locationToCopyData">The place where to write the data to.</param>
-    public void Read(long position, IntPtr locationToCopyData)
+    public void Read(long position, nint locationToCopyData)
     {
         byte[] buffer = m_bufferQueue.Dequeue();
         int bytesRead = ReadRaw(position, buffer, buffer.Length);
@@ -298,6 +300,7 @@ internal sealed class CustomFileStream
     public void Write(long currentEndOfCommitPosition, MemoryPoolStreamCore stream, long length, bool waitForWriteToDisk)
     {
         bool needsOpen = m_stream is null;
+
         try
         {
             if (needsOpen)
@@ -310,7 +313,7 @@ internal sealed class CustomFileStream
             // Loop to read and write data in blocks until reaching the end position.
             while (currentPosition < endPosition)
             {
-                stream.ReadBlock(currentPosition, out IntPtr ptr, out int streamLength);
+                stream.ReadBlock(currentPosition, out nint ptr, out int streamLength);
                 int subLength = (int)Math.Min(streamLength, endPosition - currentPosition);
                 Footer.ComputeChecksumAndClearFooter(ptr, FileStructureBlockSize, subLength);
                 Marshal.Copy(ptr, buffer, 0, subLength);
@@ -318,20 +321,21 @@ internal sealed class CustomFileStream
 
                 currentPosition += subLength;
             }
+
             m_bufferQueue.Enqueue(buffer);
 
             if (waitForWriteToDisk)
+            {
                 FlushFileBuffers();
-
+            }
             else
             {
                 using (m_isUsingStream.EnterReadLock())
                 {
-                    m_stream.Flush(false);
+                    m_stream!.Flush(false);
                 }
             }
         }
-
         finally
         {
             if (needsOpen)
@@ -341,20 +345,13 @@ internal sealed class CustomFileStream
 
 
     /// <summary>
-    /// Flushes any temporary data to the disk. This also calls WindowsAPI function 
-    /// to have the OS flush to the disk.
+    /// Flushes any temporary data to the disk.
     /// </summary>
     public void FlushFileBuffers()
     {
-        // .NET's stream.Flush(FlushToDisk:=true) actually doesn't do what it says. 
-        // Therefore WinApi must be called.
         using (m_isUsingStream.EnterReadLock())
         {
-            if (m_stream is not null)
-            {
-                m_stream.Flush(true);
-                WinApi.FlushFileBuffers(m_stream.SafeFileHandle);
-            }
+            m_stream?.Flush(true);
         }
     }
 
@@ -377,10 +374,12 @@ internal sealed class CustomFileStream
             bool openStream = m_stream is null;
             m_stream?.Dispose();
             m_stream = null;
+
             File.Move(oldFileName, newFileName);
 
             if (openStream)
                 m_stream = new FileStream(newFileName, FileMode.Open, isReadOnly ? FileAccess.Read : FileAccess.ReadWrite, isSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
+
             FileName = newFileName;
             IsSharingEnabled = isSharingEnabled;
             IsReadOnly = isReadOnly;
@@ -391,18 +390,18 @@ internal sealed class CustomFileStream
     {
         using (m_isUsingStream.EnterWriteLock())
         {
-            string fileName = m_stream.Name;
+            string fileName = m_stream!.Name;
 
             try
             {
                 m_stream.Dispose();
                 m_stream = null;
             }
-
-            catch (Exception e)
+            catch (Exception ex)
             {
-                s_log.Publish(MessageLevel.Info, "Error when disposing stream", null, null, e);
+                s_log.Publish(MessageLevel.Info, "Error when disposing stream", null, null, ex);
             }
+
             m_stream = new FileStream(fileName, FileMode.Open, IsReadOnly ? FileAccess.Read : FileAccess.ReadWrite, IsSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
         }
     }
@@ -421,6 +420,7 @@ internal sealed class CustomFileStream
                 m_stream.Dispose();
                 m_stream = new FileStream(FileName, FileMode.Open, isReadOnly ? FileAccess.Read : FileAccess.ReadWrite, isSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
             }
+
             IsSharingEnabled = isSharingEnabled;
             IsReadOnly = isReadOnly;
         }
@@ -432,27 +432,27 @@ internal sealed class CustomFileStream
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-        if (!m_disposed)
+
+        if (m_disposed)
+            return;
+        
+        try
         {
-            try
+            using (m_isUsingStream.EnterWriteLock())
             {
-                using (m_isUsingStream.EnterWriteLock())
-                {
-                    m_stream?.Dispose();
-                    m_stream = null;
-                }
+                m_stream?.Dispose();
+                m_stream = null;
             }
-            finally
-            {
-                m_disposed = true; // Prevent duplicate dispose.
-            }
+        }
+        finally
+        {
+            m_disposed = true; // Prevent duplicate dispose.
         }
     }
 
     #endregion
 
     #region [ Static ]
-
 
     /// <summary>
     /// Creates a file with the supplied name.

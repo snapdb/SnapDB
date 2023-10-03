@@ -29,21 +29,23 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Threading;
 
 /// <summary>
+/// Represents an atomic 64-bit signed integer.
+/// </summary>
+/// <remarks>
 /// Since 64 bit reads/asignments are not atomic on a 32-bit process, this class
 /// wraps the <see cref="Interlocked"/> class to if using a 32-bit process to ensure
 /// atomic reads and writes.
-/// </summary>
+/// </remarks>
 public class AtomicInt64
 {
     // Note: This is a class and not a struct to prevent users from copying the struct value
     // which would result in a non-atomic clone of the struct.  
-
     private long m_value;
 
-/// <summary>
-/// Initializes a new instance of the AtomicInt64 class with an optional initial value.
-/// </summary>
-/// <param name="value">The optional initial value for the AtomicInt64. Default is 0.</param>
+    /// <summary>
+    /// Initializes a new instance of the AtomicInt64 class with an optional initial value.
+    /// </summary>
+    /// <param name="value">The optional initial value for the AtomicInt64. Default is 0.</param>
     public AtomicInt64(long value = 0)
     {
         m_value = value;
@@ -52,39 +54,12 @@ public class AtomicInt64
     /// <summary>
     /// Gets or sets the value of the AtomicInt64.
     /// </summary>
-    /// <remarks>
-    /// For 64-bit processes, the value is directly read or written.
-    /// For 32-bit processes, atomic operations are used for thread-safety.
-    /// </remarks>
     public long Value
     {
-        /// <summary>
-        /// Gets the value of the AtomicInt64.
-        /// </summary>
-        /// <returns>The value of the AtomicInt64.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get
-        {
-            if (Environment.Is64BitProcess)
-                return m_value;
-            
-            return Interlocked.Read(ref m_value);
-        }
-
-        /// <summary>
-        /// Sets the value of the AtomicInt64.
-        /// </summary>
-        /// <param name="value">The new value to set.</param>
+        get => Interlocked.Read(ref m_value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        
-        set
-        {
-            if (Environment.Is64BitProcess)
-                m_value = value;
-            
-            else
-                Interlocked.Exchange(ref m_value, value);
-        }
+        set => Interlocked.Exchange(ref m_value, value);
     }
 
     /// <summary>
@@ -97,5 +72,4 @@ public class AtomicInt64
     {
         return value.Value;
     }
-
 }

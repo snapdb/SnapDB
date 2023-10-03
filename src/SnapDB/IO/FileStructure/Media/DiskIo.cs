@@ -31,7 +31,7 @@ using SnapDB.IO.Unmanaged;
 namespace SnapDB.IO.FileStructure.Media;
 
 /// <summary>
-/// The IO system that the entire file structure uses to acomplish it's IO operations.
+/// The IO system that the entire file structure uses to accomplish it's IO operations.
 /// This class hands data one block at a time to requesting classes
 /// and is responsible for checking the footer data of the file for corruption.
 /// </summary>
@@ -152,6 +152,7 @@ internal sealed class DiskIo : IDisposable
 
         if (m_isReadOnly)
             throw new ReadOnlyException();
+
         m_stream.RollbackChanges();
     }
 
@@ -214,19 +215,19 @@ internal sealed class DiskIo : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (!IsDisposed)
+        if (IsDisposed)
+            return;
+        
+        try
         {
-            try
-            {
-                m_stream?.Dispose();
-            }
+            m_stream?.Dispose();
+        }
 
-            finally
-            {
-                GC.SuppressFinalize(this);
-                m_stream = null;
-                IsDisposed = true;
-            }
+        finally
+        {
+            GC.SuppressFinalize(this);
+            m_stream = null!;
+            IsDisposed = true;
         }
     }
 
@@ -241,7 +242,7 @@ internal sealed class DiskIo : IDisposable
 
     public static DiskIo CreateFile(string fileName, MemoryPool pool, int fileStructureBlockSize, params Guid[] flags)
     {
-        //Exclusive opening to prevent duplicate opening.
+        // Exclusive opening to prevent duplicate opening.
         CustomFileStream fileStream = CustomFileStream.CreateFile(fileName, pool.PageSize, fileStructureBlockSize);
         DiskMedium disk = DiskMedium.CreateFile(fileStream, pool, fileStructureBlockSize, flags);
 

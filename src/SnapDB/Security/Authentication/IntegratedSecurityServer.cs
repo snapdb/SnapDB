@@ -71,55 +71,53 @@ public class IntegratedSecurityServer
         if (additionalChallenge.Length > short.MaxValue)
             throw new ArgumentOutOfRangeException(nameof(additionalChallenge), "Must be less than 32767 bytes");
 
-        using (NegotiateStream negotiateStream = new(stream, true))
+        using NegotiateStream negotiateStream = new(stream, true);
+        try
         {
-            try
-            {
-                negotiateStream.AuthenticateAsServer(CredentialCache.DefaultNetworkCredentials, ProtectionLevel.EncryptAndSign, TokenImpersonationLevel.Identification);
-            }
-            catch (Exception ex)
-            {
-                Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", null, ex);
-                return false;
-            }
-
-            negotiateStream.Write((short)additionalChallenge.Length);
-            if (additionalChallenge.Length > 0)
-            {
-                negotiateStream.Write(additionalChallenge);
-            }
-            negotiateStream.Flush();
-
-            int len = negotiateStream.ReadInt16();
-            if (len < 0)
-            {
-                Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "Challenge Length is invalid: " + len.ToString());
-                return false;
-            }
-
-            byte[] remoteChallenge;
-            if (len == 0)
-            {
-                remoteChallenge = new byte[0];
-            }
-            else
-            {
-                remoteChallenge = negotiateStream.ReadBytes(len);
-            }
-
-            if (remoteChallenge.SecureEquals(additionalChallenge))
-            {
-                if (Users.TryGetToken(negotiateStream.RemoteIdentity, out userToken))
-                {
-                    return true;
-                }
-                Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "User did not exist in the database: " + negotiateStream.RemoteIdentity.ToString());
-                return false;
-            }
-
-            Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "Challenge did not match. Potential man in the middle attack.");
+            negotiateStream.AuthenticateAsServer(CredentialCache.DefaultNetworkCredentials, ProtectionLevel.EncryptAndSign, TokenImpersonationLevel.Identification);
+        }
+        catch (Exception ex)
+        {
+            Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", null, ex);
             return false;
         }
+
+        negotiateStream.Write((short)additionalChallenge.Length);
+        if (additionalChallenge.Length > 0)
+        {
+            negotiateStream.Write(additionalChallenge);
+        }
+        negotiateStream.Flush();
+
+        int len = negotiateStream.ReadInt16();
+        if (len < 0)
+        {
+            Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "Challenge Length is invalid: " + len.ToString());
+            return false;
+        }
+
+        byte[] remoteChallenge;
+        if (len == 0)
+        {
+            remoteChallenge = Array.Empty<byte>();
+        }
+        else
+        {
+            remoteChallenge = negotiateStream.ReadBytes(len);
+        }
+
+        if (remoteChallenge.SecureEquals(additionalChallenge))
+        {
+            if (Users.TryGetToken(negotiateStream.RemoteIdentity, out userToken))
+            {
+                return true;
+            }
+            Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "User did not exist in the database: " + negotiateStream.RemoteIdentity.ToString());
+            return false;
+        }
+
+        Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "Challenge did not match. Potential man in the middle attack.");
+        return false;
     }
 
     /// <summary>

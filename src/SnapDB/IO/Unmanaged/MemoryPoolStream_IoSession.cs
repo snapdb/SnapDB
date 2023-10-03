@@ -42,10 +42,7 @@ public partial class MemoryPoolStream
 
         public IoSession(MemoryPoolStream stream)
         {
-            if (stream is null)
-                throw new ArgumentNullException(nameof(stream));
-
-            m_stream = stream;
+            m_stream = stream ?? throw new ArgumentNullException(nameof(stream));
         }
 
         public override void GetBlock(BlockArguments args)

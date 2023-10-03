@@ -44,7 +44,7 @@ namespace SnapDB.IO.FileStructure.Media;
 internal enum IoReadState
 {
     /// <summary>
-    /// Indicates that the read completed sucessfully.
+    /// Indicates that the read completed successfully.
     /// </summary>
     Valid,
 
@@ -66,7 +66,7 @@ internal enum IoReadState
     /// <summary>
     /// The index value did not match that of the file.
     /// </summary>
-    IndexNumberMissmatch,
+    IndexNumberMismatch,
 
     /// <summary>
     /// The page type requested did not match what was received.
@@ -98,7 +98,7 @@ internal static unsafe class Footer
     /// <param name="checksum1">Output: A long checksum value (64 bits).</param>
     /// <param name="checksum2">Output: An integer checksum value (32 bits).</param>
     /// <param name="length">The length of the data to be used for checksum computation, in bytes.</param>
-    public static void ComputeChecksum(IntPtr data, out long checksum1, out int checksum2, int length)
+    public static void ComputeChecksum(nint data, out long checksum1, out int checksum2, int length)
     {
         Stats.ChecksumCount++;
         Murmur3.ComputeHash((byte*)data, length, out ulong a, out ulong b);
@@ -128,7 +128,7 @@ internal static unsafe class Footer
     /// <param name="data">A pointer to the start of the data blocks.</param>
     /// <param name="blockSize">The size of each data block, in bytes (must be a power of two).</param>
     /// <param name="length">The total length of the data, including all blocks.</param>
-    public static void WriteChecksumResultsToFooter(IntPtr data, int blockSize, int length)
+    public static void WriteChecksumResultsToFooter(nint data, int blockSize, int length)
     {
         if (!BitMath.IsPowerOfTwo(blockSize))
             throw new ArgumentOutOfRangeException(nameof(blockSize), "Must be a power of two.");
@@ -156,7 +156,7 @@ internal static unsafe class Footer
     /// </remarks>
     /// <param name="data">A pointer to the data block.</param>
     /// <param name="blockSize">The size of the data block, in bytes.</param>
-    public static void WriteChecksumResultsToFooter(IntPtr data, int blockSize)
+    public static void WriteChecksumResultsToFooter(nint data, int blockSize)
     {
         byte* lpData = (byte*)data;
         ComputeChecksum(data, out long checksum1, out int checksum2, blockSize - 16);
@@ -168,7 +168,6 @@ internal static unsafe class Footer
             // Record checksum is valid and put zeroes in all other fields.
             *(int*)(lpData + blockSize - 4) = ChecksumIsValid;
         }
-
         else
         {
             // Record checksum is not valid and put zeroes in all other fields.
@@ -188,7 +187,7 @@ internal static unsafe class Footer
     /// Finally, it clears the checksum status in the footer.
     /// </remarks>
     /// <param name="data">A pointer to the data block.</param>
-    public static void ComputeChecksumAndClearFooter(IntPtr data, int blockSize)
+    public static void ComputeChecksumAndClearFooter(nint data, int blockSize)
     {
         byte* lpData = (byte*)data;
 
@@ -218,7 +217,7 @@ internal static unsafe class Footer
     /// <param name="data">A pointer to the data block.</param>
     /// <param name="blockSize">The size of the data block, in bytes.</param>
     /// <param name="length">The total length of data to process, in bytes.</param>
-    public static void ComputeChecksumAndClearFooter(IntPtr data, int blockSize, int length)
+    public static void ComputeChecksumAndClearFooter(nint data, int blockSize, int length)
     {
         if (!BitMath.IsPowerOfTwo(blockSize))
             throw new ArgumentOutOfRangeException(nameof(blockSize), "Must be a power of two.");
@@ -230,8 +229,6 @@ internal static unsafe class Footer
             throw new ArgumentException("Length is not a multiple of the block size", nameof(length));
 
         for (int offset = 0; offset < length; offset += blockSize)
-        {
             ComputeChecksumAndClearFooter(data + offset, blockSize);
-        }
     }
 }

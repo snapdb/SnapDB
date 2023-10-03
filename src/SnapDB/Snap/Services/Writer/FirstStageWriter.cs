@@ -143,58 +143,54 @@ public class FirstStageWriter<TKey, TValue>
 
             if (m_pendingTables1.Count == 10)
             {
-                using (UnionTreeStream<TKey, TValue> reader = new(m_pendingTables1.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true))
+                using UnionTreeStream<TKey, TValue> reader = new(m_pendingTables1.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true);
+                SortedTreeFile file1 = SortedTreeFile.CreateInMemory(4096);
+                SortedTreeTable<TKey, TValue> table1 = file1.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
+                using (SortedTreeTableEditor<TKey, TValue> edit = table1.BeginEdit())
                 {
-                    SortedTreeFile file1 = SortedTreeFile.CreateInMemory(4096);
-                    SortedTreeTable<TKey, TValue> table1 = file1.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
-                    using (SortedTreeTableEditor<TKey, TValue> edit = table1.BeginEdit())
-                    {
-                        edit.AddPoints(reader);
-                        edit.Commit();
-                    }
-
-                    using (ArchiveListEditor<TKey, TValue> edit = m_list.AcquireEditLock())
-                    {
-                        //Add the newly created file.
-                        edit.Add(table1);
-
-                        foreach (SortedTreeTable<TKey, TValue> table2 in m_pendingTables1)
-                        {
-                            edit.TryRemoveAndDelete(table2.ArchiveId);
-                        }
-                    }
-
-                    m_pendingTables2.Add(table1);
-                    m_pendingTables1.Clear();
+                    edit.AddPoints(reader);
+                    edit.Commit();
                 }
+
+                using (ArchiveListEditor<TKey, TValue> edit = m_list.AcquireEditLock())
+                {
+                    //Add the newly created file.
+                    edit.Add(table1);
+
+                    foreach (SortedTreeTable<TKey, TValue> table2 in m_pendingTables1)
+                    {
+                        edit.TryRemoveAndDelete(table2.ArchiveId);
+                    }
+                }
+
+                m_pendingTables2.Add(table1);
+                m_pendingTables1.Clear();
             }
 
             if (m_pendingTables2.Count == 10)
             {
-                using (UnionTreeStream<TKey, TValue> reader = new(m_pendingTables2.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true))
+                using UnionTreeStream<TKey, TValue> reader = new(m_pendingTables2.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true);
+                SortedTreeFile file1 = SortedTreeFile.CreateInMemory(4096);
+                SortedTreeTable<TKey, TValue> table1 = file1.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
+                using (SortedTreeTableEditor<TKey, TValue> edit = table1.BeginEdit())
                 {
-                    SortedTreeFile file1 = SortedTreeFile.CreateInMemory(4096);
-                    SortedTreeTable<TKey, TValue> table1 = file1.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
-                    using (SortedTreeTableEditor<TKey, TValue> edit = table1.BeginEdit())
-                    {
-                        edit.AddPoints(reader);
-                        edit.Commit();
-                    }
-
-                    using (ArchiveListEditor<TKey, TValue> edit = m_list.AcquireEditLock())
-                    {
-                        //Add the newly created file.
-                        edit.Add(table1);
-
-                        foreach (SortedTreeTable<TKey, TValue> table2 in m_pendingTables2)
-                        {
-                            edit.TryRemoveAndDelete(table2.ArchiveId);
-                        }
-                    }
-
-                    m_pendingTables3.Add(table1);
-                    m_pendingTables2.Clear();
+                    edit.AddPoints(reader);
+                    edit.Commit();
                 }
+
+                using (ArchiveListEditor<TKey, TValue> edit = m_list.AcquireEditLock())
+                {
+                    //Add the newly created file.
+                    edit.Add(table1);
+
+                    foreach (SortedTreeTable<TKey, TValue> table2 in m_pendingTables2)
+                    {
+                        edit.TryRemoveAndDelete(table2.ArchiveId);
+                    }
+                }
+
+                m_pendingTables3.Add(table1);
+                m_pendingTables2.Clear();
             }
 
             m_lastCommitedSequenceNumber.Value = args.TransactionId;
@@ -304,31 +300,27 @@ public class FirstStageWriter<TKey, TValue>
 
         if (summaryTables.Count > 0)
         {
-            using (UnionTreeStream<TKey, TValue> reader = new(summaryTables.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true))
+            using UnionTreeStream<TKey, TValue> reader = new(summaryTables.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true);
+            SortedTreeTable<TKey, TValue> newTable = m_createNextStageFile.CreateArchiveFile(startKey, endKey, size, reader, null);
+
+            using ArchiveListEditor<TKey, TValue> edit = m_list.AcquireEditLock();
+            //Add the newly created file.
+            edit.Add(newTable);
+
+            foreach (SortedTreeTable<TKey, TValue> table in pendingTables1)
             {
-                SortedTreeTable<TKey, TValue> newTable = m_createNextStageFile.CreateArchiveFile(startKey, endKey, size, reader, null);
+                edit.TryRemoveAndDelete(table.ArchiveId);
+            }
 
-                using (ArchiveListEditor<TKey, TValue> edit = m_list.AcquireEditLock())
-                {
-                    //Add the newly created file.
-                    edit.Add(newTable);
-
-                    foreach (SortedTreeTable<TKey, TValue> table in pendingTables1)
-                    {
-                        edit.TryRemoveAndDelete(table.ArchiveId);
-                    }
-
-                    foreach (SortedTreeTable<TKey, TValue> table in pendingTables2)
-                    {
-                        edit.TryRemoveAndDelete(table.ArchiveId);
-                    }
+            foreach (SortedTreeTable<TKey, TValue> table in pendingTables2)
+            {
+                edit.TryRemoveAndDelete(table.ArchiveId);
+            }
 
 
-                    foreach (SortedTreeTable<TKey, TValue> table in pendingTables3)
-                    {
-                        edit.TryRemoveAndDelete(table.ArchiveId);
-                    }
-                }
+            foreach (SortedTreeTable<TKey, TValue> table in pendingTables3)
+            {
+                edit.TryRemoveAndDelete(table.ArchiveId);
             }
         }
 

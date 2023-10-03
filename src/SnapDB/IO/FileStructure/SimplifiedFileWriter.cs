@@ -111,9 +111,8 @@ public class SimplifiedFileWriter
         Stream.Position = 0;
         Stream.Write(m_fileHeaderBlock.GetBytes());
         Stream.Flush(true);
-        WinApi.FlushFileBuffers(Stream.SafeFileHandle);
         Stream.Dispose();
-        Stream = null;
+        Stream = null!;
         File.Move(m_pendingFileName, m_completeFileName);
         m_disposed = true;
         Dispose();

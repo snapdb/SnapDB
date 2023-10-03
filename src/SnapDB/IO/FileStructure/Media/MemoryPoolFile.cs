@@ -36,10 +36,7 @@ internal partial class MemoryPoolFile
 {
     #region [ Members ]
 
-
-    /// <summary>
-    /// A Reusable I/O session for all BinaryStreams.
-    /// </summary>
+    // A Reusable I/O session for all BinaryStreams.
     private readonly IoSession m_ioSession;
 
     private bool m_isReadOnly;

@@ -98,7 +98,7 @@ public static class SecurityExtensions
     /// Therefore this method should take constant time to do a comparison of two GUIDs.
     /// </remarks>
     [MethodImpl(MethodImplOptions.NoOptimization)]
-    public unsafe static bool SecureEquals(this Guid a, Guid b)
+    public static unsafe bool SecureEquals(this Guid a, Guid b)
     {
         int* lpa = (int*)&a;
         int* lpb = (int*)&b;

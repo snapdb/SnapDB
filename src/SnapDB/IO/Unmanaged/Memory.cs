@@ -47,7 +47,7 @@ public sealed class Memory
 
     #region [ Members ]
 
-    private IntPtr m_address;
+    private nint m_address;
 
     #endregion
 
@@ -85,7 +85,7 @@ public sealed class Memory
     /// The pointer to the first byte of this unmanaged memory. 
     /// Equals <see cref="IntPtr.Zero"/> if memory has been released.
     /// </summary>
-    public IntPtr Address => m_address;
+    public nint Address => m_address;
 
     /// <summary>
     /// The number of bytes in this allocation.
@@ -111,8 +111,8 @@ public sealed class Memory
     public void Dispose()
     {
         Size = 0;
-        IntPtr value = Interlocked.Exchange(ref m_address, IntPtr.Zero);
-        if (value != IntPtr.Zero)
+        nint value = Interlocked.Exchange(ref m_address, nint.Zero);
+        if (value != nint.Zero)
         {
             try
             {
@@ -143,7 +143,7 @@ public sealed class Memory
     /// <param name="count">The number of bytes to copy from the source to the destination.</param>
     public static unsafe void Copy(byte* src, byte* dest, int count)
     {
-        WinApi.MoveMemory(dest, src, count);
+        Buffer.MemoryCopy(src, dest, count, count);
     }
 
     /// <summary>
@@ -153,9 +153,9 @@ public sealed class Memory
     /// <param name="src">A pointer to the source location from which data will be copied.</param>
     /// <param name="dest">A pointer to the destination location where data will be copied to.</param>
     /// <param name="count">The number of bytes to copy from the source to the destination.</param>
-    public static unsafe void Copy(IntPtr src, IntPtr dest, int count)
+    public static unsafe void Copy(nint src, nint dest, int count)
     {
-        WinApi.MoveMemory((byte*)dest, (byte*)src, count);
+        Buffer.MemoryCopy((byte*)src, (byte*)dest, count, count);
     }
 
     /// <summary>
@@ -182,7 +182,7 @@ public sealed class Memory
     /// </summary>
     /// <param name="pointer">The starting position.</param>
     /// <param name="length">The number of bytes to clear.</param>
-    public static unsafe void Clear(IntPtr pointer, int length)
+    public static unsafe void Clear(nint pointer, int length)
     {
         Clear((byte*)pointer, length);
     }

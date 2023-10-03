@@ -52,17 +52,15 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue>
     /// <param name="flags"></param>
     public static void Create(string pendingFileName, string completeFileName, int blockSize, Action<Guid> archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, params Guid[] flags)
     {
-        using (SimplifiedFileWriter writer = new(pendingFileName, completeFileName, blockSize, flags))
-        {
-            archiveIdCallback?.Invoke(writer.ArchiveId);
+        using SimplifiedFileWriter writer = new(pendingFileName, completeFileName, blockSize, flags);
+        archiveIdCallback?.Invoke(writer.ArchiveId);
 
-            using (ISupportsBinaryStream file = writer.CreateFile(GetFileName()))
-            using (BinaryStream bs = new(file))
-            {
-                SequentialSortedTreeWriter<TKey, TValue>.Create(bs, blockSize - 32, treeNodeType, treeStream);
-            }
-            writer.Commit();
+        using (ISupportsBinaryStream file = writer.CreateFile(GetFileName()))
+        using (BinaryStream bs = new(file))
+        {
+            SequentialSortedTreeWriter<TKey, TValue>.Create(bs, blockSize - 32, treeNodeType, treeStream);
         }
+        writer.Commit();
     }
 
     public static void CreateNonSequential(string pendingFileName, string completeFileName, int blockSize, Action<Guid> archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, params Guid[] flags)
@@ -91,11 +89,8 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue>
                 pendingFiles.Add(CreateMemoryFile(treeNodeType, queue));
             }
 
-            using (UnionTreeStream<TKey, TValue> reader = new(pendingFiles.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), false))
-            {
-                Create(pendingFileName, completeFileName, blockSize, archiveIdCallback, treeNodeType, reader, flags);
-            }
-
+            using UnionTreeStream<TKey, TValue> reader = new(pendingFiles.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), false);
+            Create(pendingFileName, completeFileName, blockSize, archiveIdCallback, treeNodeType, reader, flags);
         }
         finally
         {

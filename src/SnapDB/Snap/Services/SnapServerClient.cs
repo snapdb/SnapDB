@@ -47,12 +47,9 @@ public partial class SnapServer
         /// <param name="server">The collection to wrap.</param>
         public Client(SnapServer server)
         {
-            if (server is null)
-                throw new ArgumentNullException(nameof(server));
-
             m_syncRoot = new object();
             m_connectedDatabases = new Dictionary<string, ClientDatabaseBase>();
-            m_server = server;
+            m_server = server ?? throw new ArgumentNullException(nameof(server));
             server.RegisterClient(this);
         }
 

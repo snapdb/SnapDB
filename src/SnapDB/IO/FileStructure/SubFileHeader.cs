@@ -62,11 +62,12 @@ public class SubFileHeader
         FileName = SubFileName.Load(dataReader);
         FileIdNumber = dataReader.ReadUInt16();
         m_dataBlockCount = dataReader.ReadUInt32();
+
         if (!isSimplified)
-        {
             m_totalBlocksCount = dataReader.ReadUInt32();
-        }
+
         m_directBlock = dataReader.ReadUInt32();
+
         if (!isSimplified)
         {
             m_singleIndirectBlock = dataReader.ReadUInt32();
@@ -74,6 +75,7 @@ public class SubFileHeader
             m_tripleIndirectBlock = dataReader.ReadUInt32();
             m_quadrupleIndirectBlock = dataReader.ReadUInt32();
         }
+
         IsReadOnly = isImmutable;
     }
 
@@ -86,12 +88,10 @@ public class SubFileHeader
     /// <param name="isSimplified">if this header is a simplified header.</param>
     public SubFileHeader(ushort fileId, SubFileName fileName, bool isImmutable, bool isSimplified)
     {
-        if (fileName is null)
-            throw new ArgumentException("The feature type cannot be an empty GUID value", nameof(fileName));
         m_isSimplified = isSimplified;
         IsReadOnly = isImmutable;
         FileIdNumber = fileId;
-        FileName = fileName;
+        FileName = fileName ?? throw new ArgumentException("The feature type cannot be an empty GUID value", nameof(fileName));
     }
 
     #endregion
@@ -127,12 +127,7 @@ public class SubFileHeader
     /// </summary>
     public uint TotalBlockCount
     {
-        get
-        {
-            if (m_isSimplified)
-                return m_dataBlockCount;
-            return m_totalBlocksCount;
-        }
+        get => m_isSimplified ? m_dataBlockCount : m_totalBlocksCount;
         set
         {
             TestSimplifiedFile();
@@ -192,7 +187,7 @@ public class SubFileHeader
     }
 
     /// <summary>
-    /// Gets the block address for the tripple indirect block.
+    /// Gets the block address for the triple indirect block.
     /// </summary>
     public uint TripleIndirectBlock
     {
@@ -240,11 +235,12 @@ public class SubFileHeader
         FileName.Save(dataWriter);
         dataWriter.Write(FileIdNumber);
         dataWriter.Write(m_dataBlockCount);
+
         if (!m_isSimplified)
-        {
             dataWriter.Write(m_totalBlocksCount);
-        }
+
         dataWriter.Write(m_directBlock);
+
         if (!m_isSimplified)
         {
             dataWriter.Write(m_singleIndirectBlock);
@@ -253,7 +249,6 @@ public class SubFileHeader
             dataWriter.Write(m_quadrupleIndirectBlock);
         }
     }
-
 
     /// <summary>
     /// Test if the class has been marked as readonly. Throws an exception if editing cannot occur.

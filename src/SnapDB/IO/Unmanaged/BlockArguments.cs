@@ -44,7 +44,7 @@ public class BlockArguments
     /// <summary>
     /// The pointer for the first byte of the block.
     /// </summary>
-    public IntPtr FirstPointer;
+    public nint FirstPointer;
 
     /// <summary>
     /// The position that corresponds to <see cref="FirstPointer"/>.

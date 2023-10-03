@@ -138,7 +138,7 @@ public partial class SubFileStream
             var physicalBlockIndex = m_stream.SubFile.DirectBlock + indexPosition;
 
             m_dataIoSession.Read(physicalBlockIndex, BlockType.DataBlock, indexPosition);
-            args.FirstPointer = (IntPtr)m_dataIoSession.Pointer;
+            args.FirstPointer = (nint)m_dataIoSession.Pointer;
             args.SupportsWriting = false;
         }
 

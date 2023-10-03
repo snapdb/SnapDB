@@ -36,10 +36,6 @@ public class ArchiveTableSummary<TKey, TValue>
     where TKey : SnapTypeBase<TKey>, new()
     where TValue : SnapTypeBase<TValue>, new()
 {
-    #region [ Members ]
-
-    #endregion
-
     #region [ Constructors ]
 
     /// <summary>

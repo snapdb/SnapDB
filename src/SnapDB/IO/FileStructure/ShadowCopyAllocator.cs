@@ -83,7 +83,7 @@ internal unsafe class ShadowCopyAllocator
     /// <summary>
     /// This will make a shadow copy of the block that contains the position provided.  
     /// If the block does not exist, space is allocated and the indexes are 
-    /// set up to allow the block to be writen to.
+    /// set up to allow the block to be written to.
     /// </summary>
     /// <param name="positionIndex">The position the application intents to write to.</param>
     /// <param name="wasShadowed"></param>

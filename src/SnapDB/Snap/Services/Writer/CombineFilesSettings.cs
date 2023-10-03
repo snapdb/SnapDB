@@ -172,9 +172,7 @@ public class CombineFilesSettings
         set
         {
             TestForEditable();
-            if (value is null)
-                throw new ArgumentNullException(nameof(value));
-            m_archiveSettings = value;
+            m_archiveSettings = value ?? throw new ArgumentNullException(nameof(value));
         }
     }
 

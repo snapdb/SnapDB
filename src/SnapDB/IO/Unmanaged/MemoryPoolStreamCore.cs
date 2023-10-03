@@ -47,16 +47,16 @@ public class MemoryPoolStreamCore : IDisposable
         }
 
         private int[][] m_pageIndex;
-        private IntPtr[][] m_pagePointer;
+        private nint[][] m_pagePointer;
 
         public Settings()
         {
             m_pageIndex = new int[4][];
-            m_pagePointer = new IntPtr[4][];
+            m_pagePointer = new nint[4][];
             PageCount = 0;
         }
 
-        public IntPtr GetPointer(int page)
+        public nint GetPointer(int page)
         {
             return m_pagePointer[page >> ShiftBits][page & Mask];
         }
@@ -73,9 +73,9 @@ public class MemoryPoolStreamCore : IDisposable
             if (AddingRequiresClone)
             {
                 int[][] oldIndex = m_pageIndex;
-                IntPtr[][] oldPointer = m_pagePointer;
+                nint[][] oldPointer = m_pagePointer;
                 m_pageIndex = new int[m_pageIndex.Length * 2][];
-                m_pagePointer = new IntPtr[m_pagePointer.Length * 2][];
+                m_pagePointer = new nint[m_pagePointer.Length * 2][];
                 oldIndex.CopyTo(m_pageIndex, 0);
                 oldPointer.CopyTo(m_pagePointer, 0);
             }
@@ -84,7 +84,7 @@ public class MemoryPoolStreamCore : IDisposable
             if (m_pageIndex[bigIndex] is null)
             {
                 m_pageIndex[bigIndex] = new int[ElementsPerRow];
-                m_pagePointer[bigIndex] = new IntPtr[ElementsPerRow];
+                m_pagePointer[bigIndex] = new nint[ElementsPerRow];
             }
         }
 
@@ -93,7 +93,7 @@ public class MemoryPoolStreamCore : IDisposable
         /// </summary>
         /// <param name="pagePointer">A pointer to the new page to be added.</param>
         /// <param name="pageIndex">The index of the new page.</param>
-        public void AddNewPage(IntPtr pagePointer, int pageIndex)
+        public void AddNewPage(nint pagePointer, int pageIndex)
         {
             // Ensure that there is enough capacity to add a new page.
             EnsureCapacity();
@@ -321,7 +321,7 @@ public class MemoryPoolStreamCore : IDisposable
     /// </summary>
     /// <param name="position">The position to use to calculate the page to retrieve</param>
     /// <returns></returns>
-    private IntPtr GetPage(long position)
+    private nint GetPage(long position)
     {
         Settings settings = m_settings;
 
@@ -355,7 +355,7 @@ public class MemoryPoolStreamCore : IDisposable
             //If there are not enough pages in the stream, add enough.
             while (pageCount > settings.PageCount)
             {
-                m_pool.AllocatePage(out int pageIndex, out IntPtr pagePointer);
+                m_pool.AllocatePage(out int pageIndex, out nint pagePointer);
                 Memory.Clear(pagePointer, m_pool.PageSize);
                 settings.AddNewPage(pagePointer, pageIndex);
             }
@@ -378,7 +378,7 @@ public class MemoryPoolStreamCore : IDisposable
     /// <param name="position">The starting position of the read.</param>
     /// <param name="pointer">Ann output pointer to <see cref="position"/>.</param>
     /// <param name="validLength">The number of bytes that are valid after this position.</param>
-    public void ReadBlock(long position, out IntPtr pointer, out int validLength)
+    public void ReadBlock(long position, out nint pointer, out int validLength)
     {
         if (m_disposed)
             throw new ObjectDisposedException("MemoryStream");
@@ -402,11 +402,11 @@ public class MemoryPoolStreamCore : IDisposable
         pointer += seekDistance;
     }
 
-    public void CopyTo(long position, IntPtr dest, int length)
+    public void CopyTo(long position, nint dest, int length)
     {
     TryAgain:
 
-        ReadBlock(position, out IntPtr src, out int validLength);
+        ReadBlock(position, out nint src, out int validLength);
         if (validLength < length)
         {
             Memory.Copy(src, dest, validLength);

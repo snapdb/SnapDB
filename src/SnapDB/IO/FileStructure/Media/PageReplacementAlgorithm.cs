@@ -40,7 +40,6 @@ namespace SnapDB.IO.FileStructure.Media;
 internal partial class PageReplacementAlgorithm
     : IDisposable
 {
-
     private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(PageReplacementAlgorithm), MessageClass.Component);
 
     #region [ Members ]
@@ -85,7 +84,7 @@ internal partial class PageReplacementAlgorithm
     public PageReplacementAlgorithm(MemoryPool pool)
     {
         if (pool.PageSize < 4096)
-            throw new ArgumentOutOfRangeException("PageSize Must be greater than 4096", "pool");
+            throw new ArgumentOutOfRangeException(nameof(pool), "PageSize Must be greater than 4096");
 
         if (!BitMath.IsPowerOfTwo(pool.PageSize))
             throw new ArgumentException("PageSize Must be a power of 2", nameof(pool));
@@ -123,7 +122,7 @@ internal partial class PageReplacementAlgorithm
     /// <param name="locationOfPage">The pointer to the page</param>
     /// <param name="memoryPoolIndex">The index value of the memory pool page so it can be released back to the memory pool.</param>
     /// <returns><c>true</c> if the page was added to the class; <c>false</c> if the page already exists and the data was not replaced.</returns>
-    public bool TryAddPage(long position, IntPtr locationOfPage, int memoryPoolIndex)
+    public bool TryAddPage(long position, nint locationOfPage, int memoryPoolIndex)
     {
         lock (m_syncRoot)
         {
@@ -184,22 +183,20 @@ internal partial class PageReplacementAlgorithm
     /// </summary>
     public void Dispose()
     {
-        if (!m_disposed)
+        if (m_disposed)
+            return;
+        
+        lock (m_syncRoot)
         {
-            lock (m_syncRoot)
+            try
             {
-                try
-                {
-                    m_pageList.Dispose();
-                }
-
-                finally
-                {
-                    GC.SuppressFinalize(this);
-                    m_disposed = true; // Prevent duplicate dispose.
-                }
+                m_pageList.Dispose();
             }
-
+            finally
+            {
+                GC.SuppressFinalize(this);
+                m_disposed = true; // Prevent duplicate dispose.
+            }
         }
     }
 

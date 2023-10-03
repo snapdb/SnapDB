@@ -304,7 +304,6 @@ internal partial class BufferedFile
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
-    /// <filterpriority>2</filterpriority>
     public void Dispose()
     {
         if (m_disposed)
@@ -325,7 +324,6 @@ internal partial class BufferedFile
                 m_writeBuffer?.Dispose();
             }
         }
-
         finally
         {
             m_queue = null!;
@@ -362,30 +360,26 @@ internal partial class BufferedFile
             m_writeBuffer.GetBlock(args);
         }
 
+        // If the block is in the header, error because this area of the file is not designed to be accessed.
         if (args.Position < m_lengthOfHeader)
-        {
-            // If the block is in the header, error because this area of the file is not designed to be accessed.
             throw new ArgumentOutOfRangeException(nameof(args), "Cannot use this function to modify the file header.");
-        }
-        else
-        {
-            // If it is between the file header and uncommitted space, 
-            // it is in the committed space, which this space by design is never to be modified. 
-            if (args.IsWriting)
-                throw new ArgumentException("Cannot write to committed data space", nameof(args));
 
-            args.SupportsWriting = false;
-            args.Length = m_diskBlockSize;
+        // If it is between the file header and uncommitted space, 
+        // it is in the committed space, which this space by design is never to be modified. 
+        if (args.IsWriting)
+            throw new ArgumentException("Cannot write to committed data space", nameof(args));
 
-            // Rounds to the beginning of the block to be looked up.
-            args.FirstPosition = args.Position & ~m_pool.PageMask;
+        args.SupportsWriting = false;
+        args.Length = m_diskBlockSize;
 
-            GetBlockFromCommittedSpace(pageLock, args.FirstPosition, out args.FirstPointer);
+        // Rounds to the beginning of the block to be looked up.
+        args.FirstPosition = args.Position & ~m_pool.PageMask;
 
-            // Make sure the block does not go beyond the end of the uncommitted space.
-            if (args.FirstPosition + args.Length > m_lengthOfCommittedData)
-                args.Length = (int)(m_lengthOfCommittedData - args.FirstPosition);
-        }
+        GetBlockFromCommittedSpace(pageLock, args.FirstPosition, out args.FirstPointer);
+
+        // Make sure the block does not go beyond the end of the uncommitted space.
+        if (args.FirstPosition + args.Length > m_lengthOfCommittedData)
+            args.Length = (int)(m_lengthOfCommittedData - args.FirstPosition);
     }
 
     /// <summary>

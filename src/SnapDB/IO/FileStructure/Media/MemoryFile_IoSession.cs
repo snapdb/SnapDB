@@ -66,6 +66,7 @@ internal partial class MemoryPoolFile
         {
             if (args.IsWriting && m_file.m_isReadOnly)
                 throw new ReadOnlyException("File system is read only");
+
             args.SupportsWriting = !m_file.m_isReadOnly;
             m_file.GetBlock(args);
         }

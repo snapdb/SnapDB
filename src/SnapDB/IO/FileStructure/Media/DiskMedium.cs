@@ -36,26 +36,13 @@ namespace SnapDB.IO.FileStructure.Media;
 internal class DiskMedium
     : IDisposable
 {
-
     private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(DiskMedium), MessageClass.Component);
 
     #region [ Members ]
 
-    /// <summary>
-    /// The file block header.
-    /// </summary>
-    private FileHeaderBlock m_header;
-    /// <summary>
-    /// The underlying disk implementation.
-    /// </summary>
+    // The underlying disk implementation.
     private IDiskMediumCoreFunctions m_disk;
-    /// <summary>
-    /// The number of bytes in a given block. Typically 4KB in size.
-    /// </summary>
-    private readonly int m_blockSize;
-    /// <summary>
-    /// Prevents duplicate calls to dispose.
-    /// </summary>
+
     private bool m_disposed;
 
     #endregion
@@ -69,9 +56,9 @@ internal class DiskMedium
     /// <param name="header">The header data to use.</param>
     private DiskMedium(IDiskMediumCoreFunctions disk, FileHeaderBlock header)
     {
-        m_header = header;
+        Header = header;
         m_disk = disk;
-        m_blockSize = header.BlockSize;
+        BlockSize = header.BlockSize;
     }
 
     #endregion
@@ -94,12 +81,15 @@ internal class DiskMedium
     /// <summary>
     /// Gets the most recent committed header from the archive file.
     /// </summary>
-    public FileHeaderBlock Header => m_header;
+    public FileHeaderBlock Header { get; private set; }
 
     /// <summary>
     /// Gets the number of bytes in the file structure block size.
     /// </summary>
-    public int BlockSize => m_blockSize;
+    /// <remarks>
+    /// Typically 4KB in size.
+    /// </remarks>
+    public int BlockSize { get; }
 
     public string FileName => m_disk.FileName;
 
@@ -127,7 +117,7 @@ internal class DiskMedium
         header.IsReadOnly = true;
         m_disk.CommitChanges(header);
         Thread.MemoryBarrier();
-        m_header = header;
+        Header = header;
     }
 
     /// <summary>
@@ -166,13 +156,13 @@ internal class DiskMedium
     /// <filterpriority>2</filterpriority>
     public void Dispose()
     {
-        if (!m_disposed)
-        {
-            GC.SuppressFinalize(this);
-            m_disposed = true;
-            m_disk.Dispose();
-            m_disk = null;
-        }
+        if (m_disposed)
+            return;
+        
+        GC.SuppressFinalize(this);
+        m_disposed = true;
+        m_disk.Dispose();
+        m_disk = null!;
     }
 
     #endregion

@@ -43,7 +43,7 @@ public abstract unsafe class BinaryStreamBase
     /// <summary>
     /// A shared instance of UTF8 encoding.
     /// </summary>
-    public readonly static Encoding Utf8 = Encoding.UTF8;
+    public static readonly Encoding Utf8 = Encoding.UTF8;
 
     /// <summary>
     /// A <see cref="Stream"/> implementation of this <see cref="BinaryStreamBase"/>

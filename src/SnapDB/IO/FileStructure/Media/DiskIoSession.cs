@@ -23,6 +23,7 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 using System.Data;
 using SnapDB.IO.Unmanaged;
@@ -49,7 +50,6 @@ internal unsafe class DiskIoSession : IDisposable
     private readonly uint m_lastReadonlyBlock;
 
     private BinaryStreamIoSessionBase m_diskMediumIoSession;
-    private bool m_disposed;
 
     #endregion
 
@@ -72,15 +72,12 @@ internal unsafe class DiskIoSession : IDisposable
         if (diskIo.IsDisposed)
             throw new ObjectDisposedException(diskIo.GetType().FullName);
 
-        if (ioSession is null)
-            throw new ArgumentNullException(nameof(ioSession));
-
         if (file is null)
             throw new ArgumentNullException(nameof(file));
 
         m_args = new BlockArguments();
         m_lastReadonlyBlock = diskIo.LastReadonlyBlock;
-        m_diskMediumIoSession = ioSession;
+        m_diskMediumIoSession = ioSession ?? throw new ArgumentNullException(nameof(ioSession));
         m_snapshotSequenceNumber = header.SnapshotSequenceNumber;
         m_fileIdNumber = file.FileIdNumber;
         m_isReadOnly = file.IsReadOnly || diskIo.IsReadOnly;
@@ -169,7 +166,7 @@ internal unsafe class DiskIoSession : IDisposable
     /// <param name="blockIndex">The index value of this block.</param>
     /// <param name="blockType">The type of this block.</param>
     /// <param name="indexValue">A value put in the footer of the block designating the index of this block.</param>
-    /// <remarks>This function will increase the size of the file if the block excedes the current size of the file.</remarks>
+    /// <remarks>This function will increase the size of the file if the block exceeds the current size of the file.</remarks>
     public void WriteToNewBlock(uint blockIndex, BlockType blockType, uint indexValue)
     {
         BlockIndex = blockIndex;
@@ -217,6 +214,7 @@ internal unsafe class DiskIoSession : IDisposable
 
         WriteCount++;
         ReadCount++;
+
         if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
 
@@ -234,12 +232,12 @@ internal unsafe class DiskIoSession : IDisposable
         ReadBlock(true);
 
         IoReadState readState = IsFooterCurrentSnapshotAndValid();
-        if (readState != IoReadState.Valid)
-        {
-            IsValid = false;
 
-            throw new Exception("Read Error: " + readState.ToString());
-        }
+        if (readState == IoReadState.Valid)
+            return;
+        
+        IsValid = false;
+        throw new Exception("Read Error: " + readState.ToString());
     }
 
     /// <summary>
@@ -257,6 +255,7 @@ internal unsafe class DiskIoSession : IDisposable
         IndexValue = indexValue;
 
         ReadCount++;
+
         if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
 
@@ -269,11 +268,11 @@ internal unsafe class DiskIoSession : IDisposable
 
         IoReadState readState = IsFooterValid();
 
-        if (readState != IoReadState.Valid)
-        {
-            IsValid = false;
-            throw new Exception("Read Error: " + readState.ToString());
-        }
+        if (readState == IoReadState.Valid)
+            return;
+        
+        IsValid = false;
+        throw new Exception("Read Error: " + readState.ToString());
     }
 
     /// <summary>
@@ -291,6 +290,7 @@ internal unsafe class DiskIoSession : IDisposable
         IndexValue = indexValue;
 
         ReadCount++;
+
         if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
 
@@ -303,11 +303,11 @@ internal unsafe class DiskIoSession : IDisposable
 
         IoReadState readState = IsFooterValidFromOldBlock();
 
-        if (readState != IoReadState.Valid)
-        {
-            IsValid = false;
-            throw new Exception("Read Error: " + readState.ToString());
-        }
+        if (readState == IoReadState.Valid)
+            return;
+        
+        IsValid = false;
+        throw new Exception("Read Error: " + readState.ToString());
     }
 
     /// <summary>
@@ -315,24 +315,25 @@ internal unsafe class DiskIoSession : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (!IsDisposed)
+        if (IsDisposed)
+            return;
+        
+        try
         {
-            try
+            if (m_diskMediumIoSession is not null)
             {
-                if (m_diskMediumIoSession is not null)
-                {
-                    m_diskMediumIoSession.Dispose();
-                    m_diskMediumIoSession = null;
-                }
-                m_diskIo = null;
+                m_diskMediumIoSession.Dispose();
+                m_diskMediumIoSession = null!;
             }
 
-            finally
-            {
-                GC.SuppressFinalize(this);
-                IsValid = false;
-                IsDisposed = true; // Prevent duplicate dispose.
-            }
+            m_diskIo = null!;
+        }
+
+        finally
+        {
+            GC.SuppressFinalize(this);
+            IsValid = false;
+            IsDisposed = true; // Prevent duplicate dispose.
         }
     }
 
@@ -342,9 +343,6 @@ internal unsafe class DiskIoSession : IDisposable
     /// <exception cref="ObjectDisposedException">Thrown if this <see cref="DiskIoSession"/> instance, its parent <see cref="DiskIo"/> instance, or the underlying <see cref="DiskMediumIoSession"/> instance is disposed.</exception>
     public void Clear()
     {
-        if (m_disposed)
-            throw new ObjectDisposedException(GetType().FullName);
-
         if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
 
@@ -386,7 +384,7 @@ internal unsafe class DiskIoSession : IDisposable
         int offsetOfPosition = (int)(position - m_args.FirstPosition);
 
         if (m_args.Length - offsetOfPosition < m_blockSize)
-            throw new Exception("stream is not lining up on page boundries");
+            throw new Exception("stream is not lining up on page boundaries");
 
         Pointer += offsetOfPosition;
         Length = m_blockSize - FileStructureConstants.BlockFooterLength;
@@ -394,49 +392,52 @@ internal unsafe class DiskIoSession : IDisposable
 
     private IoReadState IsFooterValidFromOldBlock()
     {
-        byte* lpdata = Pointer + m_blockSize - 32;
-        int checksumState = lpdata[28];
+        byte* data = Pointer + m_blockSize - 32;
+        int checksumState = data[28];
 
         if (checksumState == Footer.ChecksumIsNotValid)
             return IoReadState.ChecksumInvalid;
 
         if (checksumState is Footer.ChecksumIsValid or Footer.ChecksumMustBeRecomputed)
         {
-            if (lpdata[0] != BlockType)
+            if (data[0] != BlockType)
                 return IoReadState.BlockTypeMismatch;
 
-            if (*(uint*)(lpdata + 4) != IndexValue)
-                return IoReadState.IndexNumberMissmatch;
+            if (*(uint*)(data + 4) != IndexValue)
+                return IoReadState.IndexNumberMismatch;
 
-            if (*(uint*)(lpdata + 8) >= m_snapshotSequenceNumber)
+            if (*(uint*)(data + 8) >= m_snapshotSequenceNumber)
                 return IoReadState.PageNewerThanSnapshotSequenceNumber;
 
-            if (*(ushort*)(lpdata + 2) != m_fileIdNumber)
+            if (*(ushort*)(data + 2) != m_fileIdNumber)
                 return IoReadState.FileIdNumberDidNotMatch;
+            
             return IoReadState.Valid;
         }
+
         throw new Exception("Checksum was not computed properly.");
     }
 
     private IoReadState IsFooterValid()
     {
-        byte* lpdata = Pointer + m_blockSize - 32;
-        int checksumState = lpdata[28];
+        byte* data = Pointer + m_blockSize - 32;
+        int checksumState = data[28];
+
         if (checksumState == Footer.ChecksumIsNotValid)
             return IoReadState.ChecksumInvalid;
 
         if (checksumState is Footer.ChecksumIsValid or Footer.ChecksumMustBeRecomputed)
         {
-            if (lpdata[0] != BlockType)
+            if (data[0] != BlockType)
                 return IoReadState.BlockTypeMismatch;
 
-            if (*(uint*)(lpdata + 4) != IndexValue)
-                return IoReadState.IndexNumberMissmatch;
+            if (*(uint*)(data + 4) != IndexValue)
+                return IoReadState.IndexNumberMismatch;
 
-            if (*(uint*)(lpdata + 8) > m_snapshotSequenceNumber)
+            if (*(uint*)(data + 8) > m_snapshotSequenceNumber)
                 return IoReadState.PageNewerThanSnapshotSequenceNumber;
 
-            if (*(ushort*)(lpdata + 2) != m_fileIdNumber)
+            if (*(ushort*)(data + 2) != m_fileIdNumber)
                 return IoReadState.FileIdNumberDidNotMatch;
 
             return IoReadState.Valid;
@@ -447,23 +448,24 @@ internal unsafe class DiskIoSession : IDisposable
 
     private IoReadState IsFooterCurrentSnapshotAndValid()
     {
-        byte* lpdata = Pointer + m_blockSize - 32;
-        int checksumState = lpdata[28];
+        byte* data = Pointer + m_blockSize - 32;
+        int checksumState = data[28];
+
         if (checksumState == Footer.ChecksumIsNotValid)
             return IoReadState.ChecksumInvalid;
 
         if (checksumState is Footer.ChecksumIsValid or Footer.ChecksumMustBeRecomputed)
         {
-            if (lpdata[0] != BlockType)
+            if (data[0] != BlockType)
                 return IoReadState.BlockTypeMismatch;
 
-            if (*(uint*)(lpdata + 4) != IndexValue)
-                return IoReadState.IndexNumberMissmatch;
+            if (*(uint*)(data + 4) != IndexValue)
+                return IoReadState.IndexNumberMismatch;
 
-            if (*(uint*)(lpdata + 8) != m_snapshotSequenceNumber)
+            if (*(uint*)(data + 8) != m_snapshotSequenceNumber)
                 return IoReadState.PageNewerThanSnapshotSequenceNumber;
 
-            if (*(ushort*)(lpdata + 2) != m_fileIdNumber)
+            if (*(ushort*)(data + 2) != m_fileIdNumber)
                 return IoReadState.FileIdNumberDidNotMatch;
 
             return IoReadState.Valid;
@@ -478,6 +480,7 @@ internal unsafe class DiskIoSession : IDisposable
 
         data[28] = Footer.ChecksumMustBeRecomputed;
         data[0] = BlockType;
+
         *(uint*)(data + 4) = IndexValue;
         *(ushort*)(data + 2) = m_fileIdNumber;
         *(uint*)(data + 8) = m_snapshotSequenceNumber;
@@ -486,6 +489,7 @@ internal unsafe class DiskIoSession : IDisposable
     private void ClearFooterData()
     {
         long* ptr = (long*)(Pointer + m_blockSize - 32);
+
         ptr[0] = 0;
         ptr[1] = 0;
         ptr[2] = 0;
@@ -498,6 +502,7 @@ internal unsafe class DiskIoSession : IDisposable
 
     internal static long ReadCount;
     internal static long WriteCount;
+
     public static long CachedLookups;
     public static long Lookups;
 

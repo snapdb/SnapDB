@@ -33,7 +33,7 @@ internal partial class PageReplacementAlgorithm
     /// <summary>
     /// Used to hold a lock on a page to prevent it from being collected by the collection engine.
     /// </summary>
-    abstract internal class PageLock
+    internal abstract class PageLock
         : BinaryStreamIoSessionBase, IEquatable<PageLock>
     {
         private readonly PageReplacementAlgorithm m_parent;
@@ -78,17 +78,17 @@ internal partial class PageReplacementAlgorithm
             {
                 CurrentPageIndex = -1; // Reset current page index.
                 m_disposed = true; // Mark object as disposed.
+                
                 if (disposing)
                 {
                     lock (m_parent.m_syncRoot) // Lock the parent's synchronization root for thread safety.
                     {
                         if (!m_parent.m_disposed)
-                        {
                             m_parent.m_arrayIndexLocks.Remove(this); // If parent is not already disposed, remove this instance from the parent's list of locks.
-                        }
                     }
                 }
             }
+
             base.Dispose(disposing);
         }
 
@@ -99,7 +99,7 @@ internal partial class PageReplacementAlgorithm
         /// <param name="position">The absolute position in the stream to get the page for.</param>
         /// <param name="location">A pointer for the page.</param>
         /// <returns><c>false</c> if the page does not exists and needs to be added.</returns>
-        public bool TryGetSubPage(long position, out IntPtr location)
+        public bool TryGetSubPage(long position, out nint location)
         {
             lock (m_parent.m_syncRoot)
             {
@@ -124,6 +124,7 @@ internal partial class PageReplacementAlgorithm
 
                     return true;
                 }
+
                 location = default;
 
                 return false;
@@ -142,7 +143,7 @@ internal partial class PageReplacementAlgorithm
         /// <remarks>If <see cref="wasPageAdded"/> is <c>false</c>, the calling function should 
         /// return the page back to the memory pool.
         /// </remarks>
-        public IntPtr GetOrAddPage(long position, IntPtr startOfMemoryPoolPage, int memoryPoolIndex, out bool wasPageAdded)
+        public nint GetOrAddPage(long position, nint startOfMemoryPoolPage, int memoryPoolIndex, out bool wasPageAdded)
         {
             lock (m_parent.m_syncRoot)
             {
@@ -163,7 +164,7 @@ internal partial class PageReplacementAlgorithm
                 if (m_parent.m_pageList.TryGetPageIndex(positionIndex, out int pageIndex))
                 {
                     CurrentPageIndex = pageIndex;
-                    IntPtr location = m_parent.m_pageList.GetPointerToPage(pageIndex, 1);
+                    nint location = m_parent.m_pageList.GetPointerToPage(pageIndex, 1);
                     wasPageAdded = false;
 
                     return location;
@@ -184,7 +185,7 @@ internal partial class PageReplacementAlgorithm
         /// </returns>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <filterpriority>2</filterpriority>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj);
         }
@@ -196,9 +197,9 @@ internal partial class PageReplacementAlgorithm
         /// <c>true</c> if the current object is equal to the <paramref name="other"/> parameter; otherwise, <c>false</c>.
         /// </returns>
         /// <param name="other">An object to compare with this object.</param>
-        public bool Equals(PageLock other)
+        public bool Equals(PageLock? other)
         {
-            return ReferenceEquals(null, other);
+            return other is null;
         }
 
         /// <summary>

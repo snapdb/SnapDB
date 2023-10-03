@@ -97,7 +97,8 @@ internal class SequentialReaderStream<TKey, TValue>
 
         for (int x = 0; x < m_snapshot.Tables.Count(); x++)
         {
-            ArchiveTableSummary<TKey, TValue> table = m_snapshot.Tables[x];
+            ArchiveTableSummary<TKey, TValue>? table = m_snapshot.Tables[x];
+
             if (table is not null)
             {
                 if (table.Contains(keySeekFilter.StartOfRange, keySeekFilter.EndOfRange))
@@ -106,7 +107,7 @@ internal class SequentialReaderStream<TKey, TValue>
                     {
                         m_tablesOrigList.Add(new BufferedArchiveStream<TKey, TValue>(x, table));
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
                         //ToDo: Make sure firstkey.tostring doesn't ever throw an exception.
                         StringBuilder sb = new();
@@ -115,7 +116,7 @@ internal class SequentialReaderStream<TKey, TValue>
                         sb.AppendLine($"Last Key {table.LastKey.ToString()}");
                         sb.AppendLine($"File Size {table.SortedTreeTable.BaseFile.ArchiveSize}");
                         sb.AppendLine($"File Name {table.SortedTreeTable.BaseFile.FilePath}");
-                        s_log.Publish(MessageLevel.Error, "Error while reading file", sb.ToString(), null, e);
+                        s_log.Publish(MessageLevel.Error, "Error while reading file", sb.ToString(), null, ex);
                     }
                 }
                 else

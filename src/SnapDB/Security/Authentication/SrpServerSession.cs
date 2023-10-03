@@ -235,29 +235,26 @@ public class SrpServerSession
 
         byte[] ticket = new byte[1 + 16 + 8 + 16 + 2 + blockLen + 32];
 
-        using (Aes aes = Aes.Create())
-        {
-            aes.Key = user.ServerEncryptionkey;
-            aes.IV = initializationVector;
-            aes.Mode = CipherMode.CBC;
-            aes.Padding = PaddingMode.None;
-            ICryptoTransform decrypt = aes.CreateEncryptor();
-            byte[] encryptedData = decrypt.TransformFinalBlock(dataToEncrypt, 0, dataToEncrypt.Length);
+        using Aes aes = Aes.Create();
+        aes.Key = user.ServerEncryptionkey;
+        aes.IV = initializationVector;
+        aes.Mode = CipherMode.CBC;
+        aes.Padding = PaddingMode.None;
+        ICryptoTransform decrypt = aes.CreateEncryptor();
+        byte[] encryptedData = decrypt.TransformFinalBlock(dataToEncrypt, 0, dataToEncrypt.Length);
 
-            fixed (byte* lp = ticket)
-            {
-                using (BinaryStreamPointerWrapper stream = new(lp, ticket.Length))
-                {
-                    stream.Write((byte)1);
-                    stream.Write((short)len);
-                    stream.Write(user.ServerKeyName);
-                    stream.Write(DateTime.UtcNow);
-                    stream.Write(initializationVector);
-                    stream.Write(encryptedData);
-                    stream.Write(Hmac<Sha256Digest>.Compute(user.ServerHmacKey, ticket, 0, ticket.Length - 32));
-                }
-            }
+        fixed (byte* lp = ticket)
+        {
+            using BinaryStreamPointerWrapper stream = new(lp, ticket.Length);
+            stream.Write((byte)1);
+            stream.Write((short)len);
+            stream.Write(user.ServerKeyName);
+            stream.Write(DateTime.UtcNow);
+            stream.Write(initializationVector);
+            stream.Write(encryptedData);
+            stream.Write(Hmac<Sha256Digest>.Compute(user.ServerHmacKey, ticket, 0, ticket.Length - 32));
         }
+
         return ticket;
     }
 
@@ -323,15 +320,13 @@ public class SrpServerSession
 
             byte[] encryptedData = stream.ReadBytes(encryptedDataLength);
 
-            using (Aes aes = Aes.Create())
-            {
-                aes.Key = user.ServerEncryptionkey;
-                aes.IV = initializationVector;
-                aes.Mode = CipherMode.CBC;
-                aes.Padding = PaddingMode.None;
-                ICryptoTransform decrypt = aes.CreateDecryptor();
-                sessionSecret = decrypt.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
-            }
+            using Aes aes = Aes.Create();
+            aes.Key = user.ServerEncryptionkey;
+            aes.IV = initializationVector;
+            aes.Mode = CipherMode.CBC;
+            aes.Padding = PaddingMode.None;
+            ICryptoTransform decrypt = aes.CreateDecryptor();
+            sessionSecret = decrypt.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
 
             return true;
         }

@@ -111,15 +111,11 @@ internal class ArchiveListLogFile
 
             byte[] hash = new byte[20];
             Array.Copy(data, data.Length - 20, hash, 0, 20);
-
-            using (SHA1 sha = SHA1.Create())
+            byte[] checksum = SHA1.HashData(data.AsSpan(0, data.Length - 20));
+            if (!hash.SequenceEqual(checksum))
             {
-                byte[] checksum = sha.ComputeHash(data, 0, data.Length - 20);
-                if (!hash.SequenceEqual(checksum))
-                {
-                    s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Hash sum failed.");
-                    return;
-                }
+                s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Hash sum failed.");
+                return;
             }
 
             MemoryStream stream = new(data);
@@ -164,10 +160,7 @@ internal class ArchiveListLogFile
         {
             stream.Write(file);
         }
-        using (SHA1 sha = SHA1.Create())
-        {
-            stream.Write(sha.ComputeHash(stream.ToArray()));
-        }
+        stream.Write(SHA1.HashData(stream.ToArray()));
         File.WriteAllBytes(fileName, stream.ToArray());
         FileName = fileName;
     }

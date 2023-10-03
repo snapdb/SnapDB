@@ -204,7 +204,7 @@ internal class MemoryPoolPageList
     /// <param name="index">The index identifier of the block.</param>
     /// <param name="addressPointer">The address to the start of the block.</param>
     /// <exception cref="OutOfMemoryException">Thrown if the list is full.</exception>
-    public bool TryGetNextPage(out int index, out IntPtr addressPointer)
+    public bool TryGetNextPage(out int index, out nint addressPointer)
     {
         lock (m_syncRoot)
         {
@@ -215,7 +215,7 @@ internal class MemoryPoolPageList
             if (index < 0)
             {
                 index = -1;
-                addressPointer = IntPtr.Zero;
+                addressPointer = nint.Zero;
 
                 return false;
             }
@@ -231,7 +231,7 @@ internal class MemoryPoolPageList
                 s_log.Publish(MessageLevel.Warning, MessageFlags.BugReport, "Memory Block inside Memory Pool is null. Possible race condition.");
                 throw new NullReferenceException("Memory Block is null");
             }
-            if (block.Address == IntPtr.Zero)
+            if (block.Address == nint.Zero)
             {
                 s_log.Publish(MessageLevel.Warning, MessageFlags.BugReport, "Memory Block inside Memory Pool was released prematurely. Possible race condition.");
                 throw new NullReferenceException("Memory Block is null");

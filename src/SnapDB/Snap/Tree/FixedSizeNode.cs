@@ -181,11 +181,11 @@ public unsafe class FixedSizeNode<TKey, TValue>
 
         if (index != RecordCount)
         {
-            WinApi.MoveMemory(start + KeyValueSize, start, (RecordCount - index) * KeyValueSize);
+            int count = (RecordCount - index) * KeyValueSize;
+            Buffer.MemoryCopy(start, start + KeyValueSize, count, count);
         }
 
         //Insert the data
-
         m_encoding.Encode(start, null, null, key, value);
         // Key.Write(start);
         // Value.Write(start + KeySize);

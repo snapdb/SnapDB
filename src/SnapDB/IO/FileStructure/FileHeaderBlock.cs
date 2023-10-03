@@ -44,79 +44,32 @@ public class FileHeaderBlock
 {
     #region [ Members ]
 
-    /// <summary>
-    /// The file header bytes which equals: "openHistorian 2.0 Archive\00"
-    /// </summary>
+    // The file header bytes which equals: "openHistorian 2.0 Archive\00"
     private static readonly byte[] s_fileAllocationTableHeaderBytes = "openHistorian 2.0 Archive\0"u8.ToArray();
 
     private const short FileAllocationReadTableVersion = 2;
     private const short FileAllocationWriteTableVersion = 2;
     private const short FileAllocationHeaderVersion = 2;
 
-    /// <summary>
-    /// The size of the block.
-    /// </summary>
-    private int m_blockSize;
+    // The size of the block.
 
-    /// <summary>
-    /// The version number required to read the file system.
-    /// </summary>
+    // The version number required to read the file system.
     private short m_minimumReadVersion;
 
-    /// <summary>
-    /// The version number required to write to the file system.
-    /// </summary>
+    // The version number required to write to the file system.
     private short m_minimumWriteVersion;
 
-    /// <summary>
-    /// The version of the header.
-    /// </summary>
+    // The version of the header.
     private short m_headerVersion;
 
-    /// <summary>
-    /// Gets if this file uses the simplifed file format.
-    /// </summary>
-    private bool m_isSimplifiedFileFormat;
-
-    /// <summary>
-    /// Gets the number of times the file header is repeated
-    /// </summary>
-    private byte m_headerBlockCount;
-
-    /// <summary>
-    /// Returns the last allocated block.
-    /// </summary>
-    private uint m_lastAllocatedBlock;
-
-    /// <summary>
-    /// This will be updated every time the file system has been modified. Initially, it will be one.
-    /// </summary>
-    private uint m_snapshotSequenceNumber;
-
-    /// <summary>
-    /// Since files are allocated sequentially, this value is the next file id that is not used.
-    /// </summary>
+    // Since files are allocated sequentially, this value is the next file id that is not used.
     private ushort m_nextFileId;
 
-    /// <summary>
-    /// The GUID for this archive file system.
-    /// </summary>
+    // The GUID for this archive file system.
     private Guid m_archiveId;
 
-    /// <summary>
-    /// The GUID to represent the type of this archive file.
-    /// </summary>
+    // The GUID to represent the type of this archive file.
     private Guid m_archiveType;
-
-    /// <summary>
-    /// Provides a list of all of the Features that are contained within the file.
-    /// </summary>
-    private ImmutableList<SubFileHeader?> m_files;
-
-    /// <summary>
-    /// A set of file flags describing this file.
-    /// </summary>
-    private ImmutableList<Guid> m_flags;
 
     private Dictionary<short, byte[]>? m_unknownAttributes;
 
@@ -137,14 +90,13 @@ public class FileHeaderBlock
     /// <summary>
     /// The number of bytes per block for the file structure.
     /// </summary>
-    public int BlockSize => m_blockSize;
+    public int BlockSize { get; private set; }
 
     /// <summary>
     /// Determines if the file can be written to because enough features are recognized by this current version to do it without corrupting the file system.
     /// </summary>
-    public bool CanWrite =>
-        // TODO: Support changing files that are from an older version.
-        m_minimumWriteVersion == FileAllocationWriteTableVersion;
+    // TODO: Support changing files that are from an older version.
+    public bool CanWrite => m_minimumWriteVersion == FileAllocationWriteTableVersion;
 
     /// <summary>
     /// Determines if the archive file can be read
@@ -170,45 +122,48 @@ public class FileHeaderBlock
     }
 
     /// <summary>
-    /// Gets if this file uses the simplifed file format.
+    /// Gets if this file uses the simplified file format.
     /// </summary>
-    public bool IsSimplifiedFileFormat => m_isSimplifiedFileFormat;
+    public bool IsSimplifiedFileFormat { get; private set; }
 
     /// <summary>
     /// Gets the number of times the file header exists in the archive file.
     /// </summary>
-    public byte HeaderBlockCount => m_headerBlockCount;
+    public byte HeaderBlockCount { get; private set; }
 
     /// <summary>
     /// Maintains a sequential number that represents the version of the file.
     /// </summary>
-    public uint SnapshotSequenceNumber => m_snapshotSequenceNumber;
+    /// <remarks>
+    /// This will be updated every time the file system has been modified. Initially, it will be one.
+    /// </remarks>
+    public uint SnapshotSequenceNumber { get; private set; }
 
     /// <summary>
-    /// Represents the last block that has been allocated
+    /// Represents the last block that has been allocated.
     /// </summary>
-    public uint LastAllocatedBlock => m_lastAllocatedBlock;
+    public uint LastAllocatedBlock { get; private set; }
 
     /// <summary>
     /// Returns the number of files that are in this file system. 
     /// </summary>
     /// <returns>Number of files that are in this file system. </returns>
-    public int FileCount => m_files.Count;
+    public int FileCount => Files.Count;
 
     /// <summary>
     /// Gets the size of each data block (block size - overhead)
     /// </summary>
-    public int DataBlockSize => m_blockSize - FileStructureConstants.BlockFooterLength;
+    public int DataBlockSize => BlockSize - FileStructureConstants.BlockFooterLength;
 
     /// <summary>
     /// User definable flags to associate with archive files.
     /// </summary>
-    public ImmutableList<Guid> Flags => m_flags;
+    public ImmutableList<Guid> Flags { get; private set; } = default!;
 
     /// <summary>
     /// A list of all of the files in this collection.
     /// </summary>
-    public ImmutableList<SubFileHeader?> Files => m_files;
+    public ImmutableList<SubFileHeader?> Files { get; private set; } = default!;
 
     #endregion
 
@@ -221,7 +176,7 @@ public class FileHeaderBlock
     public override FileHeaderBlock CloneEditable()
     {
         FileHeaderBlock clone = base.CloneEditable();
-        clone.m_snapshotSequenceNumber++;
+        clone.SnapshotSequenceNumber++;
         return clone;
     }
 
@@ -230,8 +185,8 @@ public class FileHeaderBlock
     /// </summary>
     protected override void SetMembersAsReadOnly()
     {
-        m_files.IsReadOnly = true;
-        m_flags.IsReadOnly = true;
+        Files.IsReadOnly = true;
+        Flags.IsReadOnly = true;
     }
 
     /// <summary>
@@ -240,10 +195,10 @@ public class FileHeaderBlock
     protected override void CloneMembersAsEditable()
     {
         if (!CanWrite)
-            throw new Exception("This file cannot be modified because the file system version is not recognized");
+            throw new InvalidOperationException("This file cannot be modified because the file system version is not recognized");
 
-        m_flags = m_flags.CloneEditable();
-        m_files = m_files.CloneEditable();
+        Flags = Flags.CloneEditable();
+        Files = Files.CloneEditable();
 
         if (m_userAttributes is not null)
             m_userAttributes = new Dictionary<Guid, byte[]>(m_userAttributes);
@@ -261,8 +216,8 @@ public class FileHeaderBlock
     {
         TestForEditable();
 
-        uint blockAddress = m_lastAllocatedBlock + 1;
-        m_lastAllocatedBlock += count;
+        uint blockAddress = LastAllocatedBlock + 1;
+        LastAllocatedBlock += count;
 
         return blockAddress;
     }
@@ -273,25 +228,25 @@ public class FileHeaderBlock
     /// <param name="fileName">Represents the nature of the data that will be stored in this file.</param>
     /// <returns></returns>
     /// <remarks>A file system only supports 64 files. This is a fundamental limitation and cannot be changed easily.</remarks>
-    public SubFileHeader? CreateNewFile(SubFileName fileName)
+    public SubFileHeader CreateNewFile(SubFileName fileName)
     {
         TestForEditable();
 
         if (!CanWrite)
-            throw new Exception("Writing to this file type is not supported");
+            throw new InvalidOperationException("Writing to this file type is not supported");
 
         if (IsReadOnly)
-            throw new Exception("File is read only");
+            throw new InvalidOperationException("File is read only");
 
-        if (m_files.Count >= 64)
+        if (Files.Count >= 64)
             throw new OverflowException("Only 64 files per file system is supported");
 
         if (ContainsSubFile(fileName))
             throw new DuplicateNameException("Name already exists");
 
-        SubFileHeader? node = new(m_nextFileId, fileName, isImmutable: false, isSimplified: IsSimplifiedFileFormat);
+        SubFileHeader node = new(m_nextFileId, fileName, isImmutable: false, isSimplified: IsSimplifiedFileFormat);
         m_nextFileId++;
-        m_files.Add(node);
+        Files.Add(node);
 
         return node;
     }
@@ -303,7 +258,7 @@ public class FileHeaderBlock
     /// <returns>true if contained, false otherwise</returns>
     public bool ContainsSubFile(SubFileName fileName)
     {
-        return m_files.Any(file => file.FileName == fileName);
+        return Files.Any(file => file?.FileName == fileName);
     }
 
     /// <summary>
@@ -335,35 +290,35 @@ public class FileHeaderBlock
         if (!IsFileAllocationTableValid())
             throw new InvalidOperationException("File Allocation Table is invalid");
 
-        byte[] dataBytes = new byte[m_blockSize];
+        byte[] dataBytes = new byte[BlockSize];
         MemoryStream stream = new(dataBytes);
         BinaryWriter dataWriter = new(stream);
 
         dataWriter.Write(s_fileAllocationTableHeaderBytes);
         dataWriter.Write(BitConverter.IsLittleEndian ? 'L' : 'B');
-        dataWriter.Write((byte)BitMath.CountBitsSet((uint)(m_blockSize - 1)));
+        dataWriter.Write((byte)BitMath.CountBitsSet((uint)(BlockSize - 1)));
         dataWriter.Write(FileAllocationReadTableVersion);
         dataWriter.Write(FileAllocationWriteTableVersion);
         dataWriter.Write(FileAllocationHeaderVersion);
-        dataWriter.Write((byte)(m_isSimplifiedFileFormat ? 2 : 1));
-        dataWriter.Write(m_headerBlockCount);
-        dataWriter.Write(m_lastAllocatedBlock);
-        dataWriter.Write(m_snapshotSequenceNumber);
+        dataWriter.Write((byte)(IsSimplifiedFileFormat ? 2 : 1));
+        dataWriter.Write(HeaderBlockCount);
+        dataWriter.Write(LastAllocatedBlock);
+        dataWriter.Write(SnapshotSequenceNumber);
         dataWriter.Write(m_nextFileId);
         dataWriter.Write(m_archiveId.ToByteArray());
         dataWriter.Write(m_archiveType.ToByteArray());
-        dataWriter.Write((short)m_files.Count);
+        dataWriter.Write((short)Files.Count);
         
-        foreach (SubFileHeader? node in m_files) 
-            node.Save(dataWriter);
+        foreach (SubFileHeader? node in Files) 
+            node?.Save(dataWriter);
 
         // Metadata Flags
-        if (m_flags.Count > 0)
+        if (Flags.Count > 0)
         {
             Encoding7Bit.WriteInt15(dataWriter.Write, (short)FileHeaderAttributes.FileFlags);
-            Encoding7Bit.WriteInt15(dataWriter.Write, (short)(m_flags.Count * 16));
+            Encoding7Bit.WriteInt15(dataWriter.Write, (short)(Flags.Count * 16));
             
-            foreach (Guid flag in m_flags) 
+            foreach (Guid flag in Flags) 
                 dataWriter.Write(flag.ToLittleEndianBytes());
         }
 
@@ -408,7 +363,7 @@ public class FileHeaderBlock
     {
         ValidateBlock(buffer);
 
-        m_blockSize = buffer.Length;
+        BlockSize = buffer.Length;
         MemoryStream stream = new(buffer);
         BinaryReader dataReader = new(stream);
 
@@ -420,12 +375,12 @@ public class FileHeaderBlock
         if (BitConverter.IsLittleEndian)
         {
             if (endian != 'L')
-                throw new Exception("This archive file was not writen with a little endian processor");
+                throw new Exception("This archive file was not written with a little endian processor");
         }
         else
         {
             if (endian != 'B')
-                throw new Exception("This archive file was not writen with a big endian processor");
+                throw new Exception("This archive file was not written with a big endian processor");
         }
 
         byte blockSizePower = dataReader.ReadByte();
@@ -435,7 +390,7 @@ public class FileHeaderBlock
 
         int blockSize = 1 << blockSizePower;
 
-        if (m_blockSize != blockSize)
+        if (BlockSize != blockSize)
             throw new Exception("Block size is unexpected");
 
         m_minimumReadVersion = dataReader.ReadInt16();
@@ -451,8 +406,8 @@ public class FileHeaderBlock
 
         if (m_headerVersion is 0 or 1)
         {
-            m_isSimplifiedFileFormat = false;
-            m_headerBlockCount = 10;
+            IsSimplifiedFileFormat = false;
+            HeaderBlockCount = 10;
             LoadHeaderV0V1(dataReader);
             return;
         }
@@ -460,16 +415,16 @@ public class FileHeaderBlock
         m_headerVersion = dataReader.ReadInt16();
         byte fileMode = dataReader.ReadByte();
 
-        m_isSimplifiedFileFormat = fileMode switch
+        IsSimplifiedFileFormat = fileMode switch
         {
             1 => false,
             2 => true,
             _ => throw new Exception("Unknown File Mode")
         };
 
-        m_headerBlockCount = dataReader.ReadByte();
-        m_lastAllocatedBlock = dataReader.ReadUInt32();
-        m_snapshotSequenceNumber = dataReader.ReadUInt32();
+        HeaderBlockCount = dataReader.ReadByte();
+        LastAllocatedBlock = dataReader.ReadUInt32();
+        SnapshotSequenceNumber = dataReader.ReadUInt32();
         m_nextFileId = dataReader.ReadUInt16();
         m_archiveId = new Guid(dataReader.ReadBytes(16));
         m_archiveType = new Guid(dataReader.ReadBytes(16));
@@ -480,12 +435,12 @@ public class FileHeaderBlock
         if (fileCount > 64)
             throw new Exception("Only 64 features are supported per archive");
 
-        m_files = new ImmutableList<SubFileHeader?>(fileCount);
+        Files = new ImmutableList<SubFileHeader?>(fileCount);
 
         for (int x = 0; x < fileCount; x++)
-            m_files.Add(new SubFileHeader(dataReader, isImmutable: true, isSimplified: m_isSimplifiedFileFormat));
+            Files.Add(new SubFileHeader(dataReader, isImmutable: true, isSimplified: IsSimplifiedFileFormat));
 
-        m_flags = new ImmutableList<Guid>();
+        Flags = new ImmutableList<Guid>();
 
         FileHeaderAttributes tag = (FileHeaderAttributes)Encoding7Bit.ReadInt15(dataReader.ReadByte);
 
@@ -500,7 +455,7 @@ public class FileHeaderBlock
                     while (dataLen > 0)
                     {
                         dataLen -= 16;
-                        m_flags.Add(dataReader.ReadBytes(16).ToLittleEndianGuid());
+                        Flags.Add(dataReader.ReadBytes(16).ToLittleEndianGuid());
                     }
                     break;
                 case FileHeaderAttributes.UserAttributes:
@@ -540,8 +495,8 @@ public class FileHeaderBlock
         m_archiveId = new Guid(dataReader.ReadBytes(16));
         m_archiveType = new Guid(dataReader.ReadBytes(16));
 
-        m_snapshotSequenceNumber = dataReader.ReadUInt32();
-        m_lastAllocatedBlock = dataReader.ReadUInt32();
+        SnapshotSequenceNumber = dataReader.ReadUInt32();
+        LastAllocatedBlock = dataReader.ReadUInt32();
         m_nextFileId = dataReader.ReadUInt16();
         int fileCount = dataReader.ReadInt32();
 
@@ -549,10 +504,10 @@ public class FileHeaderBlock
         if (fileCount > 64)
             throw new Exception("Only 64 features are supported per archive");
 
-        m_files = new ImmutableList<SubFileHeader?>(fileCount);
+        Files = new ImmutableList<SubFileHeader?>(fileCount);
 
         for (int x = 0; x < fileCount; x++)
-            m_files.Add(new SubFileHeader(dataReader, isImmutable: true, isSimplified: false));
+            Files.Add(new SubFileHeader(dataReader, isImmutable: true, isSimplified: false));
 
         // TODO: check based on block length
         int userSpaceLength = dataReader.ReadInt32();
@@ -560,65 +515,26 @@ public class FileHeaderBlock
 
         if (m_minimumWriteVersion == 1)
         {
-            new DateTime(dataReader.ReadInt64());
-            new DateTime(dataReader.ReadInt64());
+            _ = new DateTime(dataReader.ReadInt64());
+            _ = new DateTime(dataReader.ReadInt64());
             int flagCount = dataReader.ReadInt32();
-            m_flags = new ImmutableList<Guid>(flagCount);
+            Flags = new ImmutableList<Guid>(flagCount);
 
             while (flagCount > 0)
             {
                 flagCount--;
-                m_flags.Add(new Guid(dataReader.ReadBytes(16)));
+                Flags.Add(new Guid(dataReader.ReadBytes(16)));
             }
         }
         else
         {
-            m_flags = new ImmutableList<Guid>();
+            Flags = new ImmutableList<Guid>();
         }
 
         if (!IsFileAllocationTableValid())
             throw new Exception("File System is invalid");
 
         IsReadOnly = true;
-    }
-
-    private unsafe void ValidateBlock(byte[] buffer)
-    {
-        fixed (byte* lpData = buffer)
-        {
-            Footer.ComputeChecksum((IntPtr)lpData, out long checksum1, out int checksum2, buffer.Length - 16);
-
-            long checksumInData1 = *(long*)(lpData + buffer.Length - 16);
-            int checksumInData2 = *(int*)(lpData + buffer.Length - 8);
-
-            if (checksum1 != checksumInData1 || checksum2 != checksumInData2)
-                throw new Exception("Checksum on header file is invalid");
-
-            if (lpData[buffer.Length - 32] != (byte)BlockType.FileAllocationTable)
-                throw new Exception("IoReadState.BlockTypeMismatch");
-
-            if (*(int*)(lpData + buffer.Length - 28) != 0)
-                throw new Exception("IoReadState.IndexNumberMissmatch");
-
-            if (*(int*)(lpData + buffer.Length - 24) != 0)
-                throw new Exception("IoReadState.FileIdNumberDidNotMatch");
-        }
-    }
-
-    private unsafe void WriteFooterData(byte[] buffer)
-    {
-        fixed (byte* lpData = buffer)
-        {
-            lpData[buffer.Length - 32] = (byte)BlockType.FileAllocationTable;
-            *(int*)(lpData + buffer.Length - 28) = 0;
-            *(int*)(lpData + buffer.Length - 24) = 0;
-            *(int*)(lpData + buffer.Length - 20) = 0;
-
-            Footer.ComputeChecksum((IntPtr)lpData, out long checksum1, out int checksum2, buffer.Length - 16);
-            *(long*)(lpData + buffer.Length - 16) = checksum1;
-            *(int*)(lpData + buffer.Length - 8) = checksum2;
-            *(int*)(lpData + buffer.Length - 4) = 0;
-        }
     }
 
     #endregion
@@ -643,12 +559,12 @@ public class FileHeaderBlock
         if (BitConverter.IsLittleEndian)
         {
             if (endian != 'L')
-                throw new Exception("This archive file was not writen with a little endian processor");
+                throw new Exception("This archive file was not written with a little endian processor");
         }
         else
         {
             if (endian != 'B')
-                throw new Exception("This archive file was not writen with a big endian processor");
+                throw new Exception("This archive file was not written with a big endian processor");
         }
 
         byte blockSizePower = stream.ReadNextByte();
@@ -672,18 +588,18 @@ public class FileHeaderBlock
     {
         FileHeaderBlock header = new()
         {
-            m_blockSize = blockSize,
+            BlockSize = blockSize,
             m_minimumReadVersion = FileAllocationReadTableVersion,
             m_minimumWriteVersion = FileAllocationWriteTableVersion,
             m_headerVersion = FileAllocationHeaderVersion,
-            m_headerBlockCount = 10,
-            m_isSimplifiedFileFormat = false,
+            HeaderBlockCount = 10,
+            IsSimplifiedFileFormat = false,
             m_archiveId = Guid.NewGuid(),
-            m_snapshotSequenceNumber = 1,
+            SnapshotSequenceNumber = 1,
             m_nextFileId = 0,
-            m_lastAllocatedBlock = 9,
-            m_files = new ImmutableList<SubFileHeader>(),
-            m_flags = new ImmutableList<Guid>(),
+            LastAllocatedBlock = 9,
+            Files = new ImmutableList<SubFileHeader?>(),
+            Flags = new ImmutableList<Guid>(),
             m_archiveType = Guid.Empty
         };
 
@@ -704,18 +620,18 @@ public class FileHeaderBlock
     {
         FileHeaderBlock header = new()
         {
-            m_blockSize = blockSize,
+            BlockSize = blockSize,
             m_minimumReadVersion = FileAllocationReadTableVersion,
             m_minimumWriteVersion = FileAllocationWriteTableVersion,
             m_headerVersion = FileAllocationHeaderVersion,
-            m_headerBlockCount = 1,
-            m_isSimplifiedFileFormat = true,
+            HeaderBlockCount = 1,
+            IsSimplifiedFileFormat = true,
             m_archiveId = Guid.NewGuid(),
-            m_snapshotSequenceNumber = 1,
+            SnapshotSequenceNumber = 1,
             m_nextFileId = 0,
-            m_lastAllocatedBlock = 0,
-            m_files = new ImmutableList<SubFileHeader>(),
-            m_flags = new ImmutableList<Guid>(),
+            LastAllocatedBlock = 0,
+            Files = new ImmutableList<SubFileHeader?>(),
+            Flags = new ImmutableList<Guid>(),
             m_archiveType = Guid.Empty
         };
 
@@ -741,6 +657,45 @@ public class FileHeaderBlock
         header.IsReadOnly = true;
 
         return header;
+    }
+
+    private static unsafe void ValidateBlock(byte[] buffer)
+    {
+        fixed (byte* data = buffer)
+        {
+            Footer.ComputeChecksum((nint)data, out long checksum1, out int checksum2, buffer.Length - 16);
+
+            long checksumInData1 = *(long*)(data + buffer.Length - 16);
+            int checksumInData2 = *(int*)(data + buffer.Length - 8);
+
+            if (checksum1 != checksumInData1 || checksum2 != checksumInData2)
+                throw new Exception("Checksum on header file is invalid");
+
+            if (data[buffer.Length - 32] != (byte)BlockType.FileAllocationTable)
+                throw new Exception("IoReadState.BlockTypeMismatch");
+
+            if (*(int*)(data + buffer.Length - 28) != 0)
+                throw new Exception("IoReadState.IndexNumberMismatch");
+
+            if (*(int*)(data + buffer.Length - 24) != 0)
+                throw new Exception("IoReadState.FileIdNumberDidNotMatch");
+        }
+    }
+
+    private static unsafe void WriteFooterData(byte[] buffer)
+    {
+        fixed (byte* data = buffer)
+        {
+            data[buffer.Length - 32] = (byte)BlockType.FileAllocationTable;
+            *(int*)(data + buffer.Length - 28) = 0;
+            *(int*)(data + buffer.Length - 24) = 0;
+            *(int*)(data + buffer.Length - 20) = 0;
+
+            Footer.ComputeChecksum((nint)data, out long checksum1, out int checksum2, buffer.Length - 16);
+            *(long*)(data + buffer.Length - 16) = checksum1;
+            *(int*)(data + buffer.Length - 8) = checksum2;
+            *(int*)(data + buffer.Length - 4) = 0;
+        }
     }
 
     #endregion
