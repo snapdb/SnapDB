@@ -1,7 +1,7 @@
-//******************************************************************************************************
-//  Tests.cs - Gbtc
+﻿//******************************************************************************************************
+//  LogTypeTest.cs - Gbtc
 //
-//  Copyright � 2019, Grid Protection Alliance.  All Rights Reserved.
+//  Copyright © 2023, Grid Protection Alliance.  All Rights Reserved.
 //
 //  Licensed to the Grid Protection Alliance (GPA) under one or more contributor license agreements. See
 //  the NOTICE file distributed with this work for additional information regarding copyright ownership.
@@ -16,23 +16,35 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  11/04/2019 - J. Ritchie Carroll
-//       Generated original version of source code.
-//
 //  10/04/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace UnitTests;
+namespace UnitTests.Diagnostics;
 
-[TestClass]
-public class Tests
+[TestFixture]
+public class LogTypeTest
 {
-    [TestMethod]
-    public void FunctionalityTests()
+    //private readonly static LogType LogType = LogType.Create(typeof(LogTypeTest));
+
+    [Test]
+    public void Test()
     {
-        Assert.IsTrue(true);
+        new T1<int?,string>.T2<long?>();
+
+        System.Console.WriteLine(0);
     }
+
+    public class T1<T11,T12>
+    {
+        public class T2<T22>
+        {
+            public readonly LogPublisher LogType = Logger.CreatePublisher(typeof(T2<T22>),MessageClass.Component);
+            
+        }
+    }
+
 }

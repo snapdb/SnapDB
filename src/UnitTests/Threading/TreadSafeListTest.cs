@@ -1,7 +1,7 @@
-//******************************************************************************************************
-//  Tests.cs - Gbtc
+﻿//******************************************************************************************************
+//  TreadSafeListTest.cs - Gbtc
 //
-//  Copyright � 2019, Grid Protection Alliance.  All Rights Reserved.
+//  Copyright © 2023, Grid Protection Alliance.  All Rights Reserved.
 //
 //  Licensed to the Grid Protection Alliance (GPA) under one or more contributor license agreements. See
 //  the NOTICE file distributed with this work for additional information regarding copyright ownership.
@@ -16,23 +16,40 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  11/04/2019 - J. Ritchie Carroll
-//       Generated original version of source code.
-//
 //  10/04/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using System.Linq;
 
-namespace UnitTests;
+namespace UnitTests.Threading;
 
-[TestClass]
-public class Tests
+[TestFixture]
+internal class TreadSafeListTest
 {
-    [TestMethod]
-    public void FunctionalityTests()
+    [Test]
+    public void Test()
     {
-        Assert.IsTrue(true);
+        ThreadSafeList<int> ts = new ThreadSafeList<int>();
+
+        for (int x = 0; x < 10; x++)
+        {
+            ts.Add(x);
+        }
+
+        Assert.AreEqual(10, ts.Count());
+        Assert.IsTrue(ts.Remove(5));
+        Assert.AreEqual(9, ts.Count());
+        Assert.IsFalse(ts.Remove(5));
+
+        int count = 0;
+        foreach (int x in ts)
+        {
+            count++;
+            ts.ForEach((i) => ts.Remove(i));
+        }
+        Assert.AreEqual(1, count);
     }
 }

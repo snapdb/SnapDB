@@ -1,7 +1,7 @@
-//******************************************************************************************************
-//  Tests.cs - Gbtc
+﻿//******************************************************************************************************
+//  PeriodicScannerTest.cs - Gbtc
 //
-//  Copyright � 2019, Grid Protection Alliance.  All Rights Reserved.
+//  Copyright © 2023, Grid Protection Alliance.  All Rights Reserved.
 //
 //  Licensed to the Grid Protection Alliance (GPA) under one or more contributor license agreements. See
 //  the NOTICE file distributed with this work for additional information regarding copyright ownership.
@@ -16,23 +16,31 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  11/04/2019 - J. Ritchie Carroll
-//       Generated original version of source code.
-//
 //  10/04/2023 - Lillian Gensolin
 //       Converted code to .NET core.
+//
 //******************************************************************************************************
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using System;
 
-namespace UnitTests;
+namespace UnitTests.Data;
 
-[TestClass]
-public class Tests
+[TestFixture]
+public class PeriodicScannerTest
 {
-    [TestMethod]
-    public void FunctionalityTests()
+    [Test]
+    public void Test1()
     {
-        Assert.IsTrue(true);
+        DateTime start = DateTime.Now.Date;
+        DateTime stop = start.AddDays(1);
+
+        PeriodicScanner scanner = new PeriodicScanner(30);
+        _ = scanner.GetParser(start, stop, 2592000);
+        _ = scanner.GetParser(start, stop, 2592000 / 2);
+        _ = scanner.GetParser(start, stop, 2592000 / 3);
+        _ = scanner.GetParser(start, stop, 2592000 / 4);
+        _ = scanner.GetParser(start, stop, 2592000 / 5);
+        _ = new DateTime(634794697200000000).ToString();
     }
 }
