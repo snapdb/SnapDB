@@ -65,21 +65,11 @@ internal partial class PageReplacementAlgorithm : IDisposable
     #region [ Constructors ]
 
     /// <summary>
-    /// Performs memory pool collection, releasing unused pages based on the specified collection parameters.
+    /// Initializes a new instance of the <see cref="PageReplacementAlgorithm"/> class with the specified memory pool.
     /// </summary>
-    /// <param name="shiftLevel">The number of bits to shift the reference count right before evaluating for collection.</param>
-    /// <param name="excludedList">
-    /// A set of page indices to exclude from collection. Pages in this set will not be released, even if their reference count is zero.
-    /// </param>
-    /// <param name="e">The collection event arguments containing collection mode and desired release count.</param>
-    /// <returns>The number of pages actually collected and released.</returns>
-    /// <exception cref="ObjectDisposedException">Thrown if the cache is disposed.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="shiftLevel"/> is negative.</exception>
-    /// <remarks>
-    /// This method performs memory pool collection by iterating through cached pages, shifting their reference counts right by <paramref name="shiftLevel"/> bits,
-    /// and releasing pages whose reference count becomes zero, excluding those in <paramref name="excludedList"/>.
-    /// The number of pages collected is limited by <paramref name="e"/>.DesiredPageReleaseCount if the collection mode is Emergency or Critical.
-    /// </remarks>
+    /// <param name="pool">The memory pool to be used for page replacement.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the specified memory pool has a page size less than 4096.</exception>
+    /// <exception cref="ArgumentException">Thrown when the page size of the specified memory pool is not a power of 2.</exception>
     public PageReplacementAlgorithm(MemoryPool pool)
     {
         if (pool.PageSize < 4096)
@@ -173,19 +163,8 @@ internal partial class PageReplacementAlgorithm : IDisposable
     /// <summary>
     /// Performs memory pool collection, releasing unused pages based on the specified collection parameters.
     /// </summary>
-    /// <param name="shiftLevel">The number of bits to shift the reference count right before evaluating for collection.</param>
-    /// <param name="excludedList">
-    /// A set of page indices to exclude from collection. Pages in this set will not be released, even if their reference count is zero.
-    /// </param>
-    /// <param name="e">The collection event arguments containing collection mode and desired release count.</param>
-    /// <returns>The number of pages actually collected and released.</returns>
-    /// <exception cref="ObjectDisposedException">Thrown if the cache is disposed.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="shiftLevel"/> is negative.</exception>
-    /// <remarks>
-    /// This method performs memory pool collection by iterating through cached pages, shifting their reference counts right by <paramref name="shiftLevel"/> bits,
-    /// and releasing pages whose reference count becomes zero, excluding those in <paramref name="excludedList"/>.
-    /// The number of pages collected is limited by <paramref name="e"/>.DesiredPageReleaseCount if the collection mode is Emergency or Critical.
-    /// </remarks>
+    /// <param name="e">The collection event arguments specifying the collection operation details.</param>
+    /// <returns>The number of pages collected and released.</returns>
     public int DoCollection(CollectionEventArgs e)
     {
         lock (m_syncRoot)

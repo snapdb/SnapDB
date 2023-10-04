@@ -214,6 +214,10 @@ public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSetting
         EncodingMethod = encodingMethod;
     }
 
+    /// <summary>
+    /// Saves the configuration of an archive stream to the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream where the configuration data will be saved.</param>
     public override void Save(Stream stream)
     {
         stream.Write((byte)1);
@@ -234,6 +238,10 @@ public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSetting
             stream.Write(flag);
     }
 
+    /// <summary>
+    /// Loads the configuration of an archive stream from the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream from which the configuration data will be loaded.</param>
     public override void Load(Stream stream)
     {
         TestForEditable();
@@ -273,6 +281,9 @@ public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSetting
         }
     }
 
+    /// <summary>
+    /// Validates the configuration of the archive stream.
+    /// </summary>
     public override void Validate()
     {
         if (IsMemoryArchive)
@@ -286,6 +297,9 @@ public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSetting
                 Directory.CreateDirectory(path);
     }
 
+    /// <summary>
+    /// Initializes the configuration of the archive stream with default values.
+    /// </summary>
     private void Initialize()
     {
         m_directoryMethod = ArchiveDirectoryMethod.TopDirectoryOnly;

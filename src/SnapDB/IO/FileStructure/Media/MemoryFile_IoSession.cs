@@ -72,7 +72,6 @@ internal partial class MemoryPoolFile
         /// read-only and whether the requested operation involves writing. If the file system is read-only and a write operation is
         /// requested, a <see cref="ReadOnlyException"/> is thrown. Otherwise, it delegates the block retrieval operation to the underlying file.
         /// </remarks>
-        /// <param name="args">The <see cref="BlockArguments"/> that specify the block to retrieve.</param>
         public override void GetBlock(BlockArguments args)
         {
             if (args.IsWriting && m_file.m_isReadOnly)

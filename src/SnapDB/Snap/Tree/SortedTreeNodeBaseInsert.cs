@@ -35,7 +35,7 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     /// </summary>
     /// <param name="key">The key to add</param>
     /// <param name="value">The value to add</param>
-    /// <returns>True if added, False on a duplicate key error</returns>
+    /// <returns><c>true</c> if added, <c>false</c> on a duplicate key error.</returns>
     public virtual bool TryInsert(TKey key, TValue value)
     {
         if (key.IsBetween(LowerKey, UpperKey))
@@ -51,23 +51,27 @@ public partial class SortedTreeNodeBase<TKey, TValue>
         return TryInsert2(key, value);
     }
 
+    /// <summary>
+    /// Attempts to insert a sequential stream of key-value pairs into the tree.
+    /// </summary>
+    /// <param name="stream">The sequential stream of key-value pairs to insert.</param>
     public virtual void TryInsertSequentialStream(InsertStreamHelper<TKey, TValue> stream)
     {
-        //First check to see if the sequentail insertion is valid.
+        // First check to see if the sequentail insertion is valid.
         TKey key = new();
         TValue value = new();
 
-        //Exit if stream is not valid or not sequentail.
+        // Exit if stream is not valid or not sequentail.
         if (!stream.IsValid || !stream.IsStillSequential)
             return;
 
         NavigateToNode(stream.Key);
 
-        //Exit if the node holding this key is not the far right node.
+        // Exit if the node holding this key is not the far right node.
         if (!IsRightSiblingIndexNull)
             return;
 
-        //Verify that this next key to be inserted is greater than the last record in this node
+        // Verify that this next key to be inserted is greater than the last record in this node
         if (RecordCount > 0)
         {
             Read(RecordCount - 1, key, value);
@@ -93,9 +97,9 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     /// <summary>
     /// Inserts the following value to the tree if it does not exist.
     /// </summary>
-    /// <param name="key">The key to add</param>
-    /// <param name="value">The value to add</param>
-    /// <returns>True if added, False on a duplicate key error</returns>
+    /// <param name="key">The key to add.</param>
+    /// <param name="value">The value to add.</param>
+    /// <returns><c>true</c> if added; <c>false</c> on a duplicate key error</returns>
     /// <remarks>
     /// This is a slower but more complete implementation of <see cref="TryInsert"/>.
     /// Overriding classes can call this method after implementing their own high speed TryGet method.
@@ -104,14 +108,14 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     {
         NavigateToNode(key);
 
-        int index = ~GetIndexOf(key); //See the ~ here.
+        int index = ~GetIndexOf(key); // See the ~ here.
         if (index < 0)
             return false;
 
         if (InsertUnlessFull(index, key, value))
             return true;
 
-        //Check if the node needs to be split
+        // Check if the node needs to be split
         if (IsRightSiblingIndexNull && index == RecordCount)
         {
             NewNodeThenInsert(key, value);
@@ -129,12 +133,13 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     /// </summary>
     private void NewNodeThenInsert(TKey key, TValue value)
     {
-        TKey dividingKey = new(); //m_tempKey;
+        TKey dividingKey = new(); // m_tempKey;
         key.CopyTo(dividingKey);
 
         uint newNodeIndex = m_getNextNewNodeIndex();
         if (!IsRightSiblingIndexNull)
-            throw new Exception("Incorrectly implemented");
+            throw new Exception("Incorrectly implemented"); 
+
         RightSiblingNodeIndex = newNodeIndex;
 
         CreateNewNode(newNodeIndex, 0, (ushort)HeaderSize, NodeIndex, uint.MaxValue, key, UpperKey);
@@ -148,14 +153,14 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     }
 
     /// <summary>
-    /// Splits the current node and then inserts the provided key/value into the correct node.
+    /// Splits the current node and then inserts the provided key-value into the correct node.
     /// </summary>
     private void SplitNodeThenInsert(TKey key, TValue value)
     {
         uint currentNode = NodeIndex;
         uint newNodeIndex = m_getNextNewNodeIndex();
 
-        TKey dividingKey = new(); //m_tempKey;
+        TKey dividingKey = new(); // m_tempKey;
 
         Split(newNodeIndex, dividingKey);
 

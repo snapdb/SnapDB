@@ -127,18 +127,15 @@ internal partial class PageReplacementAlgorithm
         }
 
         /// <summary>
-        /// Adds a page to the list of available pages if it does not exist.
-        /// otherwise, returns the page already in the list.
+        /// Gets or adds a page at the specified position within the memory pool, based on the provided parameters.
         /// </summary>
-        /// <param name="position">The position of the first byte in the page</param>
-        /// <param name="startOfMemoryPoolPage">The pointer acquired by the memory pool to this data.</param>
-        /// <param name="memoryPoolIndex">The memory pool index for this data</param>
-        /// <param name="wasPageAdded">Determines if the page provided was indeed added to the list.</param>
-        /// <returns>The pointer to the page for this position</returns>
-        /// <remarks>
-        /// If <see cref="wasPageAdded"/> is <c>false</c>, the calling function should
-        /// return the page back to the memory pool.
-        /// </remarks>
+        /// <param name="position">The position within the memory pool to retrieve or add a page.</param>
+        /// <param name="startOfMemoryPoolPage">The starting address of the memory pool page.</param>
+        /// <param name="memoryPoolIndex">The index of the memory pool.</param>
+        /// <param name="wasPageAdded">A boolean indicating whether a new page was added during the operation.</param>
+        /// <returns>The address of the page within the memory pool.</returns>
+        /// <exception cref="ObjectDisposedException">Thrown if the parent object has been disposed.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the position is negative, exceeds the maximum valid position, or does not lie on a page boundary.</exception>
         public nint GetOrAddPage(long position, nint startOfMemoryPoolPage, int memoryPoolIndex, out bool wasPageAdded)
         {
             lock (m_parent.m_syncRoot)

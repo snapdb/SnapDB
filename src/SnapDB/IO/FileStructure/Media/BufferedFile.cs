@@ -209,7 +209,7 @@ internal partial class BufferedFile : IDiskMediumCoreFunctions
     }
 
     /// <summary>
-    /// Populates the pointer data inside <see cref="args"/> for the desired block as specified in <see cref="args"/>.
+    /// Populates the pointer data inside <paramref name="args"/> for the desired block as specified in <paramref name="args"/>.
     /// This function will block if needing to retrieve data from the disk.
     /// </summary>
     /// <param name="pageLock">The reusable lock information about what this block is currently using.</param>

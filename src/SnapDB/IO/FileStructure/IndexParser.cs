@@ -121,7 +121,7 @@ internal unsafe class IndexParser : IndexMapper
     }
 
     /// <summary>
-    /// Resets the index cache with the information from the supplied <see cref="mostRecentParser"/>.
+    /// Resets the index cache with the information from the supplied <paramref name="mostRecentParser"/>.
     /// </summary>
     /// <param name="mostRecentParser"></param>
     public void ClearIndexCache(IndexParser mostRecentParser)

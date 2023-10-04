@@ -30,6 +30,9 @@ using SnapDB.Snap.Types;
 
 namespace SnapDB.Snap.Filters;
 
+/// <summary>
+/// A class for implementing a match filter using a <see cref="BitArray"/>.
+/// </summary>
 public class PointIdMatchFilterBitArray
 {
     #region [ Members ]
@@ -37,12 +40,21 @@ public class PointIdMatchFilterBitArray
     /// <summary>
     /// A filter that uses a <see cref="BitArray"/> to set <c>true</c> and <c>false</c> values.
     /// </summary>
+    /// <typeparam name="TKey">The type of keys in the filter.</typeparam>
+    /// <typeparam name="TValue">The type of values in the filter.</typeparam>
     public class BitArrayFilter<TKey, TValue> : MatchFilterBase<TKey, TValue> where TKey : TimestampPointIdBase<TKey>, new()
     {
         #region [ Members ]
 
-        public ulong MaxValue = ulong.MaxValue;
-        public ulong MinValue = ulong.MinValue;
+        /// <summary>
+        /// Gets or sets the maximum value used in the bit array. Cannot be larger than <see cref="int.MaxValue" /> - 1.
+        /// </summary>
+        public ulong MaxValue { get; set; } = ulong.MaxValue;
+
+        /// <summary>
+        /// Gets or sets the minimum value used in the bit array.
+        /// </summary>
+        public ulong MinValue { get; set; } = ulong.MinValue;
 
         private readonly BitArray m_points;
 
@@ -66,7 +78,7 @@ public class PointIdMatchFilterBitArray
 
             while (pointCount > 0)
             {
-                //Since a bitarray cannot have more than 32bit 
+                // Since a bitarray cannot have more than 32bit.
                 m_points.SetBit((int)stream.ReadUInt32());
                 pointCount--;
             }
@@ -80,7 +92,7 @@ public class PointIdMatchFilterBitArray
         }
 
         /// <summary>
-        /// Creates a bit array filter from <see cref="points"/>.
+        /// Creates a bit array filter from <paramref name="points"/>.
         /// </summary>
         /// <param name="points">The points to use.</param>
         /// <param name="maxValue">The maximum value stored in the bit array. Cannot be larger than <c>int.MaxValue-1</c>.</param>
@@ -104,21 +116,34 @@ public class PointIdMatchFilterBitArray
 
         #region [ Properties ]
 
+        /// <summary>
+        /// Gets the unique identifier for the filter type associated with the <see cref="BitArrayFilter{TKey, TValue}"/>.
+        /// </summary>
         public override Guid FilterType => PointIdMatchFilterDefinition.FilterGuid;
 
         #endregion
 
         #region [ Methods ]
-
+        /// <summary>
+        /// Saves the filter data to the specified <see cref="BinaryStreamBase"/>.
+        /// </summary>
+        /// <param name="stream">The stream to which the filter data will be saved.</param>
         public override void Save(BinaryStreamBase stream)
         {
-            stream.Write((byte)1); //Stored as array of uint[]
+            stream.Write((byte)1); // Stored as array of uint[]
             stream.Write(MaxValue);
             stream.Write(m_points.SetCount);
+
             foreach (int x in m_points.GetAllSetBits())
                 stream.Write((uint)x);
         }
 
+        /// <summary>
+        /// Determines whether the filter contains the specified key and value.
+        /// </summary>
+        /// <param name="key">The key to check.</param>
+        /// <param name="value">The value to check.</param>
+        /// <returns><c>true</c> if the filter contains the specified key and value; otherwise, <c>false</c>.</returns>
         public override bool Contains(TKey key, TValue value)
         {
             int point = (int)key.PointId;

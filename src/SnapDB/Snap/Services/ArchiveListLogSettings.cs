@@ -123,6 +123,10 @@ public class ArchiveListLogSettings : SettingsBase<ArchiveListLogSettings>
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Saves the configuration of the log settings to the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream where the configuration data will be saved.</param>
     public override void Save(Stream stream)
     {
         stream.Write((byte)1);
@@ -131,6 +135,10 @@ public class ArchiveListLogSettings : SettingsBase<ArchiveListLogSettings>
         stream.Write(m_logFileExtension);
     }
 
+    /// <summary>
+    /// Loads the configuration of the log settings from the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream from which the configuration data will be loaded.</param>
     public override void Load(Stream stream)
     {
         TestForEditable();
@@ -147,6 +155,9 @@ public class ArchiveListLogSettings : SettingsBase<ArchiveListLogSettings>
         }
     }
 
+    /// <summary>
+    /// Validates the configuration of the log settings.
+    /// </summary>
     public override void Validate()
     {
         if (m_logPath != string.Empty && !Directory.Exists(m_logPath))

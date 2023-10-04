@@ -55,36 +55,97 @@ public static class SortedTreeEngineReaderBaseExtensionMethods
         return reader.Read(s_singleValueOptions, TimestampPointIdSeekFilter.FindKey<TKey>(timestamp, pointId), null);
     }
 
+    /// <summary>
+    /// Reads data from the database reader using a specified timestamp.
+    /// </summary>
+    /// <typeparam name="TKey">The key type for the database reader.</typeparam>
+    /// <typeparam name="TValue">The value type for the database reader.</typeparam>
+    /// <param name="reader">The IDatabaseReader to read data from.</param>
+    /// <param name="timestamp">The timestamp associated with the data.</param>
+    /// <returns>A TreeStream containing the requested data.</returns>
     public static TreeStream<TKey, TValue> Read<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader, ulong timestamp) where TKey : TimestampPointIdBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         return reader.Read(SortedTreeEngineReaderOptions.Default, TimestampSeekFilter.CreateFromRange<TKey>(timestamp, timestamp), null);
     }
 
+    /// <summary>
+    /// Reads data from the database reader using a specified time filter.
+    /// </summary>
+    /// <typeparam name="TKey">The key type for the database reader.</typeparam>
+    /// <typeparam name="TValue">The value type for the database reader.</typeparam>
+    /// <param name="reader">The IDatabaseReader to read data from.</param>
+    /// <param name="timeFilter">The time filter used to select data.</param>
+    /// <returns>A TreeStream containing the requested data.</returns>
     public static TreeStream<TKey, TValue> Read<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader, SeekFilterBase<TKey> timeFilter) where TKey : TimestampPointIdBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         return reader.Read(SortedTreeEngineReaderOptions.Default, timeFilter, null);
     }
 
+    /// <summary>
+    /// Reads all available data from the database reader.
+    /// </summary>
+    /// <typeparam name="TKey">The key type for the database reader.</typeparam>
+    /// <typeparam name="TValue">The value type for the database reader.</typeparam>
+    /// <param name="reader">The IDatabaseReader to read data from.</param>
+    /// <returns>A TreeStream containing all available data.</returns>
     public static TreeStream<TKey, TValue> Read<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader) where TKey : TimestampPointIdBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         return reader.Read(SortedTreeEngineReaderOptions.Default, null, null);
     }
 
+    /// <summary>
+    /// Reads data from the database reader using a specified time range.
+    /// </summary>
+    /// <typeparam name="TKey">The key type for the database reader.</typeparam>
+    /// <typeparam name="TValue">The value type for the database reader.</typeparam>
+    /// <param name="reader">The IDatabaseReader to read data from.</param>
+    /// <param name="firstTime">The starting timestamp of the time range.</param>
+    /// <param name="lastTime">The ending timestamp of the time range.</param>
+    /// <returns>A TreeStream containing the requested data within the specified time range.</returns>
     public static TreeStream<TKey, TValue> Read<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader, ulong firstTime, ulong lastTime) where TKey : TimestampPointIdBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         return reader.Read(SortedTreeEngineReaderOptions.Default, TimestampSeekFilter.CreateFromRange<TKey>(firstTime, lastTime), null);
     }
 
+    /// <summary>
+    /// Reads data from the database reader using a specified time range and point IDs.
+    /// </summary>
+    /// <typeparam name="TKey">The key type for the database reader.</typeparam>
+    /// <typeparam name="TValue">The value type for the database reader.</typeparam>
+    /// <param name="reader">The IDatabaseReader to read data from.</param>
+    /// <param name="firstTime">The starting timestamp of the time range.</param>
+    /// <param name="lastTime">The ending timestamp of the time range.</param>
+    /// <param name="pointIds">A collection of point IDs to filter the data.</param>
+    /// <returns>A TreeStream containing the requested data within the specified time range and point IDs.</returns>
     public static TreeStream<TKey, TValue> Read<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader, ulong firstTime, ulong lastTime, IEnumerable<ulong> pointIds) where TKey : TimestampPointIdBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         return reader.Read(SortedTreeEngineReaderOptions.Default, TimestampSeekFilter.CreateFromRange<TKey>(firstTime, lastTime), PointIdMatchFilter.CreateFromList<TKey, TValue>(pointIds.ToList()));
     }
 
+    /// <summary>
+    /// Reads data from the database reader using a specified time range and point IDs, using DateTime values for the time range.
+    /// </summary>
+    /// <typeparam name="TKey">The key type for the database reader.</typeparam>
+    /// <typeparam name="TValue">The value type for the database reader.</typeparam>
+    /// <param name="reader">The IDatabaseReader to read data from.</param>
+    /// <param name="firstTime">The starting DateTime of the time range.</param>
+    /// <param name="lastTime">The ending DateTime of the time range.</param>
+    /// <param name="pointIds">A collection of point IDs to filter the data.</param>
+    /// <returns>A TreeStream containing the requested data within the specified time range and point IDs.</returns>
     public static TreeStream<TKey, TValue> Read<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader, DateTime firstTime, DateTime lastTime, IEnumerable<ulong> pointIds) where TKey : TimestampPointIdBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         return reader.Read(SortedTreeEngineReaderOptions.Default, TimestampSeekFilter.CreateFromRange<TKey>(firstTime, lastTime), PointIdMatchFilter.CreateFromList<TKey, TValue>(pointIds.ToList()));
     }
 
+    /// <summary>
+    /// Reads data from the database reader using a specified time filter and point IDs.
+    /// </summary>
+    /// <typeparam name="TKey">The key type for the database reader.</typeparam>
+    /// <typeparam name="TValue">The value type for the database reader.</typeparam>
+    /// <param name="reader">The IDatabaseReader to read data from.</param>
+    /// <param name="key1">The time filter to use.</param>
+    /// <param name="pointIds">A collection of point IDs to filter the data.</param>
+    /// <returns>A TreeStream containing the requested data within the specified time filter and point IDs.</returns>
     public static TreeStream<TKey, TValue> Read<TKey, TValue>(this IDatabaseReader<TKey, TValue> reader, SeekFilterBase<TKey> key1, IEnumerable<ulong> pointIds) where TKey : TimestampPointIdBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         return reader.Read(SortedTreeEngineReaderOptions.Default, key1, PointIdMatchFilter.CreateFromList<TKey, TValue>(pointIds.ToList()));

@@ -19,7 +19,9 @@
 //  04/19/2014 - Steven E. Chisholm
 //       Generated original version of source code. 
 //
-//  09/25/2023
+//  09/25/2023 - Lillian Gensolin
+//       Converted code to .NET core.
+//
 //******************************************************************************************************
 
 using SnapDB.Collections;

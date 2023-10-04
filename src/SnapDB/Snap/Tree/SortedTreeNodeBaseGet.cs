@@ -29,21 +29,21 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     #region [ Methods ]
 
     /// <summary>
-    /// Seeks to the first node at this level of the tree
+    /// Seeks to the first node at this level of the tree.
     /// </summary>
     public void SeekToFirstNode()
     {
-        //Only need to do a seek if I'm not already on the first node.
+        // Only need to do a seek if I'm not already on the first node.
         if (NodeIndex == uint.MaxValue || LeftSiblingNodeIndex != uint.MaxValue)
             SetNodeIndex(SparseIndex.GetFirstIndex(Level));
     }
 
     /// <summary>
-    /// Seeks to the last node at this level of the tree
+    /// Seeks to the last node at this level of the tree.
     /// </summary>
     public void SeekToLastNode()
     {
-        //Only need to do a seek if I'm not already on the last node.
+        // Only need to do a seek if I'm not already on the last node.
         if (NodeIndex == uint.MaxValue || RightSiblingNodeIndex != uint.MaxValue)
             SetNodeIndex(SparseIndex.GetLastIndex(Level));
     }
@@ -51,24 +51,26 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     /// <summary>
     /// Gets the first record contained in the current node of the tree.
     /// </summary>
-    /// <param name="key">where to write the key</param>
-    /// <param name="value">where to write the value</param>
-    /// <returns>True if a value was found. False if the tree is empty</returns>
+    /// <param name="key">Where to write the key.</param>
+    /// <param name="value">Where to write the value.</param>
+    /// <returns><c>true</c> if a value was found; otherwise, <c>false</c> if the tree is empty.</returns>
     public bool TryGetFirstRecord(TKey key, TValue value)
     {
         if (NodeIndex == uint.MaxValue)
             throw new Exception("Current node is null");
+
         if (RecordCount == 0)
             return false;
         Read(0, key, value);
+
         return true;
     }
 
     /// <summary>
     /// Gets the first record contained in the current node of the tree.
     /// </summary>
-    /// <param name="value">where to write the value</param>
-    /// <returns>True if a value was found. False if the tree is empty</returns>
+    /// <param name="value">Where to write the value.</param>
+    /// <returns><c>true</c> if a value was found; <c>false</c> if the tree is empty.</returns>
     public bool TryGetFirstRecord(TValue value)
     {
         if (NodeIndex == uint.MaxValue)
@@ -82,15 +84,17 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     /// <summary>
     /// Gets the last record contained in the current node of the tree.
     /// </summary>
-    /// <param name="key">where to write the key</param>
-    /// <param name="value">where to write the value</param>
-    /// <returns>True if a value was found. False if the tree is empty</returns>
+    /// <param name="key">Where to write the key.</param>
+    /// <param name="value">Where to write the value.</param>
+    /// <returns><c>true</c> if a value was found; otherwise, <c>false</c> if the tree is empty.</returns>
     public bool TryGetLastRecord(TKey key, TValue value)
     {
         if (NodeIndex == uint.MaxValue)
             throw new Exception("Current node is null");
+
         if (RecordCount == 0)
             return false;
+
         Read(RecordCount - 1, key, value);
         return true;
     }
@@ -98,23 +102,26 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     /// <summary>
     /// Gets the last record contained in the current node of the tree.
     /// </summary>
-    /// <param name="value">where to write the value</param>
-    /// <returns>True if a value was found. False if the tree is empty</returns>
+    /// <param name="value">Where to write the value.</param>
+    /// <returns><c>true</c> if a value was found; otherwise, <c>false</c> if the tree is empty.</returns>
     public bool TryGetLastRecord(TValue value)
     {
         if (NodeIndex == uint.MaxValue)
             throw new Exception("Current node is null");
+
         if (RecordCount == 0)
             return false;
+
         Read(RecordCount - 1, value);
+
         return true;
     }
 
     /// <summary>
     /// Gets the provided key or the key that is directly to the right of this key.
     /// </summary>
-    /// <param name="key">the key to find. This value is not modifed</param>
-    /// <param name="value">where to write the value.</param>
+    /// <param name="key">The key to find. This value is not modifed.</param>
+    /// <param name="value">Where to write the value.</param>
     public virtual void GetOrGetNext(TKey key, TValue value)
     {
         NavigateToNode(key);
@@ -124,11 +131,12 @@ public partial class SortedTreeNodeBase<TKey, TValue>
             index = ~index - 1;
             if (index == -1)
             {
-                //This case occurs if the search position is the beginning of the array. This is possible since the 
-                //node lower bouds does not have to point to the first key. In which case, I have to seek to the previous sibling. 
+                // This case occurs if the search position is the beginning of the array. This is possible since the 
+                // node lower bouds does not have to point to the first key. In which case, I have to seek to the previous sibling. 
                 SeekToLeftSibling();
                 if (!TryGetLastRecord(value))
                     throw new KeyNotFoundException("There is no value");
+
                 return;
             }
         }
@@ -140,8 +148,8 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     /// Gets the value for the provided key if it exists.
     /// </summary>
     /// <param name="key">The key to search for.</param>
-    /// <param name="value">where to write the value if found.</param>
-    /// <returns>True if the value exists, False if not found.</returns>
+    /// <param name="value">Where to write the value if found.</param>
+    /// <returns><c>true</c> if the value exists, <c>false</c> if not found.</returns>
     public virtual bool TryGet(TKey key, TValue value)
     {
         if (key.IsBetween(LowerKey, UpperKey))
@@ -162,7 +170,7 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     /// </summary>
     /// <param name="key">The key to search for.</param>
     /// <param name="value">where to write the value if found.</param>
-    /// <returns>True if the value exists, False if not found.</returns>
+    /// <returns><c>true</c> if the value exists, <c>false</c> if not found.</returns>
     /// <remarks>
     /// This is a slower but more complete implementation of <see cref="TryGet"/>.
     /// Overriding classes can call this method after implementing their own high speed TryGet method.
@@ -173,7 +181,9 @@ public partial class SortedTreeNodeBase<TKey, TValue>
         int index = GetIndexOf(key);
         if (index < 0)
             return false;
+
         Read(index, value);
+
         return true;
     }
 

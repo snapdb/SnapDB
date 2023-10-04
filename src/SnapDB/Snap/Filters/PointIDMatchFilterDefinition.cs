@@ -30,10 +30,16 @@ using SnapDB.Snap.Definitions;
 
 namespace SnapDB.Snap.Filters;
 
+/// <summary>
+/// Defines a filter for matching data based on point IDs using a bit array to set <c>true</c> and <c>false</c> values.
+/// </summary>
 public class PointIdMatchFilterDefinition : MatchFilterDefinitionBase
 {
     #region [ Properties ]
 
+    /// <summary>
+    /// Gets the unique identifier for this match filter type.
+    /// </summary>
     public override Guid FilterType => FilterGuid;
 
     #endregion
@@ -52,6 +58,9 @@ public class PointIdMatchFilterDefinition : MatchFilterDefinitionBase
 
     #region [ Static ]
 
+    /// <summary>
+    /// The globally unique identifier (GUID) for the PointIdMatchFilterDefinition.
+    /// </summary>
     // {2034A3E3-F92E-4749-9306-B04DC36FD743}
     public static Guid FilterGuid = new(0x2034a3e3, 0xf92e, 0x4749, 0x93, 0x06, 0xb0, 0x4d, 0xc3, 0x6f, 0xd7, 0x43);
 

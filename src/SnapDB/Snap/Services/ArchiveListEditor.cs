@@ -29,7 +29,7 @@ namespace SnapDB.Snap.Services;
 /// <summary>
 /// Provides a way to edit an <see cref="ArchiveList"/> since all edits must be atomic.
 /// WARNING: Instancing this class on an <see cref="ArchiveList"/> will lock the class
-/// until <see cref="Dispose"/> is called. Therefore, keep locks to a minimum and always
+/// until Dispose() is called. Therefore, keep locks to a minimum and always
 /// use a Using block.
 /// </summary>
 public abstract class ArchiveListEditor : IDisposable
@@ -67,7 +67,7 @@ public abstract class ArchiveListEditor : IDisposable
     public abstract bool Contains(Guid archiveId);
 
     /// <summary>
-    /// Removes the <see cref="archiveId"/> from <see cref="ArchiveList{TKey,TValue}"/> and queues it for disposal.
+    /// Removes the <paramref name="archiveId"/> from <see cref="ArchiveList{TKey,TValue}"/> and queues it for disposal.
     /// </summary>
     /// <param name="archiveId">the archive to remove</param>
     /// <returns>True if the item was removed, False otherwise.</returns>

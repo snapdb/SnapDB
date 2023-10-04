@@ -78,9 +78,9 @@ public class SnapStreamingClient : SnapClient
     #region [ Methods ]
 
     /// <summary>
-    /// Gets the database that matches <see cref="databaseName"/>
+    /// Gets the database that matches <paramref name="databaseName"/>.
     /// </summary>
-    /// <param name="databaseName">the case insensitive name of the databse</param>
+    /// <param name="databaseName">The case insensitive name of the database.</param>
     /// <returns></returns>
     public override ClientDatabaseBase GetDatabase(string databaseName)
     {
@@ -115,7 +115,7 @@ public class SnapStreamingClient : SnapClient
     }
 
     /// <summary>
-    /// Determines if <see cref="databaseName"/> is contained in the database.
+    /// Determines if <paramref name="databaseName"/> is contained in the database.
     /// </summary>
     /// <param name="databaseName">Name of database instance to access.</param>
     /// <returns></returns>
@@ -135,7 +135,7 @@ public class SnapStreamingClient : SnapClient
         m_credentials = credentials ?? throw new ArgumentNullException(nameof(credentials));
         m_rawStream = stream ?? throw new ArgumentNullException(nameof(stream));
         m_rawStream.Write(0x2BA517361121L);
-        m_rawStream.Write(useSsl); //UseSSL
+        m_rawStream.Write(useSsl); // UseSSL
 
         ServerResponse command = (ServerResponse)m_rawStream.ReadNextByte();
 
@@ -177,7 +177,7 @@ public class SnapStreamingClient : SnapClient
     /// <summary>
     /// Releases the unmanaged resources used by the <see cref="SnapNetworkClient"/> object and optionally releases the managed resources.
     /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected override void Dispose(bool disposing)
     {
         if (m_disposed)

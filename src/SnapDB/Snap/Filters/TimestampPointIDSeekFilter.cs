@@ -144,7 +144,7 @@ public static class TimestampPointIdSeekFilter
     }
 
     /// <summary>
-    /// Loads a <see cref="SeekFilterBase{TKey}"/> from the provided <see cref="stream"/>.
+    /// Loads a <see cref="SeekFilterBase{TKey}"/> from the provided <paramref name="stream"/>.
     /// </summary>
     /// <param name="stream">The stream to load the filter from.</param>
     /// <returns>Seek filter to find specific key.</returns>

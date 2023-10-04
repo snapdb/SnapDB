@@ -71,14 +71,26 @@ public class ArchiveTreeStreamWrapper<TKey, TValue> : TreeStream<TKey, TValue> w
 
     #region [ Properties ]
 
+    /// <summary>
+    /// Gets a value indicating whether the data source is always sequential.
+    /// </summary>
     public override bool IsAlwaysSequential => true;
 
+    /// <summary>
+    /// Gets a value indicating that the data source never contains duplicates.
+    /// </summary>
     public override bool NeverContainsDuplicates => true;
 
     #endregion
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Reads the next key-value pair from the underlying data source using the scanner.
+    /// </summary>
+    /// <param name="key">The key to read.</param>
+    /// <param name="value">The value to read.</param>
+    /// <returns>True if the read operation was successful, otherwise false.</returns>
     protected override bool ReadNext(TKey key, TValue value)
     {
         return m_scanner.Read(key, value);

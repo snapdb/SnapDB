@@ -42,6 +42,9 @@ public class SeekFilterUniverse<TKey> : SeekFilterBase<TKey> where TKey : SnapTy
 
     #region [ Constructors ]
 
+    /// <summary>
+    /// Initializes a new instance of the SeekFilterUniverse class.
+    /// </summary>
     public SeekFilterUniverse()
     {
         StartOfFrame = new TKey();
@@ -55,17 +58,28 @@ public class SeekFilterUniverse<TKey> : SeekFilterBase<TKey> where TKey : SnapTy
 
     #region [ Properties ]
 
+    /// <summary>
+    /// Initializes a new instance of the SeekFilterUniverse class.
+    /// </summary>
     public override Guid FilterType => Guid.Empty;
 
     #endregion
 
     #region [ Methods ]
 
+    /// <summary>
+    /// This method is not supported in this filter.
+    /// </summary>
+    /// <param name="stream">The binary stream to save to.</param>
+    /// <exception cref="NotSupportedException">Thrown because saving is not supported for this filter.</exception>
     public override void Save(BinaryStreamBase stream)
     {
         throw new NotSupportedException();
     }
 
+    /// <summary>
+    /// Resets the filter to its initial state.
+    /// </summary>
     public override void Reset()
     {
         m_isEndReached = false;
@@ -73,13 +87,19 @@ public class SeekFilterUniverse<TKey> : SeekFilterBase<TKey> where TKey : SnapTy
         EndOfRange.SetMax();
     }
 
+    /// <summary>
+    /// Moves to the next window in the filter's data range.
+    /// </summary>
+    /// <returns><c>true</c> if the next window exists; otherwise, <c>false</c>.</returns>
     public override bool NextWindow()
     {
         if (m_isEndReached)
             return false;
+
         StartOfRange.SetMin();
         EndOfRange.SetMax();
         m_isEndReached = true;
+
         return true;
     }
 

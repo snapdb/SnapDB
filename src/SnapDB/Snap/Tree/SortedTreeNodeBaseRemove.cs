@@ -32,17 +32,17 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
 {
     #region [ Methods ]
 
-    //ToDO: Checked
     /// <summary>
-    /// Tries to remove the key from the Node.
+    /// Tries to remove the specified key from the node.
     /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
+    /// <param name="key">The key to remove.</param>
+    /// <returns><c>true</c> if the key was successfully removed; otherwise, <c>false</c>.</returns>
     public bool TryRemove(TKey key)
     {
         if (ValidBytes > m_minRecordNodeBytes && LowerKey.IsLessThanOrEqualTo(key) && key.IsLessThan(UpperKey))
         {
             int index = GetIndexOf(key);
+
             if (index < 0)
                 return false;
 
@@ -53,7 +53,11 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
         return TryRemove2(key);
     }
 
-    //ToDO: Checked
+    /// <summary>
+    /// Tries to remove the specified key from the node or performs additional actions if needed.
+    /// </summary>
+    /// <param name="key">The key to remove.</param>
+    /// <returns>True if the key was successfully removed or handled; otherwise, false.</returns>
     protected bool TryRemove2(TKey key)
     {
         NavigateToNode(key);
@@ -68,10 +72,13 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
 
         if (ValidBytes > m_minRecordNodeBytes) //if the node has not underflowed, we can exit early.
             return true;
+
         if (IsRightSiblingIndexNull && IsLeftSiblingIndexNull) //If there are no nodes to combine with, we can quit early.
             return true;
+
         if (RecordCount > 0 && (IsRightSiblingIndexNull || IsLeftSiblingIndexNull)) //There can be fewer than the minimum it is the first or last node on the level.
             return true;
+
 
         SparseIndex.CanCombineWithSiblings(LowerKey, (byte)(Level + 1), out bool canCombineWithLeft, out bool canCombineWithRight);
 
@@ -80,46 +87,55 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
         {
             if (canCombineWithLeft && IsRightSiblingIndexNull)
                 CombineNodes(LeftSiblingNodeIndex, NodeIndex);
-            else if (canCombineWithRight && IsLeftSiblingIndexNull)
+
+            if (canCombineWithRight && IsLeftSiblingIndexNull)
                 CombineNodes(NodeIndex, RightSiblingNodeIndex);
+
             else
                 throw new Exception("Should never reach this condition");
+
             return true;
         }
 
 
         int deltaBytesWhenCombining = MaxOverheadWithCombineNodes - HeaderSize;
 
-        if (IsRightSiblingIndexNull) //We can only combine with the left node.
+        if (IsRightSiblingIndexNull) // We can only combine with the left node.
         {
             if (!canCombineWithLeft)
                 throw new Exception("Should never reach this condition");
 
             if (ValidBytes + GetValidBytes(LeftSiblingNodeIndex) + deltaBytesWhenCombining < BlockSize)
                 CombineNodes(LeftSiblingNodeIndex, NodeIndex);
+
             else
                 RebalanceNodes(LeftSiblingNodeIndex, NodeIndex);
         }
-        else if (IsLeftSiblingIndexNull) //We can only combine with the right node.
+        else if (IsLeftSiblingIndexNull) // We can only combine with the right node.
         {
             if (!canCombineWithRight)
                 throw new Exception("Should never reach this condition");
 
             if (ValidBytes + GetValidBytes(RightSiblingNodeIndex) + deltaBytesWhenCombining < BlockSize)
                 CombineNodes(NodeIndex, RightSiblingNodeIndex);
+
             else
                 RebalanceNodes(NodeIndex, RightSiblingNodeIndex);
         }
-        else //I can combine with the right or the left node
+        else // I can combine with the right or the left node
         {
             if (canCombineWithLeft && ValidBytes + GetValidBytes(LeftSiblingNodeIndex) + deltaBytesWhenCombining < BlockSize)
                 CombineNodes(LeftSiblingNodeIndex, NodeIndex);
-            else if (canCombineWithRight && ValidBytes + GetValidBytes(RightSiblingNodeIndex) + deltaBytesWhenCombining < BlockSize)
+
+            if (canCombineWithRight && ValidBytes + GetValidBytes(RightSiblingNodeIndex) + deltaBytesWhenCombining < BlockSize)
                 CombineNodes(NodeIndex, RightSiblingNodeIndex);
-            else if (canCombineWithLeft)
+
+            if (canCombineWithLeft)
                 RebalanceNodes(LeftSiblingNodeIndex, NodeIndex);
-            else if (canCombineWithRight)
+
+            if (canCombineWithRight)
                 RebalanceNodes(NodeIndex, RightSiblingNodeIndex);
+
             else
                 throw new Exception("Should never reach this condition");
         }
@@ -142,14 +158,14 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
 
         if (left.ValidBytes < right.ValidBytes)
         {
-            //Transfer records from Right to Left
+            // Transfer records from Right to Left
             TransferRecordsFromRightToLeft(left, right, averageSize - left.ValidBytes);
 
             UpdateBoundsOfNode(left, right);
         }
         else
         {
-            //Transfer records from Left to Right
+            // Transfer records from Left to Right
             TransferRecordsFromLeftToRight(left, right, averageSize - right.ValidBytes);
 
             UpdateBoundsOfNode(left, right);
@@ -191,7 +207,7 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
         TKey newLowerKey = new();
 
         rightNode.LowerKey.CopyTo(oldLowerKey);
-        newLowerKey.Read(rightNode.GetReadPointerAfterHeader()); //ToDo: Make Generic
+        newLowerKey.Read(rightNode.GetReadPointerAfterHeader()); // ToDo: Make Generic
         rightNode.LowerKey = newLowerKey;
         leftNode.UpperKey = newLowerKey;
 
@@ -200,11 +216,11 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
 
     private void UpdateBoundsAndRemoveEmptyNode(Node<TKey> leftNode, Node<TKey> rightNode)
     {
-        if (leftNode.RecordCount == 0) //Remove the left node
+        if (leftNode.RecordCount == 0) // Remove the left node
         {
-            //Change the existing pointer to the left node to point to the right node.
+            // Change the existing pointer to the left node to point to the right node.
             SparseIndex.UpdateValue(leftNode.LowerKey, new SnapUInt32(rightNode.NodeIndex), (byte)(Level + 1));
-            //Now remove the unused key position
+            // Now remove the unused key position
             SparseIndex.Remove(rightNode.LowerKey, (byte)(Level + 1));
 
             rightNode.LowerKey = leftNode.LowerKey;
@@ -215,7 +231,7 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
                 leftNode.RightSiblingNodeIndex = rightNode.NodeIndex;
             }
         }
-        else if (rightNode.RecordCount == 0) //Remove the right node.
+        else if (rightNode.RecordCount == 0) // Remove the right node.
         {
             SparseIndex.Remove(rightNode.LowerKey, (byte)(Level + 1));
 

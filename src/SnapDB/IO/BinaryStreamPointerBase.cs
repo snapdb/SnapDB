@@ -717,7 +717,13 @@ public abstract unsafe class BinaryStreamPointerBase : BinaryStreamBase
         return base.Read7BitUInt64();
     }
 
-
+    /// <summary>
+    /// Reads a specified number of bytes from the BinaryStream and advances the position by that amount.
+    /// </summary>
+    /// <param name="value">The byte array where the read bytes will be stored.</param>
+    /// <param name="offset">The starting index in the byte array where the read bytes will be placed.</param>
+    /// <param name="count">The maximum number of bytes to read.</param>
+    /// <returns>The total number of bytes read into the buffer.</returns>
     public override int Read(byte[] value, int offset, int count)
     {
         if (RemainingReadLength >= count)
@@ -731,6 +737,11 @@ public abstract unsafe class BinaryStreamPointerBase : BinaryStreamBase
         return Read2(value, offset, count);
     }
 
+    /// <summary>
+    /// Sets the length of the BinaryStream, which is not supported and will throw a <see cref="NotSupportedException"/>.
+    /// </summary>
+    /// <param name="value">The desired length of the BinaryStream.</param>
+    /// <exception cref="NotSupportedException">Thrown to indicate that setting the length of the BinaryStream is not supported.</exception>
     public override void SetLength(long value)
     {
         throw new NotSupportedException();

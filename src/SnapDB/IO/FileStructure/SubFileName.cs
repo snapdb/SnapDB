@@ -70,7 +70,7 @@ public class SubFileName : IComparable<SubFileName>, IEquatable<SubFileName>
     #region [ Methods ]
 
     /// <summary>
-    /// Writes the <see cref="SubFileName"/> to the <see cref="writer"/>.
+    /// Writes the <see cref="SubFileName"/> to the <paramref name="writer"/>.
     /// </summary>
     /// <param name="writer"></param>
     public void Save(BinaryWriter writer)
@@ -188,8 +188,8 @@ public class SubFileName : IComparable<SubFileName>, IEquatable<SubFileName>
     /// Creates a <see cref="SubFileName"/> from the supplied data.
     /// </summary>
     /// <param name="fileName">A name associated with the data.</param>
-    /// <param name="keyType">The GUID identifier of the type of the <see cref="SortedTreeStore"/>.</param>
-    /// <param name="valueType">The GUID identifier of the value type of the <see cref="SortedTreeStore"/>.</param>
+    /// <param name="keyType">The GUID identifier of the type of the sorted tree store.</param>
+    /// <param name="valueType">The GUID identifier of the value type of the sorted tree store.</param>
     /// <returns></returns>
     public static unsafe SubFileName Create(string fileName, Guid keyType, Guid valueType)
     {
@@ -221,7 +221,7 @@ public class SubFileName : IComparable<SubFileName>, IEquatable<SubFileName>
     }
 
     /// <summary>
-    /// Loads the <see cref="SubFileName"/> from the supplied <see cref="reader"/>.
+    /// Loads the <see cref="SubFileName"/> from the supplied <paramref name="reader"/>.
     /// </summary>
     /// <param name="reader">The reader to read from.</param>
     /// <returns>The subFile's corresponding values.</returns>

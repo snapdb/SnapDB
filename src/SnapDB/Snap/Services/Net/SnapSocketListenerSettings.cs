@@ -58,8 +58,19 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     /// </summary>
     public const string DefaultServerName = "openHistorian";
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the default user has read access.
+    /// </summary>
     public bool DefaultUserCanRead = false;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the default user has write access.
+    /// </summary>
     public bool DefaultUserCanWrite = false;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the default user is an admin.
+    /// </summary>
     public bool DefaultUserIsAdmin = false;
 
     /// <summary>
@@ -155,23 +166,39 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Saves data to the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream to which data is saved.</param>
     public override void Save(Stream stream)
     {
+        // Write a byte with the value 1 to the stream.
         stream.Write((byte)1);
     }
 
+    /// <summary>
+    /// Loads data from the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream from which data is loaded.</param>
     public override void Load(Stream stream)
     {
+        // Check if the object is editable.
         TestForEditable();
 
+        // Read the next byte from the stream, which represents the version.
         byte version = stream.ReadNextByte();
 
+        // Check if the version is not equal to 1 and throw an exception if it's unknown.
         if (version != 1)
             throw new VersionNotFoundException("Unknown Version Code: " + version);
     }
 
+    /// <summary>
+    /// Validates the object's state.
+    /// </summary>
     public override void Validate()
     {
+        // This method is currently empty and does not perform any specific validation.
     }
 
     #endregion

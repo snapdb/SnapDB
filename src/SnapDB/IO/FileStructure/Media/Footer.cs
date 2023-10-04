@@ -100,10 +100,6 @@ internal static unsafe class Footer
     /// to calculate the check-sums. The computed check-sums are returned as <paramref name="checksum1"/>
     /// (64 bits) and <paramref name="checksum2"/> (32 bits).
     /// </remarks>
-    /// <param name="data">A pointer to the start of the data to compute checksum for.</param>
-    /// <param name="checksum1">Output: A long checksum value (64 bits).</param>
-    /// <param name="checksum2">Output: An integer checksum value (32 bits).</param>
-    /// <param name="length">The length of the data to be used for checksum computation, in bytes.</param>
     public static void ComputeChecksum(nint data, out long checksum1, out int checksum2, int length)
     {
         Stats.ChecksumCount++;
@@ -131,9 +127,6 @@ internal static unsafe class Footer
     /// Thrown when the <paramref name="blockSize"/> is greater than the <paramref name="length"/>
     /// or when the <paramref name="length"/> is not a multiple of the <paramref name="blockSize"/>.
     /// </exception>
-    /// <param name="data">A pointer to the start of the data blocks.</param>
-    /// <param name="blockSize">The size of each data block, in bytes (must be a power of two).</param>
-    /// <param name="length">The total length of the data, including all blocks.</param>
     public static void WriteChecksumResultsToFooter(nint data, int blockSize, int length)
     {
         if (!BitMath.IsPowerOfTwo(blockSize))
@@ -160,8 +153,6 @@ internal static unsafe class Footer
     /// it marks the checksum as valid in the footer. Otherwise, it marks the checksum as not valid in the footer.
     /// The method also ensures that all other fields in the footer are set to zeroes.
     /// </remarks>
-    /// <param name="data">A pointer to the data block.</param>
-    /// <param name="blockSize">The size of the data block, in bytes.</param>
     public static void WriteChecksumResultsToFooter(nint data, int blockSize)
     {
         byte* lpData = (byte*)data;
@@ -188,7 +179,6 @@ internal static unsafe class Footer
     /// If a recomputation is required, it calculates the checksum and updates it in the footer.
     /// Finally, it clears the checksum status in the footer.
     /// </remarks>
-    /// <param name="data">A pointer to the data block.</param>
     public static void ComputeChecksumAndClearFooter(nint data, int blockSize)
     {
         byte* lpData = (byte*)data;
@@ -216,9 +206,6 @@ internal static unsafe class Footer
     /// the footer of the data block. It is designed to work with blocks of data within a larger data structure.
     /// The method iterates over the specified data blocks, computes check-sums for each, and clears their footers.
     /// </remarks>
-    /// <param name="data">A pointer to the data block.</param>
-    /// <param name="blockSize">The size of the data block, in bytes.</param>
-    /// <param name="length">The total length of data to process, in bytes.</param>
     public static void ComputeChecksumAndClearFooter(nint data, int blockSize, int length)
     {
         if (!BitMath.IsPowerOfTwo(blockSize))

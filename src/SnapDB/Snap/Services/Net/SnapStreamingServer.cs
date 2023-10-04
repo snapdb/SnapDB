@@ -40,6 +40,9 @@ public class SnapStreamingServer : DisposableLoggingClassBase
 {
     #region [ Members ]
 
+    /// <summary>
+    /// Gets or sets a flag indicating whether SSL (Secure Sockets Layer) is required for communication.
+    /// </summary>
     public bool RequireSsl;
 
     private SecureStreamServer<SocketUserPermissions> m_authentication;
@@ -55,6 +58,13 @@ public class SnapStreamingServer : DisposableLoggingClassBase
 
     #region [ Constructors ]
 
+    /// <summary>
+    /// Initializes a new instance of the SnapStreamingServer class.
+    /// </summary>
+    /// <param name="authentication">The SecureStreamServer for handling authentication.</param>
+    /// <param name="stream">The stream for communication.</param>
+    /// <param name="server">The SnapServer associated with this streaming server.</param>
+    /// <param name="requireSsl">Flag indicating whether SSL is required for communication.</param>
     public SnapStreamingServer(SecureStreamServer<SocketUserPermissions> authentication, Stream stream, SnapServer server, bool requireSsl = false) : base(MessageClass.Framework)
     {
         Initialize(authentication, stream, server, requireSsl);

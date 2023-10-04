@@ -38,6 +38,9 @@ public class BinaryStreamStream : Stream
 {
     #region [ Members ]
 
+    /// <summary>
+    /// A new <see cref="BaseStream"/> that reads and writes to a little-endian stream.
+    /// </summary>
     public readonly BinaryStreamBase BaseStream;
 
     #endregion

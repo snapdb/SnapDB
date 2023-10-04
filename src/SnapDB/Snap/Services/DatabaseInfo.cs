@@ -118,6 +118,10 @@ public class DatabaseInfo
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Saves the configuration of the database to the specified binary stream.
+    /// </summary>
+    /// <param name="stream">The binary stream where the database configuration data will be saved.</param>
     public void Save(BinaryStreamBase stream)
     {
         stream.Write((byte)1);

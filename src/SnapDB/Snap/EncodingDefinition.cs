@@ -252,10 +252,11 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     /// </returns>
     /// <param name="obj">The object to compare with the current object. </param>
     /// <filterpriority>2</filterpriority>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is not EncodingDefinition o)
             return false;
+
         return Equals(o);
     }
 

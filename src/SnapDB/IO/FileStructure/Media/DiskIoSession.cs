@@ -311,7 +311,7 @@ internal unsafe class DiskIoSession : IDisposable
     /// <summary>
     /// Clears the data in the current <see cref="DiskIoSession"/> instance.
     /// </summary>
-    /// <exception cref="ObjectDisposedException">Thrown if this <see cref="DiskIoSession"/> instance, its parent <see cref="DiskIo"/> instance, or the underlying <see cref="DiskMediumIoSession"/> instance is disposed.</exception>
+    /// <exception cref="ObjectDisposedException">Thrown if this <see cref="DiskIoSession"/> instance, its parent <see cref="DiskIo"/> instance, or the underlying I/O session instance is disposed.</exception>
     public void Clear()
     {
         if (IsDisposed)

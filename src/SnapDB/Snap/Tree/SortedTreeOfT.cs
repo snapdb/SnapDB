@@ -42,7 +42,14 @@ public class SortedTree<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() whe
 {
     #region [ Members ]
 
+    /// <summary>
+    /// Gets or sets the sparse index associated with this node. It provides a mapping between keys and node indices.
+    /// </summary>
     protected SparseIndex<TKey> Indexer = default!;
+
+    /// <summary>
+    /// Gets or sets the storage for leaf nodes. Leaf nodes store key-value pairs in the sorted tree.
+    /// </summary>
     protected SortedTreeNodeBase<TKey, TValue> LeafStorage = default!;
 
     private readonly SortedTreeHeader m_header;
@@ -228,8 +235,8 @@ public class SortedTree<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() whe
     /// <param name="lowerBounds">The first key in the tree</param>
     /// <param name="upperBounds">The final key in the tree</param>
     /// <remarks>
-    /// If the tree contains no data. <see cref="lowerBounds"/> is set to it's maximum value
-    /// and <see cref="upperBounds"/> is set to it's minimum value.
+    /// If the tree contains no data. <paramref name="lowerBounds"/> is set to it's maximum value
+    /// and <paramref name="upperBounds"/> is set to it's minimum value.
     /// </remarks>
     public void GetKeyRange(TKey lowerBounds, TKey upperBounds)
     {

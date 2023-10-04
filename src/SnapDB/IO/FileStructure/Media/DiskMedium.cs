@@ -180,9 +180,6 @@ internal class DiskMedium : IDisposable
     /// The <paramref name="fileStructureBlockSize"/> parameter specifies the block size for the file's structure.
     /// Additionally, optional flags can be passed as an array of <paramref name="flags"/> to apply to the file header.
     /// </remarks>
-    /// <param name="pool">The memory pool to use for storage.</param>
-    /// <param name="fileStructureBlockSize">The block size for the file's structure.</param>
-    /// <param name="flags">An optional array of GUIDs representing flags to apply to the file header.</param>
     public static DiskMedium CreateMemoryFile(MemoryPool pool, int fileStructureBlockSize, params Guid[] flags)
     {
         FileHeaderBlock header = FileHeaderBlock.CreateNew(fileStructureBlockSize, flags);
@@ -205,10 +202,6 @@ internal class DiskMedium : IDisposable
     /// The <paramref name="fileStructureBlockSize"/> parameter specifies the block size for the file's structure.
     /// Additionally, optional flags can be passed as an array of <paramref name="flags"/> to apply to the file header.
     /// </remarks>
-    /// <param name="stream">The custom file stream to use as the underlying storage.</param>
-    /// <param name="pool">The memory pool to use for caching.</param>
-    /// <param name="fileStructureBlockSize">The block size for the file's structure.</param>
-    /// <param name="flags">An optional array of GUIDs representing flags to apply to the file header.</param>
     public static DiskMedium CreateFile(CustomFileStream stream, MemoryPool pool, int fileStructureBlockSize, params Guid[] flags)
     {
         FileHeaderBlock header = FileHeaderBlock.CreateNew(fileStructureBlockSize, flags);
@@ -230,9 +223,6 @@ internal class DiskMedium : IDisposable
     /// The <paramref name="pool"/> parameter specifies the memory pool to use for caching, and
     /// <paramref name="fileStructureBlockSize"/> specifies the block size for the file's structure.
     /// </remarks>
-    /// <param name="stream">The custom file stream representing the existing disk storage.</param>
-    /// <param name="pool">The memory pool to use for caching.</param>
-    /// <param name="fileStructureBlockSize">The block size for the file's structure.</param>
     public static DiskMedium OpenFile(CustomFileStream stream, MemoryPool pool, int fileStructureBlockSize)
     {
         byte[] buffer = new byte[fileStructureBlockSize];

@@ -29,10 +29,21 @@ using SnapDB.Snap.Types;
 
 namespace SnapDB.Snap.Filters;
 
+/// <summary>
+/// Partial class using a timestamp seek filter for interval ranges. 
+/// </summary>
 public partial class TimestampSeekFilter
 {
     #region [ Members ]
 
+    /// <summary>
+    /// Represents a filter for timestamp-based seek operations based on interval ranges.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the timestamp key.</typeparam>
+    /// <remarks>
+    /// This filter defines a set of date ranges used for timestamp-based seek operations.
+    /// It allows you to iterate through time windows defined by the specified interval ranges.
+    /// </remarks>
     private class IntervalRanges<TKey> : SeekFilterBase<TKey> where TKey : TimestampBase<TKey>, new()
     {
         #region [ Members ]
@@ -81,7 +92,7 @@ public partial class TimestampSeekFilter
         /// <param name="mainInterval">The smallest interval that is exact.</param>
         /// <param name="subInterval">The interval that will be parsed. Possible to be rounded.</param>
         /// <param name="tolerance">The width of every window.</param>
-        /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing.</returns>
+        /// <returns>A key seek filter base that will be able to do this parsing.</returns>
         /// <remarks>
         /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013.
         /// MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.

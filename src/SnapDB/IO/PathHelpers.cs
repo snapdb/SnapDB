@@ -41,7 +41,7 @@ public static class PathHelpers
     /// A vaild extension.
     /// </returns>
     /// <remarks>
-    /// Throws a series of exceptions if the <see cref="extension"/> is invalid.
+    /// Throws a series of exceptions if the <paramref name="extension"/> is invalid.
     /// </remarks>
     public static string FormatExtension(string extension)
     {
@@ -73,7 +73,7 @@ public static class PathHelpers
     /// </summary>
     /// <param name="fileName">any file name.</param>
     /// <remarks>
-    /// Throws a series of exceptions if the <see cref="fileName"/> is invalid.
+    /// Throws a series of exceptions if the <paramref name="fileName"/> is invalid.
     /// </remarks>
     public static void ValidateFileName(string fileName)
     {
@@ -89,7 +89,7 @@ public static class PathHelpers
     /// </summary>
     /// <param name="pathName">Any path.</param>
     /// <remarks>
-    /// Throws a series of exceptions if the <see cref="pathName"/> is invalid.
+    /// Throws a series of exceptions if the <paramref name="pathName"/> is invalid.
     /// </remarks>
     public static void ValidatePathName(string pathName)
     {

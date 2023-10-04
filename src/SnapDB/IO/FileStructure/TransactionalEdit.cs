@@ -83,6 +83,13 @@ public sealed class TransactionalEdit : IDisposable
     }
 
 #if DEBUG
+    /// <summary>
+    /// Finalizes an instance of the <see cref="TransactionalEdit"/> class.
+    /// </summary>
+    /// <remarks>
+    /// This finalizer is automatically called by the garbage collector during object cleanup.
+    /// It publishes an informational log message indicating that the finalizer has been called.
+    /// </remarks>
     ~TransactionalEdit()
     {
         s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);

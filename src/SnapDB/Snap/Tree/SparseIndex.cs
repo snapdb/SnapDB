@@ -256,7 +256,7 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
     /// <summary>
     /// Adds the following node pointer to the sparse index.
     /// </summary>
-    /// <param name="nodeKey">the first key in the <see cref="pointer"/>. Only uses the key portion of the TKeyValue</param>
+    /// <param name="nodeKey">the first key in the <paramref name="pointer"/>. Only uses the key portion of the TKeyValue</param>
     /// <param name="pointer">the index of the later node</param>
     /// <param name="level">the level of the node being added</param>
     /// <remarks>
@@ -340,7 +340,7 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
     }
 
     /// <summary>
-    /// Gets the node at the provided <see cref="level"/> where the provided <see cref="key"/> fits.
+    /// Gets the node at the provided <paramref name="level"/> where the provided <paramref name="key"/> fits.
     /// </summary>
     /// <param name="key">the key to search for.</param>
     /// <param name="level">the level of the tree </param>
@@ -349,6 +349,7 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
     {
         if (level <= 0)
             throw new ArgumentOutOfRangeException(nameof(level), "Cannot be <= 0");
+
         if (level > RootNodeLevel)
             throw new ArgumentOutOfRangeException(nameof(level), "Cannot be greater than the root node level.");
 
@@ -375,11 +376,6 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
         }
     }
 
-    /// <summary>
-    /// Gets the node associated with the current level.
-    /// </summary>
-    /// <param name="nodeLevel"></param>
-    /// <returns></returns>
     private SortedTreeNodeBase<TKey, SnapUInt32> GetNode(int nodeLevel)
     {
         return m_nodes[nodeLevel - 1];

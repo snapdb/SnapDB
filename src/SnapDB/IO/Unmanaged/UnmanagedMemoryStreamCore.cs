@@ -167,7 +167,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     private readonly object m_syncRoot;
 
     /// <summary>
-    /// Releases all the resources used by the <see cref="MemoryFile"/> object.
+    /// Releases all the resources used by the memory file object.
     /// </summary>
     private bool m_disposed;
 
@@ -222,7 +222,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// This function is more user friendly than calling GetBlock().
     /// </summary>
     /// <param name="position">The starting position of the read.</param>
-    /// <param name="pointer">An output pointer to <see cref="position"/>.</param>
+    /// <param name="pointer">An output pointer to <paramref name="position"/>.</param>
     /// <param name="validLength">The number of bytes that are valid after this position.</param>
     public void ReadBlock(long position, out nint pointer, out int validLength)
     {
@@ -303,7 +303,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     }
 
     /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="MemoryFile"/> object and optionally releases the managed resources.
+    /// Releases the unmanaged resources used by the memory file object and optionally releases the managed resources.
     /// </summary>
     /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     private void Dispose(bool disposing)
@@ -333,8 +333,6 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// This method retrieves the memory page from the memory pool associated with the specified position.
     /// If the requested page does not exist, it may increase the page count to accommodate the position.
     /// </remarks>
-    /// <param name="position">The position for which to retrieve the memory page.</param>
-    /// <returns>A pointer to the memory page corresponding to the specified position.</returns>
     private nint GetPage(long position)
     {
         Settings settings = m_settings;
@@ -359,7 +357,6 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// If the current settings require cloning, a clone of the settings is made before adding new pages.
     /// Each new page is allocated in memory and initialized with zeroes.
     /// </remarks>
-    /// <param name="pageCount">The desired number of pages to be accommodated.</param>
     private void IncreasePageCount(int pageCount)
     {
         lock (m_syncRoot)

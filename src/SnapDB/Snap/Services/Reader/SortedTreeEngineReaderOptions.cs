@@ -106,7 +106,7 @@ public class SortedTreeEngineReaderOptions
     #region [ Methods ]
 
     /// <summary>
-    /// Writes this data to the <see cref="stream"/>.
+    /// Writes this data to the <paramref name="stream"/>.
     /// </summary>
     /// <param name="stream">the stream to write data to</param>
     public void Save(BinaryStreamBase stream)

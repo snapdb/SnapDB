@@ -124,6 +124,10 @@ public class ArchiveListSettings : SettingsBase<ArchiveListSettings>
         m_importExtensions.Add(extension);
     }
 
+    /// <summary>
+    /// Saves the configuration of the import settings to the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream where the configuration data will be saved.</param>
     public override void Save(Stream stream)
     {
         stream.Write((byte)1);
@@ -140,6 +144,10 @@ public class ArchiveListSettings : SettingsBase<ArchiveListSettings>
         LogSettings.Save(stream);
     }
 
+    /// <summary>
+    /// Loads the configuration of the import settings from the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream from which the configuration data will be loaded.</param>
     public override void Load(Stream stream)
     {
         TestForEditable();
@@ -175,6 +183,9 @@ public class ArchiveListSettings : SettingsBase<ArchiveListSettings>
         }
     }
 
+    /// <summary>
+    /// Validates the configuration of the import settings.
+    /// </summary>
     public override void Validate()
     {
         if (m_importPaths.Count > 0 && m_importExtensions.Count == 0)

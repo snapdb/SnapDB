@@ -53,7 +53,7 @@ internal class IndexMapper
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates a <see cref="IndexMapper"/> that is based on a given <see cref="blockSize"/>.
+    /// Creates a <see cref="IndexMapper"/> that is based on a given <paramref name="blockSize"/>.
     /// </summary>
     /// <param name="blockSize">the number of bytes per block. Cannot be less than 64, greater than 1048576</param>
     public IndexMapper(int blockSize)

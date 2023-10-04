@@ -168,14 +168,22 @@ public enum ServerResponse : byte
 
     /// <summary>
     /// Occurs when the server name
-    /// specificed in the initial connection
+    /// specified in the initial connection
     /// does not match this server.
     /// </summary>
     ServerNameDoesNotMatch = 22,
 
+    /// <summary>
+    /// Occurs when the user has not yet logged in.
+    /// </summary>
     RequiresLogin = 23,
 
+    /// <summary>
+    /// </summary>
     KnownProtocol,
+
+    /// <summary>
+    /// </summary>
     AuthenticationFailed
 }
 

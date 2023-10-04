@@ -133,6 +133,10 @@ public class FirstStageWriterSettings : SettingsBase<FirstStageWriterSettings>
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Saves the configuration of the archive settings to the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream where the configuration data will be saved.</param>
     public override void Save(Stream stream)
     {
         stream.Write((byte)1);
@@ -143,6 +147,10 @@ public class FirstStageWriterSettings : SettingsBase<FirstStageWriterSettings>
         m_encodingMethod.Save(stream);
     }
 
+    /// <summary>
+    /// Loads the configuration of the archive settings from the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream from which the configuration data will be loaded.</param>
     public override void Load(Stream stream)
     {
         TestForEditable();
@@ -161,6 +169,9 @@ public class FirstStageWriterSettings : SettingsBase<FirstStageWriterSettings>
         }
     }
 
+    /// <summary>
+    /// Validates the configuration of the archive writer by delegating validation to its FinalSettings.
+    /// </summary>
     public override void Validate()
     {
         FinalSettings.Validate();

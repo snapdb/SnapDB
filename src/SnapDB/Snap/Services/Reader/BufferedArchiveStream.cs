@@ -29,27 +29,49 @@ using SnapDB.Snap.Tree;
 
 namespace SnapDB.Snap.Services.Reader;
 
+/// <summary>
+/// Represents a buffered stream for reading data from an archive table, where TKey and TValue are specific SnapTypeBase types.
+/// </summary>
+/// <typeparam name="TKey">The key type for the archive data.</typeparam>
+/// <typeparam name="TValue">The value type for the archive data.</typeparam>
 public class BufferedArchiveStream<TKey, TValue> : IDisposable where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
 
+    /// <summary>
+    /// Gets or sets a flag indicating whether the cache is valid.
+    /// </summary>
     public bool CacheIsValid;
+
+    /// <summary>
+    /// Gets or sets the cached key.
+    /// </summary>
     public TKey CacheKey = new();
+
+    /// <summary>
+    /// Gets or sets the cached value.
+    /// </summary>
     public TValue CacheValue = new();
+
+    /// <summary>
+    /// Gets or sets the sorted tree scanner used for reading data.
+    /// </summary>
     public SortedTreeScannerBase<TKey, TValue> Scanner;
+
     private SortedTreeTableReadSnapshot<TKey, TValue> m_snapshot;
 
     private readonly ArchiveTableSummary<TKey, TValue> m_table;
+
 
     #endregion
 
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates the table reader.
+    /// Creates an instance of the BufferedArchiveStream class with the specified index and table.
     /// </summary>
-    /// <param name="index"></param>
-    /// <param name="table"></param>
+    /// <param name="index">The index value used to disassociate the archive file.</param>
+    /// <param name="table">The ArchiveTableSummary associated with the stream.</param>
     public BufferedArchiveStream(int index, ArchiveTableSummary<TKey, TValue> table)
     {
         Index = index;
@@ -63,7 +85,7 @@ public class BufferedArchiveStream<TKey, TValue> : IDisposable where TKey : Snap
     #region [ Properties ]
 
     /// <summary>
-    /// An index value that is used to disassociate the archive file. Passed to this class from the <see cref="SortedTreeEngineReaderSequential{TKey,TValue}"/>
+    /// An index value that is used to disassociate the archive file.
     /// </summary>
     public int Index { get; private set; }
 
@@ -71,6 +93,9 @@ public class BufferedArchiveStream<TKey, TValue> : IDisposable where TKey : Snap
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Disposes of the resources used by the BufferedArchiveStream.
+    /// </summary>
     public void Dispose()
     {
         if (m_snapshot is not null)
@@ -80,17 +105,27 @@ public class BufferedArchiveStream<TKey, TValue> : IDisposable where TKey : Snap
         }
     }
 
+    /// <summary>
+    /// Updates the cached value by peeking at the next key-value pair in the scanner.
+    /// </summary>
     public void UpdateCachedValue()
     {
         CacheIsValid = Scanner.Peek(CacheKey, CacheValue);
     }
 
+    /// <summary>
+    /// Skips to the next key in the scanner and updates the cached value.
+    /// </summary>
     public void SkipToNextKeyAndUpdateCachedValue()
     {
         CacheIsValid = Scanner.Read(CacheKey, CacheValue);
         CacheIsValid = Scanner.Peek(CacheKey, CacheValue);
     }
 
+    /// <summary>
+    /// Seeks to the specified key in the scanner and updates the cached value.
+    /// </summary>
+    /// <param name="key">The key to seek to.</param>
     public void SeekToKeyAndUpdateCacheValue(TKey key)
     {
         Scanner.SeekToKey(key);

@@ -67,8 +67,8 @@ public abstract class SortedTreeTableEditor<TKey, TValue> : IDisposable where TK
     /// <param name="firstKey">The first key in the tree</param>
     /// <param name="lastKey">The final key in the tree</param>
     /// <remarks>
-    /// If the tree contains no data. <see cref="firstKey"/> is set to it's maximum value
-    /// and <see cref="lastKey"/> is set to it's minimum value.
+    /// If the tree contains no data. <paramref name="firstKey"/> is set to it's maximum value
+    /// and <paramref name="lastKey"/> is set to it's minimum value.
     /// </remarks>
     public abstract void GetKeyRange(TKey firstKey, TKey lastKey);
 

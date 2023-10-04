@@ -295,7 +295,7 @@ internal class MemoryPoolPageList : IDisposable
     /// </summary>
     /// <param name="size">The size of the buffer pool.</param>
     /// <returns>The final size of the buffer pool.</returns>
-    /// <remarks>The buffer pool shrinks to a size less than or equal to <see cref="size"/>.</remarks>
+    /// <remarks>The buffer pool shrinks to a size less than or equal to <paramref name="size"/>.</remarks>
     public long ShrinkMemoryPool(long size)
     {
         lock (m_syncRoot)
@@ -412,7 +412,7 @@ internal class MemoryPoolPageList : IDisposable
     /// <param name="totalSystemMemory">The total amount of system memory.</param>
     /// <returns>The recommended block size.</returns>
     /// <remarks>
-    /// The recommended block size is the <see cref="totalSystemMemory"/> divided by 1000
+    /// The recommended block size is the <paramref name="totalSystemMemory"/> divided by 1000
     /// but must be a multiple of the system allocation size and the page size and cannot be larger than 1GB
     /// </remarks>
     private static int CalculateMemoryBlockSize(int pageSize, long totalSystemMemory)

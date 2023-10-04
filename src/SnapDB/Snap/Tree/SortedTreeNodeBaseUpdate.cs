@@ -31,10 +31,10 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
     #region [ Methods ]
 
     /// <summary>
-    /// Updates the provided key.
+    /// Updates the key of a non-leaf node.
     /// </summary>
-    /// <param name="oldKey"></param>
-    /// <param name="newKey"></param>
+    /// <param name="oldKey">The old key to be updated.</param>
+    /// <param name="newKey">The new key to replace the old key.</param>
     public void UpdateKey(TKey oldKey, TKey newKey)
     {
         if (Level == 0)
@@ -51,10 +51,10 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
     }
 
     /// <summary>
-    /// Updates the provided value
+    /// Updates the value associated with a key in a non-leaf node.
     /// </summary>
-    /// <param name="key"></param>
-    /// <param name="value"></param>
+    /// <param name="key">The key associated with the value to update.</param>
+    /// <param name="value">The new value to replace the old value.</param>
     public void UpdateValue(TKey key, TValue value)
     {
         if (Level == 0)
@@ -66,15 +66,16 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
     }
 
     /// <summary>
-    /// Inserts the provided key into the current node.
+    /// Performs the internal update of a key in a non-leaf node.
     /// </summary>
-    /// <param name="oldKey"></param>
-    /// <param name="newKey"></param>
+    /// <param name="oldKey">The old key to be updated.</param>
+    /// <param name="newKey">The new key to replace the old key.</param>
     private void InternalUpdateKey(TKey oldKey, TKey newKey)
     {
         //ToDo: Make this implementation generic
         byte* ptr = GetReadPointer();
         int index = KeyMethods.BinarySearch(ptr + HeaderSize, oldKey, RecordCount, KeyValueSize); // BinarySearch(key);
+
         if (index < 0)
             throw new KeyNotFoundException("Missing key on update.");
 
@@ -83,6 +84,7 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
         if (index > 0)
             if (!KeyMethods.IsGreaterThan(ptr - KeyValueSize, newKey))
                 throw new Exception("Cannot update the key because the sorting gets messed up");
+
         if (index < RecordCount - 1)
             if (!KeyMethods.IsGreaterThan(newKey, ptr + KeyValueSize))
                 throw new Exception("Cannot update the key because the sorting gets messed up");
@@ -92,7 +94,7 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
 
     private void InternalUpdateValue(TKey key, TValue value)
     {
-        //ToDo: Make this implementation generic
+        // ToDo: Make this implementation generic
         byte* ptr = GetReadPointer();
         int index = KeyMethods.BinarySearch(ptr + HeaderSize, key, RecordCount, KeyValueSize); // BinarySearch(key);
         if (index < 0)

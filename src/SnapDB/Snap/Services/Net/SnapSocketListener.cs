@@ -58,7 +58,6 @@ public class SnapSocketListener : DisposableLoggingClassBase
     /// </summary>
     /// <param name="settings"></param>
     /// <param name="server"></param>
-    /// <param name="parent"></param>
     public SnapSocketListener(SnapSocketListenerSettings settings, SnapServer server) : base(MessageClass.Framework)
     {
         if (settings is null)

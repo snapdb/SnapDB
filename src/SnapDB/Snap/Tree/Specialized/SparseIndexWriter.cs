@@ -151,7 +151,7 @@ public sealed class SparseIndexWriter<TKey> : TreeStream<TKey, SnapUInt32> where
     /// </remarks>
     /// <paramref name="key">
     /// The key to read./>
-    /// <paramref name="value">The value to read./>
+    /// <paramref name="value">The value to read.<paramref/>
     protected override bool ReadNext(TKey key, SnapUInt32 value)
     {
         if (!m_isReading)

@@ -102,7 +102,7 @@ public partial class ArchiveList<TKey, TValue>
         }
 
         /// <summary>
-        /// Removes the <see cref="archiveId"/> from <see cref="ArchiveList{TKey,TValue}"/> and queues it for disposal.
+        /// Removes the <paramref name="archiveId"/> from <see cref="ArchiveList{TKey,TValue}"/> and queues it for disposal.
         /// </summary>
         /// <param name="archiveId">the archive to remove</param>
         /// <returns>True if the item was removed, False otherwise.</returns>

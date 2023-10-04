@@ -42,14 +42,15 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue> where TKey : SnapTy
     #region [ Static ]
 
     /// <summary>
-    /// Creates a new arhive file with the supplied data.
+    /// Creates a new archive file using the specified parameters and writes data to it.
     /// </summary>
-    /// <param name="pendingFileName"></param>
-    /// <param name="completeFileName"></param>
-    /// <param name="blockSize"></param>
-    /// <param name="treeNodeType"></param>
-    /// <param name="treeStream"></param>
-    /// <param name="flags"></param>
+    /// <param name="pendingFileName">The name of the pending archive file.</param>
+    /// <param name="completeFileName">The name of the complete archive file.</param>
+    /// <param name="blockSize">The size of data blocks in the archive.</param>
+    /// <param name="archiveIdCallback">An optional callback to invoke with the archive ID.</param>
+    /// <param name="treeNodeType">The encoding definition for tree nodes.</param>
+    /// <param name="treeStream">The tree stream containing data to be written to the archive.</param>
+    /// <param name="flags">Optional flags associated with the archive.</param>
     public static void Create(string pendingFileName, string completeFileName, int blockSize, Action<Guid> archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, params Guid[] flags)
     {
         using SimplifiedFileWriter writer = new(pendingFileName, completeFileName, blockSize, flags);
@@ -64,6 +65,16 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue> where TKey : SnapTy
         writer.Commit();
     }
 
+    /// <summary>
+    /// Creates a new archive file for non-sequential data using the specified parameters and writes data to it.
+    /// </summary>
+    /// <param name="pendingFileName">The name of the pending archive file.</param>
+    /// <param name="completeFileName">The name of the complete archive file.</param>
+    /// <param name="blockSize">The size of data blocks in the archive.</param>
+    /// <param name="archiveIdCallback">An optional callback to invoke with the archive ID.</param>
+    /// <param name="treeNodeType">The encoding definition for tree nodes.</param>
+    /// <param name="treeStream">The tree stream containing non-sequential data to be written to the archive.</param>
+    /// <param name="flags">Optional flags associated with the archive.</param>
     public static void CreateNonSequential(string pendingFileName, string completeFileName, int blockSize, Action<Guid> archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, params Guid[] flags)
     {
         SortedPointBuffer<TKey, TValue> queue = new(100000, true);
@@ -111,12 +122,6 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue> where TKey : SnapTy
         return table;
     }
 
-    /// <summary>
-    /// Helper method. Creates the <see cref="SubFileName"/> for the default table.
-    /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <returns></returns>
     private static SubFileName GetFileName()
     {
         Guid keyType = new TKey().GenericTypeGuid;

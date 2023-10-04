@@ -69,7 +69,7 @@ public partial class TimestampSeekFilter
     /// <param name="mainInterval">The smallest interval that is exact.</param>
     /// <param name="subInterval">The interval that will be parsed. Possible to be rounded.</param>
     /// <param name="tolerance">The width of every window.</param>
-    /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing.</returns>
+    /// <returns>A key seek filter base that will be able to do this parsing.</returns>
     /// <remarks>
     /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013.
     /// MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
@@ -87,7 +87,7 @@ public partial class TimestampSeekFilter
     /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
     /// <param name="interval">The exact interval.</param>
     /// <param name="tolerance">The width of every window</param>
-    /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing.</returns>
+    /// <returns>A key seek filter base that will be able to do this parsing.</returns>
     /// <remarks>
     /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013.
     /// MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
@@ -106,7 +106,7 @@ public partial class TimestampSeekFilter
     /// <param name="mainInterval">The smallest interval that is exact.</param>
     /// <param name="subInterval">The interval that will be parsed. Possible to be rounded.</param>
     /// <param name="tolerance">The width of every window.</param>
-    /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing.</returns>
+    /// <returns>A key seek filter base that will be able to do this parsing.</returns>
     /// <remarks>
     /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013.
     /// MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
@@ -124,7 +124,7 @@ public partial class TimestampSeekFilter
     /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
     /// <param name="interval">The exact interval to do the scan.</param>
     /// <param name="tolerance">The width of every window.</param>
-    /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing.</returns>
+    /// <returns>A key seek filter base that will be able to do this parsing.</returns>
     /// <remarks>
     /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013.
     /// Interval = 0.1 seconds.
@@ -136,7 +136,7 @@ public partial class TimestampSeekFilter
     }
 
     /// <summary>
-    /// Loads a <see cref="KeySeekFilterBase{TKey}"/> from the provided <see cref="stream"/>.
+    /// Loads a key seek filter base from the provided <paramref name="stream"/>.
     /// </summary>
     /// <param name="stream">The stream to load the filter from.</param>
     [MethodImpl(MethodImplOptions.NoOptimization)]

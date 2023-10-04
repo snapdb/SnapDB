@@ -177,7 +177,7 @@ public class MemoryPoolStreamCore : IDisposable
     private readonly object m_syncRoot;
 
     /// <summary>
-    /// Releases all the resources used by the <see cref="MemoryFile"/> object.
+    /// Releases all the resources used by the memory file object.
     /// </summary>
     private bool m_disposed;
 
@@ -247,7 +247,7 @@ public class MemoryPoolStreamCore : IDisposable
     /// This function is more user friendly than calling GetBlock().
     /// </summary>
     /// <param name="position">The starting position of the read.</param>
-    /// <param name="pointer">Ann output pointer to <see cref="position"/>.</param>
+    /// <param name="pointer">Ann output pointer to <paramref name="position"/>.</param>
     /// <param name="validLength">The number of bytes that are valid after this position.</param>
     public void ReadBlock(long position, out nint pointer, out int validLength)
     {
@@ -273,6 +273,17 @@ public class MemoryPoolStreamCore : IDisposable
         pointer += seekDistance;
     }
 
+    /// <summary>
+    /// Copies data from the current position of the BinaryStream to a specified memory location.
+    /// </summary>
+    /// <param name="position">The position in the BinaryStream from which to start copying.</param>
+    /// <param name="dest">The destination memory location where data will be copied.</param>
+    /// <param name="length">The number of bytes to copy.</param>
+    /// <remarks>
+    /// This method reads data from the BinaryStream starting at the specified position and copies it
+    /// to the destination memory location pointed to by the <paramref name="dest"/> parameter. If the
+    /// requested length exceeds the valid data available, it copies as much data as possible.
+    /// </remarks>
     public void CopyTo(long position, nint dest, int length)
     {
     TryAgain:
@@ -350,7 +361,7 @@ public class MemoryPoolStreamCore : IDisposable
     }
 
     /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="MemoryFile"/> object and optionally releases the managed resources.
+    /// Releases the unmanaged resources used by the memory file object and optionally releases the managed resources.
     /// </summary>
     /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     private void Dispose(bool disposing)

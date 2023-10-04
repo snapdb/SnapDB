@@ -71,6 +71,10 @@ public abstract class SnapServerDatabaseBase : DisposableLoggingClassBase
     /// <param name="maxFileListing">Maximum file listing.</param>
     public abstract void GetFullStatus(StringBuilder status, int maxFileListing = -1);
 
+    /// <summary>
+    /// Retrieves source details for logging purposes, including database name, key type, and value type.
+    /// </summary>
+    /// <returns>A <see cref="LogStackMessages"/> object containing source details if available; otherwise, an empty object.</returns>
     protected LogStackMessages GetSourceDetails()
     {
         return Info is not null ? LogStackMessages.Empty.Union("Database", $"Database: {Info.DatabaseName} Key: {Info.KeyType.FullName} Value: {Info.ValueType.FullName}") : LogStackMessages.Empty;
@@ -98,8 +102,8 @@ public abstract class SnapServerDatabaseBase : DisposableLoggingClassBase
         return (SnapServerDatabaseBase)reflectionMethod?.Invoke(null, new object[] { databaseConfig });
     }
 
-    //Called through reflection. Its the only way to call a generic function only knowing the Types
-    [MethodImpl(MethodImplOptions.NoOptimization)] //Prevents removing this method as it may appear unused.
+    // Called through reflection. Its the only way to call a generic function only knowing the Types
+    [MethodImpl(MethodImplOptions.NoOptimization)] // Prevents removing this method as it may appear unused.
     private static SnapServerDatabaseBase CreateDatabase<TKey, TValue>(ServerDatabaseSettings databaseConfig) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         return new SnapServerDatabase<TKey, TValue>(databaseConfig);

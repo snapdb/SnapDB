@@ -221,6 +221,10 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
             stream.Write(flag);
     }
 
+    /// <summary>
+    /// Loads the configuration of the archive settings from the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream from which the configuration data will be loaded.</param>
     public override void Load(Stream stream)
     {
         TestForEditable();
@@ -260,6 +264,9 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
         }
     }
 
+    /// <summary>
+    /// Validates the configuration of the archive settings.
+    /// </summary>
     public override void Validate()
     {
         if (WritePath.Count == 0)

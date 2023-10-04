@@ -40,6 +40,11 @@ public class BinaryStreamWrapper : BinaryStreamBase
 
     #region [ Constructors ]
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BinaryStreamWrapper"/> class with the specified <see cref="Stream"/> and ownership information.
+    /// </summary>
+    /// <param name="stream">The underlying <see cref="Stream"/> to be wrapped.</param>
+    /// <param name="ownsStream">Indicates whether this wrapper owns the underlying stream.</param>
     public BinaryStreamWrapper(Stream stream, bool ownsStream)
     {
         m_ownsStream = ownsStream;
@@ -50,12 +55,24 @@ public class BinaryStreamWrapper : BinaryStreamBase
 
     #region [ Properties ]
 
+    /// <summary>
+    /// Gets a value indicating whether the underlying stream supports writing.
+    /// </summary>
     public override bool CanWrite => m_stream.CanWrite;
 
+    /// <summary>
+    /// Gets the length (in bytes) of the underlying stream.
+    /// </summary>
     public override long Length => m_stream.Length;
 
+    /// <summary>
+    /// Gets a value indicating whether the underlying stream supports reading.
+    /// </summary>
     public override bool CanRead => m_stream.CanRead;
 
+    /// <summary>
+    /// Gets a value indicating whether the underlying stream supports seeking.
+    /// </summary>
     public override bool CanSeek => m_stream.CanSeek;
 
     /// <summary>
@@ -74,19 +91,33 @@ public class BinaryStreamWrapper : BinaryStreamBase
 
     #endregion
 
+
     #region [ Methods ]
 
+    /// <summary>
+    /// Writes a byte to the underlying stream.
+    /// </summary>
+    /// <param name="value">The byte to write to the stream.</param>
     public override void Write(byte value)
     {
         m_stream.WriteByte(value);
     }
 
+    /// <summary>
+    /// Writes a block of bytes to the underlying stream.
+    /// </summary>
+    /// <param name="value">The buffer containing the data to write.</param>
+    /// <param name="offset">The zero-based byte offset in the buffer from which to begin writing.</param>
+    /// <param name="count">The maximum number of bytes to write.</param>
     public override void Write(byte[] value, int offset, int count)
     {
         m_stream.Write(value, offset, count);
     }
 
-
+    /// <summary>
+    /// Reads a byte from the underlying stream.
+    /// </summary>
+    /// <returns>The byte read from the stream.</returns>
     public override byte ReadUInt8()
     {
         int value = m_stream.ReadByte();
@@ -96,21 +127,39 @@ public class BinaryStreamWrapper : BinaryStreamBase
         return (byte)value;
     }
 
+    /// <summary>
+    /// Flushes the underlying stream.
+    /// </summary>
     public override void Flush()
     {
         m_stream.Flush();
     }
 
+    /// <summary>
+    /// Sets the length of the underlying stream.
+    /// </summary>
+    /// <param name="value">The desired length of the stream in bytes.</param>
     public override void SetLength(long value)
     {
         m_stream.SetLength(value);
     }
 
+    /// <summary>
+    /// Reads a block of bytes from the underlying stream.
+    /// </summary>
+    /// <param name="value">The buffer where the read data will be stored.</param>
+    /// <param name="offset">The zero-based byte offset in the buffer from which to begin writing the read data.</param>
+    /// <param name="count">The maximum number of bytes to read.</param>
+    /// <returns>The total number of bytes read into the buffer.</returns>
     public override int Read(byte[] value, int offset, int count)
     {
         return m_stream.Read(value, offset, count);
     }
 
+    /// <summary>
+    /// Releases and cleans up resources associated with the object.
+    /// </summary>
+    /// <param name="disposing">Indicates whether the method is called from an explicit disposal or during finalization.</param>
     protected override void Dispose(bool disposing)
     {
         if (disposing && m_ownsStream)

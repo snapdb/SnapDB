@@ -67,6 +67,7 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
     {
         if (settings is null)
             throw new ArgumentNullException(nameof(settings));
+
         m_settings = settings.CloneReadonly();
         m_settings.Validate();
         m_createNextStageFile = new SimplifiedArchiveInitializer<TKey, TValue>(m_settings.FinalSettings);

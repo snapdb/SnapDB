@@ -29,10 +29,28 @@ namespace SnapDB.IO.FileStructure;
 /// <summary>
 /// Defines a set of attribute flags associated with file header.
 /// </summary>
+/// <summary>
+/// Represents attributes that can be stored in the file header block.
+/// </summary>
 public enum FileHeaderAttributes : short
 {
+    /// <summary>
+    /// Indicates the end of file header attributes.
+    /// </summary>
     EndOfAttributes = 0,
+
+    /// <summary>
+    /// Represents user-defined attributes stored in the file header.
+    /// </summary>
     UserAttributes = 1,
+
+    /// <summary>
+    /// Represents file flags stored in the file header.
+    /// </summary>
     FileFlags = 2,
+
+    /// <summary>
+    /// Represents the version of Historian metadata stored in the file header.
+    /// </summary>
     HistorianMetaDataVersion = 3
 }

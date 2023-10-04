@@ -86,7 +86,7 @@ public class UltraStreamWriter
     }
 
     /// <summary>
-    /// Writes a <see cref="NewLine"/> to the stream.
+    /// Writes a new line to the stream.
     /// </summary>
     public void WriteLine()
     {

@@ -177,12 +177,11 @@ internal sealed class DiskIo : IDisposable
     }
 
     /// <summary>
-    /// Does a safe copy of data from one location to another.
-    /// A safe copy allows for the source and destination to overlap.
+    /// Commits changes made to the file represented by this object with the specified file header block.
     /// </summary>
-    /// <param name="src">A pointer to the source data to be copied.</param>
-    /// <param name="dest">A pointer to the destination where the data will be copied.</param>
-    /// <param name="count">The number of bytes to copy from the source to the destination.</param>
+    /// <param name="header">The file header block containing changes to be committed.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the object has been disposed.</exception>
+    /// <exception cref="ReadOnlyException">Thrown if the object is in read-only mode.</exception>
     public void CommitChanges(FileHeaderBlock header)
     {
         if (IsDisposed)

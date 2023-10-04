@@ -45,11 +45,12 @@ public partial class SortedTreeTable<TKey, TValue> : IDisposable where TKey : Sn
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates a SortedTreeTable
+    /// Initializes a new instance of the <see cref="SortedTreeTable{TKey, TValue}"/> class
+    /// with the specified file structure, file name, and base file.
     /// </summary>
-    /// <param name="fileStructure"></param>
-    /// <param name="fileName"></param>
-    /// <param name="baseFile"></param>
+    /// <param name="fileStructure">The transactional file structure associated with the table.</param>
+    /// <param name="fileName">The subfile name of the table.</param>
+    /// <param name="baseFile">The base file associated with the table.</param>
     internal SortedTreeTable(TransactionalFileStructure fileStructure, SubFileName fileName, SortedTreeFile baseFile)
     {
         BaseFile = baseFile;
@@ -85,7 +86,9 @@ public partial class SortedTreeTable<TKey, TValue> : IDisposable where TKey : Sn
     /// </summary>
     public TKey LastKey { get; }
 
-
+    /// <summary>
+    /// Gets the unique identifier (ID) of the archive associated with this table.
+    /// </summary>
     public Guid ArchiveId => BaseFile.Snapshot.Header.ArchiveId;
 
     #endregion

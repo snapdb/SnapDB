@@ -30,16 +30,28 @@ using SnapDB.Snap.Definitions;
 
 namespace SnapDB.Snap.Filters;
 
+/// <summary>
+/// Defines a seek filter for timestamps used in the archive system.
+/// </summary>
 public class TimestampSeekFilterDefinition : SeekFilterDefinitionBase
 {
     #region [ Properties ]
 
+    /// <summary>
+    /// Gets the unique identifier (ID) representing the filter type.
+    /// </summary>
     public override Guid FilterType => FilterGuid;
 
     #endregion
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Overrides the creation of a seek filter instance based on the given BinaryStreamBase.
+    /// </summary>
+    /// <typeparam name="TKey">The type parameter specifying the key type for the seek filter.</typeparam>
+    /// <param name="stream">The BinaryStreamBase from which to create the seek filter.</param>
+    /// <returns>A seek filter instance of type SeekFilterBase&lt;TKey&gt; created from the BinaryStreamBase.</returns>
     public override SeekFilterBase<TKey> Create<TKey>(BinaryStreamBase stream)
     {
         MethodInfo method = typeof(TimestampSeekFilter).GetMethod("CreateFromStream", BindingFlags.NonPublic | BindingFlags.Static);
@@ -53,6 +65,9 @@ public class TimestampSeekFilterDefinition : SeekFilterDefinitionBase
     #region [ Static ]
 
     // {0F0F9478-DC42-4EEF-9F26-231A942EF1FA}
+    /// <summary>
+    /// Represents a static Guid used as a filter identifier.
+    /// </summary>
     public static Guid FilterGuid = new(0x0f0f9478, 0xdc42, 0x4eef, 0x9f, 0x26, 0x23, 0x1a, 0x94, 0x2e, 0xf1, 0xfa);
 
     #endregion

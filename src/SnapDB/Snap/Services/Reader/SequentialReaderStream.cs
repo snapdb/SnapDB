@@ -425,10 +425,13 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
     {
         if (!item1.CacheIsValid && !item2.CacheIsValid)
             return false;
+
         if (!item1.CacheIsValid)
             return false;
+
         if (!item2.CacheIsValid)
             return true;
+
         return item1.CacheKey.IsLessThan(item2.CacheKey); // item1.CurrentKey.CompareTo(item2.CurrentKey);
     }
 

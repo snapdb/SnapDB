@@ -32,10 +32,6 @@ namespace SnapDB.Snap.Filters;
 public partial class PointIdMatchFilter
 {
     #region [ Members ]
-
-    /// <summary>
-    /// A filter that uses a <see cref="BitArray"/> to set <c>true</c> and <c>false</c> values.
-    /// </summary>
     private class ULongHashSet<TKey, TValue> : MatchFilterBase<TKey, TValue> where TKey : TimestampPointIdBase<TKey>, new()
     {
         #region [ Members ]
@@ -48,7 +44,7 @@ public partial class PointIdMatchFilter
         #region [ Constructors ]
 
         /// <summary>
-        /// Creates a new filter backed by a <see cref="BitArray"/>.
+        /// Creates a new filter backed by a bit array.
         /// </summary>
         /// <param name="stream">The stream to load from.</param>
         /// <param name="pointCount">The number of points in the stream.</param>
@@ -66,7 +62,7 @@ public partial class PointIdMatchFilter
         }
 
         /// <summary>
-        /// Creates a bit array filter from <see cref="points"/>.
+        /// Creates a bit array filter from <paramref name="points"/>.
         /// </summary>
         /// <param name="points">The points to use.</param>
         /// <param name="maxValue">The maximum value stored in the bit array. Cannot be larger than <c>int.MaxValue-1</c>.</param>

@@ -26,6 +26,12 @@
 
 namespace SnapDB.IO.Unmanaged;
 
+/// <summary>
+/// Provides a binary stream for reading and writing data.
+/// </summary>
+/// <remarks>
+/// This class allows reading and writing binary data and is designed for use with little-endian processors.
+/// </remarks>
 public unsafe class BinaryStream : BinaryStreamPointerBase
 {
     #region [ Members ]
@@ -79,7 +85,7 @@ public unsafe class BinaryStream : BinaryStreamPointerBase
     /// </summary>
     /// <param name="stream">The base stream to use.</param>
     /// <param name="leaveOpen">
-    /// Determines if the underlying stream will automatically be disposed of when this class has it's dispose method called.
+    /// Determines if the underlying stream will automatically be disposed of when this class has its dispose method called.
     /// </param>
     public BinaryStream(ISupportsBinaryStream stream, bool leaveOpen = true)
     {
@@ -97,7 +103,14 @@ public unsafe class BinaryStream : BinaryStreamPointerBase
 
         m_mainIoSession = stream.CreateIoSession();
     }
-
+    /// <summary>
+    /// Finalizes an instance of the BinaryStream class.
+    /// </summary>
+    /// <remarks>
+    /// The destructor is responsible for cleaning up resources associated with the BinaryStream instance
+    /// when the instance is garbage-collected. It calls the Dispose method to release resources and
+    /// suppresses the finalization of this object to prevent it from being finalized again.
+    /// </remarks>
     ~BinaryStream()
     {
         Dispose(false);
@@ -108,6 +121,14 @@ public unsafe class BinaryStream : BinaryStreamPointerBase
 
     #region [ Properties ]
 
+    /// <summary>
+    /// Gets the underlying stream associated with the BinaryStream instance.
+    /// </summary>
+    /// <remarks>
+    /// The BaseStream property provides access to the stream that this BinaryStream instance operates on.
+    /// It can be used for reading data from and writing data to the underlying stream.
+    /// </remarks>
+    /// <value>The underlying stream.</value>
     public ISupportsBinaryStream? BaseStream { get; private set; }
 
     #endregion
@@ -136,7 +157,7 @@ public unsafe class BinaryStream : BinaryStreamPointerBase
     /// <param name="isWriting">hints to the stream if write access is desired.</param>
     public override void UpdateLocalBuffer(bool isWriting)
     {
-        //If the block block is already looked up, skip this step.
+        // If the block block is already looked up, skip this step.
         if ((isWriting && LastWrite - Current > 0) || (!isWriting && LastRead - Current > 0))
             return;
 

@@ -163,6 +163,10 @@ public class CombineFilesSettings : SettingsBase<CombineFilesSettings>
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Saves the configuration of the archive writer to the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream where the configuration data will be saved.</param>
     public override void Save(Stream stream)
     {
         stream.Write((byte)1);
@@ -174,6 +178,10 @@ public class CombineFilesSettings : SettingsBase<CombineFilesSettings>
         m_archiveSettings.Save(stream);
     }
 
+    /// <summary>
+    /// Loads the configuration of the archive writer from the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream from which the configuration data will be loaded.</param>
     public override void Load(Stream stream)
     {
         TestForEditable();
@@ -193,6 +201,9 @@ public class CombineFilesSettings : SettingsBase<CombineFilesSettings>
         }
     }
 
+    /// <summary>
+    /// Validates the configuration of the archive writer.
+    /// </summary>
     public override void Validate()
     {
         m_archiveSettings.Validate();

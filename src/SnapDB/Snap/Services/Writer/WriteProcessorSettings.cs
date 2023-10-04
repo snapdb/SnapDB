@@ -96,6 +96,10 @@ public class WriteProcessorSettings : SettingsBase<WriteProcessorSettings>
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Saves the configuration of the file combine settings to the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream where the configuration data will be saved.</param>
     public override void Save(Stream stream)
     {
         stream.Write((byte)1);
@@ -108,6 +112,10 @@ public class WriteProcessorSettings : SettingsBase<WriteProcessorSettings>
             stage.Save(stream);
     }
 
+    /// <summary>
+    /// Loads the configuration of the file combine settings from the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream from which the configuration data will be loaded.</param>
     public override void Load(Stream stream)
     {
         TestForEditable();
@@ -137,6 +145,9 @@ public class WriteProcessorSettings : SettingsBase<WriteProcessorSettings>
         }
     }
 
+    /// <summary>
+    /// Validates the configuration of the file combine settings.
+    /// </summary>
     public override void Validate()
     {
         if (IsEnabled)

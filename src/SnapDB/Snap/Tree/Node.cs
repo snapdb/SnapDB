@@ -36,32 +36,129 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
 {
     #region [ Members ]
 
+    /// <summary>
+    /// The size in bytes of an index value within the node's header.
+    /// </summary>    
     protected const int IndexSize = sizeof(uint);
+
+    /// <summary>
+    /// Offset within a node's header where the left sibling node's index is stored.
+    /// </summary>
     protected const int OffsetOfLeftSibling = OffsetOfValidBytes + sizeof(ushort);
+
+    /// <summary>
+    /// Offset within a node's header where the lower bounds of the node are stored.
+    /// </summary>
     protected const int OffsetOfLowerBounds = OffsetOfRightSibling + IndexSize;
+
+    /// <summary>
+    /// Offset within a node's header where the level of the node is stored.
+    /// </summary>
     protected const int OffsetOfNodeLevel = OffsetOfVersion + sizeof(byte);
+
+    /// <summary>
+    /// Offset within a node's header where the record count is stored.
+    /// </summary>
     protected const int OffsetOfRecordCount = OffsetOfNodeLevel + sizeof(byte);
+
+    /// <summary>
+    /// Offset within a node's header where the right sibling node's index is stored.
+    /// </summary>
     protected const int OffsetOfRightSibling = OffsetOfLeftSibling + IndexSize;
+
+    /// <summary>
+    /// Offset within a node's header where the number of valid bytes is stored.
+    /// </summary>
     protected const int OffsetOfValidBytes = OffsetOfRecordCount + sizeof(ushort);
 
+    /// <summary>
+    /// Offset within a node's header where the version information is stored.
+    /// </summary>
     protected const int OffsetOfVersion = 0;
 
+    /// <summary>
+    /// Version constant representing the current version of the object.
+    /// </summary>
     private const byte Version = 0;
+
+    /// <summary>
+    /// Block size of the node.
+    /// </summary>
     protected int BlockSize;
+
+    /// <summary>
+    /// Custom methods for handling keys of type TKey.
+    /// </summary>
     protected SnapTypeCustomMethods<TKey> KeyMethods;
+
+    /// <summary>
+    /// Size of a key in bytes.
+    /// </summary>
     protected int KeySize;
+
+    /// <summary>
+    /// Level of the node within the tree hierarchy.
+    /// </summary>
     protected byte Level;
+
+    /// <summary>
+    /// Binary stream pointer used for reading and writing data.
+    /// </summary>
     protected BinaryStreamPointerBase Stream;
+
+    /// <summary>
+    /// Flag indicating whether the object has been initialized.
+    /// </summary>
     private bool m_initialized;
+
+    /// <summary>
+    /// Index of the left sibling node.
+    /// </summary>
     private uint m_leftSiblingNodeIndex;
+
+    /// <summary>
+    /// The lower key bound for the node.
+    /// </summary>
     private TKey m_lowerKey;
+
+    /// <summary>
+    /// Pointer to the start of the node's data.
+    /// </summary>
     private byte* m_pointer;
+
+    /// <summary>
+    /// Pointer to the position immediately after the node's header.
+    /// </summary>
     private byte* m_pointerAfterHeader;
+
+    /// <summary>
+    /// Version number for reading from the pointer.
+    /// </summary>
     private long m_pointerReadVersion;
+
+    /// <summary>
+    /// Version number for writing to the pointer.
+    /// </summary>
     private long m_pointerWriteVersion;
+
+    /// <summary>
+    /// Number of records in the node.
+    /// </summary>
     private ushort m_recordCount;
+
+    /// <summary>
+    /// Index of the right sibling node.
+    /// </summary>
     private uint m_rightSiblingNodeIndex;
+
+    /// <summary>
+    /// The upper key bound for the node.
+    /// </summary>
     private TKey m_upperKey;
+
+    /// <summary>
+    /// Number of valid bytes in the node.
+    /// </summary>
     private ushort m_validBytes;
 
     #endregion
@@ -69,9 +166,9 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     #region [ Constructors ]
 
     /// <summary>
-    /// The constructor that is used for inheriting. Must call Initialize before using it.
+    /// Initializes a new instance of the <see cref="Node{TKey}"/> class with the specified level.
     /// </summary>
-    /// <param name="level"></param>
+    /// <param name="level">The level of the node within the tree hierarchy.</param>
     protected Node(byte level)
     {
         Level = level;
@@ -80,12 +177,11 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     }
 
     /// <summary>
-    /// The constructor that is to be used to if not inheriting this object.
-    /// Automatically initializes the node.
+    /// Initializes a new instance of the <see cref="Node{TKey}"/> class by reading node data from the specified <paramref name="stream"/>.
     /// </summary>
-    /// <param name="stream"></param>
-    /// <param name="blockSize"></param>
-    /// <param name="level"></param>
+    /// <param name="stream">The binary stream containing node data.</param>
+    /// <param name="blockSize">The size of the node's block within the stream.</param>
+    /// <param name="level">The level of the node within the tree hierarchy.</param>
     public Node(BinaryStreamPointerBase stream, int blockSize, byte level) : this(level)
     {
         InitializeNode(stream, blockSize);
@@ -96,7 +192,7 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the byte offset of the upper bouds key
+    /// Gets the byte offset of the upper bounds key.
     /// </summary>
     private int OffsetOfUpperBounds => OffsetOfLowerBounds + KeySize;
 
@@ -111,7 +207,7 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     public uint NodeIndex { get; private set; }
 
     /// <summary>
-    /// Gets/Sets the number of records in this node.
+    /// Gets or sets the number of records in this node.
     /// </summary>
     public ushort RecordCount
     {
@@ -124,7 +220,7 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     }
 
     /// <summary>
-    /// Gets/Sets the number of unused bytes in the node.
+    /// Gets or sets the number of unused bytes in the node.
     /// </summary>
     protected ushort RemainingBytes => (ushort)(BlockSize - m_validBytes);
 
@@ -226,7 +322,7 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     public void Clear()
     {
         NodeIndexChanged?.Invoke(this, EventArgs.Empty);
-        //InsideNodeBoundary = m_BoundsFalse;
+        // InsideNodeBoundary = m_BoundsFalse;
         NodeIndex = uint.MaxValue;
         m_pointerReadVersion = -1;
         m_pointerWriteVersion = -1;
@@ -239,14 +335,15 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     }
 
     /// <summary>
-    /// Sets the node data to the following node index.
-    /// The node must be initialized before calling this method.
+    /// Sets the node index to the specified value, updating the node's internal state.
     /// </summary>
-    /// <param name="nodeIndex"></param>
+    /// <param name="nodeIndex">The new node index to set.</param>
+    /// <exception cref="Exception">Thrown when an invalid node index is provided or when the node is not supposed to access the underlying node level.</exception>
     public void SetNodeIndex(uint nodeIndex)
     {
         if (nodeIndex == uint.MaxValue)
             throw new Exception("Invalid Node Index");
+
         if (NodeIndex != nodeIndex)
         {
             NodeIndexChanged?.Invoke(this, EventArgs.Empty);
@@ -266,9 +363,9 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     }
 
     /// <summary>
-    /// Creates an empty node on the provided key. Only use this to create the initial node of the tree. Not necessary for any other calls.
+    /// Creates an empty node with the specified node index.
     /// </summary>
-    /// <param name="newNodeIndex"></param>
+    /// <param name="newNodeIndex">The index of the new node to create.</param>
     public void CreateEmptyNode(uint newNodeIndex)
     {
         TKey key = new();
@@ -287,10 +384,12 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     }
 
     /// <summary>
-    /// Determines if the <see cref="key"/> resides within the bounds of the current node.
+    /// Checks if the specified key falls within the bounds of this node.
     /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
+    /// <param name="key">The key to check.</param>
+    /// <returns>
+    ///   <c>true</c> if the key is within the node's bounds; otherwise, <c>false</c>.
+    /// </returns>
     public bool IsKeyInsideBounds(TKey key)
     {
         return NodeIndex != uint.MaxValue && (LeftSiblingNodeIndex == uint.MaxValue || LowerKey.IsLessThanOrEqualTo(key)) && (RightSiblingNodeIndex == uint.MaxValue || key.IsLessThan(UpperKey));
@@ -313,13 +412,14 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     }
 
     /// <summary>
-    /// Gets the pointer after the header.
+    /// Gets a read pointer positioned immediately after the node header.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A pointer to the location after the node header in the data stream.</returns>
     public byte* GetReadPointerAfterHeader()
     {
         if (Stream.PointerVersion != m_pointerReadVersion)
             UpdateReadPointer();
+
         return m_pointerAfterHeader;
     }
 
@@ -329,16 +429,17 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     protected event EventHandler NodeIndexChanged;
 
     /// <summary>
-    /// Initializes the node. To be called once
+    /// Initializes the node with the given binary stream and block size.
     /// </summary>
-    /// <param name="stream"></param>
-    /// <param name="blockSize"></param>
+    /// <param name="stream">The binary stream containing the node data.</param>
+    /// <param name="blockSize">The size of the node's data block.</param>
+    /// <exception cref="Exception">Thrown if the method is called multiple times (duplicate initialization).</exception>
     protected void InitializeNode(BinaryStreamPointerBase stream, int blockSize)
     {
         if (m_initialized)
             throw new Exception("Duplicate calls to initialize");
-        m_initialized = true;
 
+        m_initialized = true;
         Stream = stream;
         BlockSize = blockSize;
         m_lowerKey = new TKey();
@@ -349,7 +450,7 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     /// <summary>
     /// Modifies both the <see cref="RecordCount"/> and <see cref="ValidBytes"/> in one function call.
     /// </summary>
-    /// <param name="additionalValidBytes">the number of bytes to increase <see cref="ValidBytes"/> by</param>
+    /// <param name="additionalValidBytes">The number of bytes to increase <see cref="ValidBytes"/> by.</param>
     protected void IncrementOneRecord(int additionalValidBytes)
     {
         ushort* ptr = (ushort*)(GetWritePointer() + OffsetOfRecordCount);
@@ -359,6 +460,11 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
         ptr[1] += (ushort)additionalValidBytes;
     }
 
+    /// <summary>
+    /// Increments the record counts and valid bytes of the node by the specified amounts.
+    /// </summary>
+    /// <param name="recordCount">The number of records to add to the node's record count.</param>
+    /// <param name="additionalValidBytes">The number of additional valid bytes to add to the node's valid bytes count.</param>
     protected void IncrementRecordCounts(int recordCount, int additionalValidBytes)
     {
         ushort* ptr = (ushort*)(GetWritePointer() + OffsetOfRecordCount);
@@ -371,13 +477,13 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     /// <summary>
     /// Creates a new node with the provided data.
     /// </summary>
-    /// <param name="nodeIndex"></param>
-    /// <param name="recordCount"></param>
-    /// <param name="validBytes"></param>
-    /// <param name="leftSibling"></param>
-    /// <param name="rightSibling"></param>
-    /// <param name="lowerKey"></param>
-    /// <param name="upperKey"></param>
+    /// <param name="nodeIndex">The index of the new node.</param>
+    /// <param name="recordCount">The record count for the new node.</param>
+    /// <param name="validBytes">The valid bytes count for the new node.</param>
+    /// <param name="leftSibling">The index of the left sibling node.</param>
+    /// <param name="rightSibling">The index of the right sibling node.</param>
+    /// <param name="lowerKey">The lower key for the new node.</param>
+    /// <param name="upperKey">The upper key for the new node.</param>
     protected void CreateNewNode(uint nodeIndex, ushort recordCount, ushort validBytes, uint leftSibling, uint rightSibling, TKey lowerKey, TKey upperKey)
     {
         byte* ptr = Stream.GetWritePointer(nodeIndex * BlockSize, BlockSize);
@@ -392,12 +498,11 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     }
 
     /// <summary>
-    /// This function is a special purpose function to set the right sibling of an internal node.
-    /// It is used by Split
+    /// Sets the left sibling property of a node with the specified index to a new value.
     /// </summary>
-    /// <param name="oldValue"></param>
-    /// <param name="newValue"></param>
-    /// <param name="nodeIndex"></param>
+    /// <param name="nodeIndex">The index of the node whose left sibling property is being set.</param>
+    /// <param name="oldValue">The expected old value of the left sibling property.</param>
+    /// <param name="newValue">The new value to set for the left sibling property.</param>
     protected void SetLeftSiblingProperty(uint nodeIndex, uint oldValue, uint newValue)
     {
         byte* ptr = Stream.GetWritePointer(BlockSize * nodeIndex, BlockSize);
@@ -413,48 +518,52 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     }
 
     /// <summary>
-    /// Gets the number of valid bytes of the foreign <see cref="nodeIndex"/> without seeking this current node to it.
+    /// Retrieves the valid bytes count from the specified node's header.
     /// </summary>
-    /// <param name="nodeIndex">the node to use</param>
-    /// <returns></returns>
+    /// <param name="nodeIndex">The index of the node from which to retrieve valid bytes.</param>
+    /// <returns>The count of valid bytes stored in the specified node's header.</returns>
     protected int GetValidBytes(uint nodeIndex)
     {
         byte* ptr = Stream.GetReadPointer(BlockSize * nodeIndex, BlockSize);
         if (ptr[OffsetOfNodeLevel] != Level)
             throw new Exception("This node is not supposed to access the underlying node level.");
+
         return *(ushort*)(ptr + OffsetOfValidBytes);
     }
 
     /// <summary>
-    /// Gets a read compatible pointer of the current node.
+    /// Retrieves a read pointer to the current node's data.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A pointer to the current node's data for reading.</returns>
     protected byte* GetReadPointer()
     {
         if (Stream.PointerVersion != m_pointerReadVersion)
             UpdateReadPointer();
+
         return m_pointer;
     }
 
     /// <summary>
-    /// Gets a write compatible pointer for the current node.
+    /// Retrieves a write pointer to the current node's data.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A pointer to the current node's data for writing.</returns>
     protected byte* GetWritePointer()
     {
         if (Stream.PointerVersion != m_pointerWriteVersion)
             UpdateWritePointer();
+
         return m_pointer;
     }
 
     /// <summary>
-    /// Gets the pointer after the header.
+    /// Retrieves a write pointer to the data area after the node's header.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A pointer to the data area after the node's header for writing.</returns>
     protected byte* GetWritePointerAfterHeader()
     {
         if (Stream.PointerVersion != m_pointerWriteVersion)
             UpdateWritePointer();
+
         return m_pointerAfterHeader;
     }
 

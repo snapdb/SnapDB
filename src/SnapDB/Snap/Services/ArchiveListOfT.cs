@@ -274,7 +274,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     }
 
     /// <summary>
-    /// Creates an object that can be used to get updated snapshots from this <see cref="ArchiveListOfT{TKey,TValue}"/>.
+    /// Creates an object that can be used to get updated snapshots from this archive list.
     /// Client must call <see cref="IDisposable.Dispose"/> method when finished with these resources as they will not
     /// automatically be reclaimed by the garbage collector. Class will not be initiallized until calling <see cref="ArchiveListSnapshot{TKey,TValue}.UpdateSnapshot"/>.
     /// </summary>
@@ -296,7 +296,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     }
 
     /// <summary>
-    /// Necessary to provide shadow method of <see cref="ArchiveListOfT.AcquireEditLock"/>
+    /// Necessary to provide shadow method of archive list.
     /// </summary>
     /// <returns></returns>
     protected override ArchiveListEditor InternalAcquireEditLock()
@@ -311,7 +311,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     //}
 
     /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="LogSourceBase"/> object and optionally releases the managed resources.
+    /// Releases the unmanaged resources used by the log source base object and optionally releases the managed resources.
     /// </summary>
     /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
     protected override void Dispose(bool disposing)
