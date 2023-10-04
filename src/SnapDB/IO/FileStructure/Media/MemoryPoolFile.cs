@@ -31,8 +31,7 @@ namespace SnapDB.IO.FileStructure.Media;
 /// <summary>
 /// Provides a in memory stream that uses pages that are pooled in the unmanaged buffer pool.
 /// </summary>
-internal partial class MemoryPoolFile
-    : MemoryPoolStreamCore, IDiskMediumCoreFunctions
+internal partial class MemoryPoolFile : MemoryPoolStreamCore, IDiskMediumCoreFunctions
 {
     #region [ Members ]
 
@@ -48,12 +47,17 @@ internal partial class MemoryPoolFile
     /// <summary>
     /// Create a new <see cref="MemoryPoolFile"/>.
     /// </summary>
-    public MemoryPoolFile(MemoryPool pool)
-        : base(pool)
+    public MemoryPoolFile(MemoryPool pool) : base(pool)
     {
         m_ioSession = new IoSession(this);
         m_isReadOnly = false;
     }
+
+    #endregion
+
+    #region [ Properties ]
+
+    public string FileName => string.Empty;
 
     #endregion
 
@@ -78,8 +82,6 @@ internal partial class MemoryPoolFile
 
         return m_ioSession;
     }
-
-    public string FileName => string.Empty;
 
     /// <summary>
     /// Commits changes made to the <see cref="MemoryStream"/> to a <see cref="FileHeaderBlock"/>.
@@ -106,8 +108,8 @@ internal partial class MemoryPoolFile
     /// Thrown if the <see cref="MemoryStream"/> has been disposed and cannot perform a rollback.
     /// </exception>
     /// <remarks>
-    /// This method rolls back any changes made to the current <see cref="MemoryStream"/>. If the <see cref="MemoryStream"/> 
-    /// has been disposed (IsDisposed is <c>true</c>), it throws an <see cref="ObjectDisposedException"/> indicating that the 
+    /// This method rolls back any changes made to the current <see cref="MemoryStream"/>. If the <see cref="MemoryStream"/>
+    /// has been disposed (IsDisposed is <c>true</c>), it throws an <see cref="ObjectDisposedException"/> indicating that the
     /// stream has been disposed and cannot perform a rollback.
     /// </remarks>
     public void RollbackChanges()

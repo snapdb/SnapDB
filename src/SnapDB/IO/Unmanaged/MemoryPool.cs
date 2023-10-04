@@ -28,15 +28,14 @@ using System.Diagnostics;
 using System.Text;
 using Gemstone;
 using Gemstone.Diagnostics;
-using Gemstone.Threading;
 using SnapDB.Threading;
 
 namespace SnapDB.IO.Unmanaged;
 
 /// <summary>
 /// Determines the desired buffer pool utilization level.
-/// Setting to Low will cause collection cycles to occur more often to keep the 
-/// utilization level to low. 
+/// Setting to Low will cause collection cycles to occur more often to keep the
+/// utilization level to low.
 /// </summary>
 public enum TargetUtilizationLevels
 {
@@ -44,10 +43,12 @@ public enum TargetUtilizationLevels
     /// Collections won't occur until over 25% of the memory is consumed.
     /// </summary>
     Low = 0,
+
     /// <summary>
     /// Collections won't occur until over 50% of the memory is consumed.
     /// </summary>
     Medium = 1,
+
     /// <summary>
     /// Collections won't occur until over 75% of the memory is consumed.
     /// </summary>
@@ -63,11 +64,8 @@ public enum TargetUtilizationLevels
 /// when registering to event <see cref="RequestCollection"/> and
 /// when calling <see cref="AllocatePage"/>.
 /// </remarks>
-public class MemoryPool
-    : IDisposable
+public class MemoryPool : IDisposable
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(MemoryPool), MessageClass.Component);
-
     #region [ Members ]
 
     /// <summary>
@@ -81,43 +79,6 @@ public class MemoryPool
     public const long MinimumTestedSupportedMemoryFloor = 10 * 1024 * 1024;
 
     /// <summary>
-    /// Delegates are placed in a List because
-    /// in a later version, some sort of concurrent garbage collection may be implemented
-    /// which means more control will need to be with the Event.
-    /// </summary>
-    private readonly ThreadSafeList<WeakEventHandler<CollectionEventArgs>> m_requestCollectionEvent;
-    private long m_levelNone;
-    private long m_levelLow;
-    private long m_levelNormal;
-    private long m_levelHigh;
-    private long m_levelVeryHigh;
-
-    private volatile int m_releasePageVersion;
-
-    /// <summary>
-    /// Used for synchronizing modifications to this class.
-    /// </summary>
-    private readonly object m_syncRoot;
-
-    /// <summary>
-    /// All allocates are synchronized seperately since an allocation can request a collection. 
-    /// This will create a queuing nature of the allocations.
-    /// </summary>
-    private readonly object m_syncAllocate;
-
-    private readonly MemoryPoolPageList m_pageList;
-
-    /// <summary>
-    /// Gets the current <see cref="TargetUtilizationLevels"/>.
-    /// </summary>
-    public TargetUtilizationLevels TargetUtilizationLevel { get; private set; }
-
-    /// <summary>
-    /// Each page will be exactly this size (based on RAM).
-    /// </summary>
-    public readonly int PageSize;
-
-    /// <summary>
     /// Provides a mask that the user can apply that can be used to get the offset position of a page.
     /// </summary>
     public readonly int PageMask;
@@ -129,29 +90,34 @@ public class MemoryPool
     public readonly int PageShiftBits;
 
     /// <summary>
-    /// Requests that classes using this <see cref="MemoryPool"/> release any unused buffers.
-    /// Failing to do so may result in an <see cref="OutOfMemoryException"/> to occur.
+    /// Each page will be exactly this size (based on RAM).
     /// </summary>
-    /// <remarks>
-    /// IMPORTANT NOTICE: Do not call <see cref="AllocatePage"/> via the thread
-    /// that raises this event. Also, be careful about entering a lock via this thread
-    /// because a potential deadlock might occur. 
-    /// Also, Do not remove a handler from within a lock context as the remove
-    /// blocks until all events have been called. A potential for another deadlock.
-    /// </remarks>
-    public event EventHandler<CollectionEventArgs> RequestCollection
-    {
-        add
-        {
-            m_requestCollectionEvent.Add(new WeakEventHandler<CollectionEventArgs>(value));
-            RemoveDeadEvents();
-        }
-        remove
-        {
-            m_requestCollectionEvent.RemoveAndWait(new WeakEventHandler<CollectionEventArgs>(value));
-            RemoveDeadEvents();
-        }
-    }
+    public readonly int PageSize;
+
+    private long m_levelHigh;
+    private long m_levelLow;
+
+    private long m_levelNone;
+    private long m_levelNormal;
+    private long m_levelVeryHigh;
+
+    private readonly MemoryPoolPageList m_pageList;
+
+    private volatile int m_releasePageVersion;
+
+    /// <summary>
+    /// Delegates are placed in a List because
+    /// in a later version, some sort of concurrent garbage collection may be implemented
+    /// which means more control will need to be with the Event.
+    /// </summary>
+    private readonly ThreadSafeList<WeakEventHandler<CollectionEventArgs>> m_requestCollectionEvent;
+
+    // All allocates are synchronized separately since an allocation can request a collection. 
+    // This will create a queuing nature of the allocations.
+    private readonly object m_syncAllocate;
+
+    // Used for synchronizing modifications to this class.
+    private readonly object m_syncRoot;
 
     #endregion
 
@@ -179,6 +145,7 @@ public class MemoryPool
 
         m_pageList = new MemoryPoolPageList(PageSize, maximumBufferSize);
         m_requestCollectionEvent = new ThreadSafeList<WeakEventHandler<CollectionEventArgs>>();
+
         SetTargetUtilizationLevel(utilizationLevel);
     }
 
@@ -192,6 +159,11 @@ public class MemoryPool
     #endregion
 
     #region [ Properties ]
+
+    /// <summary>
+    /// Gets the current <see cref="TargetUtilizationLevels"/>.
+    /// </summary>
+    public TargetUtilizationLevels TargetUtilizationLevel { get; private set; }
 
     /// <summary>
     /// Returns the number of bytes currently allocated by the buffer pool to other objects.
@@ -211,7 +183,7 @@ public class MemoryPool
     public long CurrentAllocatedSize => m_pageList.CurrentAllocatedSize;
 
     /// <summary>
-    /// Gets the number of bytes that have been allocated to this buffer pool 
+    /// Gets the number of bytes that have been allocated to this buffer pool
     /// by the OS.
     /// </summary>
     public long CurrentCapacity => m_pageList.CurrentCapacity;
@@ -226,20 +198,68 @@ public class MemoryPool
     #region [ Methods ]
 
     /// <summary>
+    /// Releases all the resources used by the <see cref="MemoryPool"/> object.
+    /// </summary>
+    public void Dispose()
+    {
+        lock (m_syncRoot)
+        {
+            if (IsDisposed)
+                return;
+
+            try
+            {
+                m_pageList.Dispose();
+            }
+            finally
+            {
+                IsDisposed = true; // Prevent duplicate dispose.
+            }
+        }
+    }
+
+    /// <summary>
+    /// Requests that classes using this <see cref="MemoryPool"/> release any unused buffers.
+    /// Failing to do so may result in an <see cref="OutOfMemoryException"/> to occur.
+    /// </summary>
+    /// <remarks>
+    /// IMPORTANT NOTICE: Do not call <see cref="AllocatePage"/> via the thread
+    /// that raises this event. Also, be careful about entering a lock via this thread
+    /// because a potential deadlock might occur.
+    /// Also, Do not remove a handler from within a lock context as the remove
+    /// blocks until all events have been called. A potential for another deadlock.
+    /// </remarks>
+    public event EventHandler<CollectionEventArgs> RequestCollection
+    {
+        add
+        {
+            m_requestCollectionEvent.Add(new WeakEventHandler<CollectionEventArgs>(value));
+            RemoveDeadEvents();
+        }
+        remove
+        {
+            m_requestCollectionEvent.RemoveAndWait(new WeakEventHandler<CollectionEventArgs>(value));
+            RemoveDeadEvents();
+        }
+    }
+
+    /// <summary>
     /// Requests a page from the buffered pool.
     /// If there is not a free one available, method will block
-    /// and request a collection of unused pages by raising 
+    /// and request a collection of unused pages by raising
     /// <see cref="RequestCollection"/> event.
     /// </summary>
     /// <param name="index">the index id of the page that was allocated</param>
-    /// <param name="addressPointer"> outputs a address that can be used
+    /// <param name="addressPointer">
+    /// outputs a address that can be used
     /// to access this memory address.  You cannot call release with this parameter.
-    /// Use the returned index to release pages.</param>
+    /// Use the returned index to release pages.
+    /// </param>
     /// <remarks>
     /// IMPORTANT NOTICE: Be careful when calling this method as the calling thread
     /// will block if no memory is available to have a background collection to occur.
-    /// There is a possiblity for a deadlock if calling this method from within a lock.
-    /// The page allocated will not be initialized, 
+    /// There is a possibility for a deadlock if calling this method from within a lock.
+    /// The page allocated will not be initialized,
     /// so assume that the data is garbage.
     /// </remarks>
     public void AllocatePage(out int index, out nint addressPointer)
@@ -255,14 +275,15 @@ public class MemoryPool
             while (true)
             {
                 int releasePageVersion = m_releasePageVersion;
+
                 if (m_pageList.TryGetNextPage(out index, out addressPointer))
                     return;
 
                 RequestMoreFreeBlocks();
+
                 if (releasePageVersion == m_releasePageVersion)
                 {
-                    s_log.Publish(MessageLevel.Critical, MessageFlags.PerformanceIssue, "Out Of Memory",
-                        $"Memory pool has run out of memory: Current Usage: {CurrentCapacity / 1024 / 1024}MB");
+                    s_log.Publish(MessageLevel.Critical, MessageFlags.PerformanceIssue, "Out Of Memory", $"Memory pool has run out of memory: Current Usage: {CurrentCapacity / 1024 / 1024}MB");
                     throw new OutOfMemoryException("Memory pool is full");
                 }
 
@@ -276,15 +297,16 @@ public class MemoryPool
     /// Releases the page back to the buffer pool for reallocation.
     /// </summary>
     /// <param name="pageIndex">A value of zero or less will return silently.</param>
-    /// <remarks>The page released will not be initialized.
-    /// Releasing a page is on the honor system.  
-    /// Rereferencing a released page will most certainly cause 
+    /// <remarks>
+    /// The page released will not be initialized.
+    /// Releasing a page is on the honor system.
+    /// Re-referencing a released page will most certainly cause
     /// unexpected crashing or data corruption or any other unexplained behavior.
     /// </remarks>
     public void ReleasePage(int pageIndex)
     {
         m_pageList.ReleasePage(pageIndex);
-        m_releasePageVersion++;
+        Interlocked.Increment(ref m_releasePageVersion);
     }
 
     /// <summary>
@@ -294,10 +316,9 @@ public class MemoryPool
     public void ReleasePages(IEnumerable<int> pageIndexes)
     {
         foreach (int x in pageIndexes)
-        {
             m_pageList.ReleasePage(x);
-        }
-        m_releasePageVersion++;
+
+        Interlocked.Increment(ref m_releasePageVersion);
     }
 
     /// <summary>
@@ -314,8 +335,7 @@ public class MemoryPool
             long rv = m_pageList.SetMaximumPoolSize(value);
             CalculateThresholds(rv, TargetUtilizationLevel);
 
-            s_log.Publish(MessageLevel.Info, MessageFlags.PerformanceIssue, "Pool Size Changed",
-                $"Memory pool maximum set to: {rv >> 20}MB");
+            s_log.Publish(MessageLevel.Info, MessageFlags.PerformanceIssue, "Pool Size Changed", $"Memory pool maximum set to: {rv >> 20}MB");
 
             return rv;
         }
@@ -331,29 +351,9 @@ public class MemoryPool
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             TargetUtilizationLevel = utilizationLevel;
             CalculateThresholds(MaximumPoolSize, utilizationLevel);
-        }
-    }
-
-    /// <summary>
-    /// Releases all the resources used by the <see cref="MemoryPool"/> object.
-    /// </summary>
-    public void Dispose()
-    {
-        lock (m_syncRoot)
-        {
-            if (!IsDisposed)
-            {
-                try
-                {
-                    m_pageList.Dispose();
-                }
-                finally
-                {
-                    IsDisposed = true; // Prevent duplicate dispose.
-                }
-            }
         }
     }
 
@@ -364,10 +364,12 @@ public class MemoryPool
     {
         Stopwatch sw = new();
         sw.Start();
+
         StringBuilder sb = new();
         sb.AppendLine("Collection Cycle Started");
 
-        Monitor.Enter(m_syncRoot); var lockTaken = true;
+        Monitor.Enter(m_syncRoot);
+        bool lockTaken = true;
 
         try
         {
@@ -387,14 +389,14 @@ public class MemoryPool
                     break;
 
                 CollectionEventArgs eventArgs = new(ReleasePage, MemoryPoolCollectionMode.Normal, 0);
-                Monitor.Exit(m_syncRoot); lockTaken = false;
+                Monitor.Exit(m_syncRoot);
+                lockTaken = false;
 
                 foreach (WeakEventHandler<CollectionEventArgs> c in m_requestCollectionEvent)
-                {
                     c.TryInvoke(this, eventArgs);
-                }
 
-                Monitor.Enter(m_syncRoot); lockTaken = true;
+                Monitor.Enter(m_syncRoot);
+                lockTaken = true;
 
                 sb.AppendFormat("Pass {0} Usage: {1}/{2}MB", x + 1, CurrentAllocatedSize >> 20, CurrentCapacity >> 20);
                 sb.AppendLine();
@@ -402,10 +404,11 @@ public class MemoryPool
 
             long currentSize = CurrentAllocatedSize;
             long sizeBefore = CurrentCapacity;
+
             if (m_pageList.GrowMemoryPool(currentSize + (long)(0.1 * MaximumPoolSize)))
             {
                 long sizeAfter = CurrentCapacity;
-                m_releasePageVersion++;
+                Interlocked.Increment(ref m_releasePageVersion);
 
                 sb.AppendFormat("Grew buffer pool {0}MB -> {1}MB", sizeBefore >> 20, sizeAfter >> 20);
                 sb.AppendLine();
@@ -415,36 +418,38 @@ public class MemoryPool
             {
                 int pagesToBeReleased = (int)((0.05 * MaximumPoolSize - m_pageList.FreeSpaceBytes) / PageSize);
 
-                sb.AppendFormat("* Emergency Collection Occuring. Attempting to release {0} pages.", pagesToBeReleased);
+                sb.Append($"* Emergency Collection Occurring. Attempting to release {pagesToBeReleased} pages.");
                 sb.AppendLine();
 
-                s_log.Publish(MessageLevel.Warning, MessageFlags.PerformanceIssue, "Pool Emergency",
-                    $"Memory pool is reaching an Emergency level. Desiring Pages To Release: {pagesToBeReleased}");
+                s_log.Publish(MessageLevel.Warning, MessageFlags.PerformanceIssue, "Pool Emergency", $"Memory pool is reaching an Emergency level. Desiring Pages To Release: {pagesToBeReleased}");
 
                 CollectionEventArgs eventArgs = new(ReleasePage, MemoryPoolCollectionMode.Emergency, pagesToBeReleased);
 
-                Monitor.Exit(m_syncRoot); lockTaken = false;
+                Monitor.Exit(m_syncRoot);
+                lockTaken = false;
 
                 foreach (WeakEventHandler<CollectionEventArgs> c in m_requestCollectionEvent)
                 {
                     if (eventArgs.DesiredPageReleaseCount == 0)
                         break;
+
                     c.TryInvoke(this, eventArgs);
                 }
 
-                Monitor.Enter(m_syncRoot); lockTaken = true;
+                Monitor.Enter(m_syncRoot);
+                lockTaken = true;
 
                 if (eventArgs.DesiredPageReleaseCount > 0)
                 {
-                    sb.AppendFormat("** Critical Collection Occuring. Attempting to release {0} pages.", pagesToBeReleased);
+                    sb.Append($"** Critical Collection Occurring. Attempting to release {pagesToBeReleased} pages.");
                     sb.AppendLine();
 
-                    s_log.Publish(MessageLevel.Warning, MessageFlags.PerformanceIssue, "Pool Critical",
-                        $"Memory pool is reaching an Critical level. Desiring Pages To Release: {eventArgs.DesiredPageReleaseCount}");
+                    s_log.Publish(MessageLevel.Warning, MessageFlags.PerformanceIssue, "Pool Critical", $"Memory pool is reaching an Critical level. Desiring Pages To Release: {eventArgs.DesiredPageReleaseCount}");
 
                     eventArgs = new CollectionEventArgs(ReleasePage, MemoryPoolCollectionMode.Critical, eventArgs.DesiredPageReleaseCount);
 
-                    Monitor.Exit(m_syncRoot); lockTaken = false;
+                    Monitor.Exit(m_syncRoot);
+                    lockTaken = false;
 
                     foreach (WeakEventHandler<CollectionEventArgs> c in m_requestCollectionEvent)
                     {
@@ -453,13 +458,14 @@ public class MemoryPool
                         c.TryInvoke(this, eventArgs);
                     }
 
-                    Monitor.Enter(m_syncRoot); lockTaken = true;
+                    Monitor.Enter(m_syncRoot);
+                    lockTaken = true;
                 }
             }
 
             sw.Stop();
-            sb.AppendFormat("Elapsed Time: {0}ms", sw.Elapsed.TotalMilliseconds.ToString("0.0"));
-            s_log.Publish(MessageLevel.Info, "Memory Pool Collection Occured", sb.ToString());
+            sb.AppendFormat("Elapsed Time: {0:0.0}ms", sw.Elapsed.TotalMilliseconds);
+            s_log.Publish(MessageLevel.Info, "Memory Pool Collection Occurred", sb.ToString());
 
             RemoveDeadEvents();
         }
@@ -583,6 +589,12 @@ public class MemoryPool
 
         return Math.Max(stopShrinkingLimit, (long)(MaximumPoolSize * 0.05));
     }
+
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(MemoryPool), MessageClass.Component);
 
     #endregion
 }

@@ -25,7 +25,6 @@
 //******************************************************************************************************
 
 using SnapDB.IO;
-using SnapDB.Snap.Filters;
 
 namespace SnapDB.Snap.Filters;
 
@@ -33,11 +32,15 @@ namespace SnapDB.Snap.Filters;
 /// Represents no filter
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
-public class SeekFilterUniverse<TKey>
-    : SeekFilterBase<TKey>
-    where TKey : SnapTypeBase<TKey>, new()
+public class SeekFilterUniverse<TKey> : SeekFilterBase<TKey> where TKey : SnapTypeBase<TKey>, new()
 {
+    #region [ Members ]
+
     private bool m_isEndReached;
+
+    #endregion
+
+    #region [ Constructors ]
 
     public SeekFilterUniverse()
     {
@@ -48,7 +51,15 @@ public class SeekFilterUniverse<TKey>
         Reset();
     }
 
+    #endregion
+
+    #region [ Properties ]
+
     public override Guid FilterType => Guid.Empty;
+
+    #endregion
+
+    #region [ Methods ]
 
     public override void Save(BinaryStreamBase stream)
     {
@@ -65,12 +76,12 @@ public class SeekFilterUniverse<TKey>
     public override bool NextWindow()
     {
         if (m_isEndReached)
-        {
             return false;
-        }
         StartOfRange.SetMin();
         EndOfRange.SetMax();
         m_isEndReached = true;
         return true;
     }
+
+    #endregion
 }

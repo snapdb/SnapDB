@@ -35,17 +35,20 @@ namespace SnapDB.Snap.Tree;
 /// </summary>
 /// <typeparam name="TKey">The type of keys stored in the nodes.</typeparam>
 /// <typeparam name="TValue">The type of values stored in the nodes.</typeparam>
-public unsafe class GenericEncodedNodeScanner<TKey, TValue>
-        : SortedTreeScannerBase<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public unsafe class GenericEncodedNodeScanner<TKey, TValue> : SortedTreeScannerBase<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Members ]
+
     private readonly PairEncodingBase<TKey, TValue> m_encoding;
+    private int m_nextOffset;
     private readonly TKey m_prevKey;
     private readonly TValue m_prevValue;
-    private int m_nextOffset;
     private readonly TKey m_tmpKey;
     private readonly TValue m_tmpValue;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GenericEncodedNodeScanner{TKey, TValue}"/> class with the specified encoding, node level, block size, binary stream, and key lookup function.
@@ -55,8 +58,7 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
     /// <param name="blockSize">The size of a block or node in bytes.</param>
     /// <param name="stream">The binary stream from which to read data.</param>
     /// <param name="lookupKey">A function for looking up keys based on an input key and direction.</param>
-    public GenericEncodedNodeScanner(PairEncodingBase<TKey, TValue> encoding, byte level, int blockSize, BinaryStreamPointerBase stream, Func<TKey, byte, uint> lookupKey)
-        : base(level, blockSize, stream, lookupKey)
+    public GenericEncodedNodeScanner(PairEncodingBase<TKey, TValue> encoding, byte level, int blockSize, BinaryStreamPointerBase stream, Func<TKey, byte, uint> lookupKey) : base(level, blockSize, stream, lookupKey)
     {
         m_encoding = encoding;
         m_nextOffset = 0;
@@ -67,6 +69,10 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
         m_tmpKey = new TKey();
         m_tmpValue = new TValue();
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Reads and decodes the next key-value pair at the current position for peeking without advancing the position.
@@ -142,6 +148,7 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
 
             return true;
         }
+
         return false;
     }
 
@@ -194,7 +201,7 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
 
     /// <summary>
     /// Occurs when a node's data is reset.
-    /// Derived classes can override this 
+    /// Derived classes can override this
     /// method if fields need to be reset when a node is loaded.
     /// </summary>
     protected override void OnNoadReload()
@@ -203,4 +210,6 @@ public unsafe class GenericEncodedNodeScanner<TKey, TValue>
         m_prevKey.Clear();
         m_prevValue.Clear();
     }
+
+    #endregion
 }

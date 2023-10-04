@@ -33,13 +33,16 @@ namespace SnapDB.Snap.Encoding;
 /// </summary>
 /// <typeparam name="TKey">The type to use as the key.</typeparam>
 /// <typeparam name="TValue">The type to use as the value.</typeparam>
-internal class PairEncodingFixedSize<TKey, TValue>
-    : PairEncodingBase<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+internal class PairEncodingFixedSize<TKey, TValue> : PairEncodingBase<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Members ]
+
     private readonly int m_keySize;
     private readonly int m_valueSize;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new class.
@@ -49,6 +52,10 @@ internal class PairEncodingFixedSize<TKey, TValue>
         m_keySize = new TKey().Size;
         m_valueSize = new TValue().Size;
     }
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets the encoding method that this class implements.
@@ -78,7 +85,7 @@ internal class PairEncodingFixedSize<TKey, TValue>
     public override int MaxCompressionSize => m_keySize + m_valueSize;
 
     /// <summary>
-    /// Gets if the stream supports a symbol that 
+    /// Gets if the stream supports a symbol that
     /// represents that the end of the stream has been encountered.
     /// </summary>
     /// <remarks>
@@ -87,7 +94,6 @@ internal class PairEncodingFixedSize<TKey, TValue>
     /// word is 0xFF, the encoding has specifically
     /// designated this as the end of the stream. Therefore, calls to
     /// Decompress will result in an end of stream exception.
-    /// 
     /// Failing to reserve a code as the end of stream will mean that
     /// streaming points will include its own symbol to represent the end of the
     /// stream, taking 1 extra byte per point encoded.
@@ -99,6 +105,10 @@ internal class PairEncodingFixedSize<TKey, TValue>
     /// May throw NotSupportedException if <see cref="PairEncodingBase{TKey,TValue}.ContainsEndOfStreamSymbol"/> is <c>false</c>.
     /// </summary>
     public override byte EndOfStreamSymbol => throw new NotSupportedException();
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Encodes key and value and writes them to a binary stream.
@@ -172,4 +182,6 @@ internal class PairEncodingFixedSize<TKey, TValue>
     {
         return new PairEncodingFixedSize<TKey, TValue>();
     }
+
+    #endregion
 }

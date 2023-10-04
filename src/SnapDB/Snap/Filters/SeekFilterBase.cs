@@ -34,8 +34,10 @@ namespace SnapDB.Snap.Filters;
 /// <typeparam name="TKey"></typeparam>
 public abstract class SeekFilterBase<TKey>
 {
+    #region [ Properties ]
+
     /// <summary>
-    /// The filter guid 
+    /// The filter guid
     /// </summary>
     public abstract Guid FilterType { get; }
 
@@ -43,6 +45,7 @@ public abstract class SeekFilterBase<TKey>
     /// the start of the frame to search [Inclusive]
     /// </summary>
     public TKey StartOfFrame { get; protected set; }
+
     /// <summary>
     /// the end of the frame to search [Inclusive]
     /// </summary>
@@ -52,10 +55,15 @@ public abstract class SeekFilterBase<TKey>
     /// the start of the entire range to search [Inclusive]
     /// </summary>
     public TKey StartOfRange { get; protected set; }
+
     /// <summary>
     /// the end of the entire range to search [Inclusive]
     /// </summary>
     public TKey EndOfRange { get; protected set; }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Serializes the filter to a stream
@@ -66,7 +74,7 @@ public abstract class SeekFilterBase<TKey>
     //Seekable portion of the filter
 
     /// <summary>
-    /// Resets the iterative nature of the filter. 
+    /// Resets the iterative nature of the filter.
     /// </summary>
     /// <remarks>
     /// Since a time filter is a set of date ranges, this will reset the frame so a
@@ -80,6 +88,5 @@ public abstract class SeekFilterBase<TKey>
     /// <returns>true if window exists, false if finished.</returns>
     public abstract bool NextWindow();
 
-
-
+    #endregion
 }

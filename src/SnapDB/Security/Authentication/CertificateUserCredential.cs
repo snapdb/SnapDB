@@ -28,13 +28,18 @@ using Gemstone.Identity;
 
 namespace SnapDB.Security.Authentication;
 
-
 /// <summary>
 /// An individual server side user credential.
 /// </summary>
 public class CertificateUserCredential
 {
+    #region [ Members ]
+
     public string UserId;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates user credentials.
@@ -42,24 +47,25 @@ public class CertificateUserCredential
     /// <param name="username"></param>
     public CertificateUserCredential(string username)
     {
-#if SQLCLR
+    #if SQLCLR
         SecurityIdentifier sid = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
         UserID = sid.ToString();
-#else
+    #else
         UserId = UserInfo.UserNameToSID(username);
-#endif
+    #endif
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     public void Save()
     {
-
     }
 
     public void Load()
     {
-
     }
 
+    #endregion
 }
-
-

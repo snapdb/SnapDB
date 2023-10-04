@@ -38,9 +38,15 @@ namespace SnapDB.Threading;
 /// </remarks>
 public class AtomicInt64
 {
+    #region [ Members ]
+
     // Note: This is a class and not a struct to prevent users from copying the struct value
     // which would result in a non-atomic clone of the struct.  
     private long m_value;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Initializes a new instance of the AtomicInt64 class with an optional initial value.
@@ -50,6 +56,10 @@ public class AtomicInt64
     {
         m_value = value;
     }
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets or sets the value of the AtomicInt64.
@@ -62,6 +72,10 @@ public class AtomicInt64
         set => Interlocked.Exchange(ref m_value, value);
     }
 
+    #endregion
+
+    #region [ Static ]
+
     /// <summary>
     /// Implicitly converts an AtomicInt64 to a long.
     /// </summary>
@@ -72,4 +86,6 @@ public class AtomicInt64
     {
         return value.Value;
     }
+
+    #endregion
 }

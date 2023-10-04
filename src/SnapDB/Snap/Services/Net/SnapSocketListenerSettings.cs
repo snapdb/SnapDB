@@ -27,11 +27,11 @@
 //
 //******************************************************************************************************
 
+using System.Data;
+using System.Net;
 using Gemstone.Communication;
 using Gemstone.IO.StreamExtensions;
 using SnapDB.Immutables;
-using System.Data;
-using System.Net;
 
 // ReSharper disable RedundantDefaultMemberInitializer
 namespace SnapDB.Snap.Services.Net;
@@ -39,13 +39,9 @@ namespace SnapDB.Snap.Services.Net;
 /// <summary>
 /// Contains the basic config for a socket interface.
 /// </summary>
-public class SnapSocketListenerSettings
-    : SettingsBase<SnapSocketListenerSettings>
+public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSettings>
 {
-    /// <summary>
-    /// Defines the default network port for a <see cref="SnapSocketListener"/>.
-    /// </summary>
-    public const int DefaultNetworkPort = 38402;
+    #region [ Members ]
 
     /// <summary>
     /// Defines the default network IP address for the <see cref="SnapSocketListener"/>.
@@ -53,9 +49,23 @@ public class SnapSocketListenerSettings
     public const string DefaultIpAddress = "";
 
     /// <summary>
+    /// Defines the default network port for a <see cref="SnapSocketListener"/>.
+    /// </summary>
+    public const int DefaultNetworkPort = 38402;
+
+    /// <summary>
     /// A server name that must be supplied at startup before a key exchange occurs.
     /// </summary>
     public const string DefaultServerName = "openHistorian";
+
+    public bool DefaultUserCanRead = false;
+    public bool DefaultUserCanWrite = false;
+    public bool DefaultUserIsAdmin = false;
+
+    /// <summary>
+    /// Force the use of SSL for all clients connecting to this socket.
+    /// </summary>
+    private bool m_forceSsl = false;
 
     /// <summary>
     /// The local IP address to host on. Leave empty to bind to all local interfaces.
@@ -63,7 +73,7 @@ public class SnapSocketListenerSettings
     private string m_localIpAddress = DefaultIpAddress;
 
     /// <summary>
-    /// The local TCP port to host on. 
+    /// The local TCP port to host on.
     /// </summary>
     private int m_localTcpPort = DefaultNetworkPort;
 
@@ -72,10 +82,9 @@ public class SnapSocketListenerSettings
     /// </summary>
     private string m_serverName = DefaultServerName;
 
-    /// <summary>
-    /// Force the use of SSL for all clients connecting to this socket.
-    /// </summary>
-    private bool m_forceSsl = false;
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets the local <see cref="IPEndPoint"/> from the values in <see cref="m_localIpAddress"/> and <see cref="m_localTcpPort"/>
@@ -84,24 +93,24 @@ public class SnapSocketListenerSettings
     {
         get
         {
-#if SQLCLR
+        #if SQLCLR
             if (string.IsNullOrWhiteSpace(m_localIpAddress))
                 return new IPEndPoint(IPAddress.Any, m_localTcpPort);
 
             return new IPEndPoint(IPAddress.Parse(m_localIpAddress), m_localTcpPort);
-#else
+        #else
             // SnapSocketListener automatically enables dual-stack socket for IPv6 to support legacy client implementations expecting IPv4 hosting
             IPStack ipStack = string.IsNullOrWhiteSpace(m_localIpAddress) ? Transport.GetDefaultIPStack() : Transport.IsIPv6IP(m_localIpAddress) ? IPStack.IPv6 : IPStack.IPv4;
 
             return Transport.CreateEndPoint(m_localIpAddress, m_localTcpPort, ipStack);
-#endif                
+        #endif
         }
     }
 
     /// <summary>
     /// A list of all Windows users that are allowed to connect to the historian.
     /// </summary>
-    public ImmutableList<string> Users { get; } = new ImmutableList<string>();
+    public ImmutableList<string> Users { get; } = new();
 
     /// <summary>
     /// Force the use of SSL for all clients connecting to this socket.
@@ -117,7 +126,7 @@ public class SnapSocketListenerSettings
     }
 
     /// <summary>
-    /// The local TCP port to host on. 
+    /// The local TCP port to host on.
     /// </summary>
     public int LocalTcpPort
     {
@@ -142,9 +151,9 @@ public class SnapSocketListenerSettings
         }
     }
 
-    public bool DefaultUserCanRead = false;
-    public bool DefaultUserCanWrite = false;
-    public bool DefaultUserIsAdmin = false;
+    #endregion
+
+    #region [ Methods ]
 
     public override void Save(Stream stream)
     {
@@ -164,4 +173,6 @@ public class SnapSocketListenerSettings
     public override void Validate()
     {
     }
+
+    #endregion
 }

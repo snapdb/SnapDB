@@ -28,16 +28,25 @@ namespace SnapDB.Snap;
 
 public partial class UnionTreeStream<TKey, TValue>
 {
+    #region [ Members ]
+
     /// <summary>
     /// Provides basic sorting methods that assist in UnionKeyValueStream's speed.
     /// </summary>
     private class UnionTreeStreamSortHelper
     {
+        #region [ Members ]
+
         /// <summary>
         /// All of the items in this list.
         /// </summary>
         public readonly BufferedTreeStream[] Items;
+
         private int m_validRecords;
+
+        #endregion
+
+        #region [ Constructors ]
 
         /// <summary>
         /// Creates a new custom sort helper and presorts the list.
@@ -50,12 +59,20 @@ public partial class UnionTreeStream<TKey, TValue>
             Sort();
         }
 
+        #endregion
+
+        #region [ Properties ]
+
         /// <summary>
         /// Indexer to get the specified item out of the list
         /// </summary>
         /// <param name="index">The index of the item to retrieve.</param>
         /// <returns>The <see cref="BufferedTreeStream"/> at the specified index.</returns>
         public BufferedTreeStream this[int index] => Items[index];
+
+        #endregion
+
+        #region [ Methods ]
 
         /// <summary>
         /// Resorts the entire list. Uses an insertion sort routine
@@ -76,6 +93,7 @@ public partial class UnionTreeStream<TKey, TValue>
                     Items[currentIndex + 1] = Items[currentIndex];
                     currentIndex--;
                 }
+
                 Items[currentIndex + 1] = itemToInsert;
             }
 
@@ -88,9 +106,7 @@ public partial class UnionTreeStream<TKey, TValue>
                 }
 
                 if (x == 0)
-                {
                     m_validRecords = 0;
-                }
             }
         }
 
@@ -107,9 +123,7 @@ public partial class UnionTreeStream<TKey, TValue>
             {
                 m_validRecords--;
                 for (int x = index; x < m_validRecords; x++)
-                {
                     Items[x] = Items[x + 1];
-                }
                 Items[m_validRecords] = itemToMove;
                 return;
             }
@@ -121,6 +135,7 @@ public partial class UnionTreeStream<TKey, TValue>
                 Items[currentIndex - 1] = Items[currentIndex];
                 currentIndex++;
             }
+
             Items[currentIndex - 1] = itemToMove;
         }
 
@@ -128,14 +143,18 @@ public partial class UnionTreeStream<TKey, TValue>
         {
             if (!item1.IsValid && !item2.IsValid)
                 return false;
-                
+
             if (!item1.IsValid)
                 return false;
-                
+
             if (!item2.IsValid)
                 return true;
-                
-            return item1.CacheKey.IsLessThan(item2.CacheKey);// item1.CurrentKey.CompareTo(item2.CurrentKey);
+
+            return item1.CacheKey.IsLessThan(item2.CacheKey); // item1.CurrentKey.CompareTo(item2.CurrentKey);
         }
+
+        #endregion
     }
+
+    #endregion
 }

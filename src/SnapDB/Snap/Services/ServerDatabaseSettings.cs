@@ -24,23 +24,28 @@
 //
 //******************************************************************************************************
 
-using Gemstone.IO.StreamExtensions;
-using SnapDB.Snap.Services.Writer;
-using SnapDB.Immutables;
 using System.Data;
+using Gemstone.IO.StreamExtensions;
+using SnapDB.Immutables;
+using SnapDB.Snap.Services.Writer;
 
 namespace SnapDB.Snap.Services;
 
 /// <summary>
 /// The settings for a <see cref="SnapServerDatabase{TKey,TValue}"/>.
 /// </summary>
-public class ServerDatabaseSettings
-    : SettingsBase<ServerDatabaseSettings>, IToServerDatabaseSettings
+public class ServerDatabaseSettings : SettingsBase<ServerDatabaseSettings>, IToServerDatabaseSettings
 {
-    private Guid m_keyType;
-    private Guid m_valueType;
+    #region [ Members ]
+
     private string m_databaseName;
+    private Guid m_keyType;
     private bool m_supportsWriting;
+    private Guid m_valueType;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new <see cref="ServerDatabaseSettings"/>.
@@ -61,6 +66,10 @@ public class ServerDatabaseSettings
             return x;
         });
     }
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets the type of the key component.
@@ -134,10 +143,9 @@ public class ServerDatabaseSettings
         }
     }
 
-    ServerDatabaseSettings IToServerDatabaseSettings.ToServerDatabaseSettings()
-    {
-        return this;
-    }
+    #endregion
+
+    #region [ Methods ]
 
     public override void Save(Stream stream)
     {
@@ -197,4 +205,11 @@ public class ServerDatabaseSettings
         if (StreamingEncodingMethods.Count == 0)
             throw new Exception("Must specify a streaming method");
     }
+
+    ServerDatabaseSettings IToServerDatabaseSettings.ToServerDatabaseSettings()
+    {
+        return this;
+    }
+
+    #endregion
 }

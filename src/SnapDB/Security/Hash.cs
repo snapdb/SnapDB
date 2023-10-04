@@ -1,5 +1,4 @@
-﻿
-//******************************************************************************************************
+﻿//******************************************************************************************************
 //  Hash.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
@@ -31,6 +30,8 @@ namespace SnapDB.Security;
 
 public static class Hash
 {
+    #region [ Static ]
+
     public static byte[] Compute(IDigest hash, byte[] data)
     {
         byte[] result = new byte[hash.GetDigestSize()];
@@ -38,13 +39,18 @@ public static class Hash
         hash.DoFinal(result, 0);
         return result;
     }
+
+    #endregion
 }
 
-public static class Hash<T>
-    where T : IDigest, new()
+public static class Hash<T> where T : IDigest, new()
 {
+    #region [ Static ]
+
     public static byte[] Compute(byte[] data)
     {
         return Hash.Compute(new T(), data);
     }
+
+    #endregion
 }

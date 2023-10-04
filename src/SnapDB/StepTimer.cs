@@ -34,36 +34,58 @@ namespace SnapDB;
 /// </summary>
 public static class StepTimer
 {
+    #region [ Members ]
+
     /// <summary>
     /// Represents an interface for measuring and recording the execution time of code segments.
     /// </summary>
     public interface ITimer
     {
+        #region [ Methods ]
+
         /// <summary>
         /// Stops the timer and records the elapsed time for the code segment.
         /// </summary>
         /// <param name="loopCount">The number of times the code segment was executed (default is 1).</param>
         void Stop(int loopCount = 1);
+
+        #endregion
     }
 
     private class RunCount : ITimer
     {
+        #region [ Members ]
+
         public readonly List<double> RunResults = new();
         public readonly Stopwatch Sw = new();
+
+        #endregion
+
+        #region [ Methods ]
 
         public void Stop(int loopCount = 1)
         {
             Sw.Stop();
             RunResults.Add(Sw.Elapsed.TotalSeconds / loopCount);
         }
+
+        #endregion
     }
 
-    private static readonly SortedList<string, RunCount> s_allStopwatches;
+    #endregion
+
+    #region [ Constructors ]
 
     static StepTimer()
     {
         s_allStopwatches = new SortedList<string, RunCount>();
     }
+
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly SortedList<string, RunCount> s_allStopwatches;
 
     /// <summary>
     /// Starts a named timer and optionally forces garbage collection before starting.
@@ -81,9 +103,10 @@ public static class StepTimer
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }
+
         RunCount sw = s_allStopwatches[name];
         sw.Sw.Restart();
-        
+
         return sw;
     }
 
@@ -202,7 +225,7 @@ public static class StepTimer
     }
 
     /// <summary>
-    /// Measures the execution time of an action that takes a Stopwatch parameter 
+    /// Measures the execution time of an action that takes a Stopwatch parameter
     /// and returns the median execution time in microseconds.
     /// </summary>
     /// <param name="internalLoopCount">The number of internal loops used for timing.</param>
@@ -248,4 +271,6 @@ public static class StepTimer
 
         return sw.Elapsed.TotalMilliseconds;
     }
+
+    #endregion
 }

@@ -24,25 +24,31 @@
 //   
 //******************************************************************************************************
 
-using SnapDB.IO;
 using SnapDB.Collections;
+using SnapDB.IO;
 using SnapDB.Snap.Types;
 
 namespace SnapDB.Snap.Filters;
 
-public partial class PointIdMatchFilterBitArray
+public class PointIdMatchFilterBitArray
 {
+    #region [ Members ]
+
     /// <summary>
     /// A filter that uses a <see cref="BitArray"/> to set <c>true</c> and <c>false</c> values.
     /// </summary>
-    public class BitArrayFilter<TKey, TValue>
-        : MatchFilterBase<TKey, TValue>
-        where TKey : TimestampPointIdBase<TKey>, new()
+    public class BitArrayFilter<TKey, TValue> : MatchFilterBase<TKey, TValue> where TKey : TimestampPointIdBase<TKey>, new()
     {
-        private readonly BitArray m_points;
+        #region [ Members ]
 
         public ulong MaxValue = ulong.MaxValue;
         public ulong MinValue = ulong.MinValue;
+
+        private readonly BitArray m_points;
+
+        #endregion
+
+        #region [ Constructors ]
 
         /// <summary>
         /// Creates a new filter backed by a <see cref="BitArray"/>.
@@ -84,9 +90,7 @@ public partial class PointIdMatchFilterBitArray
             m_points = new BitArray(false, (int)maxValue + 1);
 
             foreach (ulong pt in points)
-            {
                 m_points.SetBit((int)pt);
-            }
 
             foreach (int point in m_points.GetAllSetBits())
             {
@@ -96,7 +100,15 @@ public partial class PointIdMatchFilterBitArray
             }
         }
 
+        #endregion
+
+        #region [ Properties ]
+
         public override Guid FilterType => PointIdMatchFilterDefinition.FilterGuid;
+
+        #endregion
+
+        #region [ Methods ]
 
         public override void Save(BinaryStreamBase stream)
         {
@@ -113,5 +125,9 @@ public partial class PointIdMatchFilterBitArray
 
             return key.PointId <= MaxValue && m_points.GetBitUnchecked(point);
         }
+
+        #endregion
     }
+
+    #endregion
 }

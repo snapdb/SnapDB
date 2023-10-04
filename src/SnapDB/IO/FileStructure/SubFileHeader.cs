@@ -32,19 +32,19 @@ namespace SnapDB.IO.FileStructure;
 /// <summary>
 /// This contains the meta data of the file along with index information to map all of the blocks of the file.
 /// </summary>
-public class SubFileHeader
-    : ImmutableObjectAutoBase<SubFileHeader>
+public class SubFileHeader : ImmutableObjectAutoBase<SubFileHeader>
 {
     #region [ Members ]
 
-    private readonly bool m_isSimplified;
     private uint m_dataBlockCount;
-    private uint m_totalBlocksCount;
     private uint m_directBlock;
-    private uint m_singleIndirectBlock;
     private uint m_doubleIndirectBlock;
-    private uint m_tripleIndirectBlock;
+
+    private readonly bool m_isSimplified;
     private uint m_quadrupleIndirectBlock;
+    private uint m_singleIndirectBlock;
+    private uint m_totalBlocksCount;
+    private uint m_tripleIndirectBlock;
 
     #endregion
 
@@ -122,7 +122,7 @@ public class SubFileHeader
     }
 
     /// <summary>
-    /// Gets the total number of blocks that has been used by this file. 
+    /// Gets the total number of blocks that has been used by this file.
     /// This includes meta data blocks and previous version blocks.
     /// </summary>
     public uint TotalBlockCount

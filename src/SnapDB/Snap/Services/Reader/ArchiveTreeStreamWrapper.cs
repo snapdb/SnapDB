@@ -24,7 +24,6 @@
 //
 //******************************************************************************************************
 
-using SnapDB.Snap;
 using SnapDB.Snap.Storage;
 using SnapDB.Snap.Tree;
 
@@ -35,22 +34,24 @@ namespace SnapDB.Snap.Services.Reader;
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-public class ArchiveTreeStreamWrapper<TKey, TValue>
-    : TreeStream<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class ArchiveTreeStreamWrapper<TKey, TValue> : TreeStream<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
-    private readonly ArchiveTableSummary<TKey, TValue> m_table;
-    private SortedTreeTableReadSnapshot<TKey, TValue> m_snapshot;
+    #region [ Members ]
+
     private readonly SortedTreeScannerBase<TKey, TValue> m_scanner;
+    private SortedTreeTableReadSnapshot<TKey, TValue> m_snapshot;
+    private readonly ArchiveTableSummary<TKey, TValue> m_table;
     private bool m_disposed;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a <see cref="ArchiveTreeStreamWrapper{TKey,TValue}"/>
     /// </summary>
     /// <param name="table">The table to wrap.</param>
-    public ArchiveTreeStreamWrapper(SortedTreeTable<TKey, TValue> table)
-        : this(new ArchiveTableSummary<TKey, TValue>(table))
+    public ArchiveTreeStreamWrapper(SortedTreeTable<TKey, TValue> table) : this(new ArchiveTableSummary<TKey, TValue>(table))
     {
     }
 
@@ -66,9 +67,17 @@ public class ArchiveTreeStreamWrapper<TKey, TValue>
         m_scanner.SeekToStart();
     }
 
+    #endregion
+
+    #region [ Properties ]
+
     public override bool IsAlwaysSequential => true;
 
     public override bool NeverContainsDuplicates => true;
+
+    #endregion
+
+    #region [ Methods ]
 
     protected override bool ReadNext(TKey key, TValue value)
     {
@@ -82,7 +91,6 @@ public class ArchiveTreeStreamWrapper<TKey, TValue>
     protected override void Dispose(bool disposing)
     {
         if (!m_disposed)
-        {
             try
             {
                 // This will be done regardless of whether the object is finalized or disposed.
@@ -95,9 +103,10 @@ public class ArchiveTreeStreamWrapper<TKey, TValue>
             }
             finally
             {
-                m_disposed = true;          // Prevent duplicate dispose.
-                base.Dispose(disposing);    // Call base class Dispose().
+                m_disposed = true; // Prevent duplicate dispose.
+                base.Dispose(disposing); // Call base class Dispose().
             }
-        }
     }
+
+    #endregion
 }

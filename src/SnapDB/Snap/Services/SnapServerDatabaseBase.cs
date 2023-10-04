@@ -24,39 +24,39 @@
 //
 //******************************************************************************************************
 
-using Gemstone.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Gemstone.Diagnostics;
 
 namespace SnapDB.Snap.Services;
 
 /// <summary>
 /// Represents the server side of a single database.
 /// </summary>
-public abstract class SnapServerDatabaseBase
-    : DisposableLoggingClassBase
+public abstract class SnapServerDatabaseBase : DisposableLoggingClassBase
 {
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a <see cref="SnapServerDatabaseBase"/>
     /// </summary>
-    protected SnapServerDatabaseBase()
-        : base(MessageClass.Framework)
+    protected SnapServerDatabaseBase() : base(MessageClass.Framework)
     {
     }
 
-    protected LogStackMessages GetSourceDetails()
-    {
-        return Info is not null ?
-            LogStackMessages.Empty.Union("Database", $"Database: {Info.DatabaseName} Key: {Info.KeyType.FullName} Value: {Info.ValueType.FullName}") :
-            LogStackMessages.Empty;
-    }
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets basic information about the current Database.
     /// </summary>
     public abstract DatabaseInfo Info { get; }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Creates a <see cref="SnapServerDatabase{TKey,TValue}.ClientDatabase"/>
@@ -70,6 +70,15 @@ public abstract class SnapServerDatabaseBase
     /// <param name="status">Target status output <see cref="StringBuilder"/>.</param>
     /// <param name="maxFileListing">Maximum file listing.</param>
     public abstract void GetFullStatus(StringBuilder status, int maxFileListing = -1);
+
+    protected LogStackMessages GetSourceDetails()
+    {
+        return Info is not null ? LogStackMessages.Empty.Union("Database", $"Database: {Info.DatabaseName} Key: {Info.KeyType.FullName} Value: {Info.ValueType.FullName}") : LogStackMessages.Empty;
+    }
+
+    #endregion
+
+    #region [ Static ]
 
     /// <summary>
     /// Creates a new server database from the provided config.
@@ -91,10 +100,10 @@ public abstract class SnapServerDatabaseBase
 
     //Called through reflection. Its the only way to call a generic function only knowing the Types
     [MethodImpl(MethodImplOptions.NoOptimization)] //Prevents removing this method as it may appear unused.
-    private static SnapServerDatabaseBase CreateDatabase<TKey, TValue>(ServerDatabaseSettings databaseConfig)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+    private static SnapServerDatabaseBase CreateDatabase<TKey, TValue>(ServerDatabaseSettings databaseConfig) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         return new SnapServerDatabase<TKey, TValue>(databaseConfig);
     }
+
+    #endregion
 }

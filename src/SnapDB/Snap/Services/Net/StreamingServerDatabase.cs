@@ -25,9 +25,9 @@
 //******************************************************************************************************
 
 using SnapDB.IO;
-using SnapDB.Snap.Streaming;
 using SnapDB.Snap.Filters;
-using SortedTreeEngineReaderOptions = SnapDB.Snap.Services.Reader.SortedTreeEngineReaderOptions;
+using SnapDB.Snap.Services.Reader;
+using SnapDB.Snap.Streaming;
 
 namespace SnapDB.Snap.Services.Net;
 
@@ -36,14 +36,19 @@ namespace SnapDB.Snap.Services.Net;
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-internal class StreamingServerDatabase<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 
 {
-    private readonly RemoteBinaryStream m_stream;
-    private SnapServerDatabase<TKey, TValue>.ClientDatabase m_sortedTreeEngine;
+    #region [ Members ]
+
     private StreamEncodingBase<TKey, TValue> m_encodingMethod;
+    private SnapServerDatabase<TKey, TValue>.ClientDatabase m_sortedTreeEngine;
+
+    private readonly RemoteBinaryStream m_stream;
+
+    #endregion
+
+    #region [ Constructors ]
 
     public StreamingServerDatabase(RemoteBinaryStream netStream, SnapServerDatabase<TKey, TValue>.ClientDatabase engine)
     {
@@ -51,6 +56,10 @@ internal class StreamingServerDatabase<TKey, TValue>
         m_sortedTreeEngine = engine;
         m_encodingMethod = Library.CreateStreamEncoding<TKey, TValue>(EncodingDefinition.FixedSizeCombinedEncoding);
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// This function will verify the connection, create all necessary streams, set timeouts, and catch any exceptions and terminate the connection.
@@ -117,7 +126,6 @@ internal class StreamingServerDatabase<TKey, TValue>
         SortedTreeEngineReaderOptions? readerOptions = null;
 
         if (m_stream.ReadBoolean())
-        {
             try
             {
                 key1Parser = Library.Filters.GetSeekFilter<TKey>(m_stream.ReadGuid(), m_stream);
@@ -129,9 +137,8 @@ internal class StreamingServerDatabase<TKey, TValue>
 
                 return false;
             }
-        }
+
         if (m_stream.ReadBoolean())
-        {
             try
             {
                 key2Parser = Library.Filters.GetMatchFilter<TKey, TValue>(m_stream.ReadGuid(), m_stream);
@@ -143,9 +150,8 @@ internal class StreamingServerDatabase<TKey, TValue>
 
                 return false;
             }
-        }
+
         if (m_stream.ReadBoolean())
-        {
             try
             {
                 readerOptions = new SortedTreeEngineReaderOptions(m_stream);
@@ -157,7 +163,6 @@ internal class StreamingServerDatabase<TKey, TValue>
 
                 return false;
             }
-        }
 
         bool needToFinishStream = false;
 
@@ -188,7 +193,7 @@ internal class StreamingServerDatabase<TKey, TValue>
         {
             if (needToFinishStream)
 
-            m_encodingMethod.WriteEndOfStream(m_stream);
+                m_encodingMethod.WriteEndOfStream(m_stream);
             m_stream.Write((byte)ServerResponse.ErrorWhileReading);
             m_stream.Write(ex.ToString());
             m_stream.Flush();
@@ -218,4 +223,5 @@ internal class StreamingServerDatabase<TKey, TValue>
             m_sortedTreeEngine.Write(key, value);
     }
 
+    #endregion
 }

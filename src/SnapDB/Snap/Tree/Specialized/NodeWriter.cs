@@ -37,10 +37,10 @@ namespace SnapDB.Snap.Tree.Specialized;
 /// <remarks>
 /// This class is designed for writing nodes in a tree structure, and it is typically used to create or modify tree nodes.
 /// </remarks>
-public unsafe static class NodeWriter<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public static unsafe class NodeWriter<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Static ]
+
     /// <summary>
     /// Creates a new node with the specified parameters and initializes its header and encoding.
     /// </summary>
@@ -91,7 +91,6 @@ public unsafe static class NodeWriter<TKey, TValue>
             if (treeStream.Read(key1, value1))
             {
                 if (header.RemainingBytes < maximumStorageSize)
-                {
                     if (header.RemainingBytes < encoding.Encode(buffer, key2, value2, key1, value1))
                     {
                         NewNodeThenInsert(header, sparseIndex1, getNextNewNodeIndex1(), writePointer, key1);
@@ -99,7 +98,6 @@ public unsafe static class NodeWriter<TKey, TValue>
                         value2.Clear();
                         writePointer = stream.GetWritePointer(blockSize * header.NodeIndex, blockSize);
                     }
-                }
 
                 byte* stream1 = writePointer + header.ValidBytes;
                 header.ValidBytes += (ushort)encoding.Encode(stream1, key2, value2, key1, value1);
@@ -109,7 +107,6 @@ public unsafe static class NodeWriter<TKey, TValue>
                 if (treeStream.Read(key2, value2))
                 {
                     if (header.RemainingBytes < maximumStorageSize)
-                    {
                         if (header.RemainingBytes < encoding.Encode(buffer, key1, value1, key2, value2))
                         {
                             NewNodeThenInsert(header, sparseIndex1, getNextNewNodeIndex1(), writePointer, key2);
@@ -117,7 +114,7 @@ public unsafe static class NodeWriter<TKey, TValue>
                             value1.Clear();
                             writePointer = stream.GetWritePointer(blockSize * header.NodeIndex, blockSize);
                         }
-                    }
+
                     byte* stream2 = writePointer + header.ValidBytes;
                     header.ValidBytes += (ushort)encoding.Encode(stream2, key1, value1, key2, value2);
                     header.RecordCount++;
@@ -126,6 +123,7 @@ public unsafe static class NodeWriter<TKey, TValue>
                 }
             }
         }
+
         header.Save(writePointer);
     }
 
@@ -160,4 +158,6 @@ public unsafe static class NodeWriter<TKey, TValue>
 
         sparseIndex.Add(currentNode, dividingKey, newNodeIndex);
     }
+
+    #endregion
 }

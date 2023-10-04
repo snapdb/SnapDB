@@ -36,42 +36,34 @@ namespace SnapDB.Snap.Services.Writer;
 /// <summary>
 /// Handles how data is initially taken from prestage chunks and serialized to the disk.
 /// </summary>
-public class FirstStageWriter<TKey, TValue>
-    : DisposableLoggingClassBase
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
-    /// <summary>
-    /// Event that notifies that a certain sequence number has been committed.
-    /// </summary>
-    public event Action<long> SequenceNumberCommitted;
+    #region [ Members ]
 
-    /// <summary>
-    /// Occurs after a rollover operation has completed and provides the sequence number associated with
-    /// the rollover.
-    /// </summary>
-    public event Action<long> RolloverComplete;
-
-    private readonly FirstStageWriterSettings m_settings;
-    private bool m_stopped;
-    private bool m_disposed;
+    private readonly SimplifiedArchiveInitializer<TKey, TValue> m_createNextStageFile;
     private readonly AtomicInt64 m_lastCommitedSequenceNumber = new();
     private readonly AtomicInt64 m_lastRolledOverSequenceNumber = new();
-
-    private readonly ScheduledTask m_rolloverTask;
-    private readonly object m_syncRoot;
-    private readonly SafeManualResetEvent m_rolloverComplete;
     private readonly ArchiveList<TKey, TValue> m_list;
     private List<SortedTreeTable<TKey, TValue>> m_pendingTables1;
     private List<SortedTreeTable<TKey, TValue>> m_pendingTables2;
     private List<SortedTreeTable<TKey, TValue>> m_pendingTables3;
-    private readonly SimplifiedArchiveInitializer<TKey, TValue> m_createNextStageFile;
+    private readonly SafeManualResetEvent m_rolloverComplete;
+
+    private readonly ScheduledTask m_rolloverTask;
+
+    private readonly FirstStageWriterSettings m_settings;
+    private bool m_stopped;
+    private readonly object m_syncRoot;
+    private bool m_disposed;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a stage writer.
     /// </summary>
-    public FirstStageWriter(FirstStageWriterSettings settings, ArchiveList<TKey, TValue> list)
-        : base(MessageClass.Framework)
+    public FirstStageWriter(FirstStageWriterSettings settings, ArchiveList<TKey, TValue> list) : base(MessageClass.Framework)
     {
         if (settings is null)
             throw new ArgumentNullException(nameof(settings));
@@ -84,16 +76,33 @@ public class FirstStageWriter<TKey, TValue>
         m_pendingTables2 = new List<SortedTreeTable<TKey, TValue>>();
         m_pendingTables3 = new List<SortedTreeTable<TKey, TValue>>();
         m_syncRoot = new object();
-        m_rolloverTask = new ScheduledTask(ThreadingMode.DedicatedForeground, ThreadPriority.Normal);
+        m_rolloverTask = new ScheduledTask(ThreadingMode.DedicatedForeground);
         m_rolloverTask.Running += RolloverTask_Running;
         //m_rolloverTask.UnhandledException += OnProcessException;
     }
 
+    #endregion
+
+    #region [ Methods ]
+
+    /// <summary>
+    /// Event that notifies that a certain sequence number has been committed.
+    /// </summary>
+    public event Action<long> SequenceNumberCommitted;
+
+    /// <summary>
+    /// Occurs after a rollover operation has completed and provides the sequence number associated with
+    /// the rollover.
+    /// </summary>
+    public event Action<long> RolloverComplete;
+
     /// <summary>
     /// Appends this data to this stage. Also queues up for deletion if necessary.
     /// </summary>
-    /// <param name="args">arguments handed to this class from either the 
-    /// PrestageWriter or another StageWriter of a previous generation</param>
+    /// <param name="args">
+    /// arguments handed to this class from either the
+    /// PrestageWriter or another StageWriter of a previous generation
+    /// </param>
     /// <remarks>
     /// This method must be called in a single threaded manner.
     /// </remarks>
@@ -104,13 +113,14 @@ public class FirstStageWriter<TKey, TValue>
             Log.Publish(MessageLevel.Info, "No new points can be added. Point queue has been stopped. Data in rollover will be lost");
             return;
         }
+
         if (m_disposed)
         {
             Log.Publish(MessageLevel.Info, "First stage writer has been disposed. Data in rollover will be lost");
             return;
         }
 
-        SortedTreeFile file = SortedTreeFile.CreateInMemory(4096);
+        SortedTreeFile file = SortedTreeFile.CreateInMemory();
         SortedTreeTable<TKey, TValue> table = file.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
         using (SortedTreeTableEditor<TKey, TValue> edit = table.BeginEdit())
         {
@@ -128,6 +138,7 @@ public class FirstStageWriter<TKey, TValue>
                 table.Dispose();
                 return;
             }
+
             if (m_disposed)
             {
                 Log.Publish(MessageLevel.Info, "First stage writer has been disposed. Data in rollover will be lost");
@@ -139,12 +150,13 @@ public class FirstStageWriter<TKey, TValue>
             {
                 edit.Add(table);
             }
+
             m_pendingTables1.Add(table);
 
             if (m_pendingTables1.Count == 10)
             {
                 using UnionTreeStream<TKey, TValue> reader = new(m_pendingTables1.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true);
-                SortedTreeFile file1 = SortedTreeFile.CreateInMemory(4096);
+                SortedTreeFile file1 = SortedTreeFile.CreateInMemory();
                 SortedTreeTable<TKey, TValue> table1 = file1.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
                 using (SortedTreeTableEditor<TKey, TValue> edit = table1.BeginEdit())
                 {
@@ -158,9 +170,7 @@ public class FirstStageWriter<TKey, TValue>
                     edit.Add(table1);
 
                     foreach (SortedTreeTable<TKey, TValue> table2 in m_pendingTables1)
-                    {
                         edit.TryRemoveAndDelete(table2.ArchiveId);
-                    }
                 }
 
                 m_pendingTables2.Add(table1);
@@ -170,7 +180,7 @@ public class FirstStageWriter<TKey, TValue>
             if (m_pendingTables2.Count == 10)
             {
                 using UnionTreeStream<TKey, TValue> reader = new(m_pendingTables2.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true);
-                SortedTreeFile file1 = SortedTreeFile.CreateInMemory(4096);
+                SortedTreeFile file1 = SortedTreeFile.CreateInMemory();
                 SortedTreeTable<TKey, TValue> table1 = file1.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
                 using (SortedTreeTableEditor<TKey, TValue> edit = table1.BeginEdit())
                 {
@@ -184,9 +194,7 @@ public class FirstStageWriter<TKey, TValue>
                     edit.Add(table1);
 
                     foreach (SortedTreeTable<TKey, TValue> table2 in m_pendingTables2)
-                    {
                         edit.TryRemoveAndDelete(table2.ArchiveId);
-                    }
                 }
 
                 m_pendingTables3.Add(table1);
@@ -219,6 +227,70 @@ public class FirstStageWriter<TKey, TValue>
             Log.Publish(MessageLevel.NA, MessageFlags.PerformanceIssue, "Queue is full", "Rollover task is taking a long time. A long pause on the inputs is about to occur.");
             m_rolloverComplete.WaitOne();
         }
+    }
+
+    /// <summary>
+    /// Stop all writing to this class.
+    /// Once stopped, it cannot be resumed.
+    /// All data is then immediately flushed to the output.
+    /// This method calls Dispose()
+    /// </summary>
+    /// <returns></returns>
+    public long Stop()
+    {
+        Log.Publish(MessageLevel.Info, "Stop() called", "Write is stopping");
+
+        lock (m_syncRoot)
+        {
+            m_stopped = true;
+        }
+
+        m_rolloverTask.Dispose();
+        Dispose();
+        return m_lastCommitedSequenceNumber;
+    }
+
+    /// <summary>
+    /// Triggers a rollover if the provided sequence id has not yet been committed.
+    /// </summary>
+    /// <param name="sequenceId"></param>
+    public void Commit(long sequenceId)
+    {
+        lock (m_syncRoot)
+        {
+            if (sequenceId > m_lastRolledOverSequenceNumber)
+                m_rolloverTask.Start();
+        }
+    }
+
+    /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="FirstStageWriter{TKey,TValue}"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (!m_disposed && disposing)
+        {
+            lock (m_syncRoot)
+            {
+                if (m_disposed) //Prevents concurrent calls.
+                    return;
+                m_stopped = true;
+                m_disposed = true;
+            }
+
+            try
+            {
+                m_rolloverTask.Dispose();
+                m_rolloverComplete.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Log.Publish(MessageLevel.Info, MessageFlags.BugReport, "Unhandled exception in the dispose process", null, null, ex);
+            }
+        }
+
+        base.Dispose(disposing);
     }
 
     private void RolloverTask_Running(object sender, EventArgs<ScheduledTaskRunningReason> e)
@@ -270,6 +342,7 @@ public class FirstStageWriter<TKey, TValue>
                     summary.LastKey.CopyTo(endKey);
             }
         }
+
         foreach (SortedTreeTable<TKey, TValue> table in pendingTables2)
         {
             ArchiveTableSummary<TKey, TValue> summary = new(table);
@@ -282,6 +355,7 @@ public class FirstStageWriter<TKey, TValue>
                     summary.LastKey.CopyTo(endKey);
             }
         }
+
         foreach (SortedTreeTable<TKey, TValue> table in pendingTables3)
         {
             ArchiveTableSummary<TKey, TValue> summary = new(table);
@@ -308,20 +382,14 @@ public class FirstStageWriter<TKey, TValue>
             edit.Add(newTable);
 
             foreach (SortedTreeTable<TKey, TValue> table in pendingTables1)
-            {
                 edit.TryRemoveAndDelete(table.ArchiveId);
-            }
 
             foreach (SortedTreeTable<TKey, TValue> table in pendingTables2)
-            {
                 edit.TryRemoveAndDelete(table.ArchiveId);
-            }
 
 
             foreach (SortedTreeTable<TKey, TValue> table in pendingTables3)
-            {
                 edit.TryRemoveAndDelete(table.ArchiveId);
-            }
         }
 
         m_lastRolledOverSequenceNumber.Value = sequenceNumber;
@@ -329,66 +397,7 @@ public class FirstStageWriter<TKey, TValue>
         RolloverComplete?.Invoke(sequenceNumber);
     }
 
-    /// <summary>
-    /// Stop all writing to this class.
-    /// Once stopped, it cannot be resumed.
-    /// All data is then immediately flushed to the output.
-    /// This method calls Dispose()
-    /// </summary>
-    /// <returns></returns>
-    public long Stop()
-    {
-        Log.Publish(MessageLevel.Info, "Stop() called", "Write is stopping");
-
-        lock (m_syncRoot)
-        {
-            m_stopped = true;
-        }
-        m_rolloverTask.Dispose();
-        Dispose();
-        return m_lastCommitedSequenceNumber;
-    }
-
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="FirstStageWriter{TKey,TValue}"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (!m_disposed && disposing)
-        {
-            lock (m_syncRoot)
-            {
-                if (m_disposed) //Prevents concurrent calls.
-                    return;
-                m_stopped = true;
-                m_disposed = true;
-            }
-            try
-            {
-                m_rolloverTask.Dispose();
-                m_rolloverComplete.Dispose();
-            }
-            catch (Exception ex)
-            {
-                Log.Publish(MessageLevel.Info, MessageFlags.BugReport, "Unhandled exception in the dispose process", null, null, ex);
-            }
-        }
-        base.Dispose(disposing);
-    }
-
-    /// <summary>
-    /// Triggers a rollover if the provided sequence id has not yet been committed.
-    /// </summary>
-    /// <param name="sequenceId"></param>
-    public void Commit(long sequenceId)
-    {
-        lock (m_syncRoot)
-        {
-            if (sequenceId > m_lastRolledOverSequenceNumber)
-                m_rolloverTask.Start();
-        }
-    }
+    #endregion
 
     // TODO: JRC - think about custom exception handling messages with SafeInvoke for missing UnhandledException above
     //private void OnProcessException(object sender, EventArgs<Exception> e)

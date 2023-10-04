@@ -24,10 +24,10 @@
 //
 //******************************************************************************************************
 
+using System.Text;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Macs;
 using Org.BouncyCastle.Crypto.Parameters;
-using System.Text;
 
 namespace SnapDB.Security.Authentication;
 
@@ -36,17 +36,23 @@ namespace SnapDB.Security.Authentication;
 /// </summary>
 public class ScramUserCredential
 {
+    #region [ Members ]
+
     public HashMethod HashMethod;
-    public ReadonlyByteArray UserBytes;
-    public string UserName;
     public int Iterations;
     public byte[] Salt;
-    public byte[] StoredKey;
     public byte[] ServerKey;
+    public byte[] StoredKey;
+    public ReadonlyByteArray UserBytes;
+    public string UserName;
 
     private readonly HMac m_clientSignature;
-    private readonly HMac m_serverSignature;
     private readonly IDigest m_computeStoredKey;
+    private readonly HMac m_serverSignature;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Adds the following user information to the server's user database
@@ -85,11 +91,14 @@ public class ScramUserCredential
         m_computeStoredKey = Scram.CreateDigest(HashMethod);
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     public byte[] ComputeClientSignature(byte[] authMessage)
     {
         byte[] result = new byte[m_clientSignature.GetMacSize()];
         if (Monitor.TryEnter(m_clientSignature))
-        {
             try
             {
                 m_clientSignature.BlockUpdate(authMessage, 0, authMessage.Length);
@@ -99,11 +108,9 @@ public class ScramUserCredential
             {
                 Monitor.Exit(m_clientSignature);
             }
-        }
         else
-        {
             return Hmac.Compute(Scram.CreateDigest(HashMethod), StoredKey, authMessage);
-        }
+
         return result;
     }
 
@@ -111,7 +118,6 @@ public class ScramUserCredential
     {
         byte[] result = new byte[m_serverSignature.GetMacSize()];
         if (Monitor.TryEnter(m_serverSignature))
-        {
             try
             {
                 m_serverSignature.BlockUpdate(authMessage, 0, authMessage.Length);
@@ -121,11 +127,9 @@ public class ScramUserCredential
             {
                 Monitor.Exit(m_serverSignature);
             }
-        }
         else
-        {
             return Hmac.Compute(Scram.CreateDigest(HashMethod), StoredKey, authMessage);
-        }
+
         return result;
     }
 
@@ -133,32 +137,27 @@ public class ScramUserCredential
     {
         byte[] result = new byte[m_computeStoredKey.GetDigestSize()];
         if (Monitor.TryEnter(m_computeStoredKey))
-        {
             try
             {
                 m_computeStoredKey.BlockUpdate(clientKey, 0, clientKey.Length);
                 m_computeStoredKey.DoFinal(result, 0);
                 return result;
-
             }
             finally
             {
                 Monitor.Exit(m_computeStoredKey);
             }
-        }
-        else
-        {
-            return Hash.Compute(Scram.CreateDigest(HashMethod), clientKey);
-        }
+
+        return Hash.Compute(Scram.CreateDigest(HashMethod), clientKey);
     }
 
     public void Save()
     {
-
     }
 
     public void Load()
     {
-
     }
+
+    #endregion
 }

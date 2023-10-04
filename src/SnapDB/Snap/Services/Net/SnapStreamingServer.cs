@@ -24,56 +24,53 @@
 //
 //******************************************************************************************************
 
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using Gemstone.Diagnostics;
 using Gemstone.IO.StreamExtensions;
 using SnapDB.IO;
 using SnapDB.Security;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace SnapDB.Snap.Services.Net;
 
 /// <summary>
 /// This is a single server socket that handles an individual client connection.
 /// </summary>
-public class SnapStreamingServer
-    : DisposableLoggingClassBase
+public class SnapStreamingServer : DisposableLoggingClassBase
 {
-    private bool m_disposed;
-    private SnapServer m_server;
-    private SnapClient m_host;
-    private Stream m_rawStream;
-    private Stream m_secureStream;
-    private RemoteBinaryStream m_stream;
-    private SecureStreamServer<SocketUserPermissions> m_authentication;
-    private SocketUserPermissions m_permissions;
+    #region [ Members ]
+
     public bool RequireSsl;
 
-    public SnapStreamingServer(SecureStreamServer<SocketUserPermissions> authentication, Stream stream, SnapServer server, bool requireSsl = false)
-        : base(MessageClass.Framework)
+    private SecureStreamServer<SocketUserPermissions> m_authentication;
+    private SnapClient m_host;
+    private SocketUserPermissions m_permissions;
+    private Stream m_rawStream;
+    private Stream m_secureStream;
+    private SnapServer m_server;
+    private RemoteBinaryStream m_stream;
+    private bool m_disposed;
+
+    #endregion
+
+    #region [ Constructors ]
+
+    public SnapStreamingServer(SecureStreamServer<SocketUserPermissions> authentication, Stream stream, SnapServer server, bool requireSsl = false) : base(MessageClass.Framework)
     {
         Initialize(authentication, stream, server, requireSsl);
     }
 
     /// <summary>
-    /// Allows derived classes to call <see cref="Initialize"/> after the inheriting class 
+    /// Allows derived classes to call <see cref="Initialize"/> after the inheriting class
     /// has done something in the constructor.
     /// </summary>
-    protected SnapStreamingServer()
-        : base(MessageClass.Framework)
+    protected SnapStreamingServer() : base(MessageClass.Framework)
     {
     }
 
-    /// <summary>
-    /// Creates a <see cref="SnapStreamingServer"/>
-    /// </summary>
-    protected void Initialize(SecureStreamServer<SocketUserPermissions> authentication, Stream stream, SnapServer server, bool requireSsl)
-    {
-        RequireSsl = requireSsl;
-        m_rawStream = stream;
-        m_authentication = authentication;
-        m_server = server;
-    }
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// This function will verify the connection, create all necessary streams, set timeouts, and catch any exceptions and terminate the connection
@@ -98,9 +95,7 @@ public class SnapStreamingServer
             m_rawStream.Write(useSsl);
 
             if (!m_authentication.TryAuthenticateAsServer(m_rawStream, useSsl, out m_secureStream, out m_permissions))
-            {
                 return;
-            }
 
             m_stream = new RemoteBinaryStream(m_secureStream);
             m_stream.Write((byte)ServerResponse.ConnectedToRoot);
@@ -119,6 +114,7 @@ public class SnapStreamingServer
             {
                 Logger.SwallowException(ex2);
             }
+
             Log.Publish(MessageLevel.Warning, "Socket Exception", "Exception occured, Client will be disconnected.", null, ex);
         }
         finally
@@ -130,7 +126,43 @@ public class SnapStreamingServer
     }
 
     /// <summary>
-    /// This function will process any of the packets that come in.  It will throw an error if anything happens.  
+    /// Creates a <see cref="SnapStreamingServer"/>
+    /// </summary>
+    protected void Initialize(SecureStreamServer<SocketUserPermissions> authentication, Stream stream, SnapServer server, bool requireSsl)
+    {
+        RequireSsl = requireSsl;
+        m_rawStream = stream;
+        m_authentication = authentication;
+        m_server = server;
+    }
+
+
+    /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="SnapNetworkServer"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (m_disposed)
+            return;
+
+        try
+        {
+            if (disposing)
+            {
+                m_host?.Dispose();
+                m_host = null;
+            }
+        }
+        finally
+        {
+            m_disposed = true; // Prevent duplicate dispose.
+            base.Dispose(disposing); // Call base class Dispose().
+        }
+    }
+
+    /// <summary>
+    /// This function will process any of the packets that come in.  It will throw an error if anything happens.
     /// This will cause the calling function to close the connection.
     /// </summary>
     /// <remarks></remarks>
@@ -148,9 +180,7 @@ public class SnapStreamingServer
                     m_stream.Write((byte)ServerResponse.ListOfDatabases);
                     m_stream.Write(info.Count);
                     foreach (DatabaseInfo i in info)
-                    {
                         i.Save(m_stream);
-                    }
                     m_stream.Flush();
                     break;
                 case ServerCommand.ConnectToDatabase:
@@ -164,6 +194,7 @@ public class SnapStreamingServer
                         m_stream.Flush();
                         return;
                     }
+
                     ClientDatabaseBase database = m_host.GetDatabase(databaseName);
                     DatabaseInfo dbinfo = database.Info;
                     if (dbinfo.KeyTypeId != keyTypeId)
@@ -173,6 +204,7 @@ public class SnapStreamingServer
                         m_stream.Flush();
                         return;
                     }
+
                     if (dbinfo.ValueTypeId != valueTypeId)
                     {
                         m_stream.Write((byte)ServerResponse.DatabaseValueUnknown);
@@ -206,9 +238,7 @@ public class SnapStreamingServer
 
     //Called through reflection. Its the only way to call a generic function only knowing the Types
     [MethodImpl(MethodImplOptions.NoOptimization)] //Prevents removing this method as it may appear unused.
-    private bool ConnectToDatabase<TKey, TValue>(SnapServerDatabase<TKey, TValue>.ClientDatabase database)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+    private bool ConnectToDatabase<TKey, TValue>(SnapServerDatabase<TKey, TValue>.ClientDatabase database) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         m_stream.Write((byte)ServerResponse.SuccessfullyConnectedToDatabase);
         m_stream.Flush();
@@ -216,28 +246,5 @@ public class SnapStreamingServer
         return engine.RunDatabaseLevel();
     }
 
-
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="SnapNetworkServer"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (m_disposed)
-            return;
-
-        try
-        {
-            if (disposing)
-            {
-                m_host?.Dispose();
-                m_host = null;
-            }
-        }
-        finally
-        {
-            m_disposed = true;       // Prevent duplicate dispose.
-            base.Dispose(disposing); // Call base class Dispose().
-        }
-    }
+    #endregion
 }

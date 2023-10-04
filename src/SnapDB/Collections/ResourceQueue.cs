@@ -29,15 +29,20 @@ using System.Collections.Concurrent;
 namespace SnapDB.Collections;
 
 /// <summary>
-/// Provides a specialized, thread-safe queue that acts as a quasi-buffer pool. 
+/// Provides a specialized, thread-safe queue that acts as a quasi-buffer pool.
 /// </summary>
 /// <typeparam name="T">The type of resources managed by the queue (must be a reference type).</typeparam>
-public class ResourceQueue<T>
-    where T : class
+public class ResourceQueue<T> where T : class
 {
-    private readonly ConcurrentQueue<T> m_queue;
+    #region [ Members ]
+
     private readonly Func<T> m_instanceObject;
     private readonly int m_maximumCount;
+    private readonly ConcurrentQueue<T> m_queue;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new Resource Queue with the specified initial resources and maximum capacity.
@@ -49,7 +54,7 @@ public class ResourceQueue<T>
     {
         if (initialCount < 0)
             throw new ArgumentOutOfRangeException(nameof(initialCount), "Must be positive");
-        
+
         if (maximumCount < initialCount)
             throw new ArgumentOutOfRangeException(nameof(maximumCount), "Must be greater than or equal to initialCount");
 
@@ -62,13 +67,17 @@ public class ResourceQueue<T>
             m_queue.Enqueue(m_instanceObject());
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Removes an item from the queue. If one does not exist, a new item is created.
     /// </summary>
     /// <returns>The dequeued or newly recreated item of type T.</returns>
     public T Dequeue()
     {
-        if (m_queue.TryDequeue(result: out T? item))
+        if (m_queue.TryDequeue(out T? item))
             return item;
 
         // Create a new instance of T using the provided delegate if the queue is empty.
@@ -87,4 +96,6 @@ public class ResourceQueue<T>
         if (m_queue.Count < m_maximumCount)
             m_queue.Enqueue(resource);
     }
+
+    #endregion
 }

@@ -30,15 +30,24 @@ namespace SnapDB.Threading;
 
 public partial class ThreadSafeList<T>
 {
+    #region [ Members ]
+
     /// <summary>
     /// The Enumerator for a <see cref="ThreadSafeList{T}"/>.
     /// </summary>
     private class Enumerator : IEnumerator<T>
     {
-        private T m_nextItem;
-        private bool m_disposed;
-        private bool m_nextItemExists;
+        #region [ Members ]
+
         private Iterator m_iterator;
+        private T m_nextItem;
+        private bool m_nextItemExists;
+
+        private bool m_disposed;
+
+        #endregion
+
+        #region [ Constructors ]
 
         /// <summary>
         /// Initializes a new instance of the Enumerator class with the provided iterator.
@@ -49,6 +58,10 @@ public partial class ThreadSafeList<T>
             m_iterator = iterator;
             m_nextItemExists = false;
         }
+
+        #endregion
+
+        #region [ Properties ]
 
         /// <summary>
         /// Gets the element in the collection at the current position of the enumerator.
@@ -62,7 +75,7 @@ public partial class ThreadSafeList<T>
             {
                 if (!m_nextItemExists)
                     throw new InvalidOperationException("Past the end of the array, or never called MoveNext()");
-                    
+
                 return m_nextItem;
             }
         }
@@ -75,6 +88,28 @@ public partial class ThreadSafeList<T>
         /// </returns>
         /// <filterpriority>2</filterpriority>
         object IEnumerator.Current => Current;
+
+        #endregion
+
+        #region [ Methods ]
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <filterpriority>2</filterpriority>
+        public void Dispose()
+        {
+            if (!m_disposed)
+            {
+                if (m_nextItemExists)
+                    m_iterator.UnsafeUnregisterItem();
+
+                m_disposed = true;
+                m_nextItemExists = false;
+                m_nextItem = default;
+                m_iterator = null;
+            }
+        }
 
 
         /// <summary>
@@ -105,7 +140,7 @@ public partial class ThreadSafeList<T>
         {
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
-                
+
             if (m_nextItemExists)
                 m_iterator.UnsafeUnregisterItem();
 
@@ -114,22 +149,8 @@ public partial class ThreadSafeList<T>
             m_iterator.Reset();
         }
 
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        /// <filterpriority>2</filterpriority>
-        public void Dispose()
-        {
-            if (!m_disposed)
-            {
-                if (m_nextItemExists)
-                    m_iterator.UnsafeUnregisterItem();
-
-                m_disposed = true;
-                m_nextItemExists = false;
-                m_nextItem = default;
-                m_iterator = null;
-            }
-        }
+        #endregion
     }
+
+    #endregion
 }

@@ -33,9 +33,15 @@ namespace SnapDB.Snap.Encoding;
 /// </summary>
 internal class IndividualEncodingDictionary
 {
-    private readonly object m_syncRoot;
+    #region [ Members ]
+
     private readonly Dictionary<Guid, IndividualEncodingDefinitionBase> m_combinedEncoding;
     private readonly Dictionary<Tuple<Guid, Type>, IndividualEncodingDefinitionBase> m_keyTypedCombinedEncoding;
+    private readonly object m_syncRoot;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new EncodingDictionary
@@ -47,6 +53,10 @@ internal class IndividualEncodingDictionary
         m_keyTypedCombinedEncoding = new Dictionary<Tuple<Guid, Type>, IndividualEncodingDefinitionBase>();
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Registers this type
     /// </summary>
@@ -56,13 +66,9 @@ internal class IndividualEncodingDictionary
         lock (m_syncRoot)
         {
             if (encoding.TypeIfNotGeneric is null)
-            {
                 m_combinedEncoding.Add(encoding.Method, encoding);
-            }
             else if (encoding.TypeIfNotGeneric is not null)
-            {
                 m_keyTypedCombinedEncoding.Add(Tuple.Create(encoding.Method, encoding.TypeIfNotGeneric), encoding);
-            }
         }
     }
 
@@ -73,19 +79,17 @@ internal class IndividualEncodingDictionary
     /// <param name="encodingMethod">the encoding method</param>
     /// <param name="encoding">an output if the encoding method exists.</param>
     /// <returns>True if the encoding value was found, false otherwise.</returns>
-    public bool TryGetEncodingMethod<TTree>(Guid encodingMethod, out IndividualEncodingDefinitionBase encoding)
-        where TTree : SnapTypeBase<TTree>, new()
+    public bool TryGetEncodingMethod<TTree>(Guid encodingMethod, out IndividualEncodingDefinitionBase encoding) where TTree : SnapTypeBase<TTree>, new()
     {
         Type keyType = typeof(TTree);
         lock (m_syncRoot)
         {
-            if (m_keyTypedCombinedEncoding.TryGetValue(Tuple.Create(encodingMethod, keyType), out encoding)
-                || m_combinedEncoding.TryGetValue(encodingMethod, out encoding))
-            {
+            if (m_keyTypedCombinedEncoding.TryGetValue(Tuple.Create(encodingMethod, keyType), out encoding) || m_combinedEncoding.TryGetValue(encodingMethod, out encoding))
                 return true;
-            }
         }
+
         return false;
     }
 
+    #endregion
 }

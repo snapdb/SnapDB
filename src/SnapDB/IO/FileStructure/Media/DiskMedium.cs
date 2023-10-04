@@ -24,8 +24,8 @@
 //
 //******************************************************************************************************
 
-using SnapDB.IO.Unmanaged;
 using Gemstone.Diagnostics;
+using SnapDB.IO.Unmanaged;
 
 namespace SnapDB.IO.FileStructure.Media;
 
@@ -33,11 +33,8 @@ namespace SnapDB.IO.FileStructure.Media;
 /// Provides read and write access to all of the different types of disk types
 /// to use to store the file structure.
 /// </summary>
-internal class DiskMedium
-    : IDisposable
+internal class DiskMedium : IDisposable
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(DiskMedium), MessageClass.Component);
-
     #region [ Members ]
 
     // The underlying disk implementation.
@@ -61,8 +58,6 @@ internal class DiskMedium
         BlockSize = header.BlockSize;
     }
 
-    #endregion
-
 #if DEBUG
     ~DiskMedium()
     {
@@ -70,11 +65,13 @@ internal class DiskMedium
     }
 #endif
 
+    #endregion
+
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the current number of bytes used by the file system. 
-    /// This is only intended to be an approximate figure. 
+    /// Gets the current number of bytes used by the file system.
+    /// This is only intended to be an approximate figure.
     /// </summary>
     public long Length => m_disk.Length;
 
@@ -98,8 +95,23 @@ internal class DiskMedium
     #region [ Methods ]
 
     /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// </summary>
+    /// <filterpriority>2</filterpriority>
+    public void Dispose()
+    {
+        if (m_disposed)
+            return;
+
+        GC.SuppressFinalize(this);
+        m_disposed = true;
+        m_disk.Dispose();
+        m_disk = null!;
+    }
+
+    /// <summary>
     /// Occurs when rolling back a transaction. This will free up
-    /// any temporary space allocated for the change. 
+    /// any temporary space allocated for the change.
     /// </summary>
     public void RollbackChanges()
     {
@@ -150,24 +162,11 @@ internal class DiskMedium
         m_disk.ChangeShareMode(isReadOnly, isSharingEnabled);
     }
 
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-    /// </summary>
-    /// <filterpriority>2</filterpriority>
-    public void Dispose()
-    {
-        if (m_disposed)
-            return;
-        
-        GC.SuppressFinalize(this);
-        m_disposed = true;
-        m_disk.Dispose();
-        m_disk = null!;
-    }
-
     #endregion
 
     #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(DiskMedium), MessageClass.Component);
 
     /// <summary>
     /// Creates a new in-memory disk medium with the specified settings.
@@ -213,7 +212,7 @@ internal class DiskMedium
     public static DiskMedium CreateFile(CustomFileStream stream, MemoryPool pool, int fileStructureBlockSize, params Guid[] flags)
     {
         FileHeaderBlock header = FileHeaderBlock.CreateNew(fileStructureBlockSize, flags);
-        BufferedFile disk = new(stream, pool, header, isNewFile: true);
+        BufferedFile disk = new(stream, pool, header, true);
 
         return new DiskMedium(disk, header);
     }
@@ -239,7 +238,7 @@ internal class DiskMedium
         byte[] buffer = new byte[fileStructureBlockSize];
         stream.ReadRaw(0, buffer, fileStructureBlockSize);
         FileHeaderBlock header = FileHeaderBlock.Open(buffer);
-        BufferedFile disk = new(stream, pool, header, isNewFile: false);
+        BufferedFile disk = new(stream, pool, header, false);
 
         return new DiskMedium(disk, header);
     }

@@ -37,12 +37,11 @@ namespace SnapDB.IO.FileStructure.Media;
 /// </summary>
 internal sealed class DiskIo : IDisposable
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(DiskIo), MessageClass.Component);
-
     #region [ Members ]
 
-    private DiskMedium m_stream;
     private readonly bool m_isReadOnly;
+
+    private DiskMedium m_stream;
 
     #endregion
 
@@ -142,8 +141,29 @@ internal sealed class DiskIo : IDisposable
     #region [ Methods ]
 
     /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="DiskIo"/> object and optionally releases the managed resources.
+    /// </summary>
+    public void Dispose()
+    {
+        if (IsDisposed)
+            return;
+
+        try
+        {
+            m_stream?.Dispose();
+        }
+
+        finally
+        {
+            GC.SuppressFinalize(this);
+            m_stream = null!;
+            IsDisposed = true;
+        }
+    }
+
+    /// <summary>
     /// Occurs when rolling back a transaction. This will free up
-    /// any temporary space allocated for the change. 
+    /// any temporary space allocated for the change.
     /// </summary>
     public void RollbackChanges()
     {
@@ -157,7 +177,7 @@ internal sealed class DiskIo : IDisposable
     }
 
     /// <summary>
-    /// Does a safe copy of data from one location to another. 
+    /// Does a safe copy of data from one location to another.
     /// A safe copy allows for the source and destination to overlap.
     /// </summary>
     /// <param name="src">A pointer to the source data to be copied.</param>
@@ -210,28 +230,11 @@ internal sealed class DiskIo : IDisposable
         m_stream.ChangeShareMode(isReadOnly, isSharingEnabled);
     }
 
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="DiskIo"/> object and optionally releases the managed resources.
-    /// </summary>
-    public void Dispose()
-    {
-        if (IsDisposed)
-            return;
-        
-        try
-        {
-            m_stream?.Dispose();
-        }
-
-        finally
-        {
-            GC.SuppressFinalize(this);
-            m_stream = null!;
-            IsDisposed = true;
-        }
-    }
-
     #endregion
+
+    #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(DiskIo), MessageClass.Component);
 
     public static DiskIo CreateMemoryFile(MemoryPool pool, int fileStructureBlockSize, params Guid[] flags)
     {
@@ -256,4 +259,6 @@ internal sealed class DiskIo : IDisposable
 
         return new DiskIo(disk, isReadOnly);
     }
+
+    #endregion
 }

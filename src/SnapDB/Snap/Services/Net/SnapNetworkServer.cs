@@ -24,22 +24,27 @@
 //
 //******************************************************************************************************
 
-using Gemstone.Diagnostics;
-using SnapDB.Security;
 using System.Net.Sockets;
 using System.Text;
+using Gemstone.Diagnostics;
+using SnapDB.Security;
 
 namespace SnapDB.Snap.Services.Net;
 
 /// <summary>
 /// This is a single server socket that handles an individual client connection.
 /// </summary>
-internal class SnapNetworkServer
-    : SnapStreamingServer
+internal class SnapNetworkServer : SnapStreamingServer
 {
-    private bool m_disposed;
+    #region [ Members ]
+
     private readonly TcpClient m_client;
     private readonly NetworkStream m_rawStream;
+    private bool m_disposed;
+
+    #endregion
+
+    #region [ Constructors ]
 
     public SnapNetworkServer(SecureStreamServer<SocketUserPermissions> authentication, TcpClient client, SnapServer server, bool requireSsl = false)
     {
@@ -49,6 +54,10 @@ internal class SnapNetworkServer
 
         Initialize(authentication, m_rawStream, server, requireSsl);
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     public void GetFullStatus(StringBuilder status)
     {
@@ -100,4 +109,6 @@ internal class SnapNetworkServer
             Log.Publish(MessageLevel.Debug, "SnapConnectionReset", null, null, ex);
         }
     }
+
+    #endregion
 }

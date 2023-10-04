@@ -24,15 +24,17 @@
 //
 //******************************************************************************************************
 
-using SnapDB.IO;
-using SnapDB.Snap.Types;
 using System.Data;
 using System.Runtime.CompilerServices;
+using SnapDB.IO;
+using SnapDB.Snap.Types;
 
 namespace SnapDB.Snap.Filters;
 
 public partial class TimestampSeekFilter
 {
+    #region [ Static ]
+
     /// <summary>
     /// Creates a seek filter that filters keys falling within a specified time range.
     /// </summary>
@@ -44,8 +46,7 @@ public partial class TimestampSeekFilter
     /// The seek filter includes keys with timestamps greater than or equal to <paramref name="firstTime"/> and
     /// less than or equal to <paramref name="lastTime"/>. It effectively filters keys within the time range.
     /// </remarks>
-    public static SeekFilterBase<TKey> CreateFromRange<TKey>(DateTime firstTime, DateTime lastTime)
-        where TKey : TimestampPointIdBase<TKey>, new()
+    public static SeekFilterBase<TKey> CreateFromRange<TKey>(DateTime firstTime, DateTime lastTime) where TKey : TimestampPointIdBase<TKey>, new()
     {
         return new FixedRange<TKey>((ulong)firstTime.Ticks, (ulong)lastTime.Ticks);
     }
@@ -55,8 +56,7 @@ public partial class TimestampSeekFilter
     /// </summary>
     /// <param name="firstTime">The starting timestamp of the time range query (inclusive).</param>
     /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
-    public static SeekFilterBase<TKey> CreateFromRange<TKey>(ulong firstTime, ulong lastTime)
-        where TKey : TimestampPointIdBase<TKey>, new()
+    public static SeekFilterBase<TKey> CreateFromRange<TKey>(ulong firstTime, ulong lastTime) where TKey : TimestampPointIdBase<TKey>, new()
     {
         return new FixedRange<TKey>(firstTime, lastTime);
     }
@@ -71,12 +71,11 @@ public partial class TimestampSeekFilter
     /// <param name="tolerance">The width of every window.</param>
     /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing.</returns>
     /// <remarks>
-    /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013. 
-    ///               MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
-    ///               Tolerance = 0.001 seconds.
+    /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013.
+    /// MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
+    /// Tolerance = 0.001 seconds.
     /// </remarks>
-    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(ulong firstTime, ulong lastTime, ulong mainInterval, ulong subInterval, ulong tolerance)
-        where TKey : TimestampPointIdBase<TKey>, new()
+    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(ulong firstTime, ulong lastTime, ulong mainInterval, ulong subInterval, ulong tolerance) where TKey : TimestampPointIdBase<TKey>, new()
     {
         return new IntervalRanges<TKey>(firstTime, lastTime, mainInterval, subInterval, tolerance);
     }
@@ -90,12 +89,11 @@ public partial class TimestampSeekFilter
     /// <param name="tolerance">The width of every window</param>
     /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing.</returns>
     /// <remarks>
-    /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013. 
-    ///               MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
-    ///               Tolerance = 0.001 seconds.
+    /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013.
+    /// MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
+    /// Tolerance = 0.001 seconds.
     /// </remarks>
-    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(ulong firstTime, ulong lastTime, ulong interval, ulong tolerance)
-        where TKey : TimestampPointIdBase<TKey>, new()
+    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(ulong firstTime, ulong lastTime, ulong interval, ulong tolerance) where TKey : TimestampPointIdBase<TKey>, new()
     {
         return new IntervalRanges<TKey>(firstTime, lastTime, interval, interval, tolerance);
     }
@@ -110,12 +108,11 @@ public partial class TimestampSeekFilter
     /// <param name="tolerance">The width of every window.</param>
     /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing.</returns>
     /// <remarks>
-    /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013. 
-    ///               MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
-    ///               Tolerance = 0.001 seconds.
+    /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013.
+    /// MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
+    /// Tolerance = 0.001 seconds.
     /// </remarks>
-    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(DateTime firstTime, DateTime lastTime, TimeSpan mainInterval, TimeSpan subInterval, TimeSpan tolerance)
-        where TKey : TimestampPointIdBase<TKey>, new()
+    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(DateTime firstTime, DateTime lastTime, TimeSpan mainInterval, TimeSpan subInterval, TimeSpan tolerance) where TKey : TimestampPointIdBase<TKey>, new()
     {
         return new IntervalRanges<TKey>((ulong)firstTime.Ticks, (ulong)lastTime.Ticks, (ulong)mainInterval.Ticks, (ulong)subInterval.Ticks, (ulong)tolerance.Ticks);
     }
@@ -129,12 +126,11 @@ public partial class TimestampSeekFilter
     /// <param name="tolerance">The width of every window.</param>
     /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing.</returns>
     /// <remarks>
-    /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013. 
-    ///               Interval = 0.1 seconds.
-    ///               Tolerance = 0.001 seconds.
+    /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013.
+    /// Interval = 0.1 seconds.
+    /// Tolerance = 0.001 seconds.
     /// </remarks>
-    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(DateTime firstTime, DateTime lastTime, TimeSpan interval, TimeSpan tolerance)
-        where TKey : TimestampPointIdBase<TKey>, new()
+    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(DateTime firstTime, DateTime lastTime, TimeSpan interval, TimeSpan tolerance) where TKey : TimestampPointIdBase<TKey>, new()
     {
         return new IntervalRanges<TKey>((ulong)firstTime.Ticks, (ulong)lastTime.Ticks, (ulong)interval.Ticks, (ulong)interval.Ticks, (ulong)tolerance.Ticks);
     }
@@ -144,8 +140,7 @@ public partial class TimestampSeekFilter
     /// </summary>
     /// <param name="stream">The stream to load the filter from.</param>
     [MethodImpl(MethodImplOptions.NoOptimization)]
-    private static SeekFilterBase<TKey> CreateFromStream<TKey>(BinaryStreamBase stream)
-        where TKey : TimestampPointIdBase<TKey>, new()
+    private static SeekFilterBase<TKey> CreateFromStream<TKey>(BinaryStreamBase stream) where TKey : TimestampPointIdBase<TKey>, new()
     {
         byte version = stream.ReadUInt8();
 
@@ -165,5 +160,5 @@ public partial class TimestampSeekFilter
         }
     }
 
-
+    #endregion
 }

@@ -24,7 +24,6 @@
 //
 //******************************************************************************************************
 
-using Gemstone.IO.StreamExtensions;
 using SnapDB.Snap.Encoding;
 
 namespace SnapDB.Snap.Tree;
@@ -34,24 +33,28 @@ namespace SnapDB.Snap.Tree;
 /// </summary>
 /// <typeparam name="TKey">The type of keys stored in the nodes.</typeparam>
 /// <typeparam name="TValue">The type of values stored in the nodes.</typeparam>
-public unsafe class GenericEncodedNode<TKey, TValue>
-    : SortedTreeNodeBase<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public unsafe class GenericEncodedNode<TKey, TValue> : SortedTreeNodeBase<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Members ]
+
+    private byte[] m_buffer1;
+    private byte[] m_buffer2;
+    private int m_currentIndex;
+
+    private readonly TKey m_currentKey;
+    private int m_currentOffset;
+    private readonly TValue m_currentValue;
     private readonly PairEncodingBase<TKey, TValue> m_encoding;
     private int m_maximumStorageSize;
     private int m_nextOffset;
-    private int m_currentOffset;
-    private int m_currentIndex;
     private readonly TKey m_nullKey;
     private readonly TValue m_nullValue;
-    private readonly TKey m_currentKey;
-    private readonly TValue m_currentValue;
     private readonly TKey m_prevKey;
     private readonly TValue m_prevValue;
-    private byte[] m_buffer1;
-    private byte[] m_buffer2;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GenericEncodedNode{TKey, TValue}"/> class.
@@ -63,8 +66,7 @@ public unsafe class GenericEncodedNode<TKey, TValue>
     /// It associates the provided encoding method with the node and sets up event handlers for node index changes and cache clearing.
     /// The level should typically be 0, as this type of node is typically used at the leaf level of the tree.
     /// </remarks>
-    public GenericEncodedNode(PairEncodingBase<TKey, TValue> encoding, byte level)
-        : base(level)
+    public GenericEncodedNode(PairEncodingBase<TKey, TValue> encoding, byte level) : base(level)
     {
         if (level != 0)
             throw new ArgumentException("Level for this type is only supported on the leaf level.");
@@ -81,8 +83,34 @@ public unsafe class GenericEncodedNode<TKey, TValue>
         ClearNodeCache();
 
         m_encoding = encoding;
-
     }
+
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// Gets the maximum overhead expected when combining two nodes of this type.
+    /// </summary>
+    /// <remarks>
+    /// The maximum overhead includes the storage required for the data in both nodes, plus one additional byte.
+    /// This property is used in node combining operations to estimate the maximum storage needed for the resulting node.
+    /// </remarks>
+    protected override int MaxOverheadWithCombineNodes => MaximumStorageSize * 2 + 1;
+
+    /// <summary>
+    /// Gets the maximum storage size, in bytes, required for encoding a single key-value pair.
+    /// </summary>
+    /// <remarks>
+    /// This property returns the maximum storage size, in bytes, required to encode a single key-value pair
+    /// using the configured encoding method. It reflects the maximum amount of space that a single pair
+    /// can occupy in the data store, which can be useful for calculating storage requirements.
+    /// </remarks>
+    protected int MaximumStorageSize => m_encoding.MaxCompressionSize;
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Creates a new instance of <see cref="GenericEncodedNode{TKey, TValue}"/> as a clone of the current node.
@@ -110,15 +138,6 @@ public unsafe class GenericEncodedNode<TKey, TValue>
     {
         return new GenericEncodedNodeScanner<TKey, TValue>(m_encoding, Level, BlockSize, Stream, SparseIndex.Get);
     }
-
-    /// <summary>
-    /// Gets the maximum overhead expected when combining two nodes of this type.
-    /// </summary>
-    /// <remarks>
-    /// The maximum overhead includes the storage required for the data in both nodes, plus one additional byte.
-    /// This property is used in node combining operations to estimate the maximum storage needed for the resulting node.
-    /// </remarks>
-    protected override int MaxOverheadWithCombineNodes => MaximumStorageSize * 2 + 1;
 
     /// <summary>
     /// Encodes a key-value record into a binary stream.
@@ -157,16 +176,6 @@ public unsafe class GenericEncodedNode<TKey, TValue>
     {
         return m_encoding.Decode(stream, prevKey, prevValue, currentKey, currentValue, out _);
     }
-
-    /// <summary>
-    /// Gets the maximum storage size, in bytes, required for encoding a single key-value pair.
-    /// </summary>
-    /// <remarks>
-    /// This property returns the maximum storage size, in bytes, required to encode a single key-value pair
-    /// using the configured encoding method. It reflects the maximum amount of space that a single pair
-    /// can occupy in the data store, which can be useful for calculating storage requirements.
-    /// </remarks>
-    protected int MaximumStorageSize => m_encoding.MaxCompressionSize;
 
     /// <summary>
     /// Initializes the node type, including buffer allocation and storage size calculation.
@@ -242,11 +251,13 @@ public unsafe class GenericEncodedNode<TKey, TValue>
 
     /// <summary>
     /// Requests that the current stream is inserted into the tree. Sequential insertion can only occur while the stream
-    /// is in order and is entirely past the end of the tree. 
+    /// is in order and is entirely past the end of the tree.
     /// </summary>
     /// <param name="stream">the stream data to insert</param>
-    /// <param name="isFull">if returning from this function while the node is not yet full, this means the stream 
-    /// can no longer be inserted sequentially and we must break out to the root and insert one at a time.</param>
+    /// <param name="isFull">
+    /// if returning from this function while the node is not yet full, this means the stream
+    /// can no longer be inserted sequentially and we must break out to the root and insert one at a time.
+    /// </param>
     protected override void AppendSequentialStream(InsertStreamHelper<TKey, TValue> stream, out bool isFull)
     {
         int recordsAdded = 0;
@@ -307,35 +318,33 @@ public unsafe class GenericEncodedNode<TKey, TValue>
                 //End Inlined
                 goto TryAgain;
             }
-            else
+
+            //Key2,Value2 are the current record
+            if (RemainingBytes - additionalValidBytes < m_maximumStorageSize)
             {
-                //Key2,Value2 are the current record
-                if (RemainingBytes - additionalValidBytes < m_maximumStorageSize)
+                length = EncodeRecord(buffer, stream.Key1, stream.Value1, stream.Key2, stream.Value2);
+                if (RemainingBytes - additionalValidBytes < length)
                 {
-                    length = EncodeRecord(buffer, stream.Key1, stream.Value1, stream.Key2, stream.Value2);
-                    if (RemainingBytes - additionalValidBytes < length)
-                    {
-                        isFull = true;
-                        IncrementRecordCounts(recordsAdded, additionalValidBytes);
-                        ClearNodeCache();
-                        return;
-                    }
+                    isFull = true;
+                    IncrementRecordCounts(recordsAdded, additionalValidBytes);
+                    ClearNodeCache();
+                    return;
                 }
-
-                length = EncodeRecord(writePointer + m_nextOffset, stream.Key1, stream.Value1, stream.Key2, stream.Value2);
-                additionalValidBytes += length;
-                recordsAdded++;
-                m_currentOffset = m_nextOffset;
-                m_nextOffset = m_currentOffset + length;
-
-                //Inlined stream.Next()
-                stream.IsValid = stream.Stream.Read(stream.Key1, stream.Value1);
-                stream.IsStillSequential = stream.Key2.IsLessThan(stream.Key1);
-                stream.IsKvp1 = true;
-                //End Inlined
-
-                goto TryAgain;
             }
+
+            length = EncodeRecord(writePointer + m_nextOffset, stream.Key1, stream.Value1, stream.Key2, stream.Value2);
+            additionalValidBytes += length;
+            recordsAdded++;
+            m_currentOffset = m_nextOffset;
+            m_nextOffset = m_currentOffset + length;
+
+            //Inlined stream.Next()
+            stream.IsValid = stream.Stream.Read(stream.Key1, stream.Value1);
+            stream.IsStillSequential = stream.Key2.IsLessThan(stream.Key1);
+            stream.IsKvp1 = true;
+            //End Inlined
+
+            goto TryAgain;
         }
     }
 
@@ -354,68 +363,10 @@ public unsafe class GenericEncodedNode<TKey, TValue>
             SeekTo(index);
             return InsertAfter(key, value);
         }
-        else
-        {
-            //Insert Between
-            SeekTo(index);
-            return InsertBetween(key, value);
-        }
-    }
 
-    private bool InsertAfter(TKey key, TValue value)
-    {
-        fixed (byte* buffer = m_buffer1)
-        {
-            int length = EncodeRecord(buffer, m_prevKey, m_prevValue, key, value);
-
-            if (RemainingBytes < length)
-                return false;
-
-            EncodeRecord(GetWritePointer() + m_nextOffset, m_prevKey, m_prevValue, key, value);
-            //WinApi.MoveMemory(GetWritePointer() + m_nextOffset, buffer, length);
-            IncrementOneRecord(length);
-
-            key.CopyTo(m_currentKey);
-            value.CopyTo(m_currentValue);
-            m_nextOffset = m_currentOffset + length;
-            //ResetPositionCached();
-
-            return true;
-        }
-    }
-
-    private bool InsertBetween(TKey key, TValue value)
-    {
-        fixed (byte* buffer = m_buffer1, buffer2 = m_buffer2)
-        {
-            int shiftDelta1 = EncodeRecord(buffer, m_prevKey, m_prevValue, key, value);
-            int shiftDelta2 = EncodeRecord(buffer2, key, value, m_currentKey, m_currentValue);
-            int shiftDelta = shiftDelta1 + shiftDelta2;
-
-            shiftDelta -= m_nextOffset - m_currentOffset;
-
-            if (RemainingBytes < shiftDelta)
-                return false;
-
-            Stream.Position = NodePosition + m_currentOffset;
-            if (shiftDelta < 0)
-                Stream.RemoveBytes(-shiftDelta, ValidBytes - m_currentOffset);
-            else
-                Stream.InsertBytes(shiftDelta, ValidBytes - m_currentOffset);
-
-            Stream.Write(buffer, shiftDelta1);
-            Stream.Write(buffer2, shiftDelta2);
-
-            IncrementOneRecord(shiftDelta);
-
-            key.CopyTo(m_currentKey);
-            value.CopyTo(m_currentValue);
-            m_nextOffset = m_currentOffset + shiftDelta1;
-
-            //ResetPositionCached();
-
-            return true;
-        }
+        //Insert Between
+        SeekTo(index);
+        return InsertBetween(key, value);
     }
 
     //protected override bool InsertUnlessFull(int index, TKey key, TValue value)
@@ -451,14 +402,16 @@ public unsafe class GenericEncodedNode<TKey, TValue>
     protected override int GetIndexOf(TKey key)
     {
         fixed (byte* buffer = m_buffer1)
+        {
             SeekTo(key, buffer);
+        }
 
         if (m_currentIndex == RecordCount) // Beyond the end of the list
             return ~RecordCount;
 
         if (m_currentKey.IsEqualTo(key))
             return m_currentIndex;
-       
+
         return ~m_currentIndex;
     }
 
@@ -474,9 +427,7 @@ public unsafe class GenericEncodedNode<TKey, TValue>
             ClearNodeCache();
 
             while (m_currentOffset < BlockSize >> 1)
-            {
                 Read();
-            }
 
             int storageSize = EncodeRecord(buffer, m_nullKey, m_nullValue, m_currentKey, m_currentValue);
 
@@ -497,9 +448,7 @@ public unsafe class GenericEncodedNode<TKey, TValue>
             Stream.Write(buffer, storageSize);
 
             // Create the header of the second node.
-            CreateNewNode(newNodeIndex, (ushort)recordsInTheSecondNode,
-                          (ushort)(HeaderSize + bytesToMove + storageSize),
-                          NodeIndex, RightSiblingNodeIndex, dividingKey, UpperKey);
+            CreateNewNode(newNodeIndex, (ushort)recordsInTheSecondNode, (ushort)(HeaderSize + bytesToMove + storageSize), NodeIndex, RightSiblingNodeIndex, dividingKey, UpperKey);
 
             // Update the node that was the old right sibling
             if (RightSiblingNodeIndex != uint.MaxValue)
@@ -607,10 +556,64 @@ public unsafe class GenericEncodedNode<TKey, TValue>
         //right.ValidBytes += (ushort)(recordsToTransfer * KeyValueSize);
     }
 
-    #region [ Starter Code ]
+    private bool InsertAfter(TKey key, TValue value)
+    {
+        fixed (byte* buffer = m_buffer1)
+        {
+            int length = EncodeRecord(buffer, m_prevKey, m_prevValue, key, value);
+
+            if (RemainingBytes < length)
+                return false;
+
+            EncodeRecord(GetWritePointer() + m_nextOffset, m_prevKey, m_prevValue, key, value);
+            //WinApi.MoveMemory(GetWritePointer() + m_nextOffset, buffer, length);
+            IncrementOneRecord(length);
+
+            key.CopyTo(m_currentKey);
+            value.CopyTo(m_currentValue);
+            m_nextOffset = m_currentOffset + length;
+            //ResetPositionCached();
+
+            return true;
+        }
+    }
+
+    private bool InsertBetween(TKey key, TValue value)
+    {
+        fixed (byte* buffer = m_buffer1, buffer2 = m_buffer2)
+        {
+            int shiftDelta1 = EncodeRecord(buffer, m_prevKey, m_prevValue, key, value);
+            int shiftDelta2 = EncodeRecord(buffer2, key, value, m_currentKey, m_currentValue);
+            int shiftDelta = shiftDelta1 + shiftDelta2;
+
+            shiftDelta -= m_nextOffset - m_currentOffset;
+
+            if (RemainingBytes < shiftDelta)
+                return false;
+
+            Stream.Position = NodePosition + m_currentOffset;
+            if (shiftDelta < 0)
+                Stream.RemoveBytes(-shiftDelta, ValidBytes - m_currentOffset);
+            else
+                Stream.InsertBytes(shiftDelta, ValidBytes - m_currentOffset);
+
+            Stream.Write(buffer, shiftDelta1);
+            Stream.Write(buffer2, shiftDelta2);
+
+            IncrementOneRecord(shiftDelta);
+
+            key.CopyTo(m_currentKey);
+            value.CopyTo(m_currentValue);
+            m_nextOffset = m_currentOffset + shiftDelta1;
+
+            //ResetPositionCached();
+
+            return true;
+        }
+    }
 
     /// <summary>
-    /// Continue to seek until the end of the list is found or 
+    /// Continue to seek until the end of the list is found or
     /// until the <see cref="m_currentKey"/> >= <paramref name="key"/>
     /// </summary>
     /// <param name="key"></param>
@@ -682,9 +685,7 @@ public unsafe class GenericEncodedNode<TKey, TValue>
     private bool Read()
     {
         if (m_currentIndex == RecordCount)
-        {
             throw new Exception("Read past the end of the stream");
-        }
 
         m_currentKey.CopyTo(m_prevKey);
         m_currentValue.CopyTo(m_prevValue);

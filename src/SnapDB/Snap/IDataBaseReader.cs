@@ -34,10 +34,10 @@ namespace SnapDB.Snap;
 /// </summary>
 /// <typeparam name="TKey">The type of keys in the database.</typeparam>
 /// <typeparam name="TValue">The type of values in the database.</typeparam>
-public interface IDatabaseReader<TKey, TValue> : IDisposable
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public interface IDatabaseReader<TKey, TValue> : IDisposable where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Methods ]
+
     /// <summary>
     /// Reads data from the SortedTreeEngine with the provided read options and server-side filters.
     /// </summary>
@@ -47,4 +47,5 @@ public interface IDatabaseReader<TKey, TValue> : IDisposable
     /// <returns>A stream that will read the specified data.</returns>
     TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions, SeekFilterBase<TKey> keySeekFilter, MatchFilterBase<TKey, TValue>? keyMatchFilter);
 
+    #endregion
 }

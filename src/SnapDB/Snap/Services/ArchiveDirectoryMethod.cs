@@ -29,20 +29,23 @@ namespace SnapDB.Snap.Services;
 /// <summary>
 /// Specifies the directory structure to follow when writing archive files to the disk.
 /// </summary>
-public enum ArchiveDirectoryMethod : int
+public enum ArchiveDirectoryMethod
 {
     /// <summary>
     /// Writes all files in the top directory
     /// </summary>
     TopDirectoryOnly,
+
     /// <summary>
     /// Writes all files based on the starting year
     /// </summary>
     Year,
+
     /// <summary>
     /// Writes all files based on 'YearMonth'
     /// </summary>
     YearMonth,
+
     /// <summary>
     /// Writes all files based on 'Year\Month'
     /// </summary>

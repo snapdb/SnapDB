@@ -34,16 +34,15 @@ namespace SnapDB.IO.FileStructure.Media;
 /// Contains a list of page meta data. Provides a simplified way to interact with this list.
 /// This class is not thread safe.
 /// </summary>
-internal sealed unsafe class PageList
-    : IDisposable
+internal sealed unsafe class PageList : IDisposable
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(PageList), MessageClass.Component);
-
     #region [ Members ]
 
     // The internal data stored about each page. This is address information and position information
     private struct InternalPageMetaData
     {
+        #region [ Members ]
+
         /// <summary>
         /// The pointer to the page.
         /// </summary>
@@ -58,7 +57,12 @@ internal sealed unsafe class PageList
         /// The number of times this page has been referenced.
         /// </summary>
         public int ReferencedCount;
+
+        #endregion
     }
+
+    // A list of all pages that have been cached.
+    private NullableLargeArray<InternalPageMetaData> m_listOfPages;
 
     // Note: Memory pool must not be used to allocate memory since this is a blocking method.
     // Otherwise, there exists the potential to deadlock.
@@ -67,9 +71,6 @@ internal sealed unsafe class PageList
     // Contains all of the pages that are cached for the file stream.
     // Map is PositionIndex and PageIndex
     private readonly SortedList<int, int> m_pageIndexLookupByPositionIndex;
-
-    // A list of all pages that have been cached.
-    private NullableLargeArray<InternalPageMetaData> m_listOfPages;
 
     private bool m_disposed;
 
@@ -97,6 +98,33 @@ internal sealed unsafe class PageList
     #endregion
 
     #region [ Methods ]
+
+    /// <summary>
+    /// Releases all the resources used by the <see cref="PageList"/> object.
+    /// </summary>
+    public void Dispose()
+    {
+        if (m_disposed)
+            return;
+
+        try
+        {
+            if (m_memoryPool.IsDisposed)
+                return;
+
+            m_memoryPool.ReleasePages(m_listOfPages.Select(x => x.MemoryPoolIndex));
+            m_listOfPages = null!;
+        }
+        catch (Exception ex)
+        {
+            s_log.Publish(MessageLevel.Critical, "Unhandled exception when returning resources to the memory pool", null, null, ex);
+        }
+        finally
+        {
+            GC.SuppressFinalize(this);
+            m_disposed = true; // Prevent duplicate dispose.
+        }
+    }
 
     /// <summary>
     /// Converts a number from its position index into a page index.
@@ -163,7 +191,7 @@ internal sealed unsafe class PageList
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
 
-        InternalPageMetaData metaData = m_listOfPages.GetValue(pageIndex)
+        InternalPageMetaData metaData = m_listOfPages.GetValue(pageIndex);
 
         if (incrementReferencedCount > 0)
         {
@@ -224,17 +252,17 @@ internal sealed unsafe class PageList
 
             if (block.ReferencedCount != 0)
                 continue;
-            
+
             if (maxCollectCount == collectionCount)
                 continue;
-            
+
             if (excludedList.Contains(pageIndex))
                 continue;
-            
+
             collectionCount++;
             m_pageIndexLookupByPositionIndex.RemoveAt(x);
             x--;
-            
+
             m_listOfPages.SetNull(pageIndex);
             e.ReleasePage(block.MemoryPoolIndex);
         }
@@ -242,32 +270,11 @@ internal sealed unsafe class PageList
         return collectionCount;
     }
 
-    /// <summary>
-    /// Releases all the resources used by the <see cref="PageList"/> object.
-    /// </summary>
-    public void Dispose()
-    {
-        if (m_disposed)
-            return;
-        
-        try
-        {
-            if (m_memoryPool.IsDisposed)
-                return;
-            
-            m_memoryPool.ReleasePages(m_listOfPages.Select(x => x.MemoryPoolIndex));
-            m_listOfPages = null!;
-        }
-        catch (Exception ex)
-        {
-            s_log.Publish(MessageLevel.Critical, "Unhandled exception when returning resources to the memory pool", null, null, ex);
-        }
-        finally
-        {
-            GC.SuppressFinalize(this);
-            m_disposed = true; // Prevent duplicate dispose.
-        }
-    }
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(PageList), MessageClass.Component);
 
     #endregion
 }

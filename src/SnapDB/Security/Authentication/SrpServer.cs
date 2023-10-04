@@ -34,32 +34,40 @@ namespace SnapDB.Security.Authentication;
 /// </summary>
 public class SrpServer
 {
+    #region [ Members ]
+
     /// <summary>
     /// Contains the user credentials database
     /// </summary>
     public readonly SrpUserCredentials Users;
 
-    private static readonly UTF8Encoding s_utf8 = new(true);
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
-    /// 
     /// </summary>
     public SrpServer()
     {
         Users = new SrpUserCredentials();
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
-    /// Requests that the provided stream be authenticated 
+    /// Requests that the provided stream be authenticated
     /// </summary>
     /// <param name="stream"></param>
-    /// <param name="additionalChallenge">Additional data to include in the challenge. If using SSL certificates, 
-    /// adding the thumbprint to the challenge will allow detecting man in the middle attacks.</param>
+    /// <param name="additionalChallenge">
+    /// Additional data to include in the challenge. If using SSL certificates,
+    /// adding the thumbprint to the challenge will allow detecting man in the middle attacks.
+    /// </param>
     /// <returns></returns>
     public SrpServerSession AuthenticateAsServer(Stream stream, byte[] additionalChallenge = null)
     {
-        if (additionalChallenge is null)
-            additionalChallenge = new byte[] { };
+        additionalChallenge ??= new byte[] { };
 
         // Header
         //  C => S
@@ -75,12 +83,15 @@ public class SrpServer
         SrpUserCredential user = Users.Lookup(username);
         SrpServerSession session = new(user);
         if (session.TryAuthenticate(stream, additionalChallenge))
-        {
             return session;
-        }
         return null;
     }
 
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly UTF8Encoding s_utf8 = new(true);
+
+    #endregion
 }
-
-

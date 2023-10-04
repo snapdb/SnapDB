@@ -25,67 +25,27 @@
 //******************************************************************************************************
 // ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
 
-using SnapDB.IO.Unmanaged;
 using Gemstone.Diagnostics;
+using SnapDB.IO.Unmanaged;
 
 namespace SnapDB.IO.FileStructure.Media;
 
 /// <summary>
 /// A buffered file stream utilizes the <see cref="MemoryPool"/> to intellectually cache
-/// the contents of files.  
+/// the contents of files.
 /// </summary>
 /// <remarks>
 /// This class is a special purpose class that can only be used for the <see cref="TransactionalFileStructure"/>
 /// and can not buffer general purpose file.
-/// 
 /// The cache algorithm is a least recently used algorithm.
-/// This is accomplished by incrementing a counter every time a page is accessed 
+/// This is accomplished by incrementing a counter every time a page is accessed
 /// and dividing by 2 every time a collection occurs from the <see cref="MemoryPool"/>.
 /// </remarks>
 // FUTURE: Consider allowing this class to scale horizontally like how the concurrent dictionary scales.
 // FUTURE: this will reduce the concurrent contention on the class at the cost of more memory required.
-internal partial class BufferedFile
-    : IDiskMediumCoreFunctions
+internal partial class BufferedFile : IDiskMediumCoreFunctions
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(BufferedFile), MessageClass.Component);
-
     #region [ Members ]
-
-    /// <summary>
-    /// Any uncommitted data resides in this location.
-    /// </summary>
-    private MemoryPoolStreamCore m_writeBuffer;
-
-    /// <summary>
-    /// The number of bytes contained in the committed area of the file.
-    /// </summary>
-    private long m_lengthOfCommittedData;
-
-    /// <summary>
-    /// The length of the 10 header pages. 
-    /// </summary>
-    private readonly long m_lengthOfHeader;
-
-    /// <summary>
-    /// Synchronize all calls to this class.
-    /// </summary>
-    private readonly object m_syncRoot;
-
-    /// <summary>
-    /// The <see cref="MemoryPool"/> where the memory pages come from.
-    /// </summary>
-    private readonly MemoryPool m_pool;
-
-    /// <summary>
-    /// Location to store cached memory pages.
-    /// This class is thread-safe.
-    /// </summary>
-    private PageReplacementAlgorithm m_pageReplacementAlgorithm;
-
-    /// <summary>
-    /// Gets if the class has been disposed.
-    /// </summary>
-    private bool m_disposed;
 
     /// <summary>
     /// All I/O to the disk is done at this maximum block size. Usually 64KB
@@ -99,14 +59,49 @@ internal partial class BufferedFile
     private readonly int m_fileStructureBlockSize;
 
     /// <summary>
+    /// The number of bytes contained in the committed area of the file.
+    /// </summary>
+    private long m_lengthOfCommittedData;
+
+    /// <summary>
+    /// The length of the 10 header pages.
+    /// </summary>
+    private readonly long m_lengthOfHeader;
+
+    /// <summary>
+    /// Location to store cached memory pages.
+    /// This class is thread-safe.
+    /// </summary>
+    private PageReplacementAlgorithm m_pageReplacementAlgorithm;
+
+    /// <summary>
+    /// The <see cref="MemoryPool"/> where the memory pages come from.
+    /// </summary>
+    private readonly MemoryPool m_pool;
+
+    /// <summary>
     /// Manages all I/O done to the physical file.
     /// </summary>
     private CustomFileStream m_queue;
 
+    /// <summary>
+    /// Synchronize all calls to this class.
+    /// </summary>
+    private readonly object m_syncRoot;
+
+    /// <summary>
+    /// Any uncommitted data resides in this location.
+    /// </summary>
+    private MemoryPoolStreamCore m_writeBuffer;
+
+    /// <summary>
+    /// Gets if the class has been disposed.
+    /// </summary>
+    private bool m_disposed;
+
     #endregion
 
     #region [ Constructors ]
-
 
     /// <summary>
     /// Creates a file backed memory stream.
@@ -115,7 +110,7 @@ internal partial class BufferedFile
     /// <param name="pool">The <see cref="MemoryPool"/> to allocate memory from.</param>
     /// <param name="header">The <see cref="FileHeaderBlock"/> to be managed when modifications occur.</param>
     /// <param name="isNewFile">
-    /// Tells if this is a newly created file. This will make sure that the 
+    /// Tells if this is a newly created file. This will make sure that the
     /// first 10 pages have the header data copied to it.
     /// </param>
     public BufferedFile(CustomFileStream stream, MemoryPool pool, FileHeaderBlock header, bool isNewFile)
@@ -131,7 +126,6 @@ internal partial class BufferedFile
         pool.RequestCollection += m_pool_RequestCollection;
 
         if (isNewFile)
-        {
             try
             {
                 // Open the file queue for writing.
@@ -142,17 +136,14 @@ internal partial class BufferedFile
 
                 // Write the header bytes to the file queue for each header block.
                 for (int x = 0; x < header.HeaderBlockCount; x++)
-                {
                     // Ensure that the file queue is closed even if an exception is thrown
                     m_queue.WriteRaw(0, headerBytes, headerBytes.Length);
-                }
             }
 
             finally
             {
                 m_queue.Close();
             }
-        }
 
         m_lengthOfCommittedData = (header.LastAllocatedBlock + 1) * header.BlockSize;
         m_writeBuffer.ConfigureAlignment(m_lengthOfCommittedData, pool.PageSize);
@@ -170,8 +161,8 @@ internal partial class BufferedFile
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the current number of bytes used by the file system. 
-    /// This is only intended to be an approximate figure. 
+    /// Gets the current number of bytes used by the file system.
+    /// This is only intended to be an approximate figure.
     /// </summary>
     public long Length => m_queue.Length;
 
@@ -182,124 +173,7 @@ internal partial class BufferedFile
 
     #endregion
 
-    #region [ Public Methods ]
-
-    /// <summary>
-    /// Executes a commit of data. This will flush the data to the disk use the provided header data to properly
-    /// execute this function.
-    /// </summary>
-    /// <param name="header">File header block.</param>
-    public void CommitChanges(FileHeaderBlock header)
-    {
-        using (IoSession pageLock = new(this, m_pageReplacementAlgorithm))
-        {
-            // Determine how much committed data to write
-            long lengthOfAllData = (header.LastAllocatedBlock + 1) * m_fileStructureBlockSize;
-            long copyLength = lengthOfAllData - m_lengthOfCommittedData;
-
-            // Write the uncommitted data.
-            m_queue.Write(m_lengthOfCommittedData, m_writeBuffer, copyLength, waitForWriteToDisk: true);
-
-            byte[] bytes = header.GetBytes();
-
-            if (header.HeaderBlockCount == 10)
-            {
-                // Update the new header to position 0, position 1, and one of position 2-9.
-                m_queue.WriteRaw(0, bytes, m_fileStructureBlockSize);
-                m_queue.WriteRaw(m_fileStructureBlockSize, bytes, m_fileStructureBlockSize);
-                m_queue.WriteRaw(m_fileStructureBlockSize * ((header.SnapshotSequenceNumber & 7) + 2), bytes, m_fileStructureBlockSize);
-            }
-            else
-            {
-                for (int x = 0; x < header.HeaderBlockCount; x++)
-                    m_queue.WriteRaw(x * m_fileStructureBlockSize, bytes, m_fileStructureBlockSize);
-            }
-
-            m_queue.FlushFileBuffers();
-
-            long startPos;
-
-            // Copy recently committed data to the buffer pool
-            if ((m_lengthOfCommittedData & m_diskBlockSize - 1) != 0) // Only if there is a split page.
-            {
-                startPos = m_lengthOfCommittedData & ~(m_diskBlockSize - 1);
-
-                // Finish filling up the split page in the buffer.
-                if (pageLock.TryGetSubPage(startPos, out nint ptrDest))
-                {
-                    m_writeBuffer.ReadBlock(m_lengthOfCommittedData, out nint ptrSrc, out int length);
-                    Footer.WriteChecksumResultsToFooter(ptrSrc, m_fileStructureBlockSize, length);
-                    ptrDest += m_diskBlockSize - length;
-                    Memory.Copy(ptrSrc, ptrDest, length);
-                }
-
-                startPos += m_diskBlockSize;
-            }
-            else
-            {
-                startPos = m_lengthOfCommittedData;
-            }
-
-            while (startPos < lengthOfAllData)
-            {
-                // If the address doesn't exist in the current list. Read it from the disk.
-                m_pool.AllocatePage(out int poolPageIndex, out nint poolAddress);
-                m_writeBuffer.CopyTo(startPos, poolAddress, m_diskBlockSize);
-
-                Footer.WriteChecksumResultsToFooter(poolAddress, m_fileStructureBlockSize, m_diskBlockSize);
-
-                if (!m_pageReplacementAlgorithm.TryAddPage(startPos, poolAddress, poolPageIndex))
-                    m_pool.ReleasePage(poolPageIndex);
-
-                startPos += m_diskBlockSize;
-            }
-
-            m_lengthOfCommittedData = lengthOfAllData;
-        }
-
-        ReleaseWriteBufferSpace();
-    }
-
-    /// <summary>
-    /// Creates a <see cref="BinaryStreamIoSessionBase"/> that can be used to read from this disk medium.
-    /// </summary>
-    /// <returns>A new BinaryStreamIoSessionBase instance.</returns>
-    public BinaryStreamIoSessionBase CreateIoSession()
-    {
-        return new IoSession(this, m_pageReplacementAlgorithm);
-    }
-
-    /// <summary>
-    /// Rolls back all edits to the DiskMedium
-    /// </summary>
-    public void RollbackChanges()
-    {
-        if (m_disposed)
-            throw new ObjectDisposedException(GetType().ToString());
-
-        ReleaseWriteBufferSpace();
-    }
-
-    /// <summary>
-    /// Changes the extension of the current file.
-    /// </summary>
-    /// <param name="extension">The new extension.</param>
-    /// <param name="isReadOnly">If the file should be reopened as read-only.</param>
-    /// <param name="isSharingEnabled">If the file should share read privileges.</param>
-    public void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled)
-    {
-        m_queue.ChangeExtension(extension, isReadOnly, isSharingEnabled);
-    }
-
-    /// <summary>
-    /// Reopens the file with different permissions.
-    /// </summary>
-    /// <param name="isReadOnly">If the file should be reopened as read-only.</param>
-    /// <param name="isSharingEnabled">If the file should share read privileges.</param>
-    public void ChangeShareMode(bool isReadOnly, bool isSharingEnabled)
-    {
-        m_queue.ChangeShareMode(isReadOnly, isSharingEnabled);
-    }
+    #region [ Methods ]
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -334,17 +208,13 @@ internal partial class BufferedFile
         }
     }
 
-    #endregion
-
-    #region [ Private Methods ]
-
     /// <summary>
     /// Populates the pointer data inside <see cref="args"/> for the desired block as specified in <see cref="args"/>.
     /// This function will block if needing to retrieve data from the disk.
     /// </summary>
     /// <param name="pageLock">The reusable lock information about what this block is currently using.</param>
     /// <param name="args">
-    /// Contains what block needs to be read and when this function returns, 
+    /// Contains what block needs to be read and when this function returns,
     /// it will contain the proper pointer information for this block.
     /// </param>
     private void GetBlock(PageReplacementAlgorithm.PageLock pageLock, BlockArguments args)
@@ -434,6 +304,129 @@ internal partial class BufferedFile
         m_writeBuffer = new MemoryPoolStreamCore(m_pool);
         m_writeBuffer.ConfigureAlignment(m_lengthOfCommittedData, m_pool.PageSize);
     }
+
+    /// <summary>
+    /// Executes a commit of data. This will flush the data to the disk use the provided header data to properly
+    /// execute this function.
+    /// </summary>
+    /// <param name="header">File header block.</param>
+    public void CommitChanges(FileHeaderBlock header)
+    {
+        using (IoSession pageLock = new(this, m_pageReplacementAlgorithm))
+        {
+            // Determine how much committed data to write
+            long lengthOfAllData = (header.LastAllocatedBlock + 1) * m_fileStructureBlockSize;
+            long copyLength = lengthOfAllData - m_lengthOfCommittedData;
+
+            // Write the uncommitted data.
+            m_queue.Write(m_lengthOfCommittedData, m_writeBuffer, copyLength, true);
+
+            byte[] bytes = header.GetBytes();
+
+            if (header.HeaderBlockCount == 10)
+            {
+                // Update the new header to position 0, position 1, and one of position 2-9.
+                m_queue.WriteRaw(0, bytes, m_fileStructureBlockSize);
+                m_queue.WriteRaw(m_fileStructureBlockSize, bytes, m_fileStructureBlockSize);
+                m_queue.WriteRaw(m_fileStructureBlockSize * ((header.SnapshotSequenceNumber & 7) + 2), bytes, m_fileStructureBlockSize);
+            }
+            else
+            {
+                for (int x = 0; x < header.HeaderBlockCount; x++)
+                    m_queue.WriteRaw(x * m_fileStructureBlockSize, bytes, m_fileStructureBlockSize);
+            }
+
+            m_queue.FlushFileBuffers();
+
+            long startPos;
+
+            // Copy recently committed data to the buffer pool
+            if ((m_lengthOfCommittedData & (m_diskBlockSize - 1)) != 0) // Only if there is a split page.
+            {
+                startPos = m_lengthOfCommittedData & ~(m_diskBlockSize - 1);
+
+                // Finish filling up the split page in the buffer.
+                if (pageLock.TryGetSubPage(startPos, out nint ptrDest))
+                {
+                    m_writeBuffer.ReadBlock(m_lengthOfCommittedData, out nint ptrSrc, out int length);
+                    Footer.WriteChecksumResultsToFooter(ptrSrc, m_fileStructureBlockSize, length);
+                    ptrDest += m_diskBlockSize - length;
+                    Memory.Copy(ptrSrc, ptrDest, length);
+                }
+
+                startPos += m_diskBlockSize;
+            }
+            else
+            {
+                startPos = m_lengthOfCommittedData;
+            }
+
+            while (startPos < lengthOfAllData)
+            {
+                // If the address doesn't exist in the current list. Read it from the disk.
+                m_pool.AllocatePage(out int poolPageIndex, out nint poolAddress);
+                m_writeBuffer.CopyTo(startPos, poolAddress, m_diskBlockSize);
+
+                Footer.WriteChecksumResultsToFooter(poolAddress, m_fileStructureBlockSize, m_diskBlockSize);
+
+                if (!m_pageReplacementAlgorithm.TryAddPage(startPos, poolAddress, poolPageIndex))
+                    m_pool.ReleasePage(poolPageIndex);
+
+                startPos += m_diskBlockSize;
+            }
+
+            m_lengthOfCommittedData = lengthOfAllData;
+        }
+
+        ReleaseWriteBufferSpace();
+    }
+
+    /// <summary>
+    /// Creates a <see cref="BinaryStreamIoSessionBase"/> that can be used to read from this disk medium.
+    /// </summary>
+    /// <returns>A new BinaryStreamIoSessionBase instance.</returns>
+    public BinaryStreamIoSessionBase CreateIoSession()
+    {
+        return new IoSession(this, m_pageReplacementAlgorithm);
+    }
+
+    /// <summary>
+    /// Rolls back all edits to the DiskMedium
+    /// </summary>
+    public void RollbackChanges()
+    {
+        if (m_disposed)
+            throw new ObjectDisposedException(GetType().ToString());
+
+        ReleaseWriteBufferSpace();
+    }
+
+    /// <summary>
+    /// Changes the extension of the current file.
+    /// </summary>
+    /// <param name="extension">The new extension.</param>
+    /// <param name="isReadOnly">If the file should be reopened as read-only.</param>
+    /// <param name="isSharingEnabled">If the file should share read privileges.</param>
+    public void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled)
+    {
+        m_queue.ChangeExtension(extension, isReadOnly, isSharingEnabled);
+    }
+
+    /// <summary>
+    /// Reopens the file with different permissions.
+    /// </summary>
+    /// <param name="isReadOnly">If the file should be reopened as read-only.</param>
+    /// <param name="isSharingEnabled">If the file should share read privileges.</param>
+    public void ChangeShareMode(bool isReadOnly, bool isSharingEnabled)
+    {
+        m_queue.ChangeShareMode(isReadOnly, isSharingEnabled);
+    }
+
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(BufferedFile), MessageClass.Component);
 
     #endregion
 }

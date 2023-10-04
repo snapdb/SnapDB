@@ -33,27 +33,27 @@ namespace SnapDB.IO.Unmanaged;
 /// </summary>
 public class UnmanagedMemoryStreamCore : IDisposable
 {
+    #region [ Members ]
+
     /// <summary>
     /// This class was created to allow settings update to be atomic.
     /// </summary>
     private class Settings
     {
+        #region [ Members ]
+
+        private const int ElementsPerRow = 64;
+
         // Constants used for array manipulation.
         private const int Mask = 63;
-        private const int ElementsPerRow = 64;
         private const int ShiftBits = 6;
-
-        /// <summary>
-        /// Gets the total number of pages stored in the memory manager.
-        /// </summary>
-        public int PageCount
-        {
-            get;
-            private set;
-        }
 
         // Array to store IntPtr pointers for memory management.
         private nint[][] m_pagePointer;
+
+        #endregion
+
+        #region [ Constructors ]
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Settings"/> class.
@@ -64,6 +64,24 @@ public class UnmanagedMemoryStreamCore : IDisposable
             PageCount = 0;
         }
 
+        #endregion
+
+        #region [ Properties ]
+
+        /// <summary>
+        /// Gets the total number of pages stored in the memory manager.
+        /// </summary>
+        public int PageCount { get; private set; }
+
+        /// <summary>
+        /// Determines if adding a new page requires cloning the array to increase capacity.
+        /// </summary>
+        public bool AddingRequiresClone => m_pagePointer.Length * ElementsPerRow == PageCount;
+
+        #endregion
+
+        #region [ Methods ]
+
         /// <summary>
         /// Gets the IntPtr pointer at the specified page index.
         /// </summary>
@@ -72,31 +90,6 @@ public class UnmanagedMemoryStreamCore : IDisposable
         public nint GetPointer(int page)
         {
             return m_pagePointer[page >> ShiftBits][page & Mask];
-        }
-
-        /// <summary>
-        /// Determines if adding a new page requires cloning the array to increase capacity.
-        /// </summary>
-        public bool AddingRequiresClone => m_pagePointer.Length * ElementsPerRow == PageCount;
-
-        /// <summary>
-        /// Ensures the array capacity is sufficient to add a new page.
-        /// </summary>
-        private void EnsureCapacity()
-        {
-            if (AddingRequiresClone)
-            {
-                nint[][] oldPointer = m_pagePointer;
-
-                m_pagePointer = new nint[m_pagePointer.Length * 2][];
-                oldPointer.CopyTo(m_pagePointer, 0);
-            }
-
-            int bigIndex = PageCount >> ShiftBits;
-            if (m_pagePointer[bigIndex] is null)
-            {
-                m_pagePointer[bigIndex] = new nint[ElementsPerRow];
-            }
         }
 
         /// <summary>
@@ -123,15 +116,32 @@ public class UnmanagedMemoryStreamCore : IDisposable
             return (Settings)MemberwiseClone();
         }
 
+        /// <summary>
+        /// Ensures the array capacity is sufficient to add a new page.
+        /// </summary>
+        private void EnsureCapacity()
+        {
+            if (AddingRequiresClone)
+            {
+                nint[][] oldPointer = m_pagePointer;
+
+                m_pagePointer = new nint[m_pagePointer.Length * 2][];
+                oldPointer.CopyTo(m_pagePointer, 0);
+            }
+
+            int bigIndex = PageCount >> ShiftBits;
+            if (m_pagePointer[bigIndex] is null)
+                m_pagePointer[bigIndex] = new nint[ElementsPerRow];
+        }
+
+        #endregion
     }
 
-    #region [ Members ]
-
-    private List<Memory> m_memoryBlocks;
-
-    private readonly object m_syncRoot;
-
-    private volatile Settings m_settings;
+    /// <summary>
+    /// The first position of this stream. This may be different from <see cref="m_firstValidPosition"/>
+    /// due to alignment requirements.
+    /// </summary>
+    private long m_firstAddressablePosition;
 
     /// <summary>
     /// The first position that can be accessed by users of this stream.
@@ -140,21 +150,21 @@ public class UnmanagedMemoryStreamCore : IDisposable
 
     private readonly long m_invertMask;
 
+    private List<Memory> m_memoryBlocks;
+
     /// <summary>
-    /// The first position of this stream. This may be different from <see cref="m_firstValidPosition"/> 
-    /// due to alignment requirements.
+    /// The size of each page.
     /// </summary>
-    private long m_firstAddressablePosition;
+    private readonly int m_pageSize;
+
+    private volatile Settings m_settings;
 
     /// <summary>
     /// The number of bits in the page size.
     /// </summary>
     private readonly int m_shiftLength;
 
-    /// <summary>
-    /// The size of each page.
-    /// </summary>
-    private readonly int m_pageSize;
+    private readonly object m_syncRoot;
 
     /// <summary>
     /// Releases all the resources used by the <see cref="MemoryFile"/> object.
@@ -197,6 +207,46 @@ public class UnmanagedMemoryStreamCore : IDisposable
     #endregion
 
     #region [ Methods ]
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// </summary>
+    /// <filterpriority>2</filterpriority>
+    public void Dispose()
+    {
+        Dispose(true);
+    }
+
+    /// <summary>
+    /// Reads from the underlying stream the requested set of data.
+    /// This function is more user friendly than calling GetBlock().
+    /// </summary>
+    /// <param name="position">The starting position of the read.</param>
+    /// <param name="pointer">An output pointer to <see cref="position"/>.</param>
+    /// <param name="validLength">The number of bytes that are valid after this position.</param>
+    public void ReadBlock(long position, out nint pointer, out int validLength)
+    {
+        if (m_disposed)
+            throw new ObjectDisposedException("MemoryStream");
+
+        if (position < m_firstValidPosition)
+            throw new ArgumentOutOfRangeException(nameof(position), "position is before the beginning of the stream");
+
+        validLength = m_pageSize;
+        long firstPosition = ((position - m_firstAddressablePosition) & m_invertMask) + m_firstAddressablePosition;
+        pointer = GetPage(position - m_firstAddressablePosition);
+
+        if (firstPosition < m_firstValidPosition)
+        {
+            pointer += (int)(m_firstValidPosition - firstPosition);
+            validLength -= (int)(m_firstValidPosition - firstPosition);
+            firstPosition = m_firstValidPosition;
+        }
+
+        int seekDistance = (int)(position - firstPosition);
+        validLength -= seekDistance;
+        pointer += seekDistance;
+    }
 
     /// <summary>
     /// Configure the natural alignment of the data.
@@ -253,22 +303,12 @@ public class UnmanagedMemoryStreamCore : IDisposable
     }
 
     /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-    /// </summary>
-    /// <filterpriority>2</filterpriority>
-    public void Dispose()
-    {
-        Dispose(true);
-    }
-
-    /// <summary>
     /// Releases the unmanaged resources used by the <see cref="MemoryFile"/> object and optionally releases the managed resources.
     /// </summary>
     /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     private void Dispose(bool disposing)
     {
         if (!m_disposed)
-        {
             try
             {
                 foreach (Memory page in m_memoryBlocks)
@@ -280,12 +320,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
                 m_settings = null;
                 m_disposed = true;
             }
-        }
     }
-
-    #endregion
-
-    #region [ Helper Methods ]
 
     /// <summary>
     /// Retrieves the memory page associated with the specified position.
@@ -325,7 +360,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// Each new page is allocated in memory and initialized with zeroes.
     /// </remarks>
     /// <param name="pageCount">The desired number of pages to be accommodated.</param>
-        private void IncreasePageCount(int pageCount)
+    private void IncreasePageCount(int pageCount)
     {
         lock (m_syncRoot)
         {
@@ -342,7 +377,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
             while (pageCount > settings.PageCount)
             {
                 Memory block = new(m_pageSize);
-                var pagePointer = block.Address;
+                nint pagePointer = block.Address;
                 m_memoryBlocks.Add(block);
                 Memory.Clear(pagePointer, m_pageSize);
                 settings.AddNewPage(pagePointer);
@@ -357,36 +392,4 @@ public class UnmanagedMemoryStreamCore : IDisposable
     }
 
     #endregion
-
-    /// <summary>
-    /// Reads from the underlying stream the requested set of data. 
-    /// This function is more user friendly than calling GetBlock().
-    /// </summary>
-    /// <param name="position">The starting position of the read.</param>
-    /// <param name="pointer">An output pointer to <see cref="position"/>.</param>
-    /// <param name="validLength">The number of bytes that are valid after this position.</param>
-    public void ReadBlock(long position, out nint pointer, out int validLength)
-    {
-        if (m_disposed)
-            throw new ObjectDisposedException("MemoryStream");
-
-        if (position < m_firstValidPosition)
-            throw new ArgumentOutOfRangeException(nameof(position), "position is before the beginning of the stream");
-
-        validLength = m_pageSize;
-        var firstPosition = ((position - m_firstAddressablePosition) & m_invertMask) + m_firstAddressablePosition;
-        pointer = GetPage(position - m_firstAddressablePosition);
-
-        if (firstPosition < m_firstValidPosition)
-        {
-            pointer += (int)(m_firstValidPosition - firstPosition);
-            validLength -= (int)(m_firstValidPosition - firstPosition);
-            firstPosition = m_firstValidPosition;
-        }
-
-        int seekDistance = (int)(position - firstPosition);
-        validLength -= seekDistance;
-        pointer += seekDistance;
-    }
-
 }

@@ -24,42 +24,18 @@
 //
 //******************************************************************************************************
 
+using System.Runtime.InteropServices;
 using Gemstone;
 using SnapDB.IO.Unmanaged;
-using System.Runtime.InteropServices;
 
 namespace SnapDB.IO;
 
 /// <summary>
 /// An implementation of <see cref="BinaryStreamBase"/> that is pointer based.
 /// </summary>
-public abstract unsafe class BinaryStreamPointerBase
-    : BinaryStreamBase
+public abstract unsafe class BinaryStreamPointerBase : BinaryStreamBase
 {
-    /// <summary>
-    /// Creates a <see cref="BinaryStreamPointerBase"/>.
-    /// </summary>
-    protected BinaryStreamPointerBase()
-    {
-        if (!BitConverter.IsLittleEndian)
-            throw new Exception("Only designed to run on a little endian processor.");
-    }
-
-    /// <summary>
-    /// Gets the pointer version number, assuming that this binary stream has an unmanaged buffer backing this stream. 
-    /// If the pointer version is the same, then any pointer acquired is still valid.
-    /// </summary>
-    public long PointerVersion { get; protected set; }
-
-    /// <summary>
-    /// The position that corresponds to the first byte in the buffer.
-    /// </summary>
-    protected long FirstPosition;
-
-    /// <summary>
-    /// Contains the position for the last position.
-    /// </summary>
-    protected long LastPosition;
+    #region [ Members ]
 
     /// <summary>
     /// The current position data.
@@ -72,6 +48,16 @@ public abstract unsafe class BinaryStreamPointerBase
     protected byte* First;
 
     /// <summary>
+    /// The position that corresponds to the first byte in the buffer.
+    /// </summary>
+    protected long FirstPosition;
+
+    /// <summary>
+    /// Contains the position for the last position.
+    /// </summary>
+    protected long LastPosition;
+
+    /// <summary>
     /// One past the last address for reading.
     /// </summary>
     protected byte* LastRead;
@@ -80,6 +66,29 @@ public abstract unsafe class BinaryStreamPointerBase
     /// One past the last address for writing.
     /// </summary>
     protected byte* LastWrite;
+
+    #endregion
+
+    #region [ Constructors ]
+
+    /// <summary>
+    /// Creates a <see cref="BinaryStreamPointerBase"/>.
+    /// </summary>
+    protected BinaryStreamPointerBase()
+    {
+        if (!BitConverter.IsLittleEndian)
+            throw new Exception("Only designed to run on a little endian processor.");
+    }
+
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// Gets the pointer version number, assuming that this binary stream has an unmanaged buffer backing this stream.
+    /// If the pointer version is the same, then any pointer acquired is still valid.
+    /// </summary>
+    public long PointerVersion { get; protected set; }
 
 
     /// <summary>
@@ -106,7 +115,7 @@ public abstract unsafe class BinaryStreamPointerBase
     /// Gets or sets the current position for the stream.
     /// </summary>
     /// <remarks>
-    /// It is important to use this to Get or Set the position from the underlying stream since 
+    /// It is important to use this to Get or Set the position from the underlying stream since
     /// this class buffers the results of the query. Setting this field does not guarantee that
     /// the underlying stream will get set. Call FlushToUnderlyingStream to accomplish this.
     /// </remarks>
@@ -116,7 +125,9 @@ public abstract unsafe class BinaryStreamPointerBase
         set
         {
             if (FirstPosition <= value && value < LastPosition)
+            {
                 Current = First + (value - FirstPosition);
+            }
 
             else
             {
@@ -140,6 +151,10 @@ public abstract unsafe class BinaryStreamPointerBase
     /// </summary>
     protected long RemainingWriteLength => LastWrite - Current;
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Gets a pointer from the current position that can be used for writing up the the provided length.
     /// The current position is not advanced after calling this function.
@@ -158,6 +173,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
         return Current;
     }
+
     /// <summary>
     /// Gets a read pointer to a specified position in the stream for a specified length of data.
     /// </summary>
@@ -185,7 +201,7 @@ public abstract unsafe class BinaryStreamPointerBase
     /// <param name="position">The position in the stream to obtain the read pointer from.</param>
     /// <param name="length">The length of data to read starting from the specified position.</param>
     /// <param name="supportsWriting">
-    ///   When this method returns, contains a boolean indicating whether writing is supported at the specified position.
+    /// When this method returns, contains a boolean indicating whether writing is supported at the specified position.
     /// </param>
     /// <returns>A read pointer to the specified position in the stream.</returns>
     /// <exception cref="Exception">Thrown if the requested length exceeds the available data.</exception>
@@ -262,6 +278,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
             return;
         }
+
         base.Write(value);
     }
 
@@ -280,6 +297,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
             return;
         }
+
         base.Write(value);
     }
 
@@ -298,6 +316,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
             return;
         }
+
         base.Write(value);
     }
 
@@ -316,6 +335,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
             return;
         }
+
         base.Write(value);
     }
 
@@ -331,6 +351,7 @@ public abstract unsafe class BinaryStreamPointerBase
             Current += Encoding7Bit.Write(Current, value);
             return;
         }
+
         base.Write7Bit(value);
     }
 
@@ -352,6 +373,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
                 return;
             }
+
             stream[0] = (byte)(value | 128);
 
             if (value < 128 * 128)
@@ -361,6 +383,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
                 return;
             }
+
             stream[1] = (byte)((value >> 7) | 128);
 
             if (value < 128 * 128 * 128)
@@ -370,6 +393,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
                 return;
             }
+
             stream[2] = (byte)((value >> 14) | 128);
 
             if (value < 128 * 128 * 128 * 128)
@@ -379,6 +403,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
                 return;
             }
+
             stream[3] = (byte)((value >> (7 + 7 + 7)) | 128);
 
             if (value < 128L * 128 * 128 * 128 * 128)
@@ -388,6 +413,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
                 return;
             }
+
             stream[4] = (byte)((value >> (7 + 7 + 7 + 7)) | 128);
 
             if (value < 128L * 128 * 128 * 128 * 128 * 128)
@@ -397,6 +423,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
                 return;
             }
+
             stream[5] = (byte)((value >> (7 + 7 + 7 + 7 + 7)) | 128);
 
             if (value < 128L * 128 * 128 * 128 * 128 * 128 * 128)
@@ -406,6 +433,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
                 return;
             }
+
             stream[6] = (byte)((value >> (7 + 7 + 7 + 7 + 7 + 7)) | 128);
 
             if (value < 128L * 128 * 128 * 128 * 128 * 128 * 128 * 128)
@@ -416,12 +444,13 @@ public abstract unsafe class BinaryStreamPointerBase
                 return;
             }
 
-            stream[7] = (byte)(value >> (7 + 7 + 7 + 7 + 7 + 7 + 7) | 128);
+            stream[7] = (byte)((value >> (7 + 7 + 7 + 7 + 7 + 7 + 7)) | 128);
             stream[8] = (byte)(value >> (7 + 7 + 7 + 7 + 7 + 7 + 7 + 7));
             Current += 9;
 
             return;
         }
+
         base.Write7Bit(value);
     }
 
@@ -448,20 +477,21 @@ public abstract unsafe class BinaryStreamPointerBase
             *(long*)(Current + pos) = *(long*)(buffer + pos);
             pos += 8;
         }
+
         if (pos + 4 <= length)
         {
             *(int*)(Current + pos) = *(int*)(buffer + pos);
             pos += 4;
         }
+
         if (pos + 2 <= length)
         {
             *(short*)(Current + pos) = *(short*)(buffer + pos);
             pos += 2;
         }
+
         if (pos + 1 <= length)
-        {
             *(Current + pos) = *(buffer + pos);
-        }
         Current += length;
     }
 
@@ -480,23 +510,8 @@ public abstract unsafe class BinaryStreamPointerBase
 
             return;
         }
+
         Write2(value, offset, count);
-    }
-
-    private void Write2(byte[] value, int offset, int count)
-    {
-        while (count > 0)
-        {
-            if (RemainingWriteLength <= 0)
-                UpdateLocalBuffer(true);
-            int availableLength = Math.Min((int)RemainingWriteLength, count);
-
-            Marshal.Copy(value, offset, (nint)Current, availableLength);
-            Current += availableLength;
-
-            count -= availableLength;
-            offset += availableLength;
-        }
     }
 
     /// <summary>
@@ -513,6 +528,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
             return value;
         }
+
         return base.ReadUInt8();
     }
 
@@ -530,6 +546,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
             return value;
         }
+
         return base.ReadInt16();
     }
 
@@ -547,6 +564,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
             return value;
         }
+
         return base.ReadInt32();
     }
 
@@ -564,6 +582,7 @@ public abstract unsafe class BinaryStreamPointerBase
 
             return value;
         }
+
         return base.ReadInt64();
     }
 
@@ -584,28 +603,33 @@ public abstract unsafe class BinaryStreamPointerBase
                 Current += 1;
                 return value11;
             }
+
             value11 ^= (uint)stream[1] << 7;
             if (value11 < 128 * 128)
             {
                 Current += 2;
                 return value11 ^ 0x80;
             }
+
             value11 ^= (uint)stream[2] << 14;
             if (value11 < 128 * 128 * 128)
             {
                 Current += 3;
                 return value11 ^ 0x4080;
             }
+
             value11 ^= (uint)stream[3] << 21;
             if (value11 < 128 * 128 * 128 * 128)
             {
                 Current += 4;
                 return value11 ^ 0x204080;
             }
+
             value11 ^= ((uint)stream[4] << 28) ^ 0x10204080;
             Current += 5;
             return value11;
         }
+
         return base.Read7BitUInt32();
     }
 
@@ -694,7 +718,6 @@ public abstract unsafe class BinaryStreamPointerBase
     }
 
 
-
     public override int Read(byte[] value, int offset, int count)
     {
         if (RemainingReadLength >= count)
@@ -704,7 +727,38 @@ public abstract unsafe class BinaryStreamPointerBase
 
             return count;
         }
+
         return Read2(value, offset, count);
+    }
+
+    public override void SetLength(long value)
+    {
+        throw new NotSupportedException();
+    }
+
+    /// <summary>
+    /// Flushes any buffered data or state within the stream.
+    /// This method intentionally does nothing, as there is no buffering to flush.
+    /// </summary>
+    public override void Flush()
+    {
+        // Do Nothing
+    }
+
+    private void Write2(byte[] value, int offset, int count)
+    {
+        while (count > 0)
+        {
+            if (RemainingWriteLength <= 0)
+                UpdateLocalBuffer(true);
+            int availableLength = Math.Min((int)RemainingWriteLength, count);
+
+            Marshal.Copy(value, offset, (nint)Current, availableLength);
+            Current += availableLength;
+
+            count -= availableLength;
+            offset += availableLength;
+        }
     }
 
     private int Read2(byte[] value, int offset, int count)
@@ -722,20 +776,9 @@ public abstract unsafe class BinaryStreamPointerBase
             count -= availableLength;
             offset += availableLength;
         }
+
         return origionalCount;
     }
 
-    public override void SetLength(long value)
-    {
-        throw new NotSupportedException();
-    }
-
-    /// <summary>
-    /// Flushes any buffered data or state within the stream.
-    /// This method intentionally does nothing, as there is no buffering to flush.
-    /// </summary>
-    public override void Flush()
-    {
-        // Do Nothing
-    }
+    #endregion
 }

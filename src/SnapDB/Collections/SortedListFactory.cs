@@ -33,30 +33,41 @@ namespace SnapDB.Collections;
 /// </summary>
 public static class SortedListFactory
 {
-    /// <summary>
-    /// Creates a sorted list from a provided keys and values.
-    /// </summary>
-    /// <typeparam name="TKey">The type of keys in the sorted list.</typeparam>
-    /// <typeparam name="TValue">The type of values in the sorted list.</typeparam>
-    /// <param name="keys">A collection of keys to be used in the sorted list.</param>
-    /// <param name="values">A collection of values to be associated with the keys in the sorted list.</param>
-    /// <returns>A sorted list containing the specified keys and values.</returns>
-    public static SortedList<TKey, TValue> Create<TKey, TValue>(ICollection<TKey> keys, ICollection<TValue> values) where TKey : notnull
-    {
-        // Creates a sorted list from the keys and values using a helper class.
-        return new DictionaryWrapper<TKey, TValue>(keys, values).ToSortedList();
-    }
+    #region [ Members ]
 
     // A wrapper class that creates a SortedList from a set of key/value pair. 
-    private class DictionaryWrapper<TKey, TValue>
-        : IDictionary<TKey, TValue> where TKey : notnull
+    private class DictionaryWrapper<TKey, TValue> : IDictionary<TKey, TValue> where TKey : notnull
     {
+        #region [ Constructors ]
+
         // Initializes a new instance of the DictionaryWrapper<TKey, TValue> class with the provided collections of keys and values.
         public DictionaryWrapper(ICollection<TKey> keys, ICollection<TValue> values)
         {
             Keys = keys;
             Values = values;
         }
+
+        #endregion
+
+        #region [ Properties ]
+
+        public int Count => Keys.Count;
+
+        public bool IsReadOnly => true;
+
+        public TValue this[TKey key]
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+
+        public ICollection<TKey> Keys { get; }
+
+        public ICollection<TValue> Values { get; }
+
+        #endregion
+
+        #region [ Methods ]
 
         // Converts the dictionary to a sorted list and returns it.
         public SortedList<TKey, TValue> ToSortedList()
@@ -107,10 +118,6 @@ public static class SortedListFactory
             throw new NotImplementedException();
         }
 
-        public int Count => Keys.Count;
-
-        public bool IsReadOnly => true;
-
         public bool ContainsKey(TKey key)
         {
             throw new NotImplementedException();
@@ -131,14 +138,26 @@ public static class SortedListFactory
             throw new NotImplementedException();
         }
 
-        public TValue this[TKey key]
-        {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
-        }
-
-        public ICollection<TKey> Keys { get; }
-
-        public ICollection<TValue> Values { get; }
+        #endregion
     }
+
+    #endregion
+
+    #region [ Static ]
+
+    /// <summary>
+    /// Creates a sorted list from a provided keys and values.
+    /// </summary>
+    /// <typeparam name="TKey">The type of keys in the sorted list.</typeparam>
+    /// <typeparam name="TValue">The type of values in the sorted list.</typeparam>
+    /// <param name="keys">A collection of keys to be used in the sorted list.</param>
+    /// <param name="values">A collection of values to be associated with the keys in the sorted list.</param>
+    /// <returns>A sorted list containing the specified keys and values.</returns>
+    public static SortedList<TKey, TValue> Create<TKey, TValue>(ICollection<TKey> keys, ICollection<TValue> values) where TKey : notnull
+    {
+        // Creates a sorted list from the keys and values using a helper class.
+        return new DictionaryWrapper<TKey, TValue>(keys, values).ToSortedList();
+    }
+
+    #endregion
 }

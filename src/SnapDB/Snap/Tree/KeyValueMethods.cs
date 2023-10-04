@@ -32,9 +32,15 @@ namespace SnapDB.Snap.Tree;
 /// </summary>
 public abstract class KeyValueMethods
 {
+    #region [ Constructors ]
+
     internal KeyValueMethods()
     {
     }
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// The type of the key.
@@ -45,6 +51,8 @@ public abstract class KeyValueMethods
     /// The type of the value.
     /// </summary>
     public abstract Type ValueType { get; }
+
+    #endregion
 }
 
 /// <summary>
@@ -53,11 +61,24 @@ public abstract class KeyValueMethods
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-public class KeyValueMethods<TKey, TValue>
-    : KeyValueMethods
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class KeyValueMethods<TKey, TValue> : KeyValueMethods where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Properties ]
+
+    /// <summary>
+    /// The type of the key.
+    /// </summary>
+    public override Type KeyType => typeof(TKey);
+
+    /// <summary>
+    /// The type of the value.
+    /// </summary>
+    public override Type ValueType => typeof(TValue);
+
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Copies the source values to the destination.
     /// </summary>
@@ -71,13 +92,5 @@ public class KeyValueMethods<TKey, TValue>
         srcValue.CopyTo(dstValue);
     }
 
-    /// <summary>
-    /// The type of the key.
-    /// </summary>
-    public override Type KeyType => typeof(TKey);
-
-    /// <summary>
-    /// The type of the value.
-    /// </summary>
-    public override Type ValueType => typeof(TValue);
+    #endregion
 }

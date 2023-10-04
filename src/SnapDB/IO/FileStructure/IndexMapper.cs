@@ -29,17 +29,24 @@ using Gemstone;
 namespace SnapDB.IO.FileStructure;
 
 /// <summary>
-/// This class is used to convert the position of a file into a set of directions 
+/// This class is used to convert the position of a file into a set of directions
 /// that <see cref="IndexParser"/> can use to lookup the data cluster.
 /// </summary>
 internal class IndexMapper
 {
     #region [ Members ]
 
-    private readonly uint m_lastAddressableBlockIndex;
-    private readonly uint m_addressPerBlock3;
-    private readonly uint m_addressPerBlock2;
+    /// <summary>
+    /// Gets the index of the first cluster that can be accessed by this indirect block. This value is useful because
+    /// the footer of the indirect page will have this address.
+    /// </summary>
+    protected const uint FirstIndirectBaseIndex = 0;
+
     private readonly uint m_addressPerBlock;
+    private readonly uint m_addressPerBlock2;
+    private readonly uint m_addressPerBlock3;
+
+    private readonly uint m_lastAddressableBlockIndex;
 
     #endregion
 
@@ -53,8 +60,10 @@ internal class IndexMapper
     {
         if (blockSize < 64)
             throw new ArgumentOutOfRangeException(nameof(blockSize), "Cannot be less than 64");
+
         if (blockSize > 1024 * 1024)
             throw new ArgumentOutOfRangeException(nameof(blockSize), "Cannot be greater than 1048576");
+
         if (!BitMath.IsPowerOfTwo(blockSize))
             throw new Exception("block size must be a power of 2");
 
@@ -63,6 +72,7 @@ internal class IndexMapper
         m_addressPerBlock2 = (uint)Math.Min(uint.MaxValue, m_addressPerBlock * (ulong)m_addressPerBlock);
         m_addressPerBlock3 = (uint)Math.Min(uint.MaxValue, m_addressPerBlock * (ulong)m_addressPerBlock * m_addressPerBlock);
         m_lastAddressableBlockIndex = (uint)Math.Min(uint.MaxValue - 1, m_addressPerBlock * (ulong)m_addressPerBlock * m_addressPerBlock * m_addressPerBlock - 1);
+
         // Initializes all of the values.
         MapPosition(0);
     }
@@ -74,91 +84,53 @@ internal class IndexMapper
     /// <summary>
     /// Determines the block index value that will be stored in the footer of the data block.
     /// </summary>
-    public uint BaseVirtualAddressIndexValue
-    {
-        get;
-        private set;
-    }
+    public uint BaseVirtualAddressIndexValue { get; private set; }
 
     /// <summary>
     /// Gets the offset position for the address that must be read within the indirect block
-    /// at the first indirect block. 
+    /// at the first indirect block.
     /// </summary>
     /// <remarks>Returns a -1 of invalid. -1 was chosen since it will likely generate an error if not handled properly.</remarks>
-    public int FirstIndirectOffset
-    {
-        get;
-        private set;
-    }
+    public int FirstIndirectOffset { get; private set; }
 
     /// <summary>
     /// Gets the offset position for the address that must be read within the indirect block
-    /// at the second indirect block. 
+    /// at the second indirect block.
     /// </summary>
     /// <remarks>Returns a -1 of invalid. -1 was chosen since it will likely generate an error if not handled properly.</remarks>
-    public int SecondIndirectOffset
-    {
-        get;
-        private set;
-    }
+    public int SecondIndirectOffset { get; private set; }
 
     /// <summary>
     /// Gets the offset position for the address that must be read within the indirect block
-    /// at the third indirect block. 
+    /// at the third indirect block.
     /// </summary>
     /// <remarks>Returns a -1 of invalid. -1 was chosen since it will likely generate an error if not handled properly.</remarks>
-    public int ThirdIndirectOffset
-    {
-        get;
-        private set;
-    }
+    public int ThirdIndirectOffset { get; private set; }
 
     /// <summary>
     /// Gets the offset position for the address that must be read within the indirect block
-    /// at the forth indirect block. 
+    /// at the forth indirect block.
     /// </summary>
     /// <remarks>Returns a -1 of invalid. -1 was chosen since it will likely generate an error if not handled properly.</remarks>
-    protected int FourthIndirectOffset
-    {
-        get;
-        private set;
-    }
+    protected int FourthIndirectOffset { get; private set; }
 
     /// <summary>
-    /// Gets the index of the first cluster that can be accessed by this indirect block. This value is useful because 
+    /// Gets the index of the second cluster that can be accessed by this indirect block. This value is useful because
     /// the footer of the indirect page will have this address.
     /// </summary>
-    protected const uint FirstIndirectBaseIndex = 0;
+    protected uint SecondIndirectBaseIndex { get; private set; }
 
     /// <summary>
-    /// Gets the index of the second cluster that can be accessed by this indirect block. This value is useful because 
+    /// Gets the index of the third cluster that can be accessed by this indirect block. This value is useful because
     /// the footer of the indirect page will have this address.
     /// </summary>
-    protected uint SecondIndirectBaseIndex
-    {
-        get;
-        private set;
-    }
+    protected uint ThirdIndirectBaseIndex { get; private set; }
 
     /// <summary>
-    /// Gets the index of the third cluster that can be accessed by this indirect block. This value is useful because 
+    /// Gets the index of the third cluster that can be accessed by this indirect block. This value is useful because
     /// the footer of the indirect page will have this address.
     /// </summary>
-    protected uint ThirdIndirectBaseIndex
-    {
-        get;
-        private set;
-    }
-
-    /// <summary>
-    /// Gets the index of the third cluster that can be accessed by this indirect block. This value is useful because 
-    /// the footer of the indirect page will have this address.
-    /// </summary>
-    protected uint FourthIndirectBaseIndex
-    {
-        get;
-        private set;
-    }
+    protected uint FourthIndirectBaseIndex { get; private set; }
 
     #endregion
 
@@ -170,7 +142,7 @@ internal class IndexMapper
     /// <param name="positionIndex">The address that is being translated.</param>
     /// <returns>
     /// This determines what has changed in the most recent update request.
-    /// The calling classes can use this to determine what lookup information needs to be 
+    /// The calling classes can use this to determine what lookup information needs to be
     /// scrapped, and what can be kept.
     /// 0=Immediate, 1=Single, 2=Double, 3=Triple, 4=NoChange
     /// </returns>

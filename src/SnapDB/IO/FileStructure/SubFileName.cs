@@ -33,34 +33,11 @@ using System.Text;
 namespace SnapDB.IO.FileStructure;
 
 /// <summary>
-/// This is used to generate the file name that will be used for the subfile. 
+/// This is used to generate the file name that will be used for the subfile.
 /// </summary>
-public class SubFileName
-    : IComparable<SubFileName>, IEquatable<SubFileName>
+public class SubFileName : IComparable<SubFileName>, IEquatable<SubFileName>
 {
-    /// <summary>
-    /// The first 8 bytes of the <see cref="SubFileName"/>.
-    /// </summary>
-    public long RawValue1
-    {
-        get;
-    }
-
-    /// <summary>
-    /// The next 8 bytes of the <see cref="SubFileName"/>.
-    /// </summary>
-    public long RawValue2
-    {
-        get;
-    }
-
-    /// <summary>
-    /// The final 4 bytes of the <see cref="SubFileName"/>.
-    /// </summary>
-    public int RawValue3
-    {
-        get;
-    }
+    #region [ Constructors ]
 
     private SubFileName(long rawValue1, long rawValue2, int rawValue3)
     {
@@ -68,6 +45,29 @@ public class SubFileName
         RawValue2 = rawValue2;
         RawValue3 = rawValue3;
     }
+
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// The first 8 bytes of the <see cref="SubFileName"/>.
+    /// </summary>
+    public long RawValue1 { get; }
+
+    /// <summary>
+    /// The next 8 bytes of the <see cref="SubFileName"/>.
+    /// </summary>
+    public long RawValue2 { get; }
+
+    /// <summary>
+    /// The final 4 bytes of the <see cref="SubFileName"/>.
+    /// </summary>
+    public int RawValue3 { get; }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Writes the <see cref="SubFileName"/> to the <see cref="writer"/>.
@@ -78,30 +78,6 @@ public class SubFileName
         writer.Write(RawValue1);
         writer.Write(RawValue2);
         writer.Write(RawValue3);
-    }
-
-    /// <summary>
-    /// Compares the current object with another object of the same type.
-    /// </summary>
-    /// <returns>
-    /// A value that indicates the relative order of the objects being compared. 
-    /// The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other"/> parameter.Zero 
-    /// This object is equal to <paramref name="other"/>. Greater than zero This object is greater than <paramref name="other"/>. 
-    /// </returns>
-    /// <param name="other">An object to compare with this object.</param>
-    public int CompareTo(SubFileName? other)
-    {
-        if (other is null)
-            return 1;
-
-        int compare = RawValue1.CompareTo(other.RawValue1);
-
-        if (compare != 0)
-            return compare;
-
-        compare = RawValue2.CompareTo(other.RawValue2);
-
-        return compare != 0 ? compare : RawValue3.CompareTo(other.RawValue3);
     }
 
     /// <summary>
@@ -121,19 +97,7 @@ public class SubFileName
     }
 
     /// <summary>
-    /// Indicates whether the current object is equal to another object of the same type.
-    /// </summary>
-    /// <returns>
-    /// <c>true</c> if the current object is equal to the <paramref name="other"/> parameter; otherwise, <c>false</c>.
-    /// </returns>
-    /// <param name="other">An object to compare with this object.</param>
-    public bool Equals(SubFileName? other)
-    {
-        return this == other;
-    }
-
-    /// <summary>
-    /// Serves as a hash function for a particular type. 
+    /// Serves as a hash function for a particular type.
     /// </summary>
     /// <returns>
     /// A hash code for the current <see cref="T:System.Object"/>.
@@ -146,10 +110,48 @@ public class SubFileName
         return RawValue3 & int.MaxValue;
     }
 
+    /// <summary>
+    /// Compares the current object with another object of the same type.
+    /// </summary>
+    /// <returns>
+    /// A value that indicates the relative order of the objects being compared.
+    /// The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other"/> parameter.Zero
+    /// This object is equal to <paramref name="other"/>. Greater than zero This object is greater than <paramref name="other"/>.
+    /// </returns>
+    /// <param name="other">An object to compare with this object.</param>
+    public int CompareTo(SubFileName? other)
+    {
+        if (other is null)
+            return 1;
+
+        int compare = RawValue1.CompareTo(other.RawValue1);
+
+        if (compare != 0)
+            return compare;
+
+        compare = RawValue2.CompareTo(other.RawValue2);
+
+        return compare != 0 ? compare : RawValue3.CompareTo(other.RawValue3);
+    }
+
+    /// <summary>
+    /// Indicates whether the current object is equal to another object of the same type.
+    /// </summary>
+    /// <returns>
+    /// <c>true</c> if the current object is equal to the <paramref name="other"/> parameter; otherwise, <c>false</c>.
+    /// </returns>
+    /// <param name="other">An object to compare with this object.</param>
+    public bool Equals(SubFileName? other)
+    {
+        return this == other;
+    }
+
+    #endregion
+
     #region [ Static ]
 
     /// <summary>
-    /// An empty subfile name. Should not generally be used as a single file system. 
+    /// An empty subfile name. Should not generally be used as a single file system.
     /// Must have unique file names.
     /// </summary>
     public static SubFileName Empty => new(0, 0, 0);
@@ -172,11 +174,11 @@ public class SubFileName
     {
         byte[] data = new byte[16 * 3];
 
-        fixed (byte* lp = data)
+        fixed (byte* ptr = data)
         {
-            *(Guid*)lp = fileType;
-            *(Guid*)(lp + 16) = keyType;
-            *(Guid*)(lp + 32) = valueType;
+            *(Guid*)ptr = fileType;
+            *(Guid*)(ptr + 16) = keyType;
+            *(Guid*)(ptr + 32) = valueType;
         }
 
         return Create(data);
@@ -193,10 +195,10 @@ public class SubFileName
     {
         byte[] data = new byte[16 * 2 + fileName.Length * 2];
 
-        fixed (byte* lp = data)
+        fixed (byte* ptr = data)
         {
-            *(Guid*)lp = keyType;
-            *(Guid*)(lp + 16) = valueType;
+            *(Guid*)ptr = keyType;
+            *(Guid*)(ptr + 16) = valueType;
         }
 
         Encoding.Unicode.GetBytes(fileName, 0, fileName.Length, data, 32);
@@ -212,9 +214,9 @@ public class SubFileName
     {
         byte[] hash = SHA1.HashData(data);
 
-        fixed (byte* lp = hash)
+        fixed (byte* ptr = hash)
         {
-            return new SubFileName(*(long*)lp, *(long*)(lp + 8), *(int*)(lp + 16));
+            return new SubFileName(*(long*)ptr, *(long*)(ptr + 8), *(int*)(ptr + 16));
         }
     }
 

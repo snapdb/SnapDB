@@ -24,24 +24,29 @@
 //
 //******************************************************************************************************
 
-using Gemstone.IO.StreamExtensions;
 using System.Data;
+using Gemstone.IO.StreamExtensions;
 
 namespace SnapDB.Snap.Services.Writer;
 
 /// <summary>
 /// The settings for the <see cref="FirstStageWriter{TKey,TValue}"/>
 /// </summary>
-public class FirstStageWriterSettings
-    : SettingsBase<FirstStageWriterSettings>
+public class FirstStageWriterSettings : SettingsBase<FirstStageWriterSettings>
 {
+    #region [ Members ]
+
+    private EncodingDefinition m_encodingMethod = EncodingDefinition.FixedSizeCombinedEncoding;
+    private int m_maximumAllowedMb = 100;
     private int m_rolloverInterval = 10000;
     private int m_rolloverSizeMb = 80;
-    private int m_maximumAllowedMb = 100;
-    private EncodingDefinition m_encodingMethod = EncodingDefinition.FixedSizeCombinedEncoding;
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
-    /// The number of milliseconds before data is flushed to the disk. 
+    /// The number of milliseconds before data is flushed to the disk.
     /// </summary>
     /// <remarks>
     /// Must be between 1,000 ms and 60,000 ms.
@@ -53,17 +58,11 @@ public class FirstStageWriterSettings
         {
             TestForEditable();
             if (value < 1000)
-            {
                 m_rolloverInterval = 1000;
-            }
             else if (value > 60000)
-            {
                 m_rolloverInterval = 60000;
-            }
             else
-            {
                 m_rolloverInterval = value;
-            }
         }
     }
 
@@ -80,17 +79,11 @@ public class FirstStageWriterSettings
         {
             TestForEditable();
             if (value < 1)
-            {
                 m_rolloverSizeMb = 1;
-            }
             else if (value > 1024)
-            {
                 m_rolloverSizeMb = 1024;
-            }
             else
-            {
                 m_rolloverSizeMb = value;
-            }
         }
     }
 
@@ -110,17 +103,11 @@ public class FirstStageWriterSettings
         {
             TestForEditable();
             if (value < 1)
-            {
                 m_maximumAllowedMb = 1;
-            }
             else if (value > 1024)
-            {
                 m_maximumAllowedMb = 1024;
-            }
             else
-            {
                 m_maximumAllowedMb = value;
-            }
         }
     }
 
@@ -141,6 +128,10 @@ public class FirstStageWriterSettings
     /// The settings that will be used for the rolled over files.
     /// </summary>
     public SimplifiedArchiveInitializerSettings FinalSettings { get; } = new();
+
+    #endregion
+
+    #region [ Methods ]
 
     public override void Save(Stream stream)
     {
@@ -174,4 +165,6 @@ public class FirstStageWriterSettings
     {
         FinalSettings.Validate();
     }
+
+    #endregion
 }

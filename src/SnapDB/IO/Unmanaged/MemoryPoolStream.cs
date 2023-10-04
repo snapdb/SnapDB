@@ -29,8 +29,7 @@ namespace SnapDB.IO.Unmanaged;
 /// <summary>
 /// Provides a in memory stream that uses pages that are pooled in the unmanaged buffer pool.
 /// </summary>
-public partial class MemoryPoolStream
-    : MemoryPoolStreamCore, ISupportsBinaryStream
+public partial class MemoryPoolStream : MemoryPoolStreamCore, ISupportsBinaryStream
 {
     #region [ Members ]
 
@@ -51,16 +50,14 @@ public partial class MemoryPoolStream
     /// <summary>
     /// Creates a new <see cref="MemoryPoolStream"/> using the default <see cref="MemoryPool"/>.
     /// </summary>
-    public MemoryPoolStream()
-        : this(Globals.MemoryPool)
+    public MemoryPoolStream() : this(Globals.MemoryPool)
     {
     }
 
     /// <summary>
     /// Create a new <see cref="MemoryPoolStream"/>
     /// </summary>
-    public MemoryPoolStream(MemoryPool pool)
-        : base(pool)
+    public MemoryPoolStream(MemoryPool pool) : base(pool)
     {
         m_blockSize = pool.PageSize;
     }
@@ -93,19 +90,19 @@ public partial class MemoryPoolStream
     #region [ Methods ]
 
     /// <summary>
-    /// Acquire an IO Session.
-    /// </summary>
-    public BinaryStreamIoSessionBase CreateIoSession()
-    {
-        return new IoSession(this);
-    }
-
-    /// <summary>
     /// Creates a new binary from an IO session.
     /// </summary>
     public BinaryStreamBase CreateBinaryStream()
     {
         return new BinaryStream(this);
+    }
+
+    /// <summary>
+    /// Acquire an IO Session.
+    /// </summary>
+    public BinaryStreamIoSessionBase CreateIoSession()
+    {
+        return new IoSession(this);
     }
 
     #endregion

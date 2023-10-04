@@ -29,7 +29,6 @@ using System.Text;
 
 namespace SnapDB.Security;
 
-
 internal enum AuthenticationMode : byte
 {
     None = 1,
@@ -42,24 +41,21 @@ internal enum AuthenticationMode : byte
 
 public class SecureStream
 {
+    #region [ Static ]
+
     internal static byte[] ComputeCertificateChallenge(bool isServer, SslStream stream)
     {
         string localChallenge = string.Empty;
         string remoteChallenge = string.Empty;
         if (stream.RemoteCertificate is not null)
-        {
             remoteChallenge = stream.RemoteCertificate.GetCertHashString();
-        }
         if (stream.LocalCertificate is not null)
-        {
             localChallenge = stream.LocalCertificate.GetCertHashString();
-        }
         if (isServer)
-        {
             return Encoding.UTF8.GetBytes(remoteChallenge + localChallenge);
-        }
 
         return Encoding.UTF8.GetBytes(localChallenge + remoteChallenge);
     }
 
+    #endregion
 }

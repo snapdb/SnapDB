@@ -32,65 +32,73 @@ using SnapDB.Snap.Tree;
 namespace SnapDB.Snap.Collection;
 
 /// <summary>
-/// A temporary point buffer that is designed to write unsorted data to it, 
-/// then read the data back out sorted. 
+/// A temporary point buffer that is designed to write unsorted data to it,
+/// then read the data back out sorted.
 /// </summary>
 /// <typeparam name="TKey">The key type to use.</typeparam>
 /// <typeparam name="TValue">The value type to use.</typeparam>
 /// <remarks>
-/// This class is not thread safe. 
+/// This class is not thread safe.
 /// </remarks>
-public class SortedPointBuffer<TKey, TValue>
-    : TreeStream<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class SortedPointBuffer<TKey, TValue> : TreeStream<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Members ]
+
+    /// <summary>
+    /// The maximum number of items that can be stored in this buffer.
+    /// </summary>
+    private int m_capacity;
+
+    /// <summary>
+    /// The index of the next point to dequeue.
+    /// </summary>
+    private int m_dequeueIndex;
+
+    private readonly Action<TKey, TKey> m_duplicateHandler;
+
+    /// <summary>
+    /// The index of the next point to write.
+    /// </summary>
+    private int m_enqueueIndex;
+
+    /// <summary>
+    /// Gets if the stream is currently reading.
+    /// The stream was not designed to be read from and written to at the same time. So the mode must be changed.
+    /// </summary>
+    private bool m_isReadingMode;
+
+    /// <summary>
+    /// A block of data for storing the keys.
+    /// </summary>
+    private TKey[] m_keyData;
+
     private readonly KeyValueMethods<TKey, TValue> m_methods;
+
+    private readonly bool m_removeDuplicates;
 
     /// <summary>
     /// Contains indexes of sorted data.
     /// </summary>
     private int[] m_sortingBlocks1;
+
     /// <summary>
     /// Contains indexes of sorted data.
     /// </summary>
     /// <remarks>
-    /// Two blocks are needed to do a merge sort since 
+    /// Two blocks are needed to do a merge sort since
     /// this class uses indexes instead of actually moving
     /// the raw values.
     /// </remarks>
     private int[] m_sortingBlocks2;
 
     /// <summary>
-    /// A block of data for storing the keys.
-    /// </summary>
-    private TKey[] m_keyData;
-    /// <summary>
     /// A block of data for storing the values.
     /// </summary>
     private TValue[] m_valueData;
 
-    /// <summary>
-    /// The maximum number of items that can be stored in this buffer.
-    /// </summary>
-    private int m_capacity;
-    /// <summary>
-    /// The index of the next point to dequeue.
-    /// </summary>
-    private int m_dequeueIndex;
-    /// <summary>
-    /// The index of the next point to write.
-    /// </summary>
-    private int m_enqueueIndex;
-    /// <summary>
-    /// Gets if the stream is currently reading. 
-    /// The stream was not designed to be read from and written to at the same time. So the mode must be changed.
-    /// </summary>
-    private bool m_isReadingMode;
+    #endregion
 
-    private readonly bool m_removeDuplicates;
-
-    private readonly Action<TKey, TKey> m_duplicateHandler;
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a <see cref="SortedPointBuffer{TKey,TValue}"/> that can hold only exactly the specified <see cref="capacity"/>.
@@ -111,20 +119,23 @@ public class SortedPointBuffer<TKey, TValue>
     /// </summary>
     /// <param name="capacity">The maximum number of items that can be stored in this class.</param>
     /// <param name="duplicateHandler">Function that will handle encountered duplicates.</param>
-    protected SortedPointBuffer(int capacity, Action<TKey, TKey> duplicateHandler)
-        : this(capacity, duplicateHandler is null)
+    protected SortedPointBuffer(int capacity, Action<TKey, TKey> duplicateHandler) : this(capacity, duplicateHandler is null)
     {
         m_duplicateHandler = duplicateHandler;
     }
 
+    #endregion
+
+    #region [ Properties ]
+
     /// <summary>
-    /// Gets if the stream will never return duplicate keys. Do not return <c>true</c> unless it is guaranteed that 
+    /// Gets if the stream will never return duplicate keys. Do not return <c>true</c> unless it is guaranteed that
     /// the data read from this stream will never contain duplicates.
     /// </summary>
     public override bool NeverContainsDuplicates => m_removeDuplicates || (object)m_duplicateHandler is not null;
 
     /// <summary>
-    /// Gets if the stream is always in sequential order. Do not return <c>true</c> unless it is guaranteed that 
+    /// Gets if the stream is always in sequential order. Do not return <c>true</c> unless it is guaranteed that
     /// the data read from this stream is sequential.
     /// </summary>
     public override bool IsAlwaysSequential => true;
@@ -176,36 +187,9 @@ public class SortedPointBuffer<TKey, TValue>
         }
     }
 
-    private void SetCapacity(int capacity)
-    {
-        if (capacity <= 0)
-            throw new ArgumentOutOfRangeException(nameof(capacity), "must be greater than 0");
+    #endregion
 
-        m_capacity = capacity;
-        m_sortingBlocks1 = new int[capacity];
-        m_sortingBlocks2 = new int[capacity];
-        m_keyData = new TKey[capacity];
-        for (int x = 0; x < capacity; x++)
-        {
-            m_keyData[x] = new TKey();
-        }
-
-        m_valueData = new TValue[capacity];
-        for (int x = 0; x < capacity; x++)
-        {
-            m_valueData[x] = new TValue();
-        }
-    }
-
-    /// <summary>
-    /// Clears all of the items in this list.
-    /// </summary>
-    private void Clear()
-    {
-        m_dequeueIndex = 0;
-        m_enqueueIndex = 0;
-        SetEos(false);
-    }
+    #region [ Methods ]
 
     /// <summary>
     /// Attempts to enqueue the provided item to the list.
@@ -226,7 +210,7 @@ public class SortedPointBuffer<TKey, TValue>
     }
 
     /// <summary>
-    /// Advances the stream to the next value. 
+    /// Advances the stream to the next value.
     /// If before the beginning of the stream, advances to the first value
     /// </summary>
     /// <returns><c>true</c> if the advance was successful; <c>false</c> if the end of the stream was reached.</returns>
@@ -269,6 +253,33 @@ public class SortedPointBuffer<TKey, TValue>
         m_valueData[m_sortingBlocks1[index]].CopyTo(value);
     }
 
+    private void SetCapacity(int capacity)
+    {
+        if (capacity <= 0)
+            throw new ArgumentOutOfRangeException(nameof(capacity), "must be greater than 0");
+
+        m_capacity = capacity;
+        m_sortingBlocks1 = new int[capacity];
+        m_sortingBlocks2 = new int[capacity];
+        m_keyData = new TKey[capacity];
+        for (int x = 0; x < capacity; x++)
+            m_keyData[x] = new TKey();
+
+        m_valueData = new TValue[capacity];
+        for (int x = 0; x < capacity; x++)
+            m_valueData[x] = new TValue();
+    }
+
+    /// <summary>
+    /// Clears all of the items in this list.
+    /// </summary>
+    private void Clear()
+    {
+        m_dequeueIndex = 0;
+        m_enqueueIndex = 0;
+        SetEos(false);
+    }
+
     /// <summary>
     /// Does a sort of the data. using a merge sort like algorithm.
     /// </summary>
@@ -278,7 +289,6 @@ public class SortedPointBuffer<TKey, TValue>
         int count = Count;
 
         for (int x = 0; x < count; x += 2)
-        {
             // Can't sort the last entry if not.
             if (x + 1 == count)
             {
@@ -294,7 +304,6 @@ public class SortedPointBuffer<TKey, TValue>
                 m_sortingBlocks1[x] = x + 1;
                 m_sortingBlocks1[x + 1] = x;
             }
-        }
 
         bool shouldSwap = false;
 
@@ -347,20 +356,15 @@ public class SortedPointBuffer<TKey, TValue>
             int i2End = Math.Min(xStart + stride + stride, count);
 
             if (d != dEnd && i1 != i1End && i2 != i2End)
-            {
                 // Check to see if already in order, then I can shortcut.
                 if (ptr[srcIndex[i1End - 1]].IsLessThanOrEqualTo(ptr[srcIndex[i2]]))
                 {
                     for (int i = d; i < dEnd; i++)
-                    {
                         dstIndex[i] = srcIndex[i];
-                    }
                     continue;
                 }
-            }
 
             while (d < dEnd)
-            {
                 if (i1 == i1End)
                 {
                     dstIndex[d] = srcIndex[i2];
@@ -385,7 +389,6 @@ public class SortedPointBuffer<TKey, TValue>
                     d++;
                     i2++;
                 }
-            }
         }
     }
 
@@ -398,9 +401,7 @@ public class SortedPointBuffer<TKey, TValue>
                 m_sortingBlocks1[x - skipCount] = m_sortingBlocks1[x];
 
             if (m_keyData[m_sortingBlocks1[x - skipCount]].IsEqualTo(m_keyData[m_sortingBlocks1[x + 1]]))
-            {
                 skipCount++;
-            }
         }
 
         m_enqueueIndex -= skipCount;
@@ -440,4 +441,6 @@ public class SortedPointBuffer<TKey, TValue>
             RemoveDuplicates();
         }
     }
+
+    #endregion
 }

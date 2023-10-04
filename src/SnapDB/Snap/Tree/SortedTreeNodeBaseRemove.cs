@@ -30,6 +30,8 @@ namespace SnapDB.Snap.Tree;
 
 public unsafe partial class SortedTreeNodeBase<TKey, TValue>
 {
+    #region [ Methods ]
+
     //ToDO: Checked
     /// <summary>
     /// Tries to remove the key from the Node.
@@ -38,9 +40,7 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
     /// <returns></returns>
     public bool TryRemove(TKey key)
     {
-        if (ValidBytes > m_minRecordNodeBytes &&
-            LowerKey.IsLessThanOrEqualTo(key) &&
-            key.IsLessThan(UpperKey))
+        if (ValidBytes > m_minRecordNodeBytes && LowerKey.IsLessThanOrEqualTo(key) && key.IsLessThan(UpperKey))
         {
             int index = GetIndexOf(key);
             if (index < 0)
@@ -49,6 +49,7 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
             if (RemoveUnlessOverflow(index))
                 return true;
         }
+
         return TryRemove2(key);
     }
 
@@ -62,10 +63,8 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
             return false;
 
         if (!RemoveUnlessOverflow(index))
-        {
             //ToDo:SplitAndThenRemove
             throw new NotImplementedException();
-        }
 
         if (ValidBytes > m_minRecordNodeBytes) //if the node has not underflowed, we can exit early.
             return true;
@@ -124,6 +123,7 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
             else
                 throw new Exception("Should never reach this condition");
         }
+
         return true;
     }
 
@@ -233,4 +233,6 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
             throw new Exception("Should never get here");
         }
     }
+
+    #endregion
 }

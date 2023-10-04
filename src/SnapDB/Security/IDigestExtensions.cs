@@ -33,6 +33,8 @@ namespace SnapDB.Security;
 /// </summary>
 public static class DigestExtensions
 {
+    #region [ Static ]
+
     /// <summary>
     /// Computes the hash of the supplied words.
     /// </summary>
@@ -86,4 +88,6 @@ public static class DigestExtensions
         hash.DoFinal(rv, 0);
         return rv;
     }
+
+    #endregion
 }

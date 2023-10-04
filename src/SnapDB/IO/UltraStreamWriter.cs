@@ -23,22 +23,30 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
+
 using System.Runtime.CompilerServices;
 
 namespace SnapDB.IO;
 
 /// <summary>
-/// Represents an ultra high speed way to write data to a stream. 
+/// Represents an ultra high speed way to write data to a stream.
 /// StreamWriter's methods can be slow at times.
 /// </summary>
 public class UltraStreamWriter
 {
-    private const int Size = 1024;
+    #region [ Members ]
+
     private const int FlushSize = 1024 - 40;
+
+    private const int Size = 1024;
     private readonly char[] m_buffer;
+    private readonly string m_nl = Environment.NewLine;
     private int m_position;
     private readonly StreamWriter m_stream;
-    private readonly string m_nl = Environment.NewLine;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a <see cref="UltraStreamWriter"/> around <see cref="Stream"/>.
@@ -49,6 +57,10 @@ public class UltraStreamWriter
         m_buffer = new char[Size];
         m_stream = stream;
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Writes the provided character to the stream.
@@ -104,4 +116,5 @@ public class UltraStreamWriter
         m_position = 0;
     }
 
+    #endregion
 }

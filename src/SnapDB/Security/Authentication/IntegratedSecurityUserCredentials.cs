@@ -34,13 +34,19 @@ namespace SnapDB.Security.Authentication;
 /// Provides simple password based authentication that uses Secure Remote Password.
 /// </summary>
 /// <remarks>
-/// It is safe to store the user's credential on the server. This is a zero knowledge 
+/// It is safe to store the user's credential on the server. This is a zero knowledge
 /// password proof, meaning if this database is compromised, a brute force attack
 /// is the only way to reveal the password.
 /// </remarks>
 public class IntegratedSecurityUserCredentials
 {
+    #region [ Members ]
+
     private readonly Dictionary<string, IntegratedSecurityUserCredential> m_users = new();
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Gets if the user exists in the database
@@ -62,6 +68,7 @@ public class IntegratedSecurityUserCredentials
                 token = user.UserToken;
                 return true;
             }
+
             return false;
         }
     }
@@ -100,9 +107,7 @@ public class IntegratedSecurityUserCredentials
         {
             stream.Write(m_users.Count);
             foreach (IntegratedSecurityUserCredential user in m_users.Values)
-            {
                 user.Save(stream);
-            }
         }
     }
 
@@ -127,12 +132,12 @@ public class IntegratedSecurityUserCredentials
                         m_users.Add(user.UserId, user);
                     }
                 }
+
                 return;
             default:
                 throw new VersionNotFoundException("Unknown encoding method");
         }
     }
 
+    #endregion
 }
-
-

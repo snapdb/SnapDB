@@ -33,11 +33,17 @@ namespace SnapDB.Snap.Encoding;
 /// </summary>
 internal class PairEncodingDictionary
 {
-    private readonly object m_syncRoot;
+    #region [ Members ]
+
     private readonly Dictionary<EncodingDefinition, PairEncodingDefinitionBase> m_combinedEncoding;
     private readonly Dictionary<Tuple<EncodingDefinition, Type>, PairEncodingDefinitionBase> m_keyTypedCombinedEncoding;
-    private readonly Dictionary<Tuple<EncodingDefinition, Type>, PairEncodingDefinitionBase> m_valueTypedCombinedEncoding;
     private readonly Dictionary<Tuple<EncodingDefinition, Type, Type>, PairEncodingDefinitionBase> m_keyValueTypedCombinedEncoding;
+    private readonly object m_syncRoot;
+    private readonly Dictionary<Tuple<EncodingDefinition, Type>, PairEncodingDefinitionBase> m_valueTypedCombinedEncoding;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new EncodingDictionary
@@ -51,6 +57,10 @@ internal class PairEncodingDictionary
         m_keyValueTypedCombinedEncoding = new Dictionary<Tuple<EncodingDefinition, Type, Type>, PairEncodingDefinitionBase>();
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Registers this type
     /// </summary>
@@ -63,21 +73,13 @@ internal class PairEncodingDictionary
         lock (m_syncRoot)
         {
             if (encoding.KeyTypeIfNotGeneric is null && encoding.ValueTypeIfNotGeneric is null)
-            {
                 m_combinedEncoding.Add(encoding.Method, encoding);
-            }
             else if (encoding.KeyTypeIfNotGeneric is not null && encoding.ValueTypeIfNotGeneric is null)
-            {
                 m_keyTypedCombinedEncoding.Add(Tuple.Create(encoding.Method, encoding.KeyTypeIfNotGeneric), encoding);
-            }
             else if (encoding.KeyTypeIfNotGeneric is null && encoding.ValueTypeIfNotGeneric is not null)
-            {
                 m_valueTypedCombinedEncoding.Add(Tuple.Create(encoding.Method, encoding.ValueTypeIfNotGeneric), encoding);
-            }
             else
-            {
                 m_keyValueTypedCombinedEncoding.Add(Tuple.Create(encoding.Method, encoding.KeyTypeIfNotGeneric, encoding.ValueTypeIfNotGeneric), encoding);
-            }
         }
     }
 
@@ -89,9 +91,7 @@ internal class PairEncodingDictionary
     /// <param name="encodingMethod">the encoding method</param>
     /// <param name="encoding">an output if the encoding method exists.</param>
     /// <returns>True if the encoding value was found, false otherwise.</returns>
-    public bool TryGetEncodingMethod<TKey, TValue>(EncodingDefinition encodingMethod, out PairEncodingDefinitionBase encoding)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+    public bool TryGetEncodingMethod<TKey, TValue>(EncodingDefinition encodingMethod, out PairEncodingDefinitionBase encoding) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         if (encodingMethod is null)
             throw new ArgumentNullException(nameof(encodingMethod));
@@ -101,15 +101,12 @@ internal class PairEncodingDictionary
 
         lock (m_syncRoot)
         {
-            if (m_keyValueTypedCombinedEncoding.TryGetValue(Tuple.Create(encodingMethod, keyType, valueType), out encoding)
-                || m_keyTypedCombinedEncoding.TryGetValue(Tuple.Create(encodingMethod, keyType), out encoding)
-                || m_valueTypedCombinedEncoding.TryGetValue(Tuple.Create(encodingMethod, valueType), out encoding)
-                || m_combinedEncoding.TryGetValue(encodingMethod, out encoding))
-            {
+            if (m_keyValueTypedCombinedEncoding.TryGetValue(Tuple.Create(encodingMethod, keyType, valueType), out encoding) || m_keyTypedCombinedEncoding.TryGetValue(Tuple.Create(encodingMethod, keyType), out encoding) || m_valueTypedCombinedEncoding.TryGetValue(Tuple.Create(encodingMethod, valueType), out encoding) || m_combinedEncoding.TryGetValue(encodingMethod, out encoding))
                 return true;
-            }
         }
+
         return false;
     }
 
+    #endregion
 }

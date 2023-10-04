@@ -29,11 +29,9 @@ namespace SnapDB.IO.Unmanaged;
 /// <summary>
 /// Provides a in memory stream that allocates its own unmanaged memory.
 /// </summary>
-public partial class UnmanagedMemoryStream
-    : UnmanagedMemoryStreamCore, ISupportsBinaryStream
+public partial class UnmanagedMemoryStream : UnmanagedMemoryStreamCore, ISupportsBinaryStream
 {
     #region [ Members ]
-
 
     /// <summary>
     /// Releases all the resources used by the <see cref="MemoryPoolStream"/> object.
@@ -47,8 +45,7 @@ public partial class UnmanagedMemoryStream
     /// <summary>
     /// Create a new <see cref="UnmanagedMemoryStream"/> that allocates its own unmanaged memory.
     /// </summary>
-    public UnmanagedMemoryStream(int allocationSize = 4096)
-        : base(allocationSize)
+    public UnmanagedMemoryStream(int allocationSize = 4096) : base(allocationSize)
     {
     }
 
@@ -75,20 +72,20 @@ public partial class UnmanagedMemoryStream
     #region [ Methods ]
 
     /// <summary>
-    /// Acquire an IO Session.
-    /// </summary>
-    public BinaryStreamIoSessionBase CreateIoSession()
-    {
-        return new IoSession(this);
-    }
-
-    /// <summary>
     /// Creates a new binary from an IO session.
     /// </summary>
     /// <returns>A new <see cref="BinaryStreamBase"/> instance of type <see cref="BinaryStream"/>.</returns>
     public BinaryStreamBase CreateBinaryStream()
     {
         return new BinaryStream(this);
+    }
+
+    /// <summary>
+    /// Acquire an IO Session.
+    /// </summary>
+    public BinaryStreamIoSessionBase CreateIoSession()
+    {
+        return new IoSession(this);
     }
 
     #endregion

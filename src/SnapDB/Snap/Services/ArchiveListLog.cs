@@ -32,27 +32,31 @@ namespace SnapDB.Snap.Services;
 /// Contains the Pending Deletions for the <see cref="ArchiveList{TKey,TValue}"/>.
 /// This class is thread safe.
 /// </summary>
-internal class ArchiveListLog
-       : DisposableLoggingClassBase
+internal class ArchiveListLog : DisposableLoggingClassBase
 {
-    private readonly List<ArchiveListLogFile> m_files = new();
+    #region [ Members ]
+
     private HashSet<Guid> m_allFilesToDelete = new();
+
+    private readonly List<ArchiveListLogFile> m_files = new();
+
+    private ArchiveListLogFile m_pendingFile = new();
+    private readonly ArchiveListLogSettings m_settings;
 
     private readonly object m_syncRoot;
     private bool m_disposed;
-    private readonly ArchiveListLogSettings m_settings;
 
-    private ArchiveListLogFile m_pendingFile = new();
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a log that monitors pending deletions.
     /// </summary>
     /// <param name="settings">Optional settings for the log. If none are specified, the default will not load the settings.</param>
-    public ArchiveListLog(ArchiveListLogSettings settings = null)
-            : base(MessageClass.Framework)
+    public ArchiveListLog(ArchiveListLogSettings settings = null) : base(MessageClass.Framework)
     {
-        if (settings is null)
-            settings = new ArchiveListLogSettings();
+        settings ??= new ArchiveListLogSettings();
 
         m_settings = settings.CloneReadonly();
         m_settings.Validate();
@@ -61,20 +65,20 @@ internal class ArchiveListLog
         m_pendingFile = new ArchiveListLogFile();
 
         if (m_settings.IsFileBacked)
-        {
             foreach (string file in Directory.GetFiles(m_settings.LogPath, m_settings.SearchPattern))
             {
                 ArchiveListLogFile logFile = new();
                 logFile.Load(file);
                 if (logFile.IsValid)
-                {
                     m_files.Add(logFile);
-                }
             }
-        }
 
         m_allFilesToDelete = new HashSet<Guid>(GetAllFilesToDelete());
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// If the log is file backed
@@ -139,7 +143,6 @@ internal class ArchiveListLog
             m_pendingFile.FilesToDelete.Add(archiveId);
             m_allFilesToDelete?.Add(archiveId);
         }
-
     }
 
     /// <summary>
@@ -154,33 +157,10 @@ internal class ArchiveListLog
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
-            if (m_allFilesToDelete is null)
-            {
-                m_allFilesToDelete = GetAllFilesToDelete();
-            }
+            m_allFilesToDelete ??= GetAllFilesToDelete();
 
             return m_allFilesToDelete.Contains(fileId);
         }
-    }
-
-    /// <summary>
-    /// Verify that none of the pending deletion files exist in the editor.
-    /// </summary>
-    private HashSet<Guid> GetAllFilesToDelete()
-    {
-        HashSet<Guid> allFiles = new();
-        if (m_pendingFile.IsValid)
-        {
-            allFiles.UnionWith(m_pendingFile.FilesToDelete);
-        }
-        foreach (ArchiveListLogFile file in m_files)
-        {
-            if (file.IsValid)
-            {
-                allFiles.UnionWith(file.FilesToDelete);
-            }
-        }
-        return allFiles;
     }
 
     /// <summary>
@@ -192,24 +172,34 @@ internal class ArchiveListLog
         lock (m_syncRoot)
         {
             if (!m_disposed)
-            {
                 try
                 {
                     // This will be done regardless of whether the object is finalized or disposed.
-
                     if (disposing)
-                    {
                         SaveLogToDisk();
-                        // This will be done only when the object is disposed by calling Dispose().
-                    }
+                    // This will be done only when the object is disposed by calling Dispose().
                 }
                 finally
                 {
-                    m_disposed = true;          // Prevent duplicate dispose.
-                    base.Dispose(disposing);    // Call base class Dispose().
+                    m_disposed = true; // Prevent duplicate dispose.
+                    base.Dispose(disposing); // Call base class Dispose().
                 }
-            }
         }
     }
 
+    /// <summary>
+    /// Verify that none of the pending deletion files exist in the editor.
+    /// </summary>
+    private HashSet<Guid> GetAllFilesToDelete()
+    {
+        HashSet<Guid> allFiles = new();
+        if (m_pendingFile.IsValid)
+            allFiles.UnionWith(m_pendingFile.FilesToDelete);
+        foreach (ArchiveListLogFile file in m_files)
+            if (file.IsValid)
+                allFiles.UnionWith(file.FilesToDelete);
+        return allFiles;
+    }
+
+    #endregion
 }

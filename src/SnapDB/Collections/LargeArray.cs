@@ -24,31 +24,41 @@
 //
 //******************************************************************************************************
 
-using Gemstone;
 using System.Runtime.CompilerServices;
+using Gemstone;
 
 namespace SnapDB.Collections;
 
 /// <summary>
-/// Implementation that utilizes a jagged array structure and 
+/// Implementation that utilizes a jagged array structure and
 /// array expansion optimization to improve performance.
 /// </summary>
 /// <typeparam name="T">Array type.</typeparam>
 public class LargeArray<T>
 {
+    #region [ Members ]
+
+    private T[]?[] m_array;
+
+    private readonly int m_bitShift;
+
+    private readonly int m_mask;
+
     // Since large arrays expand slowly, this class can quickly grow an array with millions of elements.
     // It is highly advised that these objects are structs since keeping a list of millions of classes
     // would cause the garbage collection cycles to become very slow.
     private readonly int m_size;
-    private readonly int m_bitShift;
-    private readonly int m_mask;
-    private T[]?[] m_array;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a <see cref="LargeArray{T}"/> with a jagged array depth of 1024 elements.
     /// </summary>
-    public LargeArray()
-        : this(1024) { }
+    public LargeArray() : this(1024)
+    {
+    }
 
     /// <summary>
     /// Creates a <see cref="LargeArray{T}"/> with the specified jagged array depth.
@@ -62,6 +72,10 @@ public class LargeArray<T>
         m_array = Array.Empty<T[]?>();
         Capacity = 0;
     }
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets or sets the value in the specified index of the array.
@@ -86,6 +100,10 @@ public class LargeArray<T>
     /// Gets the number of items in the array.
     /// </summary>
     public int Capacity { get; private set; }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Sets the capacity of the array to at least the given length. Will not reduce the size.
@@ -125,6 +143,16 @@ public class LargeArray<T>
         return Capacity;
     }
 
+    /// <summary>
+    /// Clears all elements in the data structure, setting each element to its default value.
+    /// </summary>
+    public void Clear()
+    {
+        foreach (T[]? items in m_array)
+            if (items is not null)
+                Array.Clear(items, 0, items.Length);
+    }
+
     // Validates whether a given index is within the valid range of positions in the data structure.
     // If the index is less than 0 or greater than or equal to the capacity, an exception is thrown.
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -140,20 +168,10 @@ public class LargeArray<T>
     {
         if (index < 0)
             throw new ArgumentOutOfRangeException(nameof(index), "Must be greater than or equal to zero.");
-            
+
         if (index >= Capacity)
             throw new ArgumentOutOfRangeException(nameof(index), "exceeds the length of the array.");
     }
 
-    /// <summary>
-    /// Clears all elements in the data structure, setting each element to its default value.
-    /// </summary>
-    public void Clear()
-    {
-        foreach (T[]? items in m_array)
-        {
-            if (items is not null)
-                Array.Clear(items, 0, items.Length);
-        }
-    }
+    #endregion
 }

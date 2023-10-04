@@ -29,34 +29,17 @@ using SnapDB.IO.Unmanaged;
 namespace SnapDB.IO.FileStructure;
 
 /// <summary>
-/// Provides a file stream that can be used to open a file and does all of the background work 
+/// Provides a file stream that can be used to open a file and does all of the background work
 /// required to translate virtual position data into physical ones.
 /// </summary>
-internal sealed class SimplifiedSubFileStream
-    : ISupportsBinaryStream
+internal sealed class SimplifiedSubFileStream : ISupportsBinaryStream
 {
     #region [ Members ]
 
-    private BinaryStreamIoSessionBase m_ioStream1;
-
-    /// <summary>
-    /// Determines if the file stream has been disposed.
-    /// </summary>
-    private bool m_disposed;
-
-    /// <summary>
-    /// The FileAllocationTable.
-    /// </summary>
     private readonly FileHeaderBlock m_fileHeaderBlock;
 
-    /// <summary>
-    /// The size of the block.
-    /// </summary>
-    private readonly int m_blockSize;
+    private BinaryStreamIoSessionBase? m_ioStream1;
 
-    /// <summary>
-    /// The Disk Subsystem.
-    /// </summary>
     private readonly FileStream m_stream;
 
     #endregion
@@ -73,17 +56,19 @@ internal sealed class SimplifiedSubFileStream
     {
         if (subFile is null)
             throw new ArgumentNullException(nameof(subFile));
+
         if (fileHeaderBlock is null)
             throw new ArgumentNullException(nameof(fileHeaderBlock));
 
         if (subFile.DirectBlock == 0)
             throw new Exception("Must assign subFile.DirectBlock");
+
         if (fileHeaderBlock.IsReadOnly)
             throw new ArgumentException("This parameter cannot be read only when opening for writing", nameof(fileHeaderBlock));
+
         if (subFile.IsReadOnly)
             throw new ArgumentException("This parameter cannot be read only when opening for writing", nameof(subFile));
 
-        m_blockSize = fileHeaderBlock.BlockSize;
         m_stream = stream ?? throw new ArgumentNullException(nameof(stream));
         SubFile = subFile;
         m_fileHeaderBlock = fileHeaderBlock;
@@ -94,7 +79,7 @@ internal sealed class SimplifiedSubFileStream
     #region [ Properties ]
 
     /// <summary>
-    /// The file used by the stream.
+    /// Gets the file used by the stream.
     /// </summary>
     internal SubFileHeader? SubFile { get; }
 
@@ -105,8 +90,9 @@ internal sealed class SimplifiedSubFileStream
     {
         get
         {
-            if (m_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             return false;
         }
     }
@@ -114,7 +100,7 @@ internal sealed class SimplifiedSubFileStream
     /// <summary>
     /// Determines if the file system has been disposed yet.
     /// </summary>
-    public bool IsDisposed => m_disposed;
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Gets the number of available simultaneous read or write sessions.
@@ -127,15 +113,16 @@ internal sealed class SimplifiedSubFileStream
     {
         get
         {
-            if (m_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             int count = 0;
-            if (m_ioStream1 is null || m_ioStream1.IsDisposed)
-            {
-                m_ioStream1 = null;
-                count++;
-            }
-            return count;
+
+            if (m_ioStream1 is not null && !m_ioStream1.IsDisposed)
+                return count;
+
+            m_ioStream1 = null;
+            return ++count;
         }
     }
 
@@ -143,42 +130,40 @@ internal sealed class SimplifiedSubFileStream
 
     #region [ Methods ]
 
-
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
-    /// <filterpriority>2</filterpriority>
     public void Dispose()
     {
-        if (!m_disposed)
+        if (IsDisposed)
+            return;
+
+        try
         {
-            try
-            {
-                if (m_ioStream1 is not null)
-                {
-                    m_ioStream1.Dispose();
-                    m_ioStream1 = null;
-                }
-            }
-            finally
-            {
-                m_disposed = true; // Prevent duplicate dispose.
-            }
+            if (m_ioStream1 is null)
+                return;
+
+            m_ioStream1.Dispose();
+            m_ioStream1 = null;
+        }
+        finally
+        {
+            IsDisposed = true; // Prevent duplicate dispose.
         }
     }
 
 
-    /// <summary>
-    /// Aquire an IO Session.
-    /// </summary>
+    // Acquire an IO Session.
     BinaryStreamIoSessionBase ISupportsBinaryStream.CreateIoSession()
     {
-        if (m_disposed)
+        if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         if (RemainingSupportedIoSessions == 0)
             throw new Exception("There are not any remaining IO Sessions");
 
         m_ioStream1 = new SimplifiedSubFileStreamIoSession(m_stream, SubFile, m_fileHeaderBlock);
+
         return m_ioStream1;
     }
 

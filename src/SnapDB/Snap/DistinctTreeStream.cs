@@ -31,16 +31,18 @@ namespace SnapDB.Snap;
 /// </summary>
 /// <typeparam name="TKey">The type of keys in the stream.</typeparam>
 /// <typeparam name="TValue">The type of values in the stream.</typeparam>
-public class DistinctTreeStream<TKey, TValue>
-    : TreeStream<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class DistinctTreeStream<TKey, TValue> : TreeStream<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Members ]
+
+    private readonly TreeStream<TKey, TValue> m_baseStream;
     private bool m_isLastValueValid;
     private readonly TKey m_lastKey;
     private readonly TValue m_lastValue;
 
-    private readonly TreeStream<TKey, TValue> m_baseStream;
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DistinctTreeStream{TKey, TValue}"/> class.
@@ -57,11 +59,20 @@ public class DistinctTreeStream<TKey, TValue>
         m_isLastValueValid = false;
         m_baseStream = baseStream;
     }
+
+    #endregion
+
+    #region [ Properties ]
+
     /// <inheritdoc/>
     public override bool IsAlwaysSequential => true;
 
     /// <inheritdoc/>
     public override bool NeverContainsDuplicates => true;
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)
@@ -89,4 +100,6 @@ public class DistinctTreeStream<TKey, TValue>
         value.CopyTo(m_lastValue);
         return true;
     }
+
+    #endregion
 }

@@ -29,8 +29,7 @@ namespace SnapDB.IO.FileStructure;
 /// <summary>
 /// Defines a set of attribute flags associated with file header.
 /// </summary>
-public enum FileHeaderAttributes
-    : short
+public enum FileHeaderAttributes : short
 {
     EndOfAttributes = 0,
     UserAttributes = 1,

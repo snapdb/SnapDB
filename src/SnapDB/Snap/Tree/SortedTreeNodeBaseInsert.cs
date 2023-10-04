@@ -28,6 +28,8 @@ namespace SnapDB.Snap.Tree;
 
 public partial class SortedTreeNodeBase<TKey, TValue>
 {
+    #region [ Methods ]
+
     /// <summary>
     /// Inserts the following value to the tree if it does not exist.
     /// </summary>
@@ -45,6 +47,7 @@ public partial class SortedTreeNodeBase<TKey, TValue>
             if (InsertUnlessFull(index, key, value))
                 return true;
         }
+
         return TryInsert2(key, value);
     }
 
@@ -114,11 +117,9 @@ public partial class SortedTreeNodeBase<TKey, TValue>
             NewNodeThenInsert(key, value);
             return true;
         }
-        else
-        {
-            SplitNodeThenInsert(key, value);
-            return true;
-        }
+
+        SplitNodeThenInsert(key, value);
+        return true;
     }
 
     /// <summary>
@@ -173,4 +174,6 @@ public partial class SortedTreeNodeBase<TKey, TValue>
 
         SparseIndex.Add(dividingKey, newNodeIndex, (byte)(Level + 1));
     }
+
+    #endregion
 }

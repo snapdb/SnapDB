@@ -27,11 +27,13 @@
 namespace SnapDB;
 
 /// <summary>
-/// Contains functions that convert from floating-points to unsigned 64-bit integers, 
+/// Contains functions that convert from floating-points to unsigned 64-bit integers,
 /// and from unsigned 64-bit integers to floating-points.
 /// </summary>
 public static class BitConvert
 {
+    #region [ Static ]
+
     /// <summary>
     /// Converts a single-precision floating-point number to an unsigned 64-bit integer representation.
     /// </summary>
@@ -67,4 +69,6 @@ public static class BitConvert
 
         return *(float*)&tmpValue;
     }
+
+    #endregion
 }

@@ -29,27 +29,26 @@ using SnapDB.IO;
 namespace SnapDB.Snap.Tree;
 
 /// <summary>
-/// Provides the basic user methods with any derived B+Tree.  
+/// Provides the basic user methods with any derived B+Tree.
 /// This base class translates all of the core methods into simple methods
 /// that must be implemented by classes derived from this base class.
 /// </summary>
 /// <remarks>
 /// This class does not support concurrent read operations.  This is due to the caching method of each tree.
-/// If concurrent read operations are desired, clone the tree.  
+/// If concurrent read operations are desired, clone the tree.
 /// Trees cannot be cloned if the user plans to write to the tree.
 /// </remarks>
-public class SortedTree<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class SortedTree<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
 
     protected SparseIndex<TKey> Indexer = default!;
     protected SortedTreeNodeBase<TKey, TValue> LeafStorage = default!;
-    private readonly TValue m_tempValue = new();
+
+    private readonly SortedTreeHeader m_header;
 
     private bool m_isInitialized;
-    private readonly SortedTreeHeader m_header;
+    private readonly TValue m_tempValue = new();
 
     #endregion
 
@@ -63,83 +62,21 @@ public class SortedTree<TKey, TValue>
         AutoFlush = true;
     }
 
-    internal void InitializeOpen()
-    {
-        if (m_isInitialized)
-            throw new Exception("Duplicate calls to Initialize");
-        m_isInitialized = true;
-
-        SortedTree.ReadHeader(Stream, out m_header.TreeNodeType, out m_header.BlockSize);
-
-        // Since m_loadHeader is currently null in the constructor, 
-        // this will load as much data that this tree can load.
-        m_header.LoadHeader(Stream);
-
-        Initialize();
-
-        m_header.LoadHeader(Stream);
-    }
-
-    internal void InitializeCreate(EncodingDefinition treeNodeType, int blockSize)
-    {
-        if (m_isInitialized)
-            throw new Exception("Duplicate calls to Initialize");
-        
-        if (treeNodeType is null)
-            throw new ArgumentNullException(nameof(treeNodeType));
-
-
-        m_isInitialized = true;
-
-        m_header.TreeNodeType = treeNodeType;
-        m_header.BlockSize = blockSize;
-
-        m_header.RootNodeLevel = 0;
-        m_header.RootNodeIndexAddress = 1;
-        m_header.LastAllocatedBlock = 1;
-
-        Initialize();
-
-        LeafStorage.CreateEmptyNode(m_header.RootNodeIndexAddress);
-        m_header.IsDirty = true;
-        m_header.SaveHeader(Stream);
-    }
-
-    private void Initialize()
-    {
-        Indexer = new SparseIndex<TKey>();
-        LeafStorage = Library.CreateTreeNode<TKey, TValue>(m_header.TreeNodeType, 0);
-        Indexer.RootHasChanged += IndexerOnRootHasChanged;
-        Indexer.Initialize(Stream, m_header.BlockSize, GetNextNewNodeIndex, m_header.RootNodeLevel, m_header.RootNodeIndexAddress);
-        LeafStorage.Initialize(Stream, m_header.BlockSize, GetNextNewNodeIndex, Indexer);
-    }
-
-    private void IndexerOnRootHasChanged(object sender, EventArgs eventArgs)
-    {
-        m_header.RootNodeLevel = Indexer.RootNodeLevel;
-        m_header.RootNodeIndexAddress = Indexer.RootNodeIndexAddress;
-        SetDirtyFlag();
-    }
-
     #endregion
 
     #region [ Properties ]
 
     /// <summary>
-    /// Gets if the sorted tree needs to be flushed to the disk. 
+    /// Gets if the sorted tree needs to be flushed to the disk.
     /// </summary>
     public bool IsDirty => m_header.IsDirty;
 
     /// <summary>
     /// The sorted tree will not continually call the <see cref="Flush"/> method every time the header is changed.
-    /// When setting this to false, flushes must be manually invoked. Failing to do this can corrupt the SortedTree. 
+    /// When setting this to false, flushes must be manually invoked. Failing to do this can corrupt the SortedTree.
     /// Only set if you can guarantee that <see cref="Flush"/> will be called before disposing this class.
     /// </summary>
-    public bool AutoFlush
-    {
-        get;
-        set;
-    }
+    public bool AutoFlush { get; set; }
 
     /// <summary>
     /// Contains the block size that the tree nodes will be aligned on.
@@ -149,14 +86,11 @@ public class SortedTree<TKey, TValue>
     /// <summary>
     /// Contains the stream for reading and writing.
     /// </summary>
-    protected BinaryStreamPointerBase Stream
-    {
-        get;
-    }
+    protected BinaryStreamPointerBase Stream { get; }
 
     #endregion
 
-    #region [ Public Methods ]
+    #region [ Methods ]
 
     /// <summary>
     /// Flushes any header data that may have changed to the main stream.
@@ -201,7 +135,7 @@ public class SortedTree<TKey, TValue>
 
         if (IsDirty && AutoFlush)
             m_header.SaveHeader(Stream);
-        
+
         return true;
     }
 
@@ -214,9 +148,10 @@ public class SortedTree<TKey, TValue>
         TKey key = new();
         TValue value = new();
 
-        while (stream.Read(key, value)) 
+        while (stream.Read(key, value))
             Add(key, value);
     }
+
     /// <summary>
     /// Adds all of the items in the stream to this tree. Skips any duplicate entries.
     /// </summary>
@@ -233,7 +168,7 @@ public class SortedTree<TKey, TValue>
 
         InsertStreamHelper<TKey, TValue> helper = new(stream);
         LeafStorage.TryInsertSequentialStream(helper);
-        
+
         while (helper.IsValid)
         {
             if (helper.IsKvp1)
@@ -261,6 +196,7 @@ public class SortedTree<TKey, TValue>
                 m_header.SaveHeader(Stream);
             return true;
         }
+
         return false;
     }
 
@@ -305,14 +241,10 @@ public class SortedTree<TKey, TValue>
 
         if (firstFound && lastFound)
             return;
-        
+
         lowerBounds.SetMax();
         upperBounds.SetMin();
     }
-
-    #endregion
-
-    #region [ Protected Methods ]
 
     /// <summary>
     /// Creates a tree scanner that can be used to seek this tree.
@@ -335,9 +267,67 @@ public class SortedTree<TKey, TValue>
         return m_header.LastAllocatedBlock;
     }
 
+    internal void InitializeOpen()
+    {
+        if (m_isInitialized)
+            throw new Exception("Duplicate calls to Initialize");
+        m_isInitialized = true;
+
+        SortedTree.ReadHeader(Stream, out m_header.TreeNodeType, out m_header.BlockSize);
+
+        // Since m_loadHeader is currently null in the constructor, 
+        // this will load as much data that this tree can load.
+        m_header.LoadHeader(Stream);
+
+        Initialize();
+
+        m_header.LoadHeader(Stream);
+    }
+
+    internal void InitializeCreate(EncodingDefinition treeNodeType, int blockSize)
+    {
+        if (m_isInitialized)
+            throw new Exception("Duplicate calls to Initialize");
+
+        if (treeNodeType is null)
+            throw new ArgumentNullException(nameof(treeNodeType));
+
+
+        m_isInitialized = true;
+
+        m_header.TreeNodeType = treeNodeType;
+        m_header.BlockSize = blockSize;
+
+        m_header.RootNodeLevel = 0;
+        m_header.RootNodeIndexAddress = 1;
+        m_header.LastAllocatedBlock = 1;
+
+        Initialize();
+
+        LeafStorage.CreateEmptyNode(m_header.RootNodeIndexAddress);
+        m_header.IsDirty = true;
+        m_header.SaveHeader(Stream);
+    }
+
+    private void Initialize()
+    {
+        Indexer = new SparseIndex<TKey>();
+        LeafStorage = Library.CreateTreeNode<TKey, TValue>(m_header.TreeNodeType, 0);
+        Indexer.RootHasChanged += IndexerOnRootHasChanged;
+        Indexer.Initialize(Stream, m_header.BlockSize, GetNextNewNodeIndex, m_header.RootNodeLevel, m_header.RootNodeIndexAddress);
+        LeafStorage.Initialize(Stream, m_header.BlockSize, GetNextNewNodeIndex, Indexer);
+    }
+
+    private void IndexerOnRootHasChanged(object sender, EventArgs eventArgs)
+    {
+        m_header.RootNodeLevel = Indexer.RootNodeLevel;
+        m_header.RootNodeIndexAddress = Indexer.RootNodeIndexAddress;
+        SetDirtyFlag();
+    }
+
     #endregion
 
-    #region [ Private Methods ]
+    #region [ Static ]
 
     /// <summary>
     /// Opens a sorted tree using the provided stream.
@@ -376,7 +366,7 @@ public class SortedTree<TKey, TValue>
 
         SortedTree<TKey, TValue> tree = new(stream);
         tree.InitializeCreate(treeNodeType, blockSize);
-        
+
         return tree;
     }
 

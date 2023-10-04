@@ -24,8 +24,8 @@
 //
 //******************************************************************************************************
 
-using SnapDB.IO;
 using System.Data;
+using SnapDB.IO;
 
 namespace SnapDB.Snap.Tree;
 
@@ -34,6 +34,8 @@ namespace SnapDB.Snap.Tree;
 /// </summary>
 public static class SortedTree
 {
+    #region [ Static ]
+
     /// <summary>
     /// Reads the header data.
     /// </summary>
@@ -61,4 +63,6 @@ public static class SortedTree
             throw new VersionNotFoundException();
         }
     }
+
+    #endregion
 }

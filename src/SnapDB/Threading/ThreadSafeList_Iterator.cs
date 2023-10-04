@@ -28,17 +28,26 @@ namespace SnapDB.Threading;
 
 public partial class ThreadSafeList<T>
 {
+    #region [ Members ]
+
     /// <summary>
     /// Parses through a list in a thread safe manner.
     /// </summary>
     private class Iterator
     {
-        private readonly ThreadSafeList<T> m_list;
+        #region [ Members ]
+
         private long m_currentIndex;
+
+        private Wrapper m_itemCurrentlyLocked;
         private long m_lastVersion;
         private int m_lastVersionIndex;
 
-        private Wrapper m_itemCurrentlyLocked;
+        private readonly ThreadSafeList<T> m_list;
+
+        #endregion
+
+        #region [ Constructors ]
 
         /// <summary>
         /// Initializes a new iterator for a thread-safe list.
@@ -49,6 +58,10 @@ public partial class ThreadSafeList<T>
             m_list = list;
             Reset();
         }
+
+        #endregion
+
+        #region [ Methods ]
 
         /// <summary>
         /// Only 1 item can be obtained at a time. Failing to call <see cref="UnsafeUnregisterItem"/> will
@@ -86,6 +99,7 @@ public partial class ThreadSafeList<T>
                 item = default;
                 return false;
             }
+
             m_itemCurrentlyLocked = currentObject;
             item = currentObject.Item;
             return true;
@@ -116,10 +130,12 @@ public partial class ThreadSafeList<T>
         private int GetStartingIndex()
         {
             if (m_lastVersion == m_list.m_version)
-            {
                 return m_lastVersionIndex + 1;
-            }
             return 0;
         }
+
+        #endregion
     }
+
+    #endregion
 }

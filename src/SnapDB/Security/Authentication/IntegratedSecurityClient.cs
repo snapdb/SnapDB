@@ -34,19 +34,23 @@ namespace SnapDB.Security.Authentication;
 
 /// <summary>
 /// Uses windows integrated security to authentication.
-/// This uses NTLM in non-domain environments 
+/// This uses NTLM in non-domain environments
 /// and Kerberos in domain environments.
 /// </summary>
-public class IntegratedSecurityClient
-    : DisposableLoggingClassBase
+public class IntegratedSecurityClient : DisposableLoggingClassBase
 {
+    #region [ Members ]
+
     private readonly NetworkCredential m_credentials;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Uses the default credentials of the user to authenticate
     /// </summary>
-    public IntegratedSecurityClient()
-        : base(MessageClass.Component)
+    public IntegratedSecurityClient() : base(MessageClass.Component)
     {
         m_credentials = CredentialCache.DefaultNetworkCredentials;
     }
@@ -57,25 +61,29 @@ public class IntegratedSecurityClient
     /// <param name="username">The username to use</param>
     /// <param name="password">the password to use</param>
     /// <param name="domain">the domain to long in as.</param>
-    public IntegratedSecurityClient(string username, string password, string domain)
-        : base(MessageClass.Component)
+    public IntegratedSecurityClient(string username, string password, string domain) : base(MessageClass.Component)
     {
         m_credentials = new NetworkCredential(username, password, domain);
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Authenticates the client using the supplied stream.
     /// </summary>
     /// <param name="stream">the stream to use to authenticate the connection.</param>
-    /// <param name="additionalChallenge">Additional data that much match between the client and server
-    /// for the connection to succeed.</param>
+    /// <param name="additionalChallenge">
+    /// Additional data that much match between the client and server
+    /// for the connection to succeed.
+    /// </param>
     /// <returns>
     /// True if authentication succeded, false otherwise.
     /// </returns>
     public bool TryAuthenticateAsClient(Stream stream, byte[] additionalChallenge = null)
     {
-        if (additionalChallenge is null)
-            additionalChallenge = new byte[] { };
+        additionalChallenge ??= new byte[] { };
         if (additionalChallenge.Length > short.MaxValue)
             throw new ArgumentOutOfRangeException(nameof(additionalChallenge), "Must be less than 32767 bytes");
 
@@ -95,37 +103,28 @@ public class IntegratedSecurityClient
         //Simply writing the raw is as secure as creating a challenge response
         negotiateStream.Write((short)additionalChallenge.Length);
         if (additionalChallenge.Length > 0)
-        {
             negotiateStream.Write(additionalChallenge);
-        }
         negotiateStream.Flush();
 
         int len = negotiateStream.ReadInt16();
         if (len < 0)
         {
-            Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "Challenge Length is invalid: " + len.ToString());
+            Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "Challenge Length is invalid: " + len);
             return false;
         }
 
         byte[] remoteChallenge;
         if (len == 0)
-        {
             remoteChallenge = Array.Empty<byte>();
-        }
         else
-        {
             remoteChallenge = negotiateStream.ReadBytes(len);
-        }
 
         if (remoteChallenge.SecureEquals(additionalChallenge))
-        {
             return true;
-        }
-        else
-        {
-            Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "Challenge did not match. Potential man in the middle attack.");
-            return false;
-        }
+
+        Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "Challenge did not match. Potential man in the middle attack.");
+        return false;
     }
 
+    #endregion
 }

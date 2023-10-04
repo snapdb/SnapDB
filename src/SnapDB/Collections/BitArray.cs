@@ -24,13 +24,13 @@
 //
 //******************************************************************************************************
 
-using Gemstone;
 using System.Runtime.CompilerServices;
+using Gemstone;
 
 namespace SnapDB.Collections;
 
 /// <summary>
-/// Represents an array of bits much like the native .NET implementation, 
+/// Represents an array of bits much like the native .NET implementation,
 /// however this focuses on providing a free space bit array.
 /// </summary>
 public sealed class BitArray
@@ -38,9 +38,9 @@ public sealed class BitArray
     #region [ Members ]
 
     /// <summary>
-    /// Defines the number of bits to shift to get the index of the array.
+    /// Defines the number of bits per array element.
     /// </summary>
-    public const int BitsPerElementShift = 5;
+    public const int BitsPerElement = sizeof(int) * 8;
 
     /// <summary>
     /// Defines the mask to apply to get the bit position of the value.
@@ -48,14 +48,15 @@ public sealed class BitArray
     public const int BitsPerElementMask = BitsPerElement - 1;
 
     /// <summary>
-    /// Defines the number of bits per array element.
+    /// Defines the number of bits to shift to get the index of the array.
     /// </summary>
-    public const int BitsPerElement = sizeof(int) * 8;
+    public const int BitsPerElementShift = 5;
 
     private int[] m_array;
+
+    private readonly bool m_initialState;
     private int m_lastFoundClearedIndex;
     private int m_lastFoundSetIndex;
-    private readonly bool m_initialState;
 
     #endregion
 
@@ -74,17 +75,15 @@ public sealed class BitArray
             throw new ArgumentOutOfRangeException(nameof(count));
 
         // If the number does not lie on a 32 bit boundary, add 1 to the number of items in the array.
-        m_array = (count & BitsPerElementMask) != 0 ? 
-            new int[(count >> BitsPerElementShift) + 1] : 
-            new int[count >> BitsPerElementShift];
+        m_array = (count & BitsPerElementMask) != 0 ? new int[(count >> BitsPerElementShift) + 1] : new int[count >> BitsPerElementShift];
 
         if (initialState)
         {
             SetCount = count;
 
             // If the initial state is true, set all bits to 1 (-1 in two's complement).
-            for (int x = 0; x < m_array.Length; x++)            
-                m_array[x] = -1; 
+            for (int x = 0; x < m_array.Length; x++)
+                m_array[x] = -1;
         }
         else
         {
@@ -150,7 +149,7 @@ public sealed class BitArray
 
     /// <summary>
     /// Gets the status of the corresponding bit.
-    /// This method does not validate the bounds of the array, 
+    /// This method does not validate the bounds of the array,
     /// and will be Aggressively Inlined.
     /// </summary>
     /// <param name="index">Bit position to access.</param>
@@ -173,7 +172,7 @@ public sealed class BitArray
     }
 
     /// <summary>
-    /// Sets the corresponding bit to <c>true</c>. 
+    /// Sets the corresponding bit to <c>true</c>.
     /// Returns <c>true</c> if the bit state was changed.
     /// </summary>
     /// <param name="index">Bit position to set.</param>
@@ -289,10 +288,8 @@ public sealed class BitArray
         Validate(index, length);
 
         for (int x = index; x < index + length; x++)
-        {
             if ((m_array[x >> BitsPerElementShift] & (1 << (x & BitsPerElementMask))) == 0)
                 return false;
-        }
 
         return true;
     }
@@ -308,10 +305,8 @@ public sealed class BitArray
         Validate(index, length);
 
         for (int x = index; x < index + length; x++)
-        {
             if ((m_array[x >> BitsPerElementShift] & (1 << (x & BitsPerElementMask))) != 0)
                 return false;
-        }
 
         return true;
     }
@@ -327,9 +322,7 @@ public sealed class BitArray
             return;
 
         // If the number does not lie on a 32 bit boundary, add 1 to the number of items in the array.
-        int[] array = (capacity & BitsPerElementMask) != 0 ? 
-            new int[(capacity >> BitsPerElementShift) + 1] : 
-            new int[capacity >> BitsPerElementShift];
+        int[] array = (capacity & BitsPerElementMask) != 0 ? new int[(capacity >> BitsPerElementShift) + 1] : new int[capacity >> BitsPerElementShift];
 
         m_array.CopyTo(array, 0);
 
@@ -374,7 +367,6 @@ public sealed class BitArray
 
         // Iterate through the elements, starting from where the previous search left off.
         for (int x = m_lastFoundClearedIndex >> BitsPerElementShift; x < count; x++)
-        {
             // If the current element has at least one cleared bit (not all bits set to 1).
             if (m_array[x] != -1)
             {
@@ -391,7 +383,6 @@ public sealed class BitArray
                 // Return the position of the cleared bit within the bit array.
                 return position;
             }
-        }
 
         // If no cleared bit is found in the entire bit array, return -1.
         return -1;
@@ -408,7 +399,6 @@ public sealed class BitArray
 
         // Iterate through the elements, starting from where the previous search left off.
         for (int x = m_lastFoundSetIndex >> BitsPerElementShift; x < count; x++)
-        {
             // If the current element has at least one set bit, use this element.
             if (m_array[x] != 0)
             {
@@ -425,7 +415,6 @@ public sealed class BitArray
                 // Return the position of the set bit within the bit array.
                 return position;
             }
-        }
 
         // If no set bit is found in the entire bit array, return -1.
         return -1;
@@ -442,19 +431,15 @@ public sealed class BitArray
 
         // Iterate through the elements of the bit array.
         for (int x = 0; x < count; x++)
-        {
             // If all bits are cleared, this entire section can be skipped
             if (m_array[x] != 0)
             {
                 int end = Math.Min(x * BitsPerElement + BitsPerElement, Count);
 
                 for (int k = x * BitsPerElement; k < end; k++)
-                {
                     if (GetBitUnchecked(k))
                         yield return k;
-                }
             }
-        }
     }
 
     /// <summary>
@@ -468,19 +453,15 @@ public sealed class BitArray
 
         // Iterate through the elements of the bit array.
         for (int x = 0; x < count; x++)
-        {
             // If all bits are cleared, this entire section can be skipped.
             if (m_array[x] != -1)
             {
                 int end = Math.Min(x * BitsPerElement + BitsPerElement, Count);
 
                 for (int k = x * BitsPerElement; k < end; k++)
-                {
                     if (!GetBitUnchecked(k))
                         yield return k;
-                }
             }
-        }
     }
 
     // Validates that a given index is within the valid range in the bit array.

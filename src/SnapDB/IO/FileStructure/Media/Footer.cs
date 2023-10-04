@@ -31,12 +31,12 @@ namespace SnapDB.IO.FileStructure.Media;
 
 /// <summary>
 /// Since exceptions are very expensive, this enum will be returned for basic
-/// I/O operations to let the reader know what to do with the data.  
+/// I/O operations to let the reader know what to do with the data.
 /// </summary>
 /// <remarks>
-/// There two overarching conditions.  Valid or not Valid.  
+/// There two overarching conditions.  Valid or not Valid.
 /// If not valid, the reason why the page failed will be given.
-/// If a page is returned as valid, this does not mean that the 
+/// If a page is returned as valid, this does not mean that the
 /// page being referenced is the correct page, it is up to the class
 /// to check the footer of the page to verify that the page being read
 /// is the correct page.
@@ -76,10 +76,16 @@ internal enum IoReadState
 
 internal static unsafe class Footer
 {
+    #region [ Members ]
+
     public const int ChecksumIsNotComputed = 0;
-    public const int ChecksumIsValid = 1;
     public const int ChecksumIsNotValid = 2;
+    public const int ChecksumIsValid = 1;
     public const int ChecksumMustBeRecomputed = 3;
+
+    #endregion
+
+    #region [ Static ]
 
     /// <summary>
     /// Computes checksum values for the specified data stored in an unmanaged memory block.
@@ -164,15 +170,11 @@ internal static unsafe class Footer
         int checksumInData2 = *(int*)(lpData + blockSize - 8);
 
         if (checksum1 == checksumInData1 && checksum2 == checksumInData2)
-        {
             // Record checksum is valid and put zeroes in all other fields.
             *(int*)(lpData + blockSize - 4) = ChecksumIsValid;
-        }
         else
-        {
             // Record checksum is not valid and put zeroes in all other fields.
             *(int*)(lpData + blockSize - 4) = ChecksumIsNotValid;
-        }
     }
 
     /// <summary>
@@ -231,4 +233,6 @@ internal static unsafe class Footer
         for (int offset = 0; offset < length; offset += blockSize)
             ComputeChecksumAndClearFooter(data + offset, blockSize);
     }
+
+    #endregion
 }

@@ -31,15 +31,15 @@ namespace SnapDB.Snap;
 /// </summary>
 /// <typeparam name="TKey">The type of keys in the stream (must be a reference type).</typeparam>
 /// <typeparam name="TValue">The type of values in the stream (must be a reference type).</typeparam>
-public abstract class SeekableTreeStream<TKey, TValue>
-    : TreeStream<TKey, TValue>
-    where TKey : class, new()
-    where TValue : class, new()
+public abstract class SeekableTreeStream<TKey, TValue> : TreeStream<TKey, TValue> where TKey : class, new() where TValue : class, new()
 {
+    #region [ Methods ]
 
     /// <summary>
     /// Seeks the stream to the first value greater than or equal to <paramref name="key"/>.
     /// </summary>
     /// <param name="key">The key to seek to.</param>
     public abstract void SeekToKey(TKey key);
+
+    #endregion
 }

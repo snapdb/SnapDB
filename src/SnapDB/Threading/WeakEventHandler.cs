@@ -30,18 +30,22 @@ namespace SnapDB.Threading;
 /// Represents a weak event handler for events with <see cref="EventArgs"/> of type <typeparamref name="T"/>.
 /// </summary>
 /// <typeparam name="T">The type of <see cref="EventArgs"/> used by the event.</typeparam>
-public class WeakEventHandler<T> : WeakDelegateBase<EventHandler<T>>
-    where T : EventArgs
+public class WeakEventHandler<T> : WeakDelegateBase<EventHandler<T>> where T : EventArgs
 {
+    #region [ Constructors ]
+
     /// <summary>
     /// Initializes a new instance of the <see cref="WeakEventHandler{T}"/> class with the specified event handler target.
     /// </summary>
     /// <param name="target">The event handler target.</param>
-    public WeakEventHandler(EventHandler<T> target)
-        : base(target)
+    public WeakEventHandler(EventHandler<T> target) : base(target)
     {
     }
-    
+
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Tries to invoke the event handler associated with this weak reference object.
     /// </summary>
@@ -50,6 +54,8 @@ public class WeakEventHandler<T> : WeakDelegateBase<EventHandler<T>>
     /// <returns><c>true</c> if successful, <c>false</c> if the event handler has been garbage collected.</returns>
     public bool TryInvoke(object sender, T e)
     {
-        return TryInvokeInternal(new object[] { sender, e });
+        return TryInvokeInternal(new[] { sender, e });
     }
+
+    #endregion
 }

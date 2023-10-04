@@ -27,12 +27,11 @@
 namespace SnapDB.Snap;
 
 /// <summary>
-/// The interface that is required to use as a value in <see cref="SortedTree"/> 
+/// The interface that is required to use as a value in <see cref="SortedTree"/>
 /// </summary>
 /// <typeparam name="T">A class that has a default constructor</typeparam>
 /// <remarks>
 /// It is highly recommended to override many of the base class methods as many of these methods are slow.
-/// 
 /// The following methods should be overriden if possible:
 /// Read(byte*)
 /// Write(byte*)
@@ -43,39 +42,19 @@ namespace SnapDB.Snap;
 /// IsBetween(T,T)
 /// CompareTo(byte*)
 /// IsLessThanOrEqualTo(byte*, byte*)
-/// 
 /// For better random I/O inserts, it is also a good idea to implement a custom
-/// <see cref="SnapTypeCustomMethods{T}"/> that overrides 
+/// <see cref="SnapTypeCustomMethods{T}"/> that overrides
 /// the <see cref="SnapTypeCustomMethods{T}.BinarySearch"/> method.
 /// </remarks>
-public abstract class SnapTypeBase<T>
-    : SnapTypeBase, IComparable<T>, IEquatable<T>, IComparer<T>
-    where T : SnapTypeBase<T>, new()
+public abstract class SnapTypeBase<T> : SnapTypeBase, IComparable<T>, IEquatable<T>, IComparer<T> where T : SnapTypeBase<T>, new()
 {
+    #region [ Methods ]
+
     /// <summary>
     /// Copies the source to the destination
     /// </summary>
     /// <param name="destination"></param>
     public abstract void CopyTo(T destination);
-
-    /// <summary>
-    /// Compares the current instance to <see cref="other"/>.
-    /// </summary>
-    /// <param name="other">the key to compare to</param>
-    /// <returns></returns>
-    public abstract int CompareTo(T other);
-
-    /// <summary>
-    /// Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.
-    /// </summary>
-    /// <returns>
-    /// A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, as shown in the following table.Value Meaning Less than zero<paramref name="x"/> is less than <paramref name="y"/>.Zero<paramref name="x"/> equals <paramref name="y"/>.Greater than zero<paramref name="x"/> is greater than <paramref name="y"/>.
-    /// </returns>
-    /// <param name="x">The first object to compare.</param><param name="y">The second object to compare.</param>
-    public virtual int Compare(T x, T y)
-    {
-        return x.CompareTo(y);
-    }
 
     /// <summary>
     /// Compares the current <typeparamref name="T"/> object with the data in the provided byte stream.
@@ -91,7 +70,7 @@ public abstract class SnapTypeBase<T>
     {
         T other = new();
         other.Read(stream);
-        
+
         return CompareTo(other);
     }
 
@@ -116,18 +95,6 @@ public abstract class SnapTypeBase<T>
     public virtual bool IsEqualTo(T right)
     {
         return CompareTo(right) == 0;
-    }
-
-    /// <summary>
-    /// Indicates whether the current object is equal to another object of the same type.
-    /// </summary>
-    /// <returns>
-    /// <c>true</c> if the current object is equal to the <paramref name="other"/> parameter; otherwise, <c>false</c>.
-    /// </returns>
-    /// <param name="other">An object to compare with this object.</param>
-    public virtual bool Equals(T other)
-    {
-        return IsEqualTo(other);
     }
 
     /// <summary>
@@ -214,4 +181,38 @@ public abstract class SnapTypeBase<T>
         CopyTo(rv);
         return rv;
     }
+
+    /// <summary>
+    /// Compares the current instance to <see cref="other"/>.
+    /// </summary>
+    /// <param name="other">the key to compare to</param>
+    /// <returns></returns>
+    public abstract int CompareTo(T other);
+
+    /// <summary>
+    /// Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.
+    /// </summary>
+    /// <returns>
+    /// A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, as shown in the following table.Value Meaning Less than zero<paramref name="x"/> is less than <paramref name="y"/>.Zero<paramref name="x"/> equals <paramref name="y"/>.Greater than zero<paramref name="x"/> is greater than <paramref name="y"/>.
+    /// </returns>
+    /// <param name="x">The first object to compare.</param>
+    /// <param name="y">The second object to compare.</param>
+    public virtual int Compare(T x, T y)
+    {
+        return x.CompareTo(y);
+    }
+
+    /// <summary>
+    /// Indicates whether the current object is equal to another object of the same type.
+    /// </summary>
+    /// <returns>
+    /// <c>true</c> if the current object is equal to the <paramref name="other"/> parameter; otherwise, <c>false</c>.
+    /// </returns>
+    /// <param name="other">An object to compare with this object.</param>
+    public virtual bool Equals(T other)
+    {
+        return IsEqualTo(other);
+    }
+
+    #endregion
 }

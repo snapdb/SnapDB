@@ -35,31 +35,31 @@ namespace SnapDB.Snap.Tree;
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-public abstract partial class SortedTreeNodeBase<TKey, TValue>
-    : Node<TKey>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public abstract partial class SortedTreeNodeBase<TKey, TValue> : Node<TKey> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
 
     protected readonly int KeyValueSize;
+    protected SparseIndex<TKey> SparseIndex;
+    private Func<uint> m_getNextNewNodeIndex;
+    private bool m_initialized;
+    private int m_minRecordNodeBytes;
     private Node<TKey> m_tempNode1;
     private Node<TKey> m_tempNode2;
-    private int m_minRecordNodeBytes;
-    private Func<uint> m_getNextNewNodeIndex;
-    protected SparseIndex<TKey> SparseIndex;
-    private bool m_initialized;
 
     #endregion
 
     #region [ Constructors ]
 
-    protected SortedTreeNodeBase(byte level)
-        : base(level)
+    protected SortedTreeNodeBase(byte level) : base(level)
     {
         m_initialized = false;
         KeyValueSize = KeySize + new TValue().Size;
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     public abstract SortedTreeNodeBase<TKey, TValue> Clone(byte level);
 
@@ -87,12 +87,6 @@ public abstract partial class SortedTreeNodeBase<TKey, TValue>
         InitializeType();
     }
 
-    #endregion
-
-    #region [ Methods ]
-
-    #region [ Override Methods ]
-
     /// <summary>
     /// Determines which sibling node that this node can be combined with.
     /// </summary>
@@ -108,12 +102,16 @@ public abstract partial class SortedTreeNodeBase<TKey, TValue>
 
         int search = GetIndexOf(key);
         if (search < 0)
-        {
             throw new KeyNotFoundException();
-        }
         canCombineLeft = search > 0;
         canCombineRight = search < RecordCount - 1;
     }
+
+    /// <summary>
+    /// Returns a tree scanner class.
+    /// </summary>
+    /// <returns></returns>
+    public abstract SortedTreeScannerBase<TKey, TValue> CreateTreeScanner();
 
     /// <summary>
     /// Navigates to the node that contains this key.
@@ -124,14 +122,6 @@ public abstract partial class SortedTreeNodeBase<TKey, TValue>
         if (!IsKeyInsideBounds(key))
             SetNodeIndex(SparseIndex.Get(key, Level));
     }
-
-    /// <summary>
-    /// Returns a tree scanner class.
-    /// </summary>
-    /// <returns></returns>
-    public abstract SortedTreeScannerBase<TKey, TValue> CreateTreeScanner();
-
-    #endregion
 
     #endregion
 }

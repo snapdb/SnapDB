@@ -27,15 +27,20 @@
 namespace SnapDB.Immutables;
 
 /// <summary>
-/// Represents an object that can be configured as "read only" and thus made immutable.  
+/// Represents an object that can be configured as "read only" and thus made immutable.
 /// </summary>
-public interface IImmutableObject
-    : ICloneable
+public interface IImmutableObject : ICloneable
 {
+    #region [ Properties ]
+
     /// <summary>
     /// Gets or sets if a class is "read only". Once it has been set as "read only", it is immutable and must be cloned to be modified.
     /// </summary>
     bool IsReadOnly { get; set; }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Makes a clone of this object and allows it to be edited.
@@ -52,4 +57,6 @@ public interface IImmutableObject
     /// A "read only" clone of the object.
     /// </returns>
     object CloneReadonly();
+
+    #endregion
 }

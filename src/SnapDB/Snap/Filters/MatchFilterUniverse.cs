@@ -33,13 +33,18 @@ namespace SnapDB.Snap.Filters;
 /// </summary>
 /// <typeparam name="TKey">The type of keys to be matched.</typeparam>
 /// <typeparam name="TValue">The type of values to be matched.</typeparam>
-public class MatchFilterUniverse<TKey, TValue>
-    : MatchFilterBase<TKey, TValue>
+public class MatchFilterUniverse<TKey, TValue> : MatchFilterBase<TKey, TValue>
 {
+    #region [ Properties ]
+
     /// <summary>
     /// Gets the unique identifier for this match filter, which is always Guid.Empty for the universe filter.
     /// </summary>
     public override Guid FilterType => Guid.Empty;
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Saves the universe filter to a binary stream (not supported).
@@ -61,4 +66,6 @@ public class MatchFilterUniverse<TKey, TValue>
     {
         return true;
     }
+
+    #endregion
 }

@@ -26,10 +26,9 @@
 //       Converted code to .NET core.
 //******************************************************************************************************
 
+using System.Security.Cryptography;
 using Gemstone.Diagnostics;
 using Gemstone.IO.StreamExtensions;
-using Gemstone.Security.Cryptography;
-using System.Security.Cryptography;
 
 namespace SnapDB.Snap.Services;
 
@@ -38,22 +37,26 @@ namespace SnapDB.Snap.Services;
 /// </summary>
 internal class ArchiveListLogFile
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(ArchiveListLogFile), MessageClass.Framework);
+    #region [ Members ]
 
     /// <summary>
-    /// Gets if the file is valid and not corrupt.
+    /// Gets the filename of this log file. String.Empty if not currently associated with a file.
     /// </summary>
-    public bool IsValid { get; private set; }
+    public string FileName = string.Empty;
 
     /// <summary>
     /// Gets the list of all files that are pending deletion.
     /// </summary>
     public readonly List<Guid> FilesToDelete = new();
 
-    /// <summary>
-    /// Gets the filename of this log file. String.Empty if not currently associated with a file.
-    /// </summary>
-    public string FileName = string.Empty;
+    #endregion
+
+    #region [ Constructors ]
+
+    static ArchiveListLogFile()
+    {
+        s_header = System.Text.Encoding.UTF8.GetBytes("openHistorian 2.0 Archive List Log");
+    }
 
     public ArchiveListLogFile()
     {
@@ -65,6 +68,19 @@ internal class ArchiveListLogFile
         Load(fileName);
     }
 
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// Gets if the file is valid and not corrupt.
+    /// </summary>
+    public bool IsValid { get; private set; }
+
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Removes any files that have already been deleted from this log file.
     /// </summary>
@@ -74,12 +90,8 @@ internal class ArchiveListLogFile
     public void RemoveDeletedFiles(HashSet<Guid> allFiles)
     {
         for (int x = FilesToDelete.Count - 1; x >= 0; x--)
-        {
             if (!allFiles.Contains(FilesToDelete[x]))
-            {
                 FilesToDelete.RemoveAt(x);
-            }
-        }
     }
 
     /// <summary>
@@ -100,14 +112,13 @@ internal class ArchiveListLogFile
                 s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Expected file length is not long enough");
                 return;
             }
+
             for (int x = 0; x < s_header.Length; x++)
-            {
                 if (data[x] != s_header[x])
                 {
                     s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Incorrect File Header");
                     return;
                 }
-            }
 
             byte[] hash = new byte[20];
             Array.Copy(data, data.Length - 20, hash, 0, 20);
@@ -132,6 +143,7 @@ internal class ArchiveListLogFile
                         count--;
                         FilesToDelete.Add(stream.ReadGuid());
                     }
+
                     IsValid = true;
                     return;
                 default:
@@ -157,9 +169,7 @@ internal class ArchiveListLogFile
         stream.Write((byte)1);
         stream.Write(FilesToDelete.Count);
         foreach (Guid file in FilesToDelete)
-        {
             stream.Write(file);
-        }
         stream.Write(SHA1.HashData(stream.ToArray()));
         File.WriteAllBytes(fileName, stream.ToArray());
         FileName = fileName;
@@ -184,10 +194,13 @@ internal class ArchiveListLogFile
         }
     }
 
-    private static readonly byte[] s_header;
-    static ArchiveListLogFile()
-    {
-        s_header = System.Text.Encoding.UTF8.GetBytes("openHistorian 2.0 Archive List Log");
-    }
+    #endregion
 
+    #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(ArchiveListLogFile), MessageClass.Framework);
+
+    private static readonly byte[] s_header;
+
+    #endregion
 }

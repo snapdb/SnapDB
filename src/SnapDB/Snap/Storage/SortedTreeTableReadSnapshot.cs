@@ -34,15 +34,13 @@ namespace SnapDB.Snap.Storage;
 /// Provides a user with a read-only instance of an archive.
 /// This class is not thread safe.
 /// </summary>
-public class SortedTreeTableReadSnapshot<TKey, TValue>
-    : IDisposable
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class SortedTreeTableReadSnapshot<TKey, TValue> : IDisposable where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
 
-    private SubFileStream m_subStream;
     private BinaryStream m_binaryStream;
+
+    private SubFileStream m_subStream;
     private SortedTree<TKey, TValue> m_tree;
 
     #endregion
@@ -78,33 +76,12 @@ public class SortedTreeTableReadSnapshot<TKey, TValue>
     #region [ Methods ]
 
     /// <summary>
-    /// Gets a reader that can be used to parse an archive file.
-    /// </summary>
-    /// <returns></returns>
-    public SortedTreeScannerBase<TKey, TValue> GetTreeScanner()
-    {
-        return m_tree.CreateTreeScanner();
-    }
-    /// <summary>
-    /// Returns the lower and upper bounds of the tree
-    /// </summary>
-    /// <param name="lowerBounds">the first key in the tree</param>
-    /// <param name="upperBounds">the last key in the tree</param>
-    /// <remarks>
-    /// If the tree is empty, lowerBounds will be greater than upperBounds</remarks>
-    public void GetKeyRange(TKey lowerBounds, TKey upperBounds)
-    {
-        m_tree.GetKeyRange(lowerBounds, upperBounds);
-    }
-
-    /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
     /// <filterpriority>2</filterpriority>
     public void Dispose()
     {
         if (!IsDisposed)
-        {
             try
             {
                 m_binaryStream?.Dispose();
@@ -117,7 +94,28 @@ public class SortedTreeTableReadSnapshot<TKey, TValue>
                 m_tree = null;
                 IsDisposed = true;
             }
-        }
+    }
+
+    /// <summary>
+    /// Gets a reader that can be used to parse an archive file.
+    /// </summary>
+    /// <returns></returns>
+    public SortedTreeScannerBase<TKey, TValue> GetTreeScanner()
+    {
+        return m_tree.CreateTreeScanner();
+    }
+
+    /// <summary>
+    /// Returns the lower and upper bounds of the tree
+    /// </summary>
+    /// <param name="lowerBounds">the first key in the tree</param>
+    /// <param name="upperBounds">the last key in the tree</param>
+    /// <remarks>
+    /// If the tree is empty, lowerBounds will be greater than upperBounds
+    /// </remarks>
+    public void GetKeyRange(TKey lowerBounds, TKey upperBounds)
+    {
+        m_tree.GetKeyRange(lowerBounds, upperBounds);
     }
 
     #endregion

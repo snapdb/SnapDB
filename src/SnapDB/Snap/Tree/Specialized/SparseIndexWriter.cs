@@ -33,15 +33,15 @@ namespace SnapDB.Snap.Tree.Specialized;
 /// <summary>
 /// Contains information on how to parse the index nodes of the SortedTree
 /// </summary>
-public sealed class SparseIndexWriter<TKey>
-    : TreeStream<TKey, SnapUInt32>
-    where TKey : SnapTypeBase<TKey>, new()
+public sealed class SparseIndexWriter<TKey> : TreeStream<TKey, SnapUInt32> where TKey : SnapTypeBase<TKey>, new()
 {
     #region [ Members ]
 
-    private long m_readingCount;
-    private readonly BinaryStreamPointerBase m_stream;
     private bool m_isReading;
+
+    private long m_readingCount;
+
+    private readonly BinaryStreamPointerBase m_stream;
     private readonly SnapUInt32 m_value = new();
 
     #endregion
@@ -49,7 +49,7 @@ public sealed class SparseIndexWriter<TKey>
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates a new sparse index. 
+    /// Creates a new sparse index.
     /// </summary>
     public SparseIndexWriter()
     {
@@ -58,63 +58,12 @@ public sealed class SparseIndexWriter<TKey>
 
     #endregion
 
+    #region [ Properties ]
+
     /// <summary>
     /// Gets the number of nodes in the sparse index.
     /// </summary>
     public long Count { get; private set; }
-
-    #region [ Methods ]
-
-    /// <summary>
-    /// Adds the following node pointer to the sparse index.
-    /// </summary>
-    /// <param name="leftPointer">The pointer to the left element, Only used to prime the list.</param>
-    /// <param name="nodeKey">the first key in the <see cref="pointer"/>. Only uses the key portion of the TKeyValue</param>
-    /// <param name="pointer">the index of the later node</param>
-    /// <remarks>This class will add the new node data to the parent node, 
-    /// or create a new root if the current root is split.</remarks>
-    public void Add(uint leftPointer, TKey nodeKey, uint pointer)
-    {
-        if (m_isReading)
-            throw new Exception("This sparse index writer has already be set in reading mode.");
-        if (Count == 0)
-        {
-            TKey tmpKey = new();
-            tmpKey.SetMin();
-            tmpKey.Write(m_stream);
-            m_value.Value = leftPointer;
-            m_value.Write(m_stream);
-            Count++;
-        }
-        nodeKey.Write(m_stream);
-        m_value.Value = pointer;
-        m_value.Write(m_stream);
-        Count++;
-    }
-
-    public void SwitchToReading()
-    {
-        if (m_isReading)
-            throw new Exception("Duplicate call.");
-        m_isReading = true;
-        m_stream.Position = 0;
-    }
-
-    #endregion
-
-    /// <summary>
-    /// Releases the resources used by the current instance of the class.
-    /// </summary>
-    /// <param name="disposing">A flag indicating whether to release both managed and unmanaged resources (<c>true</c>), or only unmanaged resources (<c>false</c>).</param>
-    /// <remarks>
-    /// This method is called by the <see cref="Dispose"/> method and the finalizer to release the resources used by the current instance of the class.
-    /// It disposes of the underlying stream.
-    /// </remarks>
-    protected override void Dispose(bool disposing)
-    {
-        m_stream.Dispose();
-        base.Dispose(disposing);
-    }
 
     /// <summary>
     /// Gets a value indicating whether the data source is always sequential.
@@ -134,6 +83,62 @@ public sealed class SparseIndexWriter<TKey>
     /// </remarks>
     public override bool NeverContainsDuplicates => true;
 
+    #endregion
+
+    #region [ Methods ]
+
+    /// <summary>
+    /// Adds the following node pointer to the sparse index.
+    /// </summary>
+    /// <param name="leftPointer">The pointer to the left element, Only used to prime the list.</param>
+    /// <param name="nodeKey">the first key in the <see cref="pointer"/>. Only uses the key portion of the TKeyValue</param>
+    /// <param name="pointer">the index of the later node</param>
+    /// <remarks>
+    /// This class will add the new node data to the parent node,
+    /// or create a new root if the current root is split.
+    /// </remarks>
+    public void Add(uint leftPointer, TKey nodeKey, uint pointer)
+    {
+        if (m_isReading)
+            throw new Exception("This sparse index writer has already be set in reading mode.");
+        if (Count == 0)
+        {
+            TKey tmpKey = new();
+            tmpKey.SetMin();
+            tmpKey.Write(m_stream);
+            m_value.Value = leftPointer;
+            m_value.Write(m_stream);
+            Count++;
+        }
+
+        nodeKey.Write(m_stream);
+        m_value.Value = pointer;
+        m_value.Write(m_stream);
+        Count++;
+    }
+
+    public void SwitchToReading()
+    {
+        if (m_isReading)
+            throw new Exception("Duplicate call.");
+        m_isReading = true;
+        m_stream.Position = 0;
+    }
+
+    /// <summary>
+    /// Releases the resources used by the current instance of the class.
+    /// </summary>
+    /// <param name="disposing">A flag indicating whether to release both managed and unmanaged resources (<c>true</c>), or only unmanaged resources (<c>false</c>).</param>
+    /// <remarks>
+    /// This method is called by the <see cref="Dispose"/> method and the finalizer to release the resources used by the current instance of the class.
+    /// It disposes of the underlying stream.
+    /// </remarks>
+    protected override void Dispose(bool disposing)
+    {
+        m_stream.Dispose();
+        base.Dispose(disposing);
+    }
+
     /// <summary>
     /// Reads the next key-value pair from the data source.
     /// </summary>
@@ -144,7 +149,8 @@ public sealed class SparseIndexWriter<TKey>
     /// This method is used to sequentially read key-value pairs from the data source.
     /// It should be called after switching to reading mode using <see cref="SwitchToReading"/> method.
     /// </remarks>
-    /// <paramref name="key">The key to read./>
+    /// <paramref name="key">
+    /// The key to read./>
     /// <paramref name="value">The value to read./>
     protected override bool ReadNext(TKey key, SnapUInt32 value)
     {
@@ -162,4 +168,6 @@ public sealed class SparseIndexWriter<TKey>
 
         return false;
     }
+
+    #endregion
 }

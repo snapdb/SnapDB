@@ -24,21 +24,20 @@
 //
 //******************************************************************************************************
 
+using System.Data;
 using Gemstone.IO.StreamExtensions;
 using SnapDB.Immutables;
 using SnapDB.Snap.Services.Net;
-using SnapDB.Snap.Tree;
-using System;
-using System.Data;
 
 namespace SnapDB.Snap.Services;
 
 /// <summary>
 /// Settings for <see cref="SnapServer"/>.
 /// </summary>
-public class ServerSettings
-    : SettingsBase<ServerSettings>, IToServerSettings
+public class ServerSettings : SettingsBase<ServerSettings>, IToServerSettings
 {
+    #region [ Members ]
+
     /// <summary>
     /// Lists all of the databases that are part of the server.
     /// </summary>
@@ -48,6 +47,10 @@ public class ServerSettings
     /// All of the socket based listeners for the database.
     /// </summary>
     private readonly ImmutableList<SnapSocketListenerSettings> m_listeners;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new instance of <see cref="ServerSettings"/>.
@@ -70,6 +73,10 @@ public class ServerSettings
         });
     }
 
+    #endregion
+
+    #region [ Properties ]
+
     /// <summary>
     /// Lists all of the databases that are part of the server.
     /// </summary>
@@ -80,19 +87,9 @@ public class ServerSettings
     /// </summary>
     public ImmutableList<SnapSocketListenerSettings> Listeners => m_listeners;
 
-    /// <summary>
-    /// Converts an instance of <see cref="ServerSettings"/> to its interface representation <see cref="IToServerSettings"/>.
-    /// </summary>
-    /// <returns>
-    /// An instance of <see cref="ServerSettings"/> as an interface <see cref="IToServerSettings"/>.
-    /// </returns>
-    /// <remarks>
-    /// This method allows the <see cref="ServerSettings"/> to be cast as an interface <see cref="IToServerSettings"/>.
-    /// </remarks>
-    ServerSettings IToServerSettings.ToServerSettings()
-    {
-        return this;
-    }
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Saves the current <see cref="ServerSettings"/> instance to a provided <see cref="Stream"/>.
@@ -153,6 +150,7 @@ public class ServerSettings
                     listener.Load(stream);
                     m_listeners.Add(listener);
                 }
+
                 break;
 
             default:
@@ -170,12 +168,24 @@ public class ServerSettings
     public override void Validate()
     {
         foreach (ServerDatabaseSettings db in m_databases)
-        {
             db.Validate();
-        }
         foreach (SnapSocketListenerSettings lst in m_listeners)
-        {
             lst.Validate();
-        }
     }
+
+    /// <summary>
+    /// Converts an instance of <see cref="ServerSettings"/> to its interface representation <see cref="IToServerSettings"/>.
+    /// </summary>
+    /// <returns>
+    /// An instance of <see cref="ServerSettings"/> as an interface <see cref="IToServerSettings"/>.
+    /// </returns>
+    /// <remarks>
+    /// This method allows the <see cref="ServerSettings"/> to be cast as an interface <see cref="IToServerSettings"/>.
+    /// </remarks>
+    ServerSettings IToServerSettings.ToServerSettings()
+    {
+        return this;
+    }
+
+    #endregion
 }

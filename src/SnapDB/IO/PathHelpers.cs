@@ -31,6 +31,8 @@ namespace SnapDB.IO;
 /// </summary>
 public static class PathHelpers
 {
+    #region [ Static ]
+
     /// <summary>
     /// Ensures that the provided extension is in the provided format:  .exe
     /// </summary>
@@ -98,4 +100,5 @@ public static class PathHelpers
             throw new ArgumentException("filename has invalid characters.", "value");
     }
 
+    #endregion
 }

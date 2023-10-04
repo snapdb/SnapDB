@@ -29,20 +29,24 @@ using System.Data;
 namespace SnapDB.Immutables;
 
 /// <summary>
-/// Represents an object that can be configured as read only and thus made immutable.  
+/// Represents an object that can be configured as read only and thus made immutable.
 /// The original contents of this class will not be editable once <see cref="IsReadOnly"/> is set to true.
 /// In order to modify the contest of this object, a clone of the object must be created with <see cref="CloneEditable"/>.
 /// </summary>
 /// <typeparam name="T">Object type.</typeparam>
 /// <remarks>
-/// For a classes that implement this, all setters should call <see cref="TestForEditable"/> before 
-/// setting the value. 
+/// For a classes that implement this, all setters should call <see cref="TestForEditable"/> before
+/// setting the value.
 /// </remarks>
-public abstract class ImmutableObjectBase<T>
-    : IImmutableObject<T>
-    where T : ImmutableObjectBase<T>
+public abstract class ImmutableObjectBase<T> : IImmutableObject<T> where T : ImmutableObjectBase<T>
 {
+    #region [ Members ]
+
     private bool m_isReadOnly;
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets or sets if this class is immutable and thus read-only. Once
@@ -55,7 +59,7 @@ public abstract class ImmutableObjectBase<T>
         {
             if (!(value ^ m_isReadOnly))
                 return; // If values are different.
-            
+
             if (m_isReadOnly)
                 throw new ReadOnlyException("Object has been set as read only and cannot be reversed");
 
@@ -63,6 +67,10 @@ public abstract class ImmutableObjectBase<T>
             SetMembersAsReadOnly();
         }
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Test if the class has been marked as read-only. Throws an exception if editing cannot occur.
@@ -73,13 +81,8 @@ public abstract class ImmutableObjectBase<T>
             ThrowReadOnly();
     }
 
-    private static void ThrowReadOnly()
-    {
-        throw new ReadOnlyException("Object has been set as read only");
-    }
-
     /// <summary>
-    /// Requests that member fields be set to read-only. 
+    /// Requests that member fields be set to read-only.
     /// </summary>
     protected abstract void SetMembersAsReadOnly();
 
@@ -96,10 +99,10 @@ public abstract class ImmutableObjectBase<T>
     public virtual T CloneEditable()
     {
         T initializer = (T)MemberwiseClone();
-        
+
         initializer.m_isReadOnly = false;
         initializer.CloneMembersAsEditable();
-        
+
         return initializer;
     }
 
@@ -157,4 +160,15 @@ public abstract class ImmutableObjectBase<T>
     {
         return IsReadOnly ? this : CloneEditable();
     }
+
+    #endregion
+
+    #region [ Static ]
+
+    private static void ThrowReadOnly()
+    {
+        throw new ReadOnlyException("Object has been set as read only");
+    }
+
+    #endregion
 }

@@ -24,8 +24,8 @@
 //
 //******************************************************************************************************
 
-using SnapDB.IO;
 using System.Data;
+using SnapDB.IO;
 
 namespace SnapDB.Snap.Tree;
 
@@ -51,16 +51,22 @@ namespace SnapDB.Snap.Tree;
 
 internal class SortedTreeHeader
 {
-    public EncodingDefinition TreeNodeType;
+    #region [ Members ]
+
     public int BlockSize;
     public uint LastAllocatedBlock;
     public uint RootNodeIndexAddress;
     public byte RootNodeLevel;
+    public EncodingDefinition TreeNodeType;
 
     private bool m_isDirty;
 
+    #endregion
+
+    #region [ Properties ]
+
     /// <summary>
-    /// Gets if the sorted tree needs to be flushed to the disk. 
+    /// Gets if the sorted tree needs to be flushed to the disk.
     /// </summary>
     public bool IsDirty
     {
@@ -72,6 +78,10 @@ internal class SortedTreeHeader
             m_isDirty = true;
         }
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Loads the header.
@@ -131,4 +141,6 @@ internal class SortedTreeHeader
         stream.Position = oldPosotion;
         m_isDirty = false;
     }
+
+    #endregion
 }

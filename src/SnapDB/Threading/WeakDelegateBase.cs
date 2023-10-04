@@ -32,36 +32,29 @@ namespace SnapDB.Threading;
 /// Represents a base class for weak delegate wrappers with a specified delegate type.
 /// </summary>
 /// <typeparam name="T">The type constraint for the delegate.</typeparam>
-public abstract class WeakDelegateBase<T> : WeakReference
-    where T : class
+public abstract class WeakDelegateBase<T> : WeakReference where T : class
 {
+    #region [ Members ]
+
     private readonly MethodInfo m_method;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Initializes a new instance of the <see cref="WeakDelegateBase{T}"/> class with the specified delegate target.
     /// </summary>
     /// <param name="target">The delegate target.</param>
-    protected WeakDelegateBase(Delegate target)
-        : base(target is null ? null : target.Target)
+    protected WeakDelegateBase(Delegate target) : base(target is null ? null : target.Target)
     {
         if (target is not null)
             m_method = target.Method;
     }
 
-    /// <summary>
-    /// Tries to invoke the delegate associated with this weak reference object.
-    /// </summary>
-    /// <param name="parameters">An array of parameters to pass to the delegate.</param>
-    /// <returns><c>true</c> if successful, <c>false</c> if the delegate has been garbage collected.</returns>
-    protected bool TryInvokeInternal(object[] parameters)
-    {
-        object target = base.Target;
-        if (target is null)
-            return false;
-        
-        m_method.Invoke(target, parameters);
-        return true;
-    }
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Determines whether the current <see cref="WeakDelegateBase{T}"/> instance is equal to another object.
@@ -80,6 +73,21 @@ public abstract class WeakDelegateBase<T> : WeakReference
     }
 
     /// <summary>
+    /// Tries to invoke the delegate associated with this weak reference object.
+    /// </summary>
+    /// <param name="parameters">An array of parameters to pass to the delegate.</param>
+    /// <returns><c>true</c> if successful, <c>false</c> if the delegate has been garbage collected.</returns>
+    protected bool TryInvokeInternal(object[] parameters)
+    {
+        object target = base.Target;
+        if (target is null)
+            return false;
+
+        m_method.Invoke(target, parameters);
+        return true;
+    }
+
+    /// <summary>
     /// Determines whether the current <see cref="WeakDelegateBase{T}"/> instance is equal to another <see cref="WeakDelegateBase{T}"/> instance.
     /// </summary>
     /// <param name="obj">The <see cref="WeakDelegateBase{T}"/> instance to compare with the current instance.</param>
@@ -91,4 +99,6 @@ public abstract class WeakDelegateBase<T> : WeakReference
 
         return m_method == obj.m_method && ReferenceEquals(Target, obj.Target);
     }
+
+    #endregion
 }

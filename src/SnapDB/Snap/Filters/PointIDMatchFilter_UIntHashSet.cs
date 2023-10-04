@@ -31,16 +31,21 @@ namespace SnapDB.Snap.Filters;
 
 public partial class PointIdMatchFilter
 {
+    #region [ Members ]
+
     /// <summary>
     /// A filter that uses a <see cref="BitArray"/> to set <c>true</c> and <c>false</c> values
     /// </summary>
-    private class UIntHashSet<TKey, TValue>
-        : MatchFilterBase<TKey, TValue>
-        where TKey : TimestampPointIdBase<TKey>, new()
+    private class UIntHashSet<TKey, TValue> : MatchFilterBase<TKey, TValue> where TKey : TimestampPointIdBase<TKey>, new()
     {
+        #region [ Members ]
+
         private readonly ulong m_maxValue;
         private readonly HashSet<uint> m_points;
 
+        #endregion
+
+        #region [ Constructors ]
 
         /// <summary>
         /// Creates a new filter backed by a <see cref="BitArray"/>.
@@ -72,7 +77,15 @@ public partial class PointIdMatchFilter
             m_points.UnionWith(points.Select(x => (uint)x));
         }
 
+        #endregion
+
+        #region [ Properties ]
+
         public override Guid FilterType => PointIdMatchFilterDefinition.FilterGuid;
+
+        #endregion
+
+        #region [ Methods ]
 
         public override void Save(BinaryStreamBase stream)
         {
@@ -89,5 +102,8 @@ public partial class PointIdMatchFilter
             return key.PointId <= uint.MaxValue && m_points.Contains((uint)key.PointId);
         }
 
+        #endregion
     }
+
+    #endregion
 }

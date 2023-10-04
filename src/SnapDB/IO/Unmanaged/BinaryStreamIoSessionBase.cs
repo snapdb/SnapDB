@@ -29,13 +29,27 @@ namespace SnapDB.IO.Unmanaged;
 /// <summary>
 /// Implementing this interface allows a binary stream to be attached to a buffer.
 /// </summary>
-public abstract class BinaryStreamIoSessionBase
-    : IDisposable
+public abstract class BinaryStreamIoSessionBase : IDisposable
 {
+    #region [ Properties ]
+
     /// <summary>
     /// Gets if the object has been disposed.
     /// </summary>
     public bool IsDisposed { get; private set; }
+
+    #endregion
+
+    #region [ Methods ]
+
+    /// <summary>
+    /// Releases all the resources used by the <see cref="BinaryStreamIoSessionBase"/> object.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
     /// <summary>
     /// Gets a block for the following I/O session.
@@ -49,33 +63,16 @@ public abstract class BinaryStreamIoSessionBase
     public abstract void Clear();
 
     /// <summary>
-    /// Releases all the resources used by the <see cref="BinaryStreamIoSessionBase"/> object.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
     /// Releases the unmanaged resources used by the <see cref="BinaryStreamIoSessionBase"/> object and optionally releases the managed resources.
     /// </summary>
     /// <param name="disposing"><c>true</c> releases both managed and unmanaged resources; <c>false</c> releases only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
-        if (!IsDisposed)
-        {
-            try
-            {
-                if (disposing)
-                {
-                    // This will be done only when the object is disposed by calling Dispose().
-                }
-            }
-            finally
-            {
-                IsDisposed = true;  // Prevent duplicate dispose.
-            }
-        }
+        if (IsDisposed)
+            return;
+
+        IsDisposed = true; // Prevent duplicate dispose.
     }
+
+    #endregion
 }

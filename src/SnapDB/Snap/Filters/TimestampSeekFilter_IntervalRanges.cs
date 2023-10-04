@@ -31,19 +31,25 @@ namespace SnapDB.Snap.Filters;
 
 public partial class TimestampSeekFilter
 {
-    private class IntervalRanges<TKey>
-        : SeekFilterBase<TKey>
-        where TKey : TimestampBase<TKey>, new()
-    {
+    #region [ Members ]
 
-        private ulong m_start;
+    private class IntervalRanges<TKey> : SeekFilterBase<TKey> where TKey : TimestampBase<TKey>, new()
+    {
+        #region [ Members ]
+
+        private uint m_count;
         private ulong m_current;
         private ulong m_mainInterval;
+
+        private ulong m_start;
+        private ulong m_stop;
         private ulong m_subInterval;
-        private uint m_count;
         private uint m_subIntervalPerMainInterval;
         private ulong m_tolerance;
-        private ulong m_stop;
+
+        #endregion
+
+        #region [ Constructors ]
 
         private IntervalRanges()
         {
@@ -57,8 +63,7 @@ public partial class TimestampSeekFilter
         /// Creates a filter by reading from the stream.
         /// </summary>
         /// <param name="stream">The stream to read from.</param>
-        public IntervalRanges(BinaryStreamBase stream)
-            : this()
+        public IntervalRanges(BinaryStreamBase stream) : this()
         {
             ulong start = stream.ReadUInt64();
             ulong stop = stream.ReadUInt64();
@@ -78,40 +83,44 @@ public partial class TimestampSeekFilter
         /// <param name="tolerance">The width of every window.</param>
         /// <returns>A <see cref="KeySeekFilterBase{TKey}"/> that will be able to do this parsing.</returns>
         /// <remarks>
-        /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013. 
-        ///               MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
-        ///               Tolerance = 0.001 seconds.
+        /// Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013.
+        /// MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
+        /// Tolerance = 0.001 seconds.
         /// </remarks>
-        public IntervalRanges(ulong firstTime, ulong lastTime, ulong mainInterval, ulong subInterval, ulong tolerance)
-            : this()
+        public IntervalRanges(ulong firstTime, ulong lastTime, ulong mainInterval, ulong subInterval, ulong tolerance) : this()
         {
             Initialize(firstTime, lastTime, mainInterval, subInterval, tolerance);
         }
 
-        private void Initialize(ulong start, ulong stop, ulong mainInterval, ulong subInterval, ulong tolerance)
+        #endregion
+
+        #region [ Properties ]
+
+        private ulong StartOfWindow
         {
-            if (start > stop)
-                throw new ArgumentOutOfRangeException(nameof(start), "start must be before stop");
-            if (mainInterval < subInterval)
-                throw new ArgumentOutOfRangeException(nameof(mainInterval), "must be larger than the subinterval");
-            if (tolerance > subInterval)
-                throw new ArgumentOutOfRangeException(nameof(tolerance), "must be smaller than the subinterval");
-
-            m_start = start;
-            m_stop = stop;
-
-            StartOfRange.SetMin();
-            StartOfRange.Timestamp = m_start;
-            EndOfRange.SetMax();
-            EndOfRange.Timestamp = m_stop;
-
-            m_current = start;
-            m_mainInterval = mainInterval;
-            m_subInterval = subInterval;
-            m_subIntervalPerMainInterval = (uint)Math.Round(mainInterval / (double)subInterval);
-            m_tolerance = tolerance;
-            m_count = 0;
+            get => StartOfFrame.Timestamp;
+            set
+            {
+                StartOfFrame.SetMin();
+                StartOfFrame.Timestamp = value;
+            }
         }
+
+        private ulong EndOfWindow
+        {
+            get => EndOfFrame.Timestamp;
+            set
+            {
+                EndOfFrame.SetMax();
+                EndOfFrame.Timestamp = value;
+            }
+        }
+
+        public override Guid FilterType => TimestampSeekFilterDefinition.FilterGuid;
+
+        #endregion
+
+        #region [ Methods ]
 
         /// <summary>
         /// Gets the next search window.
@@ -141,32 +150,13 @@ public partial class TimestampSeekFilter
                 {
                     m_count += 1;
                 }
+
                 return true;
             }
         }
 
-        private ulong StartOfWindow
-        {
-            get => StartOfFrame.Timestamp;
-            set
-            {
-                StartOfFrame.SetMin();
-                StartOfFrame.Timestamp = value;
-            }
-        }
-
-        private ulong EndOfWindow
-        {
-            get => EndOfFrame.Timestamp;
-            set
-            {
-                EndOfFrame.SetMax();
-                EndOfFrame.Timestamp = value;
-            }
-        }
-
         /// <summary>
-        /// Resets the iterative nature of the filter. 
+        /// Resets the iterative nature of the filter.
         /// </summary>
         /// <remarks>
         /// Since a time filter is a set of date ranges, this will reset the frame so a
@@ -192,7 +182,33 @@ public partial class TimestampSeekFilter
             stream.Write(m_tolerance);
         }
 
-        public override Guid FilterType => TimestampSeekFilterDefinition.FilterGuid;
+        private void Initialize(ulong start, ulong stop, ulong mainInterval, ulong subInterval, ulong tolerance)
+        {
+            if (start > stop)
+                throw new ArgumentOutOfRangeException(nameof(start), "start must be before stop");
+            if (mainInterval < subInterval)
+                throw new ArgumentOutOfRangeException(nameof(mainInterval), "must be larger than the subinterval");
+            if (tolerance > subInterval)
+                throw new ArgumentOutOfRangeException(nameof(tolerance), "must be smaller than the subinterval");
+
+            m_start = start;
+            m_stop = stop;
+
+            StartOfRange.SetMin();
+            StartOfRange.Timestamp = m_start;
+            EndOfRange.SetMax();
+            EndOfRange.Timestamp = m_stop;
+
+            m_current = start;
+            m_mainInterval = mainInterval;
+            m_subInterval = subInterval;
+            m_subIntervalPerMainInterval = (uint)Math.Round(mainInterval / (double)subInterval);
+            m_tolerance = tolerance;
+            m_count = 0;
+        }
+
+        #endregion
     }
 
+    #endregion
 }

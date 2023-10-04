@@ -24,32 +24,33 @@
 //
 //******************************************************************************************************
 
-using SnapDB.Snap;
 using SnapDB.Snap.Tree;
 
 namespace SnapDB.Snap.Services.Reader;
 
-internal class UnionReader<TKey, TValue>
-    : TreeStream<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Members ]
 
-    private List<BufferedArchiveStream<TKey, TValue>> m_tablesOrigList;
-    private readonly CustomSortHelper<BufferedArchiveStream<TKey, TValue>> m_sortedArchiveStreams;
     private BufferedArchiveStream<TKey, TValue> m_firstTable;
     private SortedTreeScannerBase<TKey, TValue> m_firstTableScanner;
-    private readonly TKey m_readWhileUpperBounds = new();
+
     private readonly TKey m_nextArchiveStreamLowerBounds = new();
+    private readonly TKey m_readWhileUpperBounds = new();
+    private readonly CustomSortHelper<BufferedArchiveStream<TKey, TValue>> m_sortedArchiveStreams;
+
+    private List<BufferedArchiveStream<TKey, TValue>> m_tablesOrigList;
+
+    #endregion
+
+    #region [ Constructors ]
 
     public UnionReader(List<ArchiveTableSummary<TKey, TValue>> tables)
     {
         m_tablesOrigList = new List<BufferedArchiveStream<TKey, TValue>>();
 
         foreach (ArchiveTableSummary<TKey, TValue> table in tables)
-        {
             m_tablesOrigList.Add(new BufferedArchiveStream<TKey, TValue>(0, table));
-        }
 
         m_sortedArchiveStreams = new CustomSortHelper<BufferedArchiveStream<TKey, TValue>>(m_tablesOrigList, IsLessThan);
 
@@ -57,6 +58,17 @@ internal class UnionReader<TKey, TValue>
         SeekToKey(m_readWhileUpperBounds);
     }
 
+    #endregion
+
+    #region [ Properties ]
+
+    public override bool IsAlwaysSequential => true;
+
+    public override bool NeverContainsDuplicates => true;
+
+    #endregion
+
+    #region [ Methods ]
 
     protected override void Dispose(bool disposing)
     {
@@ -65,22 +77,15 @@ internal class UnionReader<TKey, TValue>
             m_tablesOrigList.ForEach(x => x.Dispose());
             m_tablesOrigList = null;
         }
+
         base.Dispose(disposing);
     }
-
-    public override bool IsAlwaysSequential => true;
-
-    public override bool NeverContainsDuplicates => true;
 
     protected override bool ReadNext(TKey key, TValue value)
     {
         if (m_firstTableScanner is not null)
-        {
             if (m_firstTableScanner.ReadWhile(key, value, m_readWhileUpperBounds))
-            {
                 return true;
-            }
-        }
         return ReadCatchAll(key, value);
     }
 
@@ -88,13 +93,9 @@ internal class UnionReader<TKey, TValue>
     {
     TryAgain:
         if (m_firstTableScanner is null)
-        {
             return false;
-        }
         if (m_firstTableScanner.ReadWhile(key, value, m_readWhileUpperBounds))
-        {
             return true;
-        }
         ReadWhileFollowupActions();
         goto TryAgain;
     }
@@ -137,7 +138,7 @@ internal class UnionReader<TKey, TValue>
     //-------------------------------------------------------------
 
     /// <summary>
-    /// Will verify that the stream is in the proper order and remove any duplicates that were found. 
+    /// Will verify that the stream is in the proper order and remove any duplicates that were found.
     /// May be called after every single read, but better to be called
     /// when a ReadWhile function returns false.
     /// </summary>
@@ -158,6 +159,7 @@ internal class UnionReader<TKey, TValue>
                 RemoveDuplicatesFromList();
                 SetReadWhileUpperBoundsValue();
             }
+
             if (compare > 0)
             {
                 m_sortedArchiveStreams.SortAssumingIncreased(0);
@@ -165,6 +167,7 @@ internal class UnionReader<TKey, TValue>
                 m_firstTableScanner = m_firstTable.Scanner;
                 SetReadWhileUpperBoundsValue();
             }
+
             if (compare == 0 && !m_sortedArchiveStreams[0].CacheIsValid)
             {
                 Dispose();
@@ -191,7 +194,7 @@ internal class UnionReader<TKey, TValue>
             return false;
         if (!item2.CacheIsValid)
             return true;
-        return item1.CacheKey.IsLessThan(item2.CacheKey);// item1.CurrentKey.CompareTo(item2.CurrentKey);
+        return item1.CacheKey.IsLessThan(item2.CacheKey); // item1.CurrentKey.CompareTo(item2.CurrentKey);
     }
 
     /// <summary>
@@ -208,7 +211,7 @@ internal class UnionReader<TKey, TValue>
             return 1;
         if (!item2.CacheIsValid)
             return -1;
-        return item1.CacheKey.CompareTo(item2.CacheKey);// item1.CurrentKey.CompareTo(item2.CurrentKey);
+        return item1.CacheKey.CompareTo(item2.CacheKey); // item1.CurrentKey.CompareTo(item2.CurrentKey);
     }
 
     /// <summary>
@@ -218,9 +221,7 @@ internal class UnionReader<TKey, TValue>
     private void SeekToKey(TKey key)
     {
         foreach (BufferedArchiveStream<TKey, TValue> table in m_sortedArchiveStreams.Items)
-        {
             table.SeekToKeyAndUpdateCacheValue(key);
-        }
         m_sortedArchiveStreams.Sort();
 
         //Remove any duplicates
@@ -246,26 +247,20 @@ internal class UnionReader<TKey, TValue>
     private void RemoveDuplicatesIfExists()
     {
         if (m_sortedArchiveStreams.Items.Length > 1)
-        {
             if (CompareStreams(m_sortedArchiveStreams[0], m_sortedArchiveStreams[1]) == 0 && m_sortedArchiveStreams[0].CacheIsValid)
-            {
                 //If a duplicate entry is found, advance the position of the duplicate entry
                 RemoveDuplicatesFromList();
-            }
-        }
     }
 
     /// <summary>
     /// Call this function when the same point exists in multiple archive files. It will
     /// read past the duplicate point in all other archive files and then resort the tables.
-    /// 
     /// Assums that the archiveStream's cached value is current.
     /// </summary>
     private void RemoveDuplicatesFromList()
     {
         int lastDuplicateIndex = -1;
         for (int index = 1; index < m_sortedArchiveStreams.Items.Length; index++)
-        {
             if (CompareStreams(m_sortedArchiveStreams[0], m_sortedArchiveStreams[index]) == 0)
             {
                 m_sortedArchiveStreams[index].SkipToNextKeyAndUpdateCachedValue();
@@ -275,7 +270,6 @@ internal class UnionReader<TKey, TValue>
             {
                 break;
             }
-        }
 
         //Resorts the list in reverse order.
         for (int j = lastDuplicateIndex; j > 0; j--)
@@ -285,22 +279,19 @@ internal class UnionReader<TKey, TValue>
     }
 
     /// <summary>
-    /// Sets the read while upper bounds value. 
-    /// Which is the lesser of 
+    /// Sets the read while upper bounds value.
+    /// Which is the lesser of
     /// The first point in the adjacent table or
     /// The end of the current seek window.
-    ///  </summary>
+    /// </summary>
     private void SetReadWhileUpperBoundsValue()
     {
         if (m_sortedArchiveStreams.Items.Length > 1 && m_sortedArchiveStreams[1].CacheIsValid)
-        {
             m_sortedArchiveStreams[1].CacheKey.CopyTo(m_nextArchiveStreamLowerBounds);
-        }
         else
-        {
             m_nextArchiveStreamLowerBounds.SetMax();
-        }
         m_nextArchiveStreamLowerBounds.CopyTo(m_readWhileUpperBounds);
     }
 
+    #endregion
 }

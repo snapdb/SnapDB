@@ -32,18 +32,25 @@ namespace SnapDB.Snap.Services;
 
 public partial class SnapServerDatabase<TKey, TValue>
 {
+    #region [ Members ]
+
     /// <summary>
     /// A client database that is one part of a  <see cref="SnapServer.Client"/> that wraps a <see cref="SnapServerDatabase{TKey,TValue}"/>.
     /// </summary>
-    internal class ClientDatabase
-        : ClientDatabaseBase<TKey, TValue>
+    internal class ClientDatabase : ClientDatabaseBase<TKey, TValue>
     {
-        private readonly object m_syncRoot;
-        private bool m_disposed;
-        private readonly SnapServerDatabase<TKey, TValue> m_server;
+        #region [ Members ]
+
         private readonly SnapServer.Client m_client;
         private readonly Action<ClientDatabaseBase> m_onDispose;
         private readonly WeakList<SequentialReaderStream<TKey, TValue>> m_openStreams;
+        private readonly SnapServerDatabase<TKey, TValue> m_server;
+        private readonly object m_syncRoot;
+        private bool m_disposed;
+
+        #endregion
+
+        #region [ Constructors ]
 
         public ClientDatabase(SnapServerDatabase<TKey, TValue> server, SnapClient client, Action<ClientDatabaseBase> onDispose)
         {
@@ -56,8 +63,34 @@ public partial class SnapServerDatabase<TKey, TValue>
 
             m_syncRoot = new object();
             m_openStreams = new WeakList<SequentialReaderStream<TKey, TValue>>();
-
         }
+
+        #endregion
+
+        #region [ Properties ]
+
+        /// <summary>
+        /// Gets if has been disposed.
+        /// </summary>
+        public override bool IsDisposed => m_disposed;
+
+        /// <summary>
+        /// Gets basic information about the current Database.
+        /// </summary>
+        public override DatabaseInfo Info
+        {
+            get
+            {
+                if (m_disposed)
+                    throw new ObjectDisposedException(GetType().FullName);
+
+                return m_server.Info;
+            }
+        }
+
+        #endregion
+
+        #region [ Methods ]
 
         public override void AttachFilesOrPaths(IEnumerable<string> paths)
         {
@@ -80,29 +113,10 @@ public partial class SnapServerDatabase<TKey, TValue>
         }
 
         /// <summary>
-        /// Gets if has been disposed.
-        /// </summary>
-        public override bool IsDisposed => m_disposed;
-
-        /// <summary>
-        /// Gets basic information about the current Database.
-        /// </summary>
-        public override DatabaseInfo Info
-        {
-            get
-            {
-                if (m_disposed)
-                    throw new ObjectDisposedException(GetType().FullName);
-
-                return m_server.Info;
-            }
-        }
-
-        /// <summary>
-        /// Forces a soft commit on the database. A soft commit 
+        /// Forces a soft commit on the database. A soft commit
         /// only commits data to memory. This allows other clients to read the data.
         /// While soft committed, this data could be lost during an unexpected shutdown.
-        /// Soft commits usually occur within microseconds. 
+        /// Soft commits usually occur within microseconds.
         /// </summary>
         public override void SoftCommit()
         {
@@ -115,7 +129,7 @@ public partial class SnapServerDatabase<TKey, TValue>
         /// <summary>
         /// Forces a commit to the disk subsystem. Once this returns, the data will not
         /// be lost due to an application crash or unexpected shutdown.
-        /// Hard commits can take 100ms or longer depending on how much data has to be committed. 
+        /// Hard commits can take 100ms or longer depending on how much data has to be committed.
         /// This requires two consecutive hardware cache flushes.
         /// </summary>
         public override void HardCommit()
@@ -169,20 +183,16 @@ public partial class SnapServerDatabase<TKey, TValue>
                 stream.Disposed += OnStreamDisposal;
 
                 lock (m_syncRoot)
+                {
                     m_openStreams.Add(stream);
+                }
             }
 
             return stream;
         }
 
-        private void OnStreamDisposal(SequentialReaderStream<TKey, TValue> stream)
-        {
-            lock (m_syncRoot)
-                m_openStreams.Remove(stream);
-        }
-
         /// <summary>
-        /// Writes the tree stream to the database. 
+        /// Writes the tree stream to the database.
         /// </summary>
         /// <param name="stream">all of the key/value pairs to add to the database.</param>
         public override void Write(TreeStream<TKey, TValue> stream)
@@ -205,5 +215,17 @@ public partial class SnapServerDatabase<TKey, TValue>
 
             m_server.Write(key, value);
         }
+
+        private void OnStreamDisposal(SequentialReaderStream<TKey, TValue> stream)
+        {
+            lock (m_syncRoot)
+            {
+                m_openStreams.Remove(stream);
+            }
+        }
+
+        #endregion
     }
+
+    #endregion
 }

@@ -13,6 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 	EndProjectSection
 EndProject
 Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "docgen", "DocGen\docgen.shfbproj", "{E0CCFF2A-C2DF-436C-B34C-A20215DA227A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AB3102F3-053C-4505-928D-C90078B6FE03} = {AB3102F3-053C-4505-928D-C90078B6FE03}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit Tests", "Unit Tests", "{72BFFD41-57CE-46E7-A81B-9E5F605EF8BE}"
 EndProject

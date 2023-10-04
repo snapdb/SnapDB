@@ -1,5 +1,4 @@
-﻿
-//******************************************************************************************************
+﻿//******************************************************************************************************
 //  WorkerThreadSynchronization.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
@@ -39,24 +38,28 @@ namespace SnapDB.Threading;
 /// when the socket makes any kind of blocking call, such as flusing to an underlying socket. Upon returning
 /// from this command, calling <see cref="EndSafeToCallbackRegion"/> will return this class to a state where callback
 /// will not be executed.
-/// 
-/// It is critical that <see cref="BeginSafeToCallbackRegion"/>, <see cref="EndSafeToCallbackRegion"/>, and 
+/// It is critical that <see cref="BeginSafeToCallbackRegion"/>, <see cref="EndSafeToCallbackRegion"/>, and
 /// <see cref="PulseSafeToCallback"/> only be called by the worker thread, as these methods are not thread safe and
 /// control the state of the <see cref="WorkerThreadSynchronization"/>.
-/// 
-/// In easy terms. When you (the worker) get a convenient time, I need to do something that might modify your 
+/// In easy terms. When you (the worker) get a convenient time, I need to do something that might modify your
 /// current working state. Let me know when I can do that.
 /// </remarks>
-public class WorkerThreadSynchronization
-    : DisposableLoggingClassBase
+public class WorkerThreadSynchronization : DisposableLoggingClassBase
 {
+    #region [ Members ]
+
     /// <summary>
     /// A callback request. Cancel this request when the callback is no longer needed.
     /// </summary>
-    public class CallbackRequest
-        : IDisposable
+    public class CallbackRequest : IDisposable
     {
+        #region [ Members ]
+
         private Action m_callback;
+
+        #endregion
+
+        #region [ Constructors ]
 
         /// <summary>
         /// Creates a callback request.
@@ -65,6 +68,18 @@ public class WorkerThreadSynchronization
         public CallbackRequest(Action callback)
         {
             m_callback = callback;
+        }
+
+        #endregion
+
+        #region [ Methods ]
+
+        /// <summary>
+        /// Disposes of the callback.
+        /// </summary>
+        public void Dispose()
+        {
+            m_callback = null;
         }
 
         /// <summary>
@@ -76,34 +91,17 @@ public class WorkerThreadSynchronization
         }
 
         /// <summary>
-        /// Disposes of the callback.
-        /// </summary>
-        public void Dispose()
-        {
-            m_callback = null;
-        }
-
-        /// <summary>
         /// Executes the callback item.
         /// </summary>
         public void Run()
         {
             Action callback = Interlocked.Exchange(ref m_callback, null);
             if ((object)callback is not null)
-            {
                 callback();
-            }
         }
+
+        #endregion
     }
-
-    private readonly object m_syncRoot;
-
-    private readonly List<CallbackRequest> m_pendingCallbacks;
-
-    /// <summary>
-    /// Only to be set by the worker thread.
-    /// </summary>
-    private volatile bool m_isSafeToCallback;
 
     /// <summary>
     /// Only to be set within lock(m_syncRoot).
@@ -116,10 +114,22 @@ public class WorkerThreadSynchronization
     private volatile bool m_isRequestCallbackMethodProcessing;
 
     /// <summary>
+    /// Only to be set by the worker thread.
+    /// </summary>
+    private volatile bool m_isSafeToCallback;
+
+    private readonly List<CallbackRequest> m_pendingCallbacks;
+
+    private readonly object m_syncRoot;
+
+    #endregion
+
+    #region [ Constructors ]
+
+    /// <summary>
     /// Creates a <see cref="WorkerThreadSynchronization"/>.
     /// </summary>
-    public WorkerThreadSynchronization()
-        : base(MessageClass.Component)
+    public WorkerThreadSynchronization() : base(MessageClass.Component)
     {
         m_syncRoot = new object();
         m_isSafeToCallback = false;
@@ -128,8 +138,12 @@ public class WorkerThreadSynchronization
         m_pendingCallbacks = new List<CallbackRequest>();
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
-    /// Requests that the following action be completed as soon as reasonably possible. 
+    /// Requests that the following action be completed as soon as reasonably possible.
     /// This will either be done immediately, or be queued for the next approriate time.
     /// </summary>
     /// <param name="callback">action to perform</param>
@@ -154,6 +168,7 @@ public class WorkerThreadSynchronization
                 m_isCallbackWaiting = true;
                 m_pendingCallbacks.Add(request);
             }
+
             //-----------------------------------------
             Thread.MemoryBarrier();
             m_isRequestCallbackMethodProcessing = false;
@@ -163,11 +178,11 @@ public class WorkerThreadSynchronization
     }
 
     /// <summary>
-    /// Signals that if any callbacks are pending, 
+    /// Signals that if any callbacks are pending,
     /// go ahead and run them now. Otherwise, wait.
     /// </summary>
     /// <remarks>
-    /// This method will be inlined and has virtually no 
+    /// This method will be inlined and has virtually no
     /// overhead so long as a callback is not waiting.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -181,7 +196,7 @@ public class WorkerThreadSynchronization
     /// Enters a region where a callback can occur.
     /// </summary>
     /// <remarks>
-    /// A good place to put this is before a long 
+    /// A good place to put this is before a long
     /// action where it is possible that the thread
     /// might be blocked.
     /// </remarks>
@@ -193,9 +208,7 @@ public class WorkerThreadSynchronization
         m_isSafeToCallback = true;
         Thread.MemoryBarrier(); // Since volatile reads can be reordered above writes.
         if (m_isCallbackWaiting)
-        {
             ExecuteAllCallbacks();
-        }
     }
 
     /// <summary>
@@ -207,11 +220,9 @@ public class WorkerThreadSynchronization
         m_isSafeToCallback = false;
         Thread.MemoryBarrier(); // Since volatile reads can be reordered above writes.
         if (m_isRequestCallbackMethodProcessing || m_isCallbackWaiting)
-        {
             // If I set m_isSafeToCallback while RequestCallback was running,
             // I need to check and see if the RequestCallback got the message.
             ExecuteAllCallbacks();
-        }
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -223,7 +234,6 @@ public class WorkerThreadSynchronization
             {
                 m_isCallbackWaiting = false;
                 foreach (CallbackRequest callback in m_pendingCallbacks)
-                {
                     try
                     {
                         callback.Run();
@@ -232,10 +242,11 @@ public class WorkerThreadSynchronization
                     {
                         Log.Publish(MessageLevel.Error, "Unexpected error when invoking callbacks", null, null, ex);
                     }
-                }
+
                 m_pendingCallbacks.Clear();
             }
         }
     }
 
+    #endregion
 }

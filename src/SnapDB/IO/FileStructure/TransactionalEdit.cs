@@ -34,46 +34,30 @@ namespace SnapDB.IO.FileStructure;
 /// Provides the state information for a transaction on the file system.
 /// </summary>
 /// <remarks>Failing to call Commit or Rollback will inhibit additional transactions to be acquired.</remarks>
-public sealed class TransactionalEdit
-    : IDisposable
+public sealed class TransactionalEdit : IDisposable
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(TransactionalEdit), MessageClass.Component);
-
     #region [ Members ]
 
-    /// <summary>
-    /// This delegate is called when the Commit function is called and all the data has been written to the underlying file system.
-    /// the purpose of this delegate is to notify the calling class that this transaction is concluded since
-    /// only one write transaction can be acquired at a time.
-    /// </summary>
-    private Action m_delHasBeenCommitted;
-
-    /// <summary>
-    /// This delegate is called when the RollBack function is called. This also occurs when the object is disposed.
-    /// the purpose of this delegate is to notify the calling class that this transaction is concluded since
-    /// only one write transaction can be acquired at a time.
-    /// </summary>
-    private Action m_delHasBeenRolledBack;
-
-    /// <summary>
-    /// Prevents duplicate calls to dispose.
-    /// </summary>
-    private bool m_disposed;
-
-    /// <summary>
-    /// The underlying diskIO to do the read and write against.
-    /// </summary>
+    // The underlying diskIO to do the read and write against.
     private readonly DiskIo m_dataReader;
 
-    /// <summary>
-    /// The readonly snapshot of the archive file.
-    /// </summary>
+    // This delegate is called when the Commit function is called and all the data has been written to the underlying file system.
+    // the purpose of this delegate is to notify the calling class that this transaction is concluded since
+    // only one write transaction can be acquired at a time.
+    private Action? m_delHasBeenCommitted;
+
+    // This delegate is called when the RollBack function is called. This also occurs when the object is disposed.
+    // the purpose of this delegate is to notify the calling class that this transaction is concluded since
+    // only one write transaction can be acquired at a time.
+    private Action? m_delHasBeenRolledBack;
+
+    // The readonly snapshot of the archive file.
     private readonly FileHeaderBlock m_fileHeaderBlock;
 
-    /// <summary>
-    /// All files that have ever been opened.
-    /// </summary>
-    private readonly List<SubFileStream> m_openedFiles;
+    // All files that have ever been opened.
+    private readonly List<SubFileStream?> m_openedFiles;
+
+    private bool m_disposed;
 
     #endregion
 
@@ -90,7 +74,7 @@ public sealed class TransactionalEdit
         if (dataReader is null)
             throw new ArgumentNullException(nameof(dataReader));
 
-        m_openedFiles = new List<SubFileStream>();
+        m_openedFiles = new List<SubFileStream?>();
         m_disposed = false;
         m_fileHeaderBlock = dataReader.LastCommittedHeader.CloneEditable();
         m_dataReader = dataReader;
@@ -118,6 +102,7 @@ public sealed class TransactionalEdit
         {
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             return m_fileHeaderBlock.Files;
         }
     }
@@ -136,13 +121,27 @@ public sealed class TransactionalEdit
     #region [ Methods ]
 
     /// <summary>
+    /// Releases all the resources used by the <see cref="ReadSnapshot"/> object.
+    /// </summary>
+    public void Dispose()
+    {
+        if (m_disposed)
+            return;
+
+        RollbackAndDispose();
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
     /// Creates and opens a new file on the current file system.
     /// </summary>
     public SubFileStream CreateFile(SubFileName fileName)
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         m_fileHeaderBlock.CreateNewFile(fileName);
+
         return OpenFile(fileName);
     }
 
@@ -154,11 +153,15 @@ public sealed class TransactionalEdit
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         if (fileIndex < 0 || fileIndex >= m_fileHeaderBlock.Files.Count)
             throw new ArgumentOutOfRangeException(nameof(fileIndex), "The file index provided could not be found in the header.");
+
         SubFileHeader? subFile = m_fileHeaderBlock.Files[fileIndex];
-        SubFileStream fileStream = new(m_dataReader, subFile, m_fileHeaderBlock, isReadOnly: false);
+        SubFileStream fileStream = new(m_dataReader, subFile, m_fileHeaderBlock, false);
+
         m_openedFiles.Add(fileStream);
+
         return fileStream;
     }
 
@@ -169,12 +172,15 @@ public sealed class TransactionalEdit
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         for (int x = 0; x < Files.Count; x++)
         {
             SubFileHeader? file = Files[x];
-            if (file.FileName == fileName)
+
+            if (file?.FileName == fileName)
                 return OpenFile(x);
         }
+
         throw new Exception("File does not exist");
     }
 
@@ -182,17 +188,18 @@ public sealed class TransactionalEdit
     /// This will cause the transaction to be written to the database.
     /// Also calls Dispose().
     /// </summary>
-    /// <remarks>Duplicate calls to this function, or subsequent calls to RollbackTransaction will throw an exception.</remarks>
+    /// <remarks>
+    /// Duplicate calls to this function, or subsequent calls to RollbackTransaction will throw an exception.
+    /// </remarks>
     public void CommitAndDispose()
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
 
-        foreach (SubFileStream file in m_openedFiles)
-        {
+        foreach (SubFileStream? file in m_openedFiles)
             if (file is not null && !file.IsDisposed)
-                throw new Exception("Not all files have been properly disposed of.");
-        }
+                throw new Exception("Not all files have been properly disposed.");
+
         try
         {
             // TODO: First commit the data, then the file system.
@@ -204,6 +211,7 @@ public sealed class TransactionalEdit
             m_delHasBeenCommitted = null;
             m_delHasBeenRolledBack = null;
             m_disposed = true;
+
             GC.SuppressFinalize(this);
         }
     }
@@ -217,11 +225,9 @@ public sealed class TransactionalEdit
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
 
-        foreach (SubFileStream file in m_openedFiles)
-        {
+        foreach (SubFileStream? file in m_openedFiles)
             if (file is not null && !file.IsDisposed)
                 file.Dispose();
-        }
 
         try
         {
@@ -239,19 +245,11 @@ public sealed class TransactionalEdit
         }
     }
 
-    /// <summary>
-    /// Releases all the resources used by the <see cref="ReadSnapshot"/> object.
-    /// </summary>
-    public void Dispose()
-    {
-        if (!m_disposed)
-        {
-            RollbackAndDispose();
-            GC.SuppressFinalize(this);
-        }
-    }
-
     #endregion
 
+    #region [ Static ]
 
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(TransactionalEdit), MessageClass.Component);
+
+    #endregion
 }

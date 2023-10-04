@@ -29,33 +29,44 @@ using System.Text;
 namespace SnapDB.Security;
 
 /// <summary>
-/// Computes the password credentials. 
+/// Computes the password credentials.
 /// Optimized so duplicate calls will not recompute the password unless necessary.
 /// </summary>
 internal class PbdkfCredentials
 {
+    #region [ Members ]
+
+    /// <summary>
+    /// The password value
+    /// </summary>
+    public byte[] SaltedPassword;
+
     // Original username and password
     /// <summary>
     /// The UTF8 encoded normalized username.
     /// </summary>
     public byte[] UsernameBytes;
-    private readonly byte[] m_passwordBytes;
 
     // Salted password, base on PBKDF2
     private HashMethod m_hashMethod;
     private int m_iterations;
+
+    private readonly byte[] m_passwordBytes;
     private byte[] m_salt;
 
-    /// <summary>
-    /// The password value 
-    /// </summary>
-    public byte[] SaltedPassword;
+    #endregion
+
+    #region [ Constructors ]
 
     public PbdkfCredentials(string username, string password)
     {
         UsernameBytes = Encoding.UTF8.GetBytes(username.Normalize(NormalizationForm.FormKC));
         m_passwordBytes = Encoding.UTF8.GetBytes(password.Normalize(NormalizationForm.FormKC));
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Updates the <see cref="SaltedPassword"/>. Returns False if the password value did not change.
@@ -105,8 +116,12 @@ internal class PbdkfCredentials
                 default:
                     throw new Exception("Invalid Hash Method");
             }
+
             return true;
         }
+
         return false;
     }
+
+    #endregion
 }

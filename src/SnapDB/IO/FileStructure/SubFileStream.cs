@@ -34,39 +34,24 @@ using SnapDB.IO.Unmanaged;
 namespace SnapDB.IO.FileStructure;
 
 /// <summary>
-/// Provides a file stream that can be used to open a file and does all of the background work 
+/// Provides a file stream that can be used to open a file and does all of the background work
 /// required to translate virtual position data into physical ones.
 /// </summary>
-public sealed partial class SubFileStream
-    : ISupportsBinaryStream
+public sealed partial class SubFileStream : ISupportsBinaryStream
 {
     #region [ Members ]
 
-    private BinaryStreamIoSessionBase m_ioStream1;
+    private readonly int m_blockSize;
 
-    private BinaryStreamIoSessionBase m_ioStream2;
-
-    /// <summary>
-    /// Determines if the file stream has been disposed.
-    /// </summary>
-    private bool m_disposed;
-
-    /// <summary>
-    /// Determines if the filestream can be written to.
-    /// </summary>
-    private readonly bool m_isReadOnly;
-
-    /// <summary>
-    /// The FileAllocationTable.
-    /// </summary>
-    private readonly FileHeaderBlock m_fileHeaderBlock;
-
-    /// <summary>
-    /// The Disk Subsystem.
-    /// </summary>
     private readonly DiskIo m_dataReader;
 
-    private readonly int m_blockSize;
+    private readonly FileHeaderBlock m_fileHeaderBlock;
+
+    private BinaryStreamIoSessionBase? m_ioStream1;
+
+    private BinaryStreamIoSessionBase? m_ioStream2;
+
+    private readonly bool m_isReadOnly;
 
     #endregion
 
@@ -83,24 +68,30 @@ public sealed partial class SubFileStream
     {
         if (dataReader is null)
             throw new ArgumentNullException(nameof(dataReader));
+
         if (subFile is null)
             throw new ArgumentNullException(nameof(subFile));
+
         if (fileHeaderBlock is null)
-            throw new ArgumentNullException(nameof(subFile));
+            throw new ArgumentNullException(nameof(fileHeaderBlock));
 
         if (!isReadOnly)
         {
             if (dataReader.IsReadOnly)
                 throw new ArgumentException("This parameter cannot be read only when opening for writing", nameof(dataReader));
+
             if (fileHeaderBlock.IsReadOnly)
                 throw new ArgumentException("This parameter cannot be read only when opening for writing", nameof(fileHeaderBlock));
+
             if (subFile.IsReadOnly)
                 throw new ArgumentException("This parameter cannot be read only when opening for writing", nameof(subFile));
         }
+
         if (isReadOnly)
         {
             if (!fileHeaderBlock.IsReadOnly)
                 throw new ArgumentException("This parameter must be read only when opening for reading", nameof(fileHeaderBlock));
+
             if (!subFile.IsReadOnly)
                 throw new ArgumentException("This parameter must be read only when opening for reading", nameof(subFile));
         }
@@ -128,7 +119,7 @@ public sealed partial class SubFileStream
     {
         get
         {
-            if (m_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
             return m_isReadOnly;
@@ -138,7 +129,7 @@ public sealed partial class SubFileStream
     /// <summary>
     /// Determines if the file system has been disposed yet.
     /// </summary>
-    public bool IsDisposed => m_disposed;
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Gets the number of available simultaneous read/write sessions.
@@ -152,7 +143,7 @@ public sealed partial class SubFileStream
         {
             int count = 0;
 
-            if (m_disposed)
+            if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
             if (m_ioStream1 is null || m_ioStream1.IsDisposed)
@@ -160,6 +151,7 @@ public sealed partial class SubFileStream
 
             if (m_ioStream2 is null || m_ioStream2.IsDisposed)
                 count++;
+
             return count;
         }
     }
@@ -168,81 +160,70 @@ public sealed partial class SubFileStream
 
     #region [ Methods ]
 
-    private void ClearIndexNodeCache(IoSession caller, IndexParser mostRecentParser)
-    {
-        if (!m_fileHeaderBlock.IsSimplifiedFileFormat)
-        {
-            if (m_ioStream1 is not null && !m_ioStream1.IsDisposed && m_ioStream1 != caller)
-                ((IoSession)m_ioStream1).ClearIndexCache(mostRecentParser);
-
-            if (m_ioStream2 is not null && !m_ioStream2.IsDisposed && m_ioStream2 != caller)
-                ((IoSession)m_ioStream2).ClearIndexCache(mostRecentParser);
-        }
-    }
-
-
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
     /// <filterpriority>2</filterpriority>
     public void Dispose()
     {
-        if (!m_disposed)
-        {
-            try
-            {
-                if (m_ioStream1 is not null)
-                {
-                    m_ioStream1.Dispose();
-                    m_ioStream1 = null;
-                }
+        if (IsDisposed)
+            return;
 
-                if (m_ioStream2 is not null)
-                {
-                    m_ioStream2.Dispose();
-                    m_ioStream2 = null;
-                }
+        try
+        {
+            if (m_ioStream1 is not null)
+            {
+                m_ioStream1.Dispose();
+                m_ioStream1 = null;
             }
 
-            finally
+            if (m_ioStream2 is not null)
             {
-                m_disposed = true; // Prevent duplicate dispose.
+                m_ioStream2.Dispose();
+                m_ioStream2 = null;
             }
         }
+        finally
+        {
+            IsDisposed = true; // Prevent duplicate dispose.
+        }
+    }
+
+    private void ClearIndexNodeCache(IoSession caller, IndexParser mostRecentParser)
+    {
+        if (m_fileHeaderBlock.IsSimplifiedFileFormat)
+            return;
+
+        if (m_ioStream1 is not null && !m_ioStream1.IsDisposed && m_ioStream1 != caller)
+            ((IoSession)m_ioStream1).ClearIndexCache(mostRecentParser);
+
+        if (m_ioStream2 is not null && !m_ioStream2.IsDisposed && m_ioStream2 != caller)
+            ((IoSession)m_ioStream2).ClearIndexCache(mostRecentParser);
     }
 
 
     /// <summary>
-    /// Aquire an IO Session.
+    /// Acquire an IO Session.
     /// </summary>
     BinaryStreamIoSessionBase ISupportsBinaryStream.CreateIoSession()
     {
-        if (m_disposed)
+        if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
 
         if (RemainingSupportedIoSessions == 0)
             throw new Exception("There are not any remaining IO Sessions");
 
         BinaryStreamIoSessionBase session;
-        if (m_fileHeaderBlock.IsSimplifiedFileFormat)
-        {
-            session = new SimplifiedIoSession(this);
-        }
 
+        if (m_fileHeaderBlock.IsSimplifiedFileFormat)
+            session = new SimplifiedIoSession(this);
         else
-        {
             session = new IoSession(this);
-        }
 
         if (m_ioStream1 is null || m_ioStream1.IsDisposed)
-        {
             m_ioStream1 = session;
-        }
-
         else
-        {
             m_ioStream2 = session;
-        }
 
         return session;
     }

@@ -24,8 +24,8 @@
 //
 //******************************************************************************************************
 
-using SnapDB.IO.Unmanaged;
 using SnapDB.IO;
+using SnapDB.IO.Unmanaged;
 
 namespace SnapDB.Snap.Encoding;
 
@@ -36,6 +36,8 @@ namespace SnapDB.Snap.Encoding;
 /// <typeparam name="TValue">The value type.</typeparam>
 public abstract class PairEncodingBase<TKey, TValue>
 {
+    #region [ Properties ]
+
     /// <summary>
     /// Gets the encoding method that this class implements.
     /// </summary>
@@ -64,7 +66,7 @@ public abstract class PairEncodingBase<TKey, TValue>
     public abstract int MaxCompressionSize { get; }
 
     /// <summary>
-    /// Gets if the stream supports a symbol that 
+    /// Gets if the stream supports a symbol that
     /// represents that the end of the stream has been encountered.
     /// </summary>
     /// <remarks>
@@ -73,7 +75,6 @@ public abstract class PairEncodingBase<TKey, TValue>
     /// word is 0xFF, the encoding has specifically
     /// designated this as the end of the stream. Therefore, calls to
     /// Decompress will result in an end of stream exception.
-    /// 
     /// Failing to reserve a code as the end of stream will mean that
     /// streaming points will include its own symbol to represent the end of the
     /// stream, taking 1 extra byte per point encoded.
@@ -86,6 +87,10 @@ public abstract class PairEncodingBase<TKey, TValue>
     /// </summary>
     public abstract byte EndOfStreamSymbol { get; }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Encodes key-value pairs and writes them to a byte pointer.
     /// </summary>
@@ -95,7 +100,7 @@ public abstract class PairEncodingBase<TKey, TValue>
     /// <param name="key">The key to be encoded and written.</param>
     /// <param name="value">The value to be encoded and written.</param>
     /// <returns>The position of the byte pointer after encoding.</returns>
-    public unsafe virtual int Encode(byte* stream, TKey prevKey, TValue prevValue, TKey key, TValue value)
+    public virtual unsafe int Encode(byte* stream, TKey prevKey, TValue prevValue, TKey key, TValue value)
     {
         BinaryStreamPointerWrapper bs = new(stream, MaxCompressionSize);
         Encode(bs, prevKey, prevValue, key, value);
@@ -112,7 +117,7 @@ public abstract class PairEncodingBase<TKey, TValue>
     /// <param name="value">The decoded value.</param>
     /// <param name="isEndOfStream">A boolean indicating whether the end of the stream has been reached.</param>
     /// <returns>The position of the byte pointer after decoding.</returns>
-    public unsafe virtual int Decode(byte* stream, TKey prevKey, TValue prevValue, TKey key, TValue value, out bool isEndOfStream)
+    public virtual unsafe int Decode(byte* stream, TKey prevKey, TValue prevValue, TKey key, TValue value, out bool isEndOfStream)
     {
         BinaryStreamPointerWrapper bs = new(stream, MaxCompressionSize);
         Decode(bs, prevKey, prevValue, key, value, out isEndOfStream);
@@ -146,4 +151,6 @@ public abstract class PairEncodingBase<TKey, TValue>
     /// </summary>
     /// <returns>A clone.</returns>
     public abstract PairEncodingBase<TKey, TValue> Clone();
+
+    #endregion
 }

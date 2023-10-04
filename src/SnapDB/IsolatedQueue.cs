@@ -27,9 +27,9 @@
 //
 //******************************************************************************************************
 
-using Gemstone.ArrayExtensions;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using Gemstone.ArrayExtensions;
 
 namespace SnapDB;
 
@@ -39,16 +39,24 @@ namespace SnapDB;
 /// </summary>
 public class IsolatedQueue<T>
 {
+    #region [ Members ]
+
     /// <summary>
-    /// Represents an individual node that allows for items to be added and removed from the 
-    /// queue independently and without locks. 
+    /// Represents an individual node that allows for items to be added and removed from the
+    /// queue independently and without locks.
     /// </summary>
     private class IsolatedNode
     {
+        #region [ Members ]
+
+        private readonly T[] m_blocks;
+        private volatile int m_head;
         private readonly int m_lastBlock;
         private volatile int m_tail;
-        private volatile int m_head;
-        private readonly T[] m_blocks;
+
+        #endregion
+
+        #region [ Constructors ]
 
         /// <summary>
         /// Creates a <see cref="IsolatedNode"/>
@@ -61,6 +69,10 @@ public class IsolatedQueue<T>
             m_blocks = new T[count];
             m_lastBlock = m_blocks.Length;
         }
+
+        #endregion
+
+        #region [ Properties ]
 
         /// <summary>
         /// Gets if the current node is out of entries.
@@ -77,6 +89,10 @@ public class IsolatedQueue<T>
         /// </summary>
         public bool CanEnqueue => m_head != m_lastBlock;
 
+        #endregion
+
+        #region [ Methods ]
+
         /// <summary>
         /// Adds the following item to the queue. Be sure to check if it is full first.
         /// </summary>
@@ -86,7 +102,7 @@ public class IsolatedQueue<T>
         {
             m_blocks[m_head] = item;
             // No memory barrier here since .NET 2.0 ensures that writes will not be reordered.
-            m_head = m_head + 1;
+            m_head++;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -95,20 +111,26 @@ public class IsolatedQueue<T>
             T item = m_blocks[m_tail];
             m_blocks[m_tail] = default;
             // No memory barrier here since .NET 2.0 ensures that writes will not be reordered.
-            m_tail = m_tail + 1;
+            m_tail++;
 
             return item;
         }
+
+        #endregion
     }
 
     private readonly ConcurrentQueue<IsolatedNode> m_blocks;
 
     private IsolatedNode m_currentHead;
     private IsolatedNode m_currentTail;
+    private int m_dequeueCount;
+    private int m_enqueueCount;
 
     private readonly int m_unitCount;
-    private int m_enqueueCount;
-    private int m_dequeueCount;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates an <see cref="IsolatedQueue{T}"/>
@@ -119,8 +141,12 @@ public class IsolatedQueue<T>
         m_blocks = new ConcurrentQueue<IsolatedNode>();
     }
 
+    #endregion
+
+    #region [ Properties ]
+
     /// <summary>
-    /// The number of elements in the queue. 
+    /// The number of elements in the queue.
     /// </summary>
     /// <returns>
     /// Note: Due to the nature of simultaneous access. This is a representative number.
@@ -133,20 +159,18 @@ public class IsolatedQueue<T>
         {
             int delta = m_enqueueCount - m_dequeueCount;
             if (delta < int.MinValue / 2)
-            {
                 return int.MaxValue;
-            }
             if (delta > int.MaxValue / 2)
-            {
                 return int.MaxValue;
-            }
             if (delta < 0)
-            {
                 return 0;
-            }
             return delta;
         }
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Addes the provided item to the <see cref="IsolatedQueue{T}"/>.
@@ -161,20 +185,8 @@ public class IsolatedQueue<T>
             m_enqueueCount++;
             return;
         }
-        EnqueueSlower(item);
-    }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private void EnqueueSlower(T item)
-    {
-        if (m_currentHead is null || !m_currentHead.CanEnqueue)
-        {
-            m_currentHead = new IsolatedNode(m_unitCount);
-            Thread.MemoryBarrier();
-            m_blocks.Enqueue(m_currentHead);
-            m_enqueueCount++;
-        }
-        m_currentHead.Enqueue(item);
+        EnqueueSlower(item);
     }
 
     /// <summary>
@@ -190,36 +202,8 @@ public class IsolatedQueue<T>
             m_dequeueCount++;
             return true;
         }
-        return TryDequeueSlower(out item);
-    }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private bool TryDequeueSlower(out T item)
-    {
-        if (m_currentTail is null)
-        {
-            if (!m_blocks.TryDequeue(out m_currentTail))
-            {
-                item = default;
-                return false;
-            }
-        }
-        if (m_currentTail.DequeueMustMoveToNextNode)
-        {
-            if (!m_blocks.TryDequeue(out m_currentTail))
-            {
-                item = default;
-                return false;
-            }
-        }
-        if (m_currentTail.CanDequeue)
-        {
-            item = m_currentTail.Dequeue();
-            m_dequeueCount++;
-            return true;
-        }
-        item = default;
-        return false;
+        return TryDequeueSlower(out item);
     }
 
     /// <summary>
@@ -232,9 +216,7 @@ public class IsolatedQueue<T>
     {
         items.ValidateParameters(offset, length);
         for (int x = 0; x < length; x++)
-        {
             Enqueue(items[offset + x]);
-        }
     }
 
     /// <summary>
@@ -251,15 +233,55 @@ public class IsolatedQueue<T>
         {
             T item;
             if (TryDequeue(out item))
-            {
                 items[x] = item;
-            }
             else
-            {
                 return x;
-            }
         }
+
         return length;
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private void EnqueueSlower(T item)
+    {
+        if (m_currentHead is null || !m_currentHead.CanEnqueue)
+        {
+            m_currentHead = new IsolatedNode(m_unitCount);
+            Thread.MemoryBarrier();
+            m_blocks.Enqueue(m_currentHead);
+            m_enqueueCount++;
+        }
+
+        m_currentHead.Enqueue(item);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private bool TryDequeueSlower(out T item)
+    {
+        if (m_currentTail is null)
+            if (!m_blocks.TryDequeue(out m_currentTail))
+            {
+                item = default;
+                return false;
+            }
+
+        if (m_currentTail.DequeueMustMoveToNextNode)
+            if (!m_blocks.TryDequeue(out m_currentTail))
+            {
+                item = default;
+                return false;
+            }
+
+        if (m_currentTail.CanDequeue)
+        {
+            item = m_currentTail.Dequeue();
+            m_dequeueCount++;
+            return true;
+        }
+
+        item = default;
+        return false;
+    }
+
+    #endregion
 }

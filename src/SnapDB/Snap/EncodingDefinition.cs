@@ -37,7 +37,6 @@ namespace SnapDB.Snap;
 /// If Combined KeyValue encoding
 /// byte type = 1
 /// Guid KeyValueEncodingMethod
-/// 
 /// If Individual Compression
 /// byte type = 2
 /// Guid KeyEncodingMethod
@@ -45,15 +44,24 @@ namespace SnapDB.Snap;
 /// </remarks>
 public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, IEquatable<EncodingDefinition>
 {
-    /// <summary>
-    /// Gets if the compression method compresses the key and value as a unit.
-    /// </summary>
-    public bool IsKeyValueEncoded { get; }
+    #region [ Members ]
+
+    private readonly int m_hashCode;
 
     private readonly Guid m_keyEncodingMethod;
-    private readonly Guid m_valueEncodingMethod;
     private readonly Guid m_keyValueEncodingMethod;
-    private readonly int m_hashCode;
+    private readonly Guid m_valueEncodingMethod;
+
+    #endregion
+
+    #region [ Constructors ]
+
+    static EncodingDefinition()
+    {
+        FixedSizeIndividualGuid = new Guid(0x1dea326d, 0xa63a, 0x4f73, 0xb5, 0x1c, 0x7b, 0x31, 0x25, 0xc6, 0xda, 0x55);
+        FixedSizeCombinedEncoding = new EncodingDefinition(FixedSizeIndividualGuid);
+        FixedSizeIndividualEncoding = new EncodingDefinition(FixedSizeIndividualGuid, FixedSizeIndividualGuid);
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EncodingDefinition"/> class from a binary stream.
@@ -76,9 +84,9 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
             m_keyValueEncodingMethod = Guid.Empty;
             IsKeyValueEncoded = false;
         }
+
         m_hashCode = ComputeHashCode();
-        IsFixedSizeEncoding = this == FixedSizeCombinedEncoding ||
-                                this == FixedSizeIndividualEncoding;
+        IsFixedSizeEncoding = this == FixedSizeCombinedEncoding || this == FixedSizeIndividualEncoding;
     }
 
     /// <summary>
@@ -102,9 +110,9 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
             m_keyValueEncodingMethod = Guid.Empty;
             IsKeyValueEncoded = false;
         }
+
         m_hashCode = ComputeHashCode();
-        IsFixedSizeEncoding = this == FixedSizeCombinedEncoding ||
-                                this == FixedSizeIndividualEncoding;
+        IsFixedSizeEncoding = this == FixedSizeCombinedEncoding || this == FixedSizeIndividualEncoding;
     }
 
     /// <summary>
@@ -133,9 +141,17 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
         m_keyValueEncodingMethod = Guid.Empty;
         IsKeyValueEncoded = false;
         m_hashCode = ComputeHashCode();
-        IsFixedSizeEncoding = keyEncoding == FixedSizeIndividualGuid &&
-                                valueEncoding == FixedSizeIndividualGuid;
+        IsFixedSizeEncoding = keyEncoding == FixedSizeIndividualGuid && valueEncoding == FixedSizeIndividualGuid;
     }
+
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// Gets if the compression method compresses the key and value as a unit.
+    /// </summary>
+    public bool IsKeyValueEncoded { get; }
 
     /// <summary>
     /// Gets if the encoding method is the special fixed size encoding method.
@@ -152,7 +168,7 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
         {
             if (IsKeyValueEncoded)
                 throw new Exception("Not Valid");
-                
+
             return m_keyEncodingMethod;
         }
     }
@@ -181,10 +197,14 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
         {
             if (!IsKeyValueEncoded)
                 throw new Exception("Not Valid");
-                
+
             return m_keyValueEncodingMethod;
         }
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Serializes the <see cref="EncodingDefinition"/> to a binary stream.
@@ -204,6 +224,7 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
             stream.Write(ValueEncodingMethod);
         }
     }
+
     /// <summary>
     /// Serializes the <see cref="EncodingDefinition"/> to a regular stream.
     /// </summary>
@@ -224,45 +245,13 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     }
 
     /// <summary>
-    /// Compares the current object with another object of the same type.
-    /// </summary>
-    /// <returns>
-    /// A value that indicates the relative order of the objects being compared. The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other"/> parameter.Zero This object is equal to <paramref name="other"/>. Greater than zero This object is greater than <paramref name="other"/>. 
-    /// </returns>
-    /// <param name="other">An object to compare with this object.</param>
-    public int CompareTo(EncodingDefinition other)
-    {
-        int cmp = m_hashCode.CompareTo(other.m_hashCode); if (cmp != 0) return cmp;
-        cmp = IsKeyValueEncoded.CompareTo(other.IsKeyValueEncoded); if (cmp != 0) return cmp;
-        cmp = m_keyEncodingMethod.CompareTo(other.m_keyEncodingMethod); if (cmp != 0) return cmp;
-        cmp = m_valueEncodingMethod.CompareTo(other.m_valueEncodingMethod); if (cmp != 0) return cmp;
-        return m_keyValueEncodingMethod.CompareTo(other.m_keyValueEncodingMethod);
-    }
-
-    /// <summary>
-    /// Indicates whether the current object is equal to another object of the same type.
-    /// </summary>
-    /// <returns>
-    /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
-    /// </returns>
-    /// <param name="other">An object to compare with this object.</param>
-    public bool Equals(EncodingDefinition other)
-    {
-        return (object)other is not null &&
-               m_hashCode == other.m_hashCode &&
-               IsKeyValueEncoded == other.IsKeyValueEncoded &&
-               m_keyEncodingMethod == other.m_keyEncodingMethod &&
-               m_valueEncodingMethod == other.m_valueEncodingMethod &&
-               m_keyValueEncodingMethod == other.m_keyValueEncodingMethod;
-    }
-
-    /// <summary>
     /// Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/>.
     /// </summary>
     /// <returns>
     /// true if the specified object  is equal to the current object; otherwise, false.
     /// </returns>
-    /// <param name="obj">The object to compare with the current object. </param><filterpriority>2</filterpriority>
+    /// <param name="obj">The object to compare with the current object. </param>
+    /// <filterpriority>2</filterpriority>
     public override bool Equals(object obj)
     {
         if (obj is not EncodingDefinition o)
@@ -271,21 +260,7 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     }
 
     /// <summary>
-    /// Compares the current instance with another object of the same type and returns an integer that indicates whether the current instance precedes, follows, or occurs in the same position in the sort order as the other object.
-    /// </summary>
-    /// <returns>
-    /// A value that indicates the relative order of the objects being compared. The return value has these meanings: Value Meaning Less than zero This instance precedes <paramref name="obj"/> in the sort order. Zero This instance occurs in the same position in the sort order as <paramref name="obj"/>. Greater than zero This instance follows <paramref name="obj"/> in the sort order. 
-    /// </returns>
-    /// <param name="obj">An object to compare with this instance. </param><exception cref="T:System.ArgumentException"><paramref name="obj"/> is not the same type as this instance. </exception><filterpriority>2</filterpriority>
-    public int CompareTo(object obj)
-    {
-        if (obj is not EncodingDefinition o)
-            return -1;
-        return CompareTo(o);
-    }
-
-    /// <summary>
-    /// Serves as a hash function for a particular type. 
+    /// Serves as a hash function for a particular type.
     /// </summary>
     /// <returns>
     /// A hash code for the current <see cref="T:System.Object"/>.
@@ -298,11 +273,80 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
 
     private int ComputeHashCode()
     {
-        return IsKeyValueEncoded.GetHashCode() ^
-                      m_keyEncodingMethod.GetHashCode() ^
-                      m_valueEncodingMethod.GetHashCode() ^
-                      m_keyValueEncodingMethod.GetHashCode();
+        return IsKeyValueEncoded.GetHashCode() ^ m_keyEncodingMethod.GetHashCode() ^ m_valueEncodingMethod.GetHashCode() ^ m_keyValueEncodingMethod.GetHashCode();
     }
+
+    /// <summary>
+    /// Compares the current instance with another object of the same type and returns an integer that indicates whether the current instance precedes, follows, or occurs in the same position in the sort order as the other object.
+    /// </summary>
+    /// <returns>
+    /// A value that indicates the relative order of the objects being compared. The return value has these meanings: Value Meaning Less than zero This instance precedes <paramref name="obj"/> in the sort order. Zero This instance occurs in the same position in the sort order as <paramref name="obj"/>. Greater than zero This instance follows <paramref name="obj"/> in the sort order.
+    /// </returns>
+    /// <param name="obj">An object to compare with this instance. </param>
+    /// <exception cref="T:System.ArgumentException"><paramref name="obj"/> is not the same type as this instance. </exception>
+    /// <filterpriority>2</filterpriority>
+    public int CompareTo(object obj)
+    {
+        if (obj is not EncodingDefinition o)
+            return -1;
+        return CompareTo(o);
+    }
+
+    /// <summary>
+    /// Compares the current object with another object of the same type.
+    /// </summary>
+    /// <returns>
+    /// A value that indicates the relative order of the objects being compared. The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other"/> parameter.Zero This object is equal to <paramref name="other"/>. Greater than zero This object is greater than <paramref name="other"/>.
+    /// </returns>
+    /// <param name="other">An object to compare with this object.</param>
+    public int CompareTo(EncodingDefinition other)
+    {
+        int cmp = m_hashCode.CompareTo(other.m_hashCode);
+        if (cmp != 0)
+            return cmp;
+        cmp = IsKeyValueEncoded.CompareTo(other.IsKeyValueEncoded);
+        if (cmp != 0)
+            return cmp;
+        cmp = m_keyEncodingMethod.CompareTo(other.m_keyEncodingMethod);
+        if (cmp != 0)
+            return cmp;
+        cmp = m_valueEncodingMethod.CompareTo(other.m_valueEncodingMethod);
+        if (cmp != 0)
+            return cmp;
+        return m_keyValueEncodingMethod.CompareTo(other.m_keyValueEncodingMethod);
+    }
+
+    /// <summary>
+    /// Indicates whether the current object is equal to another object of the same type.
+    /// </summary>
+    /// <returns>
+    /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+    /// </returns>
+    /// <param name="other">An object to compare with this object.</param>
+    public bool Equals(EncodingDefinition other)
+    {
+        return (object)other is not null && m_hashCode == other.m_hashCode && IsKeyValueEncoded == other.IsKeyValueEncoded && m_keyEncodingMethod == other.m_keyEncodingMethod && m_valueEncodingMethod == other.m_valueEncodingMethod && m_keyValueEncodingMethod == other.m_keyValueEncodingMethod;
+    }
+
+    #endregion
+
+    #region [ Static ]
+
+    /// <summary>
+    /// Represents a FixedSize combined encoding method.
+    /// </summary>
+    public static readonly EncodingDefinition FixedSizeCombinedEncoding;
+
+    /// <summary>
+    /// Represents a FixedSize combined encoding method made up of two individual fixed size IDs.
+    /// Functionally implemented the same as <see cref="FixedSizeCombinedEncoding"/>
+    /// </summary>
+    public static readonly EncodingDefinition FixedSizeIndividualEncoding;
+
+    /// <summary>
+    /// The Guid associated with the individual encoding method of a FixedSize
+    /// </summary>
+    public static readonly Guid FixedSizeIndividualGuid;
 
     /// <summary>
     /// Checks for inequality between two encoding definitions.
@@ -324,27 +368,5 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
         return a.Equals(b);
     }
 
-    static EncodingDefinition()
-    {
-        FixedSizeIndividualGuid = new Guid(0x1dea326d, 0xa63a, 0x4f73, 0xb5, 0x1c, 0x7b, 0x31, 0x25, 0xc6, 0xda, 0x55);
-        FixedSizeCombinedEncoding = new EncodingDefinition(FixedSizeIndividualGuid);
-        FixedSizeIndividualEncoding = new EncodingDefinition(FixedSizeIndividualGuid, FixedSizeIndividualGuid);
-    }
-
-    /// <summary>
-    /// Represents a FixedSize combined encoding method.
-    /// </summary>
-    public static readonly EncodingDefinition FixedSizeCombinedEncoding;
-
-    /// <summary>
-    /// Represents a FixedSize combined encoding method made up of two individual fixed size IDs. 
-    /// Functionally implemented the same as <see cref="FixedSizeCombinedEncoding"/> 
-    /// </summary>
-    public static readonly EncodingDefinition FixedSizeIndividualEncoding;
-
-    /// <summary>
-    /// The Guid associated with the individual encoding method of a FixedSize
-    /// </summary>
-    public static readonly Guid FixedSizeIndividualGuid;
-
+    #endregion
 }

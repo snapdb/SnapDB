@@ -24,11 +24,11 @@
 //
 //******************************************************************************************************
 
+using System.Net;
+using System.Text;
 using Gemstone.Diagnostics;
 using SnapDB.Collections;
 using SnapDB.Snap.Services.Net;
-using System.Net;
-using System.Text;
 
 namespace SnapDB.Snap.Services;
 
@@ -37,20 +37,12 @@ namespace SnapDB.Snap.Services;
 /// </summary>
 /// <remarks>
 /// A centralized server hosting model for a SortedTreeStore.
-/// 
 /// This class contains all of the databases, client connections,
 /// sockets, user authentication, and core settings for the SortedTreeStore.
 /// </remarks>
-public partial class SnapServer
-    : DisposableLoggingClassBase
+public partial class SnapServer : DisposableLoggingClassBase
 {
-    private bool m_disposed;
-    private readonly object m_syncRoot = new();
-
-    /// <summary>
-    /// Contains a list of databases that are UPPER case names.
-    /// </summary>
-    private readonly Dictionary<string, SnapServerDatabaseBase> m_databases;
+    #region [ Members ]
 
     /// <summary>
     /// Contains a list of all clients such that a strong reference will not be maintained.
@@ -58,15 +50,26 @@ public partial class SnapServer
     private readonly WeakList<Client> m_clients;
 
     /// <summary>
+    /// Contains a list of databases that are UPPER case names.
+    /// </summary>
+    private readonly Dictionary<string, SnapServerDatabaseBase> m_databases;
+
+    /// <summary>
     /// All of the socket listener per IPEndPoint.
     /// </summary>
     private readonly Dictionary<IPEndPoint, SnapSocketListener> m_sockets;
 
+    private readonly object m_syncRoot = new();
+    private bool m_disposed;
+
+    #endregion
+
+    #region [ Constructors ]
+
     /// <summary>
     /// Creates an empty server instance
     /// </summary>
-    public SnapServer()
-        : base(MessageClass.Framework)
+    public SnapServer() : base(MessageClass.Framework)
     {
         m_sockets = new Dictionary<IPEndPoint, SnapSocketListener>();
         m_clients = new WeakList<Client>();
@@ -78,8 +81,7 @@ public partial class SnapServer
     /// <summary>
     /// Creates a new instance of <see cref="SnapServer"/> and adds the supplied database
     /// </summary>
-    public SnapServer(IToServerDatabaseSettings settings)
-        : this()
+    public SnapServer(IToServerDatabaseSettings settings) : this()
     {
         AddDatabase(settings);
     }
@@ -87,8 +89,7 @@ public partial class SnapServer
     /// <summary>
     /// Creates a new instance of <see cref="SnapServer"/>
     /// </summary>
-    public SnapServer(IToServerSettings settings)
-        : this()
+    public SnapServer(IToServerSettings settings) : this()
     {
         if (settings is null)
             throw new ArgumentNullException(nameof(settings));
@@ -106,6 +107,10 @@ public partial class SnapServer
         foreach (SnapSocketListenerSettings list in settings2.Listeners)
             AddSocketListener(list);
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     public void AddDatabase(IToServerDatabaseSettings databaseConfig)
     {
@@ -221,90 +226,6 @@ public partial class SnapServer
     }
 
     /// <summary>
-    /// Gets the database that matches <see cref="databaseName"/>
-    /// </summary>
-    /// <param name="databaseName">the case insensitive name of the database</param>
-    /// <returns></returns>
-    private SnapServerDatabaseBase GetDatabase(string databaseName)
-    {
-        lock (m_syncRoot)
-            return m_databases[databaseName.ToUpper()];
-    }
-
-    /// <summary>
-    /// Determines if <see cref="databaseName"/> is contained in the database.
-    /// </summary>
-    /// <param name="databaseName">Name of database instance to access.</param>
-    /// <returns></returns>
-    private bool Contains(string databaseName)
-    {
-        lock (m_syncRoot)
-            return m_databases.ContainsKey(databaseName.ToUpper());
-    }
-
-    /// <summary>
-    /// Gets basic information for every database connected to the server.
-    /// </summary>
-    /// <returns></returns>
-    private List<DatabaseInfo> GetDatabaseInfo()
-    {
-        lock (m_syncRoot)
-            return m_databases.Values.Select(database => database.Info).ToList();
-    }
-
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="SnapServer"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (m_disposed)
-            return;
-
-        try
-        {
-            if (!disposing)
-                return;
-
-            foreach (SnapSocketListener socket in m_sockets.Values)
-                socket.Dispose();
-
-            m_sockets.Clear();
-
-            foreach (SnapServerDatabaseBase db in m_databases.Values)
-                db.Dispose();
-
-            m_databases.Clear();
-        }
-        finally
-        {
-            m_disposed = true;       // Prevent duplicate dispose.
-            base.Dispose(disposing); // Call base class Dispose().
-        }
-    }
-
-    /// <summary>
-    /// Registers a client with the server host.
-    /// </summary>
-    /// <param name="client"></param>
-    private void RegisterClient(Client client)
-    {
-        lock (m_syncRoot)
-        {
-            m_clients.Add(client);
-        }
-    }
-
-    /// <summary>
-    /// UnRegisters a client with the server host. 
-    /// </summary>
-    private void UnRegisterClient(Client client)
-    {
-        lock (m_syncRoot)
-            m_clients.Remove(client);
-    }
-
-    /// <summary>
     /// Gets the status of the server.
     /// </summary>
     /// <param name="status">Target status output <see cref="StringBuilder"/>.</param>
@@ -349,4 +270,98 @@ public partial class SnapServer
             }
         }
     }
+
+    /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="SnapServer"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (m_disposed)
+            return;
+
+        try
+        {
+            if (!disposing)
+                return;
+
+            foreach (SnapSocketListener socket in m_sockets.Values)
+                socket.Dispose();
+
+            m_sockets.Clear();
+
+            foreach (SnapServerDatabaseBase db in m_databases.Values)
+                db.Dispose();
+
+            m_databases.Clear();
+        }
+        finally
+        {
+            m_disposed = true; // Prevent duplicate dispose.
+            base.Dispose(disposing); // Call base class Dispose().
+        }
+    }
+
+    /// <summary>
+    /// Gets the database that matches <see cref="databaseName"/>
+    /// </summary>
+    /// <param name="databaseName">the case insensitive name of the database</param>
+    /// <returns></returns>
+    private SnapServerDatabaseBase GetDatabase(string databaseName)
+    {
+        lock (m_syncRoot)
+        {
+            return m_databases[databaseName.ToUpper()];
+        }
+    }
+
+    /// <summary>
+    /// Determines if <see cref="databaseName"/> is contained in the database.
+    /// </summary>
+    /// <param name="databaseName">Name of database instance to access.</param>
+    /// <returns></returns>
+    private bool Contains(string databaseName)
+    {
+        lock (m_syncRoot)
+        {
+            return m_databases.ContainsKey(databaseName.ToUpper());
+        }
+    }
+
+    /// <summary>
+    /// Gets basic information for every database connected to the server.
+    /// </summary>
+    /// <returns></returns>
+    private List<DatabaseInfo> GetDatabaseInfo()
+    {
+        lock (m_syncRoot)
+        {
+            return m_databases.Values.Select(database => database.Info).ToList();
+        }
+    }
+
+    /// <summary>
+    /// Registers a client with the server host.
+    /// </summary>
+    /// <param name="client"></param>
+    private void RegisterClient(Client client)
+    {
+        lock (m_syncRoot)
+        {
+            m_clients.Add(client);
+        }
+    }
+
+    /// <summary>
+    /// UnRegisters a client with the server host.
+    /// </summary>
+    private void UnRegisterClient(Client client)
+    {
+        lock (m_syncRoot)
+        {
+            m_clients.Remove(client);
+        }
+    }
+
+    #endregion
 }

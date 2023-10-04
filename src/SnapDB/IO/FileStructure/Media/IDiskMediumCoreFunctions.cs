@@ -31,27 +31,29 @@ namespace SnapDB.IO.FileStructure.Media;
 /// <summary>
 /// The interface that is required construct a <see cref="DiskMedium"/> class.
 /// </summary>
-internal interface IDiskMediumCoreFunctions
-    : IDisposable
+internal interface IDiskMediumCoreFunctions : IDisposable
 {
-    /// <summary>
-    /// Creates a <see cref="BinaryStreamIoSessionBase"/> that can be used to read from this disk medium.
-    /// </summary>
-    BinaryStreamIoSessionBase CreateIoSession();
+    #region [ Properties ]
 
     /// <summary>
-    /// Gets the current number of bytes used by the file system. 
-    /// This is only intended to be an approximate figure. 
+    /// Gets the current number of bytes used by the file system.
+    /// This is only intended to be an approximate figure.
     /// </summary>
-    long Length
-    {
-        get;
-    }
+    long Length { get; }
 
     /// <summary>
     /// Gets the file name associated with the medium. Returns an empty string if a memory file.
     /// </summary>
     string FileName { get; }
+
+    #endregion
+
+    #region [ Methods ]
+
+    /// <summary>
+    /// Creates a <see cref="BinaryStreamIoSessionBase"/> that can be used to read from this disk medium.
+    /// </summary>
+    BinaryStreamIoSessionBase CreateIoSession();
 
     /// <summary>
     /// Executes a commit of data. This will flush the data to the disk use the provided header data to properly
@@ -79,4 +81,5 @@ internal interface IDiskMediumCoreFunctions
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     void ChangeShareMode(bool isReadOnly, bool isSharingEnabled);
 
+    #endregion
 }

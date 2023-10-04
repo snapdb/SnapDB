@@ -34,13 +34,19 @@ namespace SnapDB.Security.Authentication;
 /// Provides simple password based authentication that uses Secure Remote Password.
 /// </summary>
 /// <remarks>
-/// It is safe to store the user's credential on the server. This is a zero knowledge 
+/// It is safe to store the user's credential on the server. This is a zero knowledge
 /// password proof, meaning if this database is compromised, a brute force attack
 /// is the only way to reveal the password.
 /// </remarks>
 public class CertificateUserCredentials
 {
+    #region [ Members ]
+
     private readonly Dictionary<string, CertificateUserCredential> m_users = new();
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Looks up the username from the database.
@@ -66,7 +72,9 @@ public class CertificateUserCredentials
             return false;
 
         lock (m_users)
+        {
             return m_users.ContainsKey(i.User?.Value ?? string.Empty);
+        }
     }
 
     /// <summary>
@@ -82,4 +90,6 @@ public class CertificateUserCredentials
             m_users.Add(user.UserId, user);
         }
     }
+
+    #endregion
 }

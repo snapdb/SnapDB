@@ -30,16 +30,21 @@ namespace SnapDB.Immutables;
 
 /// <summary>
 /// A list that can be modified until <see cref="ImmutableObjectBase{T}.IsReadOnly"/> is set to <c>true</c>. Once this occurs,
-/// the list itself can no longer be modified.  Remember, this does not cause objects contained in this class to be Immutable 
+/// the list itself can no longer be modified.  Remember, this does not cause objects contained in this class to be Immutable
 /// unless they implement <see cref="IImmutableObject"/>.
 /// </summary>
 /// <typeparam name="T">List type.</typeparam>
-public class ImmutableList<T>
-    : ImmutableObjectBase<ImmutableList<T?>>, IList<T?>
+public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?>
 {
+    #region [ Members ]
+
+    private readonly Func<T?, T>? m_formatter;
     private readonly bool m_isISupportsReadonlyType;
     private List<T?> m_list;
-    private readonly Func<T?, T>? m_formatter;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new <see cref="ImmutableList{TKey}"/>.
@@ -62,37 +67,44 @@ public class ImmutableList<T>
         m_list = new List<T?>(capacity);
     }
 
-    /// <summary>Returns an enumerator that iterates through the collection.</summary>
-    /// <returns>A <see cref="T:System.Collections.Generic.IEnumerator`1" /> that can be used to iterate through the collection.</returns>
-    /// <filterpriority>1</filterpriority>
-    public IEnumerator<T> GetEnumerator()
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// Gets the number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+    /// </summary>
+    /// <returns>The number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</returns>
+    public int Count => m_list.Count;
+
+    /// <summary>
+    /// Gets or sets the element at the specified index.
+    /// </summary>
+    /// <returns>The element at the specified index.</returns>
+    /// <param name="index">The zero-based index of the element to get or set.</param>
+    public T? this[int index]
     {
-        return m_list.GetEnumerator();
+        get => m_list[index];
+        set
+        {
+            TestForEditable();
+
+            if (m_formatter is null)
+                m_list[index] = value;
+            else
+                m_list[index] = m_formatter(value);
+        }
     }
 
-    /// <summary>Returns an enumerator that iterates through a collection.</summary>
-    /// <returns>An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.</returns>
-    /// <filterpriority>2</filterpriority>
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return ((IEnumerable)m_list).GetEnumerator();
-    }
+    #endregion
 
-    /// <summary>Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1" />.</summary>
-    /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
-    /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
-    public void Add(T? item)
-    {
-        TestForEditable();
-
-        m_list.Add(m_formatter is null ? item : m_formatter(item));
-    }
+    #region [ Methods ]
 
     /// <summary>
     /// Adds the elements of the specified collection to the end of the <see cref="T:System.Collections.Generic.List`1"/>.
     /// </summary>
     /// <param name="collection">
-    /// The collection whose elements should be added to the end of the <see cref="T:System.Collections.Generic.List`1"/>. 
+    /// The collection whose elements should be added to the end of the <see cref="T:System.Collections.Generic.List`1"/>.
     /// The collection itself cannot be <c>null</c>, but it can contain elements that are <c>null</c>.
     /// </param>
     public void AddRange(IEnumerable<T?> collection)
@@ -101,7 +113,7 @@ public class ImmutableList<T>
 
         if (m_formatter is not null)
         {
-            foreach (T? item in collection) 
+            foreach (T? item in collection)
                 m_list.Add(m_formatter(item));
 
             return;
@@ -111,69 +123,18 @@ public class ImmutableList<T>
     }
 
     /// <summary>
-    /// Removes all items from the collection.
-    /// </summary>
-    public void Clear()
-    {
-        TestForEditable();
-        m_list.Clear();
-    }
-
-    /// <summary>
-    /// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1" /> contains a specific value.
-    /// </summary>
-    /// <returns><c>true</c> if <paramref name="item" /> is found in the <see cref="T:System.Collections.Generic.ICollection`1" />; otherwise, <c>false</c>.</returns>
-    /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
-    public bool Contains(T? item)
-    {
-        return m_list.Contains(item);
-    }
-
-    /// <summary>
-    /// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
-    /// </summary>
-    /// <param name="array">
-    /// The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1" />. 
-    /// The <see cref="T:System.Array" /> must have zero-based indexing.
-    /// </param>
-    /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
-    public void CopyTo(T?[] array, int arrayIndex)
-    {
-        m_list.CopyTo(array, arrayIndex);
-    }
-
-    /// <summary>
-    /// Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.ICollection`1" />.
-    /// </summary>
-    /// <returns><c>true</c> if <paramref name="item" /> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1" />; 
-    /// otherwise, <c>false</c>. This method also returns false if <paramref name="item" /> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1" />.
-    /// </returns>
-    /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
-    public bool Remove(T? item)
-    {
-        TestForEditable();
-        return m_list.Remove(item);
-    }
-
-    /// <summary>
-    /// Gets the number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1" />.
-    /// </summary>
-    /// <returns>The number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1" />.</returns>
-    public int Count => m_list.Count;
-
-    /// <summary>
-    /// Requests that member fields be set to "read-only". 
+    /// Requests that member fields be set to "read-only".
     /// </summary>
     protected override void SetMembersAsReadOnly()
     {
         if (!m_isISupportsReadonlyType)
             return;
-        
+
         for (int x = 0; x < m_list.Count; x++)
         {
             IImmutableObject? item = (IImmutableObject?)m_list[x];
 
-            if (item is not null) 
+            if (item is not null)
                 item.IsReadOnly = true;
         }
     }
@@ -204,21 +165,93 @@ public class ImmutableList<T>
         }
     }
 
+    /// <summary>Returns an enumerator that iterates through the collection.</summary>
+    /// <returns>A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.</returns>
+    /// <filterpriority>1</filterpriority>
+    public IEnumerator<T> GetEnumerator()
+    {
+        return m_list.GetEnumerator();
+    }
+
+    /// <summary>Returns an enumerator that iterates through a collection.</summary>
+    /// <returns>An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.</returns>
+    /// <filterpriority>2</filterpriority>
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return ((IEnumerable)m_list).GetEnumerator();
+    }
+
+    /// <summary>Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</summary>
+    /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+    /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.</exception>
+    public void Add(T? item)
+    {
+        TestForEditable();
+
+        m_list.Add(m_formatter is null ? item : m_formatter(item));
+    }
+
     /// <summary>
-    /// Determines the index of a specific item in the <see cref="T:System.Collections.Generic.IList`1" />.
+    /// Removes all items from the collection.
     /// </summary>
-    /// <returns>The index of <paramref name="item" /> if found in the list; otherwise, -1.</returns>
-    /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.IList`1" />.</param>
+    public void Clear()
+    {
+        TestForEditable();
+        m_list.Clear();
+    }
+
+    /// <summary>
+    /// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
+    /// </summary>
+    /// <returns><c>true</c> if <paramref name="item"/> is found in the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, <c>false</c>.</returns>
+    /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+    public bool Contains(T? item)
+    {
+        return m_list.Contains(item);
+    }
+
+    /// <summary>
+    /// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
+    /// </summary>
+    /// <param name="array">
+    /// The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1"/>.
+    /// The <see cref="T:System.Array"/> must have zero-based indexing.
+    /// </param>
+    /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+    public void CopyTo(T?[] array, int arrayIndex)
+    {
+        m_list.CopyTo(array, arrayIndex);
+    }
+
+    /// <summary>
+    /// Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+    /// </summary>
+    /// <returns>
+    /// <c>true</c> if <paramref name="item"/> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1"/>;
+    /// otherwise, <c>false</c>. This method also returns false if <paramref name="item"/> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1"/>.
+    /// </returns>
+    /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+    public bool Remove(T? item)
+    {
+        TestForEditable();
+        return m_list.Remove(item);
+    }
+
+    /// <summary>
+    /// Determines the index of a specific item in the <see cref="T:System.Collections.Generic.IList`1"/>.
+    /// </summary>
+    /// <returns>The index of <paramref name="item"/> if found in the list; otherwise, -1.</returns>
+    /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.IList`1"/>.</param>
     public int IndexOf(T? item)
     {
         return m_list.IndexOf(item);
     }
 
     /// <summary>
-    /// Inserts an item to the <see cref="T:System.Collections.Generic.IList`1" /> at the specified index.
+    /// Inserts an item to the <see cref="T:System.Collections.Generic.IList`1"/> at the specified index.
     /// </summary>
-    /// <param name="index">The zero-based index at which <paramref name="item" /> should be inserted.</param>
-    /// <param name="item">The object to insert into the <see cref="T:System.Collections.Generic.IList`1" />.</param>
+    /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+    /// <param name="item">The object to insert into the <see cref="T:System.Collections.Generic.IList`1"/>.</param>
     public void Insert(int index, T? item)
     {
         TestForEditable();
@@ -226,7 +259,7 @@ public class ImmutableList<T>
     }
 
     /// <summary>
-    /// Removes the <see cref="T:System.Collections.Generic.IList`1" /> item at the specified index.
+    /// Removes the <see cref="T:System.Collections.Generic.IList`1"/> item at the specified index.
     /// </summary>
     /// <param name="index">The zero-based index of the item to remove.</param>
     public void RemoveAt(int index)
@@ -235,22 +268,5 @@ public class ImmutableList<T>
         m_list.RemoveAt(index);
     }
 
-    /// <summary>
-    /// Gets or sets the element at the specified index.
-    /// </summary>
-    /// <returns>The element at the specified index.</returns>
-    /// <param name="index">The zero-based index of the element to get or set.</param>
-    public T? this[int index]
-    {
-        get => m_list[index];
-        set
-        {
-            TestForEditable();
-
-            if (m_formatter is null)
-                m_list[index] = value;
-            else
-                m_list[index] = m_formatter(value);
-        }
-    }
+    #endregion
 }

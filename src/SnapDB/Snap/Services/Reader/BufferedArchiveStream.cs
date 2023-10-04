@@ -29,19 +29,21 @@ using SnapDB.Snap.Tree;
 
 namespace SnapDB.Snap.Services.Reader;
 
-public class BufferedArchiveStream<TKey, TValue>
-    : IDisposable
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class BufferedArchiveStream<TKey, TValue> : IDisposable where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Members ]
+
+    public bool CacheIsValid;
+    public TKey CacheKey = new();
+    public TValue CacheValue = new();
     public SortedTreeScannerBase<TKey, TValue> Scanner;
-    private readonly ArchiveTableSummary<TKey, TValue> m_table;
     private SortedTreeTableReadSnapshot<TKey, TValue> m_snapshot;
 
-    /// <summary>
-    /// An index value that is used to disassociate the archive file. Passed to this class from the <see cref="SortedTreeEngineReaderSequential{TKey,TValue}"/>
-    /// </summary>
-    public int Index { get; private set; }
+    private readonly ArchiveTableSummary<TKey, TValue> m_table;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates the table reader.
@@ -56,9 +58,27 @@ public class BufferedArchiveStream<TKey, TValue>
         Scanner = m_snapshot.GetTreeScanner();
     }
 
-    public bool CacheIsValid;
-    public TKey CacheKey = new();
-    public TValue CacheValue = new();
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// An index value that is used to disassociate the archive file. Passed to this class from the <see cref="SortedTreeEngineReaderSequential{TKey,TValue}"/>
+    /// </summary>
+    public int Index { get; private set; }
+
+    #endregion
+
+    #region [ Methods ]
+
+    public void Dispose()
+    {
+        if (m_snapshot is not null)
+        {
+            m_snapshot.Dispose();
+            m_snapshot = null;
+        }
+    }
 
     public void UpdateCachedValue()
     {
@@ -77,12 +97,5 @@ public class BufferedArchiveStream<TKey, TValue>
         CacheIsValid = Scanner.Peek(CacheKey, CacheValue);
     }
 
-    public void Dispose()
-    {
-        if (m_snapshot is not null)
-        {
-            m_snapshot.Dispose();
-            m_snapshot = null;
-        }
-    }
+    #endregion
 }

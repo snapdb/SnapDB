@@ -20,9 +20,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using SnapDB.Security.Authentication;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
+using SnapDB.Security.Authentication;
 
 namespace Org.BouncyCastle.Crypto.Agreement.Srp;
 
@@ -33,16 +33,22 @@ namespace Org.BouncyCastle.Crypto.Agreement.Srp;
  */
 internal class Srp6Server
 {
-    private readonly SrpConstants m_param;
-    protected BigInteger V;
+    #region [ Members ]
 
     protected BigInteger A;
 
     protected BigInteger PrivB;
     protected BigInteger PubB;
+    protected BigInteger S;
 
     protected BigInteger U;
-    protected BigInteger S;
+    protected BigInteger V;
+
+    private readonly SrpConstants m_param;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /**
     * Initialises the server to accept a new client authentication attempt
@@ -54,13 +60,17 @@ internal class Srp6Server
     */
     public Srp6Server(SrpConstants param, BigInteger v)
     {
-        this.m_param = param;
-        this.V = v;
+        m_param = param;
+        V = v;
 
-#pragma warning disable CS0436 // Type conflicts with imported type
-        this.PrivB = Srp6Utilities.GeneratePrivateValue(param.N, new SecureRandom());
-#pragma warning restore CS0436 // Type conflicts with imported type
+    #pragma warning disable CS0436 // Type conflicts with imported type
+        PrivB = Srp6Utilities.GeneratePrivateValue(param.N, new SecureRandom());
+    #pragma warning restore CS0436 // Type conflicts with imported type
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /**
      * Generates the server's credentials that are to be sent to the client.
@@ -68,7 +78,7 @@ internal class Srp6Server
      */
     public virtual BigInteger GenerateServerCredentials()
     {
-        this.PubB = m_param.K.Multiply(V).Mod(m_param.N).Add(m_param.G.ModPow(PrivB, m_param.N)).Mod(m_param.N);
+        PubB = m_param.K.Multiply(V).Mod(m_param.N).Add(m_param.G.ModPow(PrivB, m_param.N)).Mod(m_param.N);
         return PubB;
     }
 
@@ -80,10 +90,11 @@ internal class Srp6Server
      */
     public virtual BigInteger CalculateSecret(IDigest digest, BigInteger clientA)
     {
-        this.A = Srp6Utilities.ValidatePublicValue(m_param.N, clientA);
-        this.U = Srp6Utilities.CalculateU(digest, m_param.N, A, PubB);
-        this.S = V.ModPow(U, m_param.N).Multiply(A).Mod(m_param.N).ModPow(PrivB, m_param.N);
+        A = Srp6Utilities.ValidatePublicValue(m_param.N, clientA);
+        U = Srp6Utilities.CalculateU(digest, m_param.N, A, PubB);
+        S = V.ModPow(U, m_param.N).Multiply(A).Mod(m_param.N).ModPow(PrivB, m_param.N);
         return S;
     }
 
+    #endregion
 }

@@ -36,38 +36,22 @@ using SnapDB.Threading;
 namespace SnapDB.Snap.Services.Writer;
 
 /// <summary>
-/// Where uncommitted data is collected before it is 
+/// Where uncommitted data is collected before it is
 /// inserted into an archive file in a bulk operation.
 /// </summary>
 /// <remarks>
 /// This class is thread safe
 /// </remarks>
-public class PrebufferWriter<TKey, TValue>
-    : DisposableLoggingClassBase
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class PrebufferWriter<TKey, TValue> : DisposableLoggingClassBase where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
-    /// <summary>
-    /// Specifies that this class has been disposed.
-    /// </summary>
-    private bool m_disposed;
+    #region [ Members ]
+
+    private SortedPointBuffer<TKey, TValue> m_activeQueue;
+
     /// <summary>
     /// Gets if the rollover thread is currently working.
     /// </summary>
     private bool m_currentlyRollingOverFullQueue;
-    /// <summary>
-    /// Specifies that the prebuffer has been requested to stop processing data. 
-    /// This occurs when gracefully shutting down the Engine, 
-    /// allowing for all points to be rolled over and written to the underlying disk.
-    /// </summary>
-    private bool m_stopped;
-
-    private readonly PrebufferWriterSettings m_settings;
-
-    /// <summary>
-    /// The point sequence number assigned to points when they are added to the prebuffer.
-    /// </summary>
-    private readonly AtomicInt64 m_latestTransactionId = new();
 
     /// <summary>
     /// The Transaction Id that is currently being processed by the rollover thread.
@@ -75,21 +59,44 @@ public class PrebufferWriter<TKey, TValue>
     /// </summary>
     private AtomicInt64 m_currentTransactionIdRollingOver = new();
 
-    private readonly object m_syncRoot;
+    /// <summary>
+    /// The point sequence number assigned to points when they are added to the prebuffer.
+    /// </summary>
+    private readonly AtomicInt64 m_latestTransactionId = new();
+
     private readonly Action<PrebufferRolloverArgs<TKey, TValue>> m_onRollover;
-    private readonly SafeManualResetEvent m_waitForEmptyActiveQueue;
-    private readonly ScheduledTask m_rolloverTask;
-    private SortedPointBuffer<TKey, TValue> m_processingQueue;
-    private SortedPointBuffer<TKey, TValue> m_activeQueue;
     private readonly LogEventPublisher m_performanceLog;
+
+    private SortedPointBuffer<TKey, TValue> m_processingQueue;
+    private readonly ScheduledTask m_rolloverTask;
+
+    private readonly PrebufferWriterSettings m_settings;
+
+    /// <summary>
+    /// Specifies that the prebuffer has been requested to stop processing data.
+    /// This occurs when gracefully shutting down the Engine,
+    /// allowing for all points to be rolled over and written to the underlying disk.
+    /// </summary>
+    private bool m_stopped;
+
+    private readonly object m_syncRoot;
+    private readonly SafeManualResetEvent m_waitForEmptyActiveQueue;
+
+    /// <summary>
+    /// Specifies that this class has been disposed.
+    /// </summary>
+    private bool m_disposed;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a prestage writer.
     /// </summary>
     /// <param name="settings">The settings to use for this prebuffer writer</param>
     /// <param name="onRollover">delegate to call when a file is done with this stage.</param>
-    public PrebufferWriter(PrebufferWriterSettings settings, Action<PrebufferRolloverArgs<TKey, TValue>> onRollover)
-        : base(MessageClass.Framework)
+    public PrebufferWriter(PrebufferWriterSettings settings, Action<PrebufferRolloverArgs<TKey, TValue>> onRollover) : base(MessageClass.Framework)
     {
         if (settings is null)
             throw new ArgumentNullException(nameof(settings));
@@ -114,12 +121,19 @@ public class PrebufferWriter<TKey, TValue>
         //m_rolloverTask.UnhandledException += OnProcessException;
     }
 
+    #endregion
+
+    #region [ Properties ]
+
     /// <summary>
-    /// Gets the latest transaction id which is a sequential counter 
+    /// Gets the latest transaction id which is a sequential counter
     /// based on the number of insert operations that have occured.
     /// </summary>
     public long LatestTransactionId => m_latestTransactionId;
 
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Triggers a rollover if the provided transaction id has not yet been triggered.
@@ -137,16 +151,13 @@ public class PrebufferWriter<TKey, TValue>
                     Log.Publish(MessageLevel.Warning, "Disposed Object", "A call to Commit() occured after this class disposed");
                     return;
                 }
-                else
-                {
-                    Log.Publish(MessageLevel.Warning, "Writer Stopped", "A call to Commit() occured after this class was stopped");
-                    return;
-                }
+
+                Log.Publish(MessageLevel.Warning, "Writer Stopped", "A call to Commit() occured after this class was stopped");
+                return;
             }
+
             if (transactionId > m_currentTransactionIdRollingOver)
-            {
                 m_rolloverTask.Start();
-            }
         }
     }
 
@@ -168,6 +179,7 @@ public class PrebufferWriter<TKey, TValue>
                 Log.Publish(MessageLevel.Warning, "Disposed Object", "A call to Write(TKey,TValue) occured after this class disposed");
                 return m_latestTransactionId;
             }
+
             if (m_stopped)
             {
                 Log.Publish(MessageLevel.Warning, "Writer Stopped", "A call to Write(TKey,TValue) occured after this class was stopped");
@@ -177,16 +189,13 @@ public class PrebufferWriter<TKey, TValue>
             if (m_activeQueue.TryEnqueue(key, value))
             {
                 if (m_activeQueue.Count == 1)
-                {
                     m_rolloverTask.Start(m_settings.RolloverInterval);
-                }
                 if (m_activeQueue.Count == m_settings.RolloverPointCount)
-                {
                     m_rolloverTask.Start();
-                }
                 m_latestTransactionId.Value++;
                 return m_latestTransactionId;
             }
+
             currentlyWorking = m_currentlyRollingOverFullQueue;
             m_rolloverTask.Start();
             m_waitForEmptyActiveQueue.Reset();
@@ -197,6 +206,60 @@ public class PrebufferWriter<TKey, TValue>
 
         m_waitForEmptyActiveQueue.WaitOne();
         goto TryAgain;
+    }
+
+    /// <summary>
+    /// Stop all writing to this class.
+    /// Once stopped, it cannot be resumed.
+    /// All data is then immediately flushed to the output.
+    /// This method calls Dispose()
+    /// </summary>
+    /// <returns>the transaction number of the last point that written</returns>
+    public long Stop()
+    {
+        Log.Publish(MessageLevel.Info, "Stop() called", "Write is stopping");
+
+        lock (m_syncRoot)
+        {
+            m_stopped = true;
+        }
+
+        m_rolloverTask.Dispose(); //This method block until the worker runs one last time
+        Dispose();
+        return m_latestTransactionId;
+    }
+
+    /// <summary>
+    /// Disposes the underlying queues contained in this class.
+    /// This method is not thread safe.
+    /// It is assumed this will be called after <see cref="Stop"/>.
+    /// </summary>
+    protected override void Dispose(bool disposing)
+    {
+        if (!m_disposed && disposing)
+        {
+            lock (m_syncRoot)
+            {
+                if (m_disposed) //Prevents concurrent calls.
+                    return;
+                m_stopped = true;
+                m_disposed = true;
+            }
+
+            try
+            {
+                m_rolloverTask.Dispose();
+                m_waitForEmptyActiveQueue.Dispose();
+                m_processingQueue.Dispose();
+                m_activeQueue.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Log.Publish(MessageLevel.Info, MessageFlags.BugReport, "Unhandled exception in the dispose process", null, null, ex);
+            }
+        }
+
+        base.Dispose(disposing);
     }
 
     /// <summary>
@@ -253,60 +316,11 @@ public class PrebufferWriter<TKey, TValue>
         {
             Log.Publish(MessageLevel.Critical, "Rollover process unhandled exception", "The rollover process threw an unhandled exception. There is likely data loss that will result from this exception", null, ex);
         }
+
         m_currentlyRollingOverFullQueue = false;
-
     }
 
-    /// <summary>
-    /// Stop all writing to this class.
-    /// Once stopped, it cannot be resumed.
-    /// All data is then immediately flushed to the output.
-    /// This method calls Dispose()
-    /// </summary>
-    /// <returns>the transaction number of the last point that written</returns>
-    public long Stop()
-    {
-        Log.Publish(MessageLevel.Info, "Stop() called", "Write is stopping");
-
-        lock (m_syncRoot)
-        {
-            m_stopped = true;
-        }
-        m_rolloverTask.Dispose(); //This method block until the worker runs one last time
-        Dispose();
-        return m_latestTransactionId;
-    }
-
-    /// <summary>
-    /// Disposes the underlying queues contained in this class. 
-    /// This method is not thread safe.
-    /// It is assumed this will be called after <see cref="Stop"/>.
-    /// </summary>
-    protected override void Dispose(bool disposing)
-    {
-        if (!m_disposed && disposing)
-        {
-            lock (m_syncRoot)
-            {
-                if (m_disposed) //Prevents concurrent calls.
-                    return;
-                m_stopped = true;
-                m_disposed = true;
-            }
-            try
-            {
-                m_rolloverTask.Dispose();
-                m_waitForEmptyActiveQueue.Dispose();
-                m_processingQueue.Dispose();
-                m_activeQueue.Dispose();
-            }
-            catch (Exception ex)
-            {
-                Log.Publish(MessageLevel.Info, MessageFlags.BugReport, "Unhandled exception in the dispose process", null, null, ex);
-            }
-        }
-        base.Dispose(disposing);
-    }
+    #endregion
 
     // TODO: JRC - think about custom exception handling messages with SafeInvoke for missing UnhandledException above
     //private void OnProcessException(object sender, EventArgs<Exception> e)

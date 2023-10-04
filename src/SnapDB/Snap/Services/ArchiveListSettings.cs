@@ -24,22 +24,27 @@
 //
 //******************************************************************************************************
 
-using Gemstone.IO.StreamExtensions;
-using SnapDB.IO;
 using System.Data;
 using System.Globalization;
+using Gemstone.IO.StreamExtensions;
 using SnapDB.Immutables;
+using SnapDB.IO;
 
 namespace SnapDB.Snap.Services;
 
 /// <summary>
 /// Settings for <see cref="ArchiveList{TKey,TValue}"/>.
 /// </summary>
-public class ArchiveListSettings
-    : SettingsBase<ArchiveListSettings>
+public class ArchiveListSettings : SettingsBase<ArchiveListSettings>
 {
-    private readonly ImmutableList<string> m_importPaths;
+    #region [ Members ]
+
     private readonly ImmutableList<string> m_importExtensions;
+    private readonly ImmutableList<string> m_importPaths;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new instance of <see cref="ArchiveListSettings"/>.
@@ -56,6 +61,10 @@ public class ArchiveListSettings
         LogSettings = new ArchiveListLogSettings();
     }
 
+    #endregion
+
+    #region [ Properties ]
+
     /// <summary>
     /// The log settings to use for logging deletions.
     /// </summary>
@@ -64,7 +73,7 @@ public class ArchiveListSettings
     /// <summary>
     /// A set of all import paths to load upon initialization.
     /// Be sure to include all paths that existed last time the service
-    /// restarted since the ArchiveListLog processes immediately upon 
+    /// restarted since the ArchiveListLog processes immediately upon
     /// construction.
     /// </summary>
     public IEnumerable<string> ImportPaths => m_importPaths;
@@ -73,6 +82,10 @@ public class ArchiveListSettings
     /// A set of all file extensions that will need to be loaded from each path.
     /// </summary>
     public IEnumerable<string> ImportExtensions => m_importExtensions;
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Adds the supplied path to the list.
@@ -108,7 +121,7 @@ public class ArchiveListSettings
         TestForEditable();
         extension = PathHelpers.FormatExtension(extension);
 
-            m_importExtensions.Add(extension);
+        m_importExtensions.Add(extension);
     }
 
     public override void Save(Stream stream)
@@ -159,7 +172,6 @@ public class ArchiveListSettings
 
             default:
                 throw new VersionNotFoundException("Unknown Version Code: " + version);
-
         }
     }
 
@@ -170,4 +182,6 @@ public class ArchiveListSettings
 
         LogSettings.Validate();
     }
+
+    #endregion
 }

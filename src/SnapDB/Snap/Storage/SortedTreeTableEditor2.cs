@@ -23,6 +23,7 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
+
 using SnapDB.Snap.Tree;
 
 namespace SnapDB.Snap.Storage;
@@ -31,12 +32,15 @@ namespace SnapDB.Snap.Storage;
 /// A single instance editor that is used
 /// to modifiy an archive file.
 /// </summary>
-public abstract class SortedTreeTableEditor<TKey, TValue>
-    : IDisposable
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public abstract class SortedTreeTableEditor<TKey, TValue> : IDisposable where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Members ]
+
     private bool m_disposed;
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Releases all the resources used by the <see cref="SortedTreeTableEditor{TKey,TValue}"/> object.
@@ -94,11 +98,9 @@ public abstract class SortedTreeTableEditor<TKey, TValue>
     protected virtual void Dispose(bool disposing)
     {
         if (!m_disposed)
-        {
             try
             {
                 // This will be done regardless of whether the object is finalized or disposed.
-
                 if (disposing)
                 {
                     // This will be done only when the object is disposed by calling Dispose().
@@ -106,8 +108,9 @@ public abstract class SortedTreeTableEditor<TKey, TValue>
             }
             finally
             {
-                m_disposed = true;  // Prevent duplicate dispose.
+                m_disposed = true; // Prevent duplicate dispose.
             }
-        }
     }
+
+    #endregion
 }

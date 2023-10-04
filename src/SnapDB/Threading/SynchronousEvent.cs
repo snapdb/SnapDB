@@ -34,19 +34,22 @@ namespace SnapDB.Threading;
 /// </summary>
 /// <typeparam name="T"></typeparam>
 /// <remarks>
-/// This is useful when needing to process data on a certain thread. On instance is 
+/// This is useful when needing to process data on a certain thread. On instance is
 /// when preparing data that needs to then be processed on the UI thread. Just construct
 /// this class on the UI thread, then when any thread raises an event, this event will be
 /// queued on the UI thread.
 /// </remarks>
-public class SynchronousEvent<T>
-    : IDisposable
-    where T : EventArgs
+public class SynchronousEvent<T> : IDisposable where T : EventArgs
 {
-    private bool m_disposed;
-    private readonly ManualResetEvent m_waiting;
-    public event EventHandler<T> CustomEvent;
+    #region [ Members ]
+
     private readonly AsyncOperation m_asyncEventHelper;
+    private readonly ManualResetEvent m_waiting;
+    private bool m_disposed;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Initializes a new instance of the SynchronousEvent class.
@@ -57,6 +60,24 @@ public class SynchronousEvent<T>
         m_asyncEventHelper = AsyncOperationManager.CreateOperation(null);
     }
 
+    #endregion
+
+    #region [ Methods ]
+
+    /// <summary>
+    /// Prevents any future events from processing and
+    /// attempts to cancel a pending operation.
+    /// Function returns before any attempts to cancel are successful.
+    /// </summary>
+    public void Dispose()
+    {
+        m_disposed = true;
+        Thread.MemoryBarrier();
+        m_waiting.Set();
+    }
+
+    public event EventHandler<T> CustomEvent;
+
     /// <summary>
     /// Raises the custom event with the provided event arguments.
     /// </summary>
@@ -65,14 +86,14 @@ public class SynchronousEvent<T>
     {
         if (m_disposed)
             return;
-            
+
         if (CustomEvent is not null)
         {
             m_waiting.Reset();
             Thread.MemoryBarrier();
             if (m_disposed)
                 return;
-                
+
             m_asyncEventHelper.Post(Callback, args);
             m_waiting.WaitOne();
         }
@@ -92,15 +113,5 @@ public class SynchronousEvent<T>
         }
     }
 
-    /// <summary>
-    /// Prevents any future events from processing and
-    /// attempts to cancel a pending operation. 
-    /// Function returns before any attempts to cancel are successful.
-    /// </summary>
-    public void Dispose()
-    {
-        m_disposed = true;
-        Thread.MemoryBarrier();
-        m_waiting.Set();
-    }
+    #endregion
 }

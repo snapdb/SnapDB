@@ -34,10 +34,15 @@ namespace SnapDB.Text;
 /// <summary>
 /// Provides a natural sorting mechanism for strings, considering embedded numeric values within the strings.
 /// </summary>
-public class NaturalComparer
-    : Comparer<string>
+public class NaturalComparer : Comparer<string>
 {
+    #region [ Members ]
+
     private readonly Dictionary<string, string[]> m_table;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NaturalComparer"/> class.
@@ -47,14 +52,18 @@ public class NaturalComparer
         m_table = new Dictionary<string, string[]>();
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Compares two strings using natural sorting rules.
     /// </summary>
     /// <param name="x">The first string to compare.</param>
     /// <param name="y">The second string to compare.</param>
     /// <returns>
-    /// A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, 
-    /// as shown in the following table: 
+    /// A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>,
+    /// as shown in the following table:
     /// -1 if <paramref name="x"/> is less than <paramref name="y"/>,
     /// 0 if <paramref name="x"/> equals <paramref name="y"/>,
     /// 1 if <paramref name="x"/> is greater than <paramref name="y"/>.
@@ -68,15 +77,14 @@ public class NaturalComparer
         if (y is null)
             return 1;
         if (x == y)
-        {
             return 0;
-        }
 
         if (!m_table.TryGetValue(x, out string[] x1))
         {
             x1 = Regex.Split(x.Replace(" ", ""), "([0-9]+)");
             m_table.Add(x, x1);
         }
+
         if (!m_table.TryGetValue(y, out string[] y1))
         {
             y1 = Regex.Split(y.Replace(" ", ""), "([0-9]+)");
@@ -84,23 +92,20 @@ public class NaturalComparer
         }
 
         for (int i = 0; i < x1.Length && i < y1.Length; i++)
-        {
             if (x1[i] != y1[i])
-            {
                 return PartCompare(x1[i], y1[i]);
-            }
-        }
         if (y1.Length > x1.Length)
             return 1;
 
         if (x1.Length > y1.Length)
             return -1;
 
-        else
-        {
-            return 0;
-        }
+        return 0;
     }
+
+    #endregion
+
+    #region [ Static ]
 
     /// <summary>
     /// Compares two string parts, handling numeric values within the strings.
@@ -108,8 +113,8 @@ public class NaturalComparer
     /// <param name="left">The left string part to compare.</param>
     /// <param name="right">The right string part to compare.</param>
     /// <returns>
-    /// A signed integer that indicates the relative values of <paramref name="left"/> and <paramref name="right"/>, 
-    /// as shown in the following table: 
+    /// A signed integer that indicates the relative values of <paramref name="left"/> and <paramref name="right"/>,
+    /// as shown in the following table:
     /// -1 if <paramref name="left"/> is less than <paramref name="right"/>,
     /// 0 if <paramref name="left"/> equals <paramref name="right"/>,
     /// 1 if <paramref name="left"/> is greater than <paramref name="right"/>.
@@ -124,4 +129,6 @@ public class NaturalComparer
 
         return x.CompareTo(y);
     }
+
+    #endregion
 }

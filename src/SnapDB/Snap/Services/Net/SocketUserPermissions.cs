@@ -24,35 +24,42 @@
 //
 //******************************************************************************************************
 
+using System.Data;
 using Gemstone.IO.StreamExtensions;
 using SnapDB.Security.Authentication;
-using System.Data;
 
 namespace SnapDB.Snap.Services.Net;
 
 /// <summary>
 /// Permissions associated with an individual user.
 /// </summary>
-public struct SocketUserPermissions
-    : IUserToken
+public struct SocketUserPermissions : IUserToken
 {
-    /// <summary>
-    /// Gets if the user can perform write operations
-    /// </summary>
-    public bool CanWrite;
+    #region [ Members ]
+
     /// <summary>
     /// Gets if the user can perform read operations
     /// </summary>
     public bool CanRead;
+
+    /// <summary>
+    /// Gets if the user can perform write operations
+    /// </summary>
+    public bool CanWrite;
+
     /// <summary>
     /// Gets if the user can perform admin operations
     /// </summary>
     /// <remarks>
-    /// Admin operations would include 
+    /// Admin operations would include
     /// Detatching/Deleting/Moving
     /// archive file.
     /// </remarks>
     public bool IsAdmin;
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Saves the token to a stream
@@ -84,4 +91,6 @@ public struct SocketUserPermissions
                 throw new VersionNotFoundException("Could not interpret version");
         }
     }
+
+    #endregion
 }

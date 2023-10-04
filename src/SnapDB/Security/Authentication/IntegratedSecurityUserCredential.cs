@@ -30,16 +30,12 @@ using Gemstone.IO.StreamExtensions;
 
 namespace SnapDB.Security.Authentication;
 
-
 /// <summary>
 /// An individual server side user credential
 /// </summary>
 public class IntegratedSecurityUserCredential
 {
-    /// <summary>
-    /// The username that was passed to the constructor.
-    /// </summary>
-    public string Username;
+    #region [ Members ]
 
     /// <summary>
     /// The security identifier for the username
@@ -47,9 +43,18 @@ public class IntegratedSecurityUserCredential
     public string UserId;
 
     /// <summary>
+    /// The username that was passed to the constructor.
+    /// </summary>
+    public string Username;
+
+    /// <summary>
     /// The token associated with this user and their permissions.
     /// </summary>
     public Guid UserToken;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates user credentials
@@ -59,12 +64,12 @@ public class IntegratedSecurityUserCredential
     public IntegratedSecurityUserCredential(string username, Guid userToken)
     {
         Username = username;
-#if SQLCLR
+    #if SQLCLR
         SecurityIdentifier sid = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
         UserID = sid.ToString();
-#else
+    #else
         UserId = UserInfo.UserNameToSID(username);
-#endif
+    #endif
         UserToken = userToken;
     }
 
@@ -75,6 +80,10 @@ public class IntegratedSecurityUserCredential
     {
         Load(stream);
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Saves to the supplied stream.
@@ -104,10 +113,8 @@ public class IntegratedSecurityUserCredential
                 return;
             default:
                 throw new VersionNotFoundException("Unknown encoding method");
-
         }
     }
 
+    #endregion
 }
-
-

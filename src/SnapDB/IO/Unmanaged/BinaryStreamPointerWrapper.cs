@@ -29,9 +29,10 @@ namespace SnapDB.IO.Unmanaged;
 /// <summary>
 /// Creates a <see cref="BinaryStreamBase"/> that wraps a single pointer.
 /// </summary>
-public unsafe class BinaryStreamPointerWrapper
-    : BinaryStreamPointerBase
+public unsafe class BinaryStreamPointerWrapper : BinaryStreamPointerBase
 {
+    #region [ Constructors ]
+
     /// <summary>
     /// Creates a <see cref="BinaryStreamPointerWrapper"/>.
     /// </summary>
@@ -50,6 +51,10 @@ public unsafe class BinaryStreamPointerWrapper
         LastWrite = stream + length;
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Updates the local buffer data.
     /// </summary>
@@ -58,10 +63,12 @@ public unsafe class BinaryStreamPointerWrapper
     {
         if (Position >= LastPosition)
             throw new EndOfStreamException("Read past the end of the buffer.");
+
         if (Position < 0)
             throw new EndOfStreamException("Before the start of the buffer buffer.");
 
         // Do Nothing
     }
 
+    #endregion
 }

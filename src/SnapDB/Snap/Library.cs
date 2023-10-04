@@ -26,11 +26,11 @@
 
 using System.Reflection;
 using Gemstone.Diagnostics;
-using SnapDB.Snap.Tree;
+using SnapDB.Snap.Definitions;
 using SnapDB.Snap.Encoding;
 using SnapDB.Snap.Filters;
-using SnapDB.Snap.Definitions;
 using SnapDB.Snap.Streaming;
+using SnapDB.Snap.Tree;
 
 namespace SnapDB.Snap;
 
@@ -40,28 +40,7 @@ namespace SnapDB.Snap;
 /// </summary>
 public static class Library
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(Library), MessageClass.Framework);
-
-    /// <summary>
-    /// Gets all of the encoding data.
-    /// </summary>
-    public static readonly EncodingLibrary Encodings;
-    /// <summary>
-    /// Gets all of the filters.
-    /// </summary>
-    public static readonly FilterLibrary Filters;
-
-    private static readonly object s_syncRoot;
-    private static readonly Dictionary<Guid, Type> s_typeLookup;
-    private static readonly Dictionary<Type, Guid> s_registeredType;
-
-    /// <summary>
-    /// The assembly must reference one of these assembly names in order to be scanned for matching types.
-    /// </summary>
-    private static readonly HashSet<string> s_filterAssemblyNames;
-    private static readonly HashSet<Assembly> s_loadedAssemblies;
-
-    private static readonly Dictionary<Tuple<Type, Type>, object> s_keyValueMethodsList;
+    #region [ Constructors ]
 
     static Library()
     {
@@ -92,6 +71,35 @@ public static class Library
         }
     }
 
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(Library), MessageClass.Framework);
+
+    /// <summary>
+    /// Gets all of the encoding data.
+    /// </summary>
+    public static readonly EncodingLibrary Encodings;
+
+    /// <summary>
+    /// Gets all of the filters.
+    /// </summary>
+    public static readonly FilterLibrary Filters;
+
+    private static readonly object s_syncRoot;
+    private static readonly Dictionary<Guid, Type> s_typeLookup;
+    private static readonly Dictionary<Type, Guid> s_registeredType;
+
+    /// <summary>
+    /// The assembly must reference one of these assembly names in order to be scanned for matching types.
+    /// </summary>
+    private static readonly HashSet<string> s_filterAssemblyNames;
+
+    private static readonly HashSet<Assembly> s_loadedAssemblies;
+
+    private static readonly Dictionary<Tuple<Type, Type>, object> s_keyValueMethodsList;
+
     private static void CurrentDomainOnAssemblyLoad(object sender, AssemblyLoadEventArgs args)
     {
         lock (s_syncRoot)
@@ -102,7 +110,7 @@ public static class Library
     }
 
     /// <summary>
-    /// Will attempt to reload any type that 
+    /// Will attempt to reload any type that
     /// inherits from <see cref="SnapTypeBase"/> in
     /// any new assemblies.
     /// </summary>
@@ -119,7 +127,6 @@ public static class Library
         {
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (Assembly assembly in assemblies)
-            {
                 if (!s_loadedAssemblies.Contains(assembly))
                 {
                     s_loadedAssemblies.Add(assembly);
@@ -130,7 +137,6 @@ public static class Library
 
                         Module[] modules = assembly.GetModules(false);
                         foreach (Module module in modules)
-                        {
                             try
                             {
                                 Type[] types;
@@ -140,13 +146,11 @@ public static class Library
                                 }
                                 catch (ReflectionTypeLoadException ex)
                                 {
-                                    s_log.Publish(MessageLevel.Debug, "Reflection Load Error Occurred",
-                                        assembly.GetName().Name, ex.ToString() + Environment.NewLine +
-                                        string.Join(Environment.NewLine, ex.LoaderExceptions.Select(x => x.ToString())));
+                                    s_log.Publish(MessageLevel.Debug, "Reflection Load Error Occurred", assembly.GetName().Name, ex + Environment.NewLine + string.Join(Environment.NewLine, ex.LoaderExceptions.Select(x => x.ToString())));
                                     types = ex.Types;
                                 }
+
                                 foreach (Type assemblyType in types)
-                                {
                                     try
                                     {
                                         if ((object)assemblyType is not null && !assemblyType.IsAbstract && !assemblyType.ContainsGenericParameters)
@@ -182,9 +186,7 @@ public static class Library
                                                 KeyValueMethods obj = (KeyValueMethods)Activator.CreateInstance(assemblyType);
                                                 Tuple<Type, Type> ttypes = Tuple.Create(obj.KeyType, obj.ValueType);
                                                 if (!s_keyValueMethodsList.ContainsKey(ttypes))
-                                                {
                                                     s_keyValueMethodsList.Add(ttypes, obj);
-                                                }
                                             }
                                         }
                                     }
@@ -192,16 +194,13 @@ public static class Library
                                     {
                                         s_log.Publish(MessageLevel.Critical, "Static Constructor Error", null, null, ex);
                                     }
-                                }
                             }
                             catch (Exception ex)
                             {
                                 s_log.Publish(MessageLevel.Critical, "Static Constructor Error", null, null, ex);
                             }
-                        }
                     }
                 }
-            }
         }
         catch (Exception ex)
         {
@@ -232,18 +231,15 @@ public static class Library
     /// If an existing KeyValueMethods instance is found for the specified types, it is returned.
     /// Otherwise, a new KeyValueMethods instance is created and returned.
     /// </remarks>
-    public static KeyValueMethods<TKey, TValue> GetKeyValueMethods<TKey, TValue>()
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+    public static KeyValueMethods<TKey, TValue> GetKeyValueMethods<TKey, TValue>() where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         Tuple<Type, Type> t = Tuple.Create(typeof(TKey), typeof(TValue));
         lock (s_syncRoot)
         {
             if (s_keyValueMethodsList.TryGetValue(t, out object obj))
-            {
                 return (KeyValueMethods<TKey, TValue>)obj;
-            }
         }
+
         return new KeyValueMethods<TKey, TValue>();
     }
 
@@ -254,9 +250,7 @@ public static class Library
     /// <typeparam name="TValue">The type of values in the StreamEncodingBase instance.</typeparam>
     /// <param name="encodingMethod">The encoding method to use for data serialization.</param>
     /// <returns>A new StreamEncodingBase instance configured with the specified encoding method.</returns>
-    internal static StreamEncodingBase<TKey, TValue> CreateStreamEncoding<TKey, TValue>(EncodingDefinition encodingMethod)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+    internal static StreamEncodingBase<TKey, TValue> CreateStreamEncoding<TKey, TValue>(EncodingDefinition encodingMethod) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         return new StreamEncodingGeneric<TKey, TValue>(encodingMethod);
     }
@@ -270,9 +264,7 @@ public static class Library
     /// <param name="level">The level of the tree node in the tree hierarchy.</param>
     /// <returns>A new SortedTreeNodeBase instance configured with the specified encoding method and level.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the encodingMethod is null.</exception>
-    internal static SortedTreeNodeBase<TKey, TValue> CreateTreeNode<TKey, TValue>(EncodingDefinition encodingMethod, byte level)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+    internal static SortedTreeNodeBase<TKey, TValue> CreateTreeNode<TKey, TValue>(EncodingDefinition encodingMethod, byte level) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         if (encodingMethod is null)
             throw new ArgumentNullException(nameof(encodingMethod));
@@ -300,7 +292,7 @@ public static class Library
             if (s_registeredType.TryGetValue(type, out Guid existingId))
             {
                 if (existingId != id)
-                    throw new Exception("Existing type does not match Guid: " + type.FullName + " ID: " + id.ToString());
+                    throw new Exception("Existing type does not match Guid: " + type.FullName + " ID: " + id);
 
                 //Type is already registered.
                 return;
@@ -309,7 +301,7 @@ public static class Library
             if (s_typeLookup.TryGetValue(id, out Type existingType))
             {
                 if (existingType != type)
-                    throw new Exception("Existing type does not have a unique Guid. Type1:" + type.FullName + " Type2: " + existingType.FullName + " ID: " + id.ToString());
+                    throw new Exception("Existing type does not have a unique Guid. Type1:" + type.FullName + " Type2: " + existingType.FullName + " ID: " + id);
 
                 //Type is already registered.
                 return;
@@ -319,4 +311,6 @@ public static class Library
             s_typeLookup.Add(id, type);
         }
     }
+
+    #endregion
 }

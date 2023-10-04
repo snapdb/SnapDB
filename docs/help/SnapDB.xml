@@ -6,7 +6,7 @@
   <members>
     <member name="T:SnapDB.BitConvert">
       <summary>
-            Contains functions that convert from floating-points to unsigned 64-bit integers, 
+            Contains functions that convert from floating-points to unsigned 64-bit integers,
             and from unsigned 64-bit integers to floating-points.
             </summary>
     </member>
@@ -121,7 +121,7 @@
     </member>
     <member name="P:SnapDB.IsolatedQueue`1.Count">
       <summary>
-            The number of elements in the queue. 
+            The number of elements in the queue.
             </summary>
       <returns>
             Note: Due to the nature of simultaneous access. This is a representative number.
@@ -254,7 +254,7 @@
     </member>
     <member name="M:SnapDB.StepTimer.Time(System.Int32,System.Action{System.Diagnostics.Stopwatch})">
       <summary>
-            Measures the execution time of an action that takes a Stopwatch parameter 
+            Measures the execution time of an action that takes a Stopwatch parameter
             and returns the median execution time in microseconds.
             </summary>
       <param name="internalLoopCount">The number of internal loops used for timing.</param>
@@ -272,46 +272,9 @@
             </summary>
       <param name="loopCount">The number of times the code segment was executed (default is 1).</param>
     </member>
-    <member name="T:SnapDB.WinApi">
-      <summary>
-            Provides necessary Windows API functions.
-            </summary>
-    </member>
-    <member name="M:SnapDB.WinApi.FlushFileBuffers(Microsoft.Win32.SafeHandles.SafeFileHandle)">
-      <summary>
-            Flushes the buffers of a specified file and causes all buffered data to be written to a file.
-            </summary>
-      <param name="handle">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>handle</parameter>
-            <parameter>M:SnapDB.WinApi.FlushFileBuffers(Microsoft.Win32.SafeHandles.SafeFileHandle)</parameter>
-          </include>
-        </markup>
-      </param>
-      <remarks>
-            Since the flush of a file stream does not actually work, this finishes the flush to the disk file system.
-            Which still could cache the results, but this is about the best we can do for a flush right now.
-            </remarks>
-    </member>
-    <member name="M:SnapDB.WinApi.MoveMemory(System.Byte*,System.Byte*,System.Int32)">
-      <summary>
-            Copies data from one memory location to another. This function does a check
-            to see if the data bytes overlaps and guarantees that the bytes are copied in 
-            such a way to preserve the move.
-            </summary>
-      <param name="destination">A pointer to the destination.</param>
-      <param name="source">A pointer to the source.</param>
-      <param name="count">The number of bytes to move.</param>
-      <remarks>
-            By setting the SuppressUnmanagedCodeSecurityAttribute will decrease 
-            the pinvoke overhead by about 2x.
-            </remarks>
-    </member>
     <member name="T:SnapDB.Collections.BitArray">
       <summary>
-            Represents an array of bits much like the native .NET implementation, 
+            Represents an array of bits much like the native .NET implementation,
             however this focuses on providing a free space bit array.
             </summary>
     </member>
@@ -431,7 +394,7 @@
     <member name="M:SnapDB.Collections.BitArray.GetBitUnchecked(System.Int32)">
       <summary>
             Gets the status of the corresponding bit.
-            This method does not validate the bounds of the array, 
+            This method does not validate the bounds of the array,
             and will be Aggressively Inlined.
             </summary>
       <param name="index">Bit position to access.</param>
@@ -486,7 +449,7 @@
     </member>
     <member name="M:SnapDB.Collections.BitArray.TrySetBit(System.Int32)">
       <summary>
-            Sets the corresponding bit to <c>true</c>. 
+            Sets the corresponding bit to <c>true</c>.
             Returns <c>true</c> if the bit state was changed.
             </summary>
       <param name="index">Bit position to set.</param>
@@ -583,7 +546,7 @@
     </member>
     <member name="T:SnapDB.Collections.LargeArray`1">
       <summary>
-            Implementation that utilizes a jagged array structure and 
+            Implementation that utilizes a jagged array structure and
             array expansion optimization to improve performance.
             </summary>
       <typeparam name="T">Array type.</typeparam>
@@ -716,7 +679,7 @@
     </member>
     <member name="P:SnapDB.Collections.NullableLargeArray`1.Item(System.Int32)">
       <summary>
-            Gets the provided item from the array. 
+            Gets the provided item from the array.
             </summary>
       <param name="index">The index of the item.</param>
       <returns>The item at the specified index.</returns>
@@ -769,7 +732,7 @@
     </member>
     <member name="T:SnapDB.Collections.ResourceQueue`1">
       <summary>
-            Provides a specialized, thread-safe queue that acts as a quasi-buffer pool. 
+            Provides a specialized, thread-safe queue that acts as a quasi-buffer pool.
             </summary>
       <typeparam name="T">The type of resources managed by the queue (must be a reference type).</typeparam>
     </member>
@@ -950,7 +913,7 @@
     </member>
     <member name="T:SnapDB.Immutables.IImmutableObject">
       <summary>
-            Represents an object that can be configured as "read only" and thus made immutable.  
+            Represents an object that can be configured as "read only" and thus made immutable.
             </summary>
     </member>
     <member name="M:SnapDB.Immutables.IImmutableObject.CloneEditable">
@@ -976,7 +939,7 @@
     </member>
     <member name="T:SnapDB.Immutables.IImmutableObject`1">
       <summary>
-            Represents an object that can be configured as read only and thus made immutable.  
+            Represents an object that can be configured as read only and thus made immutable.
             The original contents of this class will not be editable once <see cref="P:SnapDB.Immutables.IImmutableObject.IsReadOnly" /> is set to <c>true</c>.
             In order to modify the contest of this object, a clone of the object must be created with <see cref="M:SnapDB.Immutables.IImmutableObject`1.CloneEditable" />.
             </summary>
@@ -1011,7 +974,7 @@
     <member name="T:SnapDB.Immutables.ImmutableList`1">
       <summary>
             A list that can be modified until <see cref="P:SnapDB.Immutables.ImmutableObjectBase`1.IsReadOnly" /> is set to <c>true</c>. Once this occurs,
-            the list itself can no longer be modified.  Remember, this does not cause objects contained in this class to be Immutable 
+            the list itself can no longer be modified.  Remember, this does not cause objects contained in this class to be Immutable
             unless they implement <see cref="T:SnapDB.Immutables.IImmutableObject" />.
             </summary>
       <typeparam name="T">List type.</typeparam>
@@ -1055,7 +1018,7 @@
             Adds the elements of the specified collection to the end of the <see cref="T:System.Collections.Generic.List`1" />.
             </summary>
       <param name="collection">
-            The collection whose elements should be added to the end of the <see cref="T:System.Collections.Generic.List`1" />. 
+            The collection whose elements should be added to the end of the <see cref="T:System.Collections.Generic.List`1" />.
             The collection itself cannot be <c>null</c>, but it can contain elements that are <c>null</c>.
             </param>
     </member>
@@ -1082,7 +1045,7 @@
             Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
             </summary>
       <param name="array">
-            The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1" />. 
+            The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1" />.
             The <see cref="T:System.Array" /> must have zero-based indexing.
             </param>
       <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
@@ -1124,7 +1087,7 @@
             </summary>
       <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
       <returns>
-        <c>true</c> if <paramref name="item" /> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1" />; 
+        <c>true</c> if <paramref name="item" /> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1" />;
             otherwise, <c>false</c>. This method also returns false if <paramref name="item" /> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1" />.
             </returns>
     </member>
@@ -1136,12 +1099,12 @@
     </member>
     <member name="M:SnapDB.Immutables.ImmutableList`1.SetMembersAsReadOnly">
       <summary>
-            Requests that member fields be set to "read-only". 
+            Requests that member fields be set to "read-only".
             </summary>
     </member>
     <member name="T:SnapDB.Immutables.ImmutableObjectAutoBase`1">
       <summary>
-            Represents an object that can be configured as read only and thus made immutable.  
+            Represents an object that can be configured as read only and thus made immutable.
             This class will automatically clone any field that implements <see cref="T:SnapDB.Immutables.IImmutableObject" /></summary>
       <typeparam name="T">Object type.</typeparam>
     </member>
@@ -1161,19 +1124,19 @@
     </member>
     <member name="M:SnapDB.Immutables.ImmutableObjectAutoBase`1.SetMembersAsReadOnly">
       <summary>
-            Requests that member fields be set to "read-only". 
+            Requests that member fields be set to "read-only".
             </summary>
     </member>
     <member name="T:SnapDB.Immutables.ImmutableObjectBase`1">
       <summary>
-            Represents an object that can be configured as read only and thus made immutable.  
+            Represents an object that can be configured as read only and thus made immutable.
             The original contents of this class will not be editable once <see cref="P:SnapDB.Immutables.ImmutableObjectBase`1.IsReadOnly" /> is set to true.
             In order to modify the contest of this object, a clone of the object must be created with <see cref="M:SnapDB.Immutables.ImmutableObjectBase`1.CloneEditable" />.
             </summary>
       <typeparam name="T">Object type.</typeparam>
       <remarks>
-            For a classes that implement this, all setters should call <see cref="M:SnapDB.Immutables.ImmutableObjectBase`1.TestForEditable" /> before 
-            setting the value. 
+            For a classes that implement this, all setters should call <see cref="M:SnapDB.Immutables.ImmutableObjectBase`1.TestForEditable" /> before
+            setting the value.
             </remarks>
     </member>
     <member name="M:SnapDB.Immutables.ImmutableObjectBase`1.#ctor">
@@ -1230,7 +1193,7 @@
     </member>
     <member name="M:SnapDB.Immutables.ImmutableObjectBase`1.SetMembersAsReadOnly">
       <summary>
-            Requests that member fields be set to read-only. 
+            Requests that member fields be set to read-only.
             </summary>
     </member>
     <member name="M:SnapDB.Immutables.ImmutableObjectBase`1.TestForEditable">
@@ -1298,7 +1261,7 @@
     </member>
     <member name="M:SnapDB.IO.BinaryStreamBase.InsertBytes(System.Int32,System.Int32)">
       <summary>
-            Inserts a certain number of bytes into the stream, shifting valid data to the right.  The stream's position remains unchanged. 
+            Inserts a certain number of bytes into the stream, shifting valid data to the right.  The stream's position remains unchanged.
             (ie. pointing to the beginning of the newly inserted bytes).
             </summary>
       <param name="numberOfBytes">The number of bytes to insert</param>
@@ -1306,7 +1269,7 @@
       <remarks>
             Internally this fuction merely acomplishes an Array.Copy(stream,position,stream,position+numberOfBytes,lengthOfValidDataToShift)
             However, it's much more complicated than this. So this is a pretty useful function.
-            The newly created space is uninitialized. 
+            The newly created space is uninitialized.
             </remarks>
     </member>
     <member name="P:SnapDB.IO.BinaryStreamBase.Length">
@@ -1374,7 +1337,7 @@
     </member>
     <member name="M:SnapDB.IO.BinaryStreamBase.ReadAll(System.Byte[],System.Int32,System.Int32)">
       <summary>
-            Reads all of the provided bytes. Will not return prematurely, 
+            Reads all of the provided bytes. Will not return prematurely,
             but continue to execute a <see cref="M:SnapDB.IO.BinaryStreamBase.Read(System.Byte[],System.Int32,System.Int32)" /> command until the entire
             <paramref name="length" /> has been read.
             </summary>
@@ -1519,17 +1482,21 @@
     </member>
     <member name="M:SnapDB.IO.BinaryStreamBase.RemoveBytes(System.Int32,System.Int32)">
       <summary>
-            Removes a certain number of bytes from the stream, shifting valid data after this location to the left.  The stream's position remains unchanged. 
+            Removes a certain number of bytes from the stream, shifting valid data after this location to the left.  The stream's position remains unchanged.
             (ie. pointing to where the data used to exist).
             </summary>
-      <param name="numberOfBytes">The distance to shift.  Positive means shifting to the right (ie. inserting data)
-            Negative means shift to the left (ie. deleteing data)</param>
-      <param name="lengthOfValidDataToShift">The number of bytes that will need to be shifted to perform the remove. 
-            This only includes the data that is valid after the shift is complete, and not the data that will be removed.</param>
+      <param name="numberOfBytes">
+            The distance to shift.  Positive means shifting to the right (ie. inserting data)
+            Negative means shift to the left (ie. deleteing data)
+            </param>
+      <param name="lengthOfValidDataToShift">
+            The number of bytes that will need to be shifted to perform the remove.
+            This only includes the data that is valid after the shift is complete, and not the data that will be removed.
+            </param>
       <remarks>
             Internally this fuction merely acomplishes an Array.Copy(stream,position+numberOfBytes,stream,position,lengthOfValidDataToShift)
             However, it's much more complicated than this. So this is a pretty useful function.
-            The space at the end of the copy is uninitialized. 
+            The space at the end of the copy is uninitialized.
             </remarks>
     </member>
     <member name="M:SnapDB.IO.BinaryStreamBase.Seek(System.Int64,System.IO.SeekOrigin)">
@@ -1821,7 +1788,7 @@
       <param name="position">The position in the stream to obtain the read pointer from.</param>
       <param name="length">The length of data to read starting from the specified position.</param>
       <param name="supportsWriting">
-              When this method returns, contains a boolean indicating whether writing is supported at the specified position.
+            When this method returns, contains a boolean indicating whether writing is supported at the specified position.
             </param>
       <returns>A read pointer to the specified position in the stream.</returns>
       <exception cref="T:System.Exception">Thrown if the requested length exceeds the available data.</exception>
@@ -1865,7 +1832,7 @@
     </member>
     <member name="P:SnapDB.IO.BinaryStreamPointerBase.PointerVersion">
       <summary>
-            Gets the pointer version number, assuming that this binary stream has an unmanaged buffer backing this stream. 
+            Gets the pointer version number, assuming that this binary stream has an unmanaged buffer backing this stream.
             If the pointer version is the same, then any pointer acquired is still valid.
             </summary>
     </member>
@@ -1874,7 +1841,7 @@
             Gets or sets the current position for the stream.
             </summary>
       <remarks>
-            It is important to use this to Get or Set the position from the underlying stream since 
+            It is important to use this to Get or Set the position from the underlying stream since
             this class buffers the results of the query. Setting this field does not guarantee that
             the underlying stream will get set. Call FlushToUnderlyingStream to accomplish this.
             </remarks>
@@ -2042,7 +2009,7 @@
     </member>
     <member name="T:SnapDB.IO.BinaryStreamStream">
       <summary>
-            A <see cref="T:System.IO.Stream" /> wrapper around a <see cref="T:SnapDB.IO.BinaryStreamBase" />. 
+            A <see cref="T:System.IO.Stream" /> wrapper around a <see cref="T:SnapDB.IO.BinaryStreamBase" />.
             </summary>
       <remarks>
             A <see cref="T:System.IO.Stream" /> inherits from <see cref="T:System.MarshalByRefObject" />
@@ -2116,19 +2083,21 @@
             When overridden in a derived class, reads a sequence of bytes from the current stream and advances the position within the stream by the number of bytes read.
             </summary>
       <param name="buffer">
-            An array of bytes. When this method returns, the buffer contains the specified byte array with the values between <paramref name="offset" /> 
-            and (<paramref name="offset" /> + <paramref name="count" /> - 1) replaced by the bytes read from the current source. 
+            An array of bytes. When this method returns, the buffer contains the specified byte array with the values between <paramref name="offset" />
+            and (<paramref name="offset" /> + <paramref name="count" /> - 1) replaced by the bytes read from the current source.
             </param>
       <param name="offset">
             The zero-based byte offset in <paramref name="buffer" /> at which to begin storing the data read from the current stream.
             </param>
       <param name="count">
-            The maximum number of bytes to be read from the current stream.</param>
+            The maximum number of bytes to be read from the current stream.
+            </param>
       <returns>
             The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many bytes are not currently available, or zero (0) if the end of the stream has been reached.
             </returns>
       <exception cref="T:System.ArgumentException">
-            The sum of <paramref name="offset" /> and <paramref name="count" /> is larger than the buffer length.</exception>
+            The sum of <paramref name="offset" /> and <paramref name="count" /> is larger than the buffer length.
+            </exception>
       <exception cref="T:System.ArgumentNullException">
         <paramref name="buffer" /> is null.</exception>
       <exception cref="T:System.ArgumentOutOfRangeException">
@@ -2270,7 +2239,7 @@
             Gets or sets the current position for the stream.
             </summary>
       <remarks>
-            It is important to use this to get or set the position from the underlying stream since 
+            It is important to use this to get or set the position from the underlying stream since
             this class buffers the results of the query. Setting this field does not guarantee that
             the underlying stream will get set. Call FlushToUnderlyingStream to accomplish this.
             </remarks>
@@ -2480,7 +2449,7 @@
             </summary>
       <param name="stream">The underlying stream used for communication.</param>
       <param name="workerThreadSynchronization">
-                An optional instance of WorkerThreadSynchronization for synchronization. If not provided, a new instance will be created.
+            An optional instance of WorkerThreadSynchronization for synchronization. If not provided, a new instance will be created.
             </param>
       <exception cref="T:System.Exception">Thrown if the processor is not little-endian (not supported).</exception>
     </member>
@@ -2504,7 +2473,7 @@
             Disposes of the RemoteBinaryStream, releasing any resources associated with it.
             </summary>
       <param name="disposing">
-                A flag indicating whether the method is called from the finalizer or directly by user code.
+            A flag indicating whether the method is called from the finalizer or directly by user code.
             </param>
     </member>
     <member name="M:SnapDB.IO.RemoteBinaryStream.Flush">
@@ -2606,7 +2575,7 @@
     </member>
     <member name="T:SnapDB.IO.UltraStreamWriter">
       <summary>
-            Represents an ultra high speed way to write data to a stream. 
+            Represents an ultra high speed way to write data to a stream.
             StreamWriter's methods can be slow at times.
             </summary>
     </member>
@@ -2645,7 +2614,7 @@
     </member>
     <member name="T:SnapDB.IO.FileStructure.FileHeaderBlock">
       <summary>
-            Contains the information that is in the header page of an archive file.  
+            Contains the information that is in the header page of an archive file.
             </summary>
     </member>
     <member name="M:SnapDB.IO.FileStructure.FileHeaderBlock.AllocateFreeBlocks(System.UInt32)">
@@ -2757,7 +2726,7 @@
     </member>
     <member name="P:SnapDB.IO.FileStructure.FileHeaderBlock.FileCount">
       <summary>
-            Returns the number of files that are in this file system. 
+            Returns the number of files that are in this file system.
             </summary>
       <returns>Number of files that are in this file system. </returns>
     </member>
@@ -2791,20 +2760,22 @@
     </member>
     <member name="P:SnapDB.IO.FileStructure.FileHeaderBlock.IsSimplifiedFileFormat">
       <summary>
-            Gets if this file uses the simplifed file format.
+            Gets if this file uses the simplified file format.
             </summary>
     </member>
     <member name="P:SnapDB.IO.FileStructure.FileHeaderBlock.LastAllocatedBlock">
       <summary>
-            Represents the last block that has been allocated
+            Represents the last block that has been allocated.
             </summary>
     </member>
     <member name="M:SnapDB.IO.FileStructure.FileHeaderBlock.Open(System.Byte[])">
       <summary>
             Opens a file header
             </summary>
-      <param name="data">The block of data to be loaded. The length of this block must be equal to the
-            block size of a partition.</param>
+      <param name="data">
+            The block of data to be loaded. The length of this block must be equal to the
+            block size of a partition.
+            </param>
       <returns>
         <markup>
           <include item="SMCMissingTag">
@@ -2823,18 +2794,21 @@
     </member>
     <member name="M:SnapDB.IO.FileStructure.FileHeaderBlock.SetMembersAsReadOnly">
       <summary>
-            Requests that member fields be set to readonly. 
+            Requests that member fields be set to readonly.
             </summary>
     </member>
     <member name="P:SnapDB.IO.FileStructure.FileHeaderBlock.SnapshotSequenceNumber">
       <summary>
             Maintains a sequential number that represents the version of the file.
             </summary>
+      <remarks>
+            This will be updated every time the file system has been modified. Initially, it will be one.
+            </remarks>
     </member>
     <member name="T:SnapDB.IO.FileStructure.ReadSnapshot">
       <summary>
-            Aquires a snapshot of the file system to browse in an isolated mannor.  
-            This is read only and will also block the main file from being deleted. 
+            Acquires a snapshot of the file system to browse in an isolated manner.
+            This is read only and will also block the main file from being deleted.
             Therefore it is important to release this lock so the file can be deleted after a rollover.
             </summary>
     </member>
@@ -2881,7 +2855,7 @@
     </member>
     <member name="T:SnapDB.IO.FileStructure.SimplifiedFileWriter">
       <summary>
-            Assists in the writing of a simplified file. This file can only be appended to 
+            Assists in the writing of a simplified file. This file can only be appended to
             and it must be sequentially written.
             </summary>
     </member>
@@ -2928,13 +2902,8 @@
     </member>
     <member name="P:SnapDB.IO.FileStructure.SimplifiedFileWriter.ArchiveId">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>P:SnapDB.IO.FileStructure.SimplifiedFileWriter.ArchiveId</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets the GUID number for this <see cref="T:SnapDB.IO.FileStructure.SimplifiedFileWriter" />.
+            </summary>
     </member>
     <member name="M:SnapDB.IO.FileStructure.SimplifiedFileWriter.Commit">
       <summary>
@@ -2987,13 +2956,8 @@
     </member>
     <member name="F:SnapDB.IO.FileStructure.SimplifiedFileWriter.Stream">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.IO.FileStructure.SimplifiedFileWriter.Stream</parameter>
-          </include>
-        </markup>
-      </summary>
+            Defines the file stream for this <see cref="T:SnapDB.IO.FileStructure.SimplifiedFileWriter" />.
+            </summary>
     </member>
     <member name="T:SnapDB.IO.FileStructure.SubFileHeader">
       <summary>
@@ -3060,18 +3024,18 @@
     </member>
     <member name="P:SnapDB.IO.FileStructure.SubFileHeader.TotalBlockCount">
       <summary>
-            Gets the total number of blocks that has been used by this file. 
+            Gets the total number of blocks that has been used by this file.
             This includes meta data blocks and previous version blocks.
             </summary>
     </member>
     <member name="P:SnapDB.IO.FileStructure.SubFileHeader.TripleIndirectBlock">
       <summary>
-            Gets the block address for the tripple indirect block.
+            Gets the block address for the triple indirect block.
             </summary>
     </member>
     <member name="T:SnapDB.IO.FileStructure.SubFileName">
       <summary>
-            This is used to generate the file name that will be used for the subfile. 
+            This is used to generate the file name that will be used for the subfile.
             </summary>
     </member>
     <member name="M:SnapDB.IO.FileStructure.SubFileName.CompareTo(SnapDB.IO.FileStructure.SubFileName)">
@@ -3080,9 +3044,9 @@
             </summary>
       <param name="other">An object to compare with this object.</param>
       <returns>
-            A value that indicates the relative order of the objects being compared. 
-            The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other" /> parameter.Zero 
-            This object is equal to <paramref name="other" />. Greater than zero This object is greater than <paramref name="other" />. 
+            A value that indicates the relative order of the objects being compared.
+            The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other" /> parameter.Zero
+            This object is equal to <paramref name="other" />. Greater than zero This object is greater than <paramref name="other" />.
             </returns>
     </member>
     <member name="M:SnapDB.IO.FileStructure.SubFileName.Create(System.Byte[])">
@@ -3145,7 +3109,7 @@
     </member>
     <member name="P:SnapDB.IO.FileStructure.SubFileName.Empty">
       <summary>
-            An empty subfile name. Should not generally be used as a single file system. 
+            An empty subfile name. Should not generally be used as a single file system.
             Must have unique file names.
             </summary>
     </member>
@@ -3169,7 +3133,7 @@
     </member>
     <member name="M:SnapDB.IO.FileStructure.SubFileName.GetHashCode">
       <summary>
-            Serves as a hash function for a particular type. 
+            Serves as a hash function for a particular type.
             </summary>
       <returns>
             A hash code for the current <see cref="T:System.Object" />.
@@ -3254,7 +3218,7 @@
     </member>
     <member name="T:SnapDB.IO.FileStructure.SubFileStream">
       <summary>
-            Provides a file stream that can be used to open a file and does all of the background work 
+            Provides a file stream that can be used to open a file and does all of the background work
             required to translate virtual position data into physical ones.
             </summary>
     </member>
@@ -3297,7 +3261,9 @@
             This will cause the transaction to be written to the database.
             Also calls Dispose().
             </summary>
-      <remarks>Duplicate calls to this function, or subsequent calls to RollbackTransaction will throw an exception.</remarks>
+      <remarks>
+            Duplicate calls to this function, or subsequent calls to RollbackTransaction will throw an exception.
+            </remarks>
     </member>
     <member name="M:SnapDB.IO.FileStructure.TransactionalEdit.CreateFile(SnapDB.IO.FileStructure.SubFileName)">
       <summary>
@@ -3386,7 +3352,7 @@
     <member name="T:SnapDB.IO.FileStructure.TransactionalFileStructure">
       <summary>
             This class is responsible for managing the transactions that occur on the file system.
-            Therefore, it keeps up with the latest snapshot of the file allocation table, 
+            Therefore, it keeps up with the latest snapshot of the file allocation table,
             permits only a single concurrent edit of the archive system, and determines when a file
             can be deleted when there are no read or write transactions. It also containst the IO system.
             </summary>
@@ -3398,7 +3364,7 @@
     </member>
     <member name="M:SnapDB.IO.FileStructure.TransactionalFileStructure.BeginEdit">
       <summary>
-            This will start a transactional edit on the file. 
+            This will start a transactional edit on the file.
             </summary>
       <returns>
         <markup>
@@ -3467,7 +3433,7 @@
     <member name="M:SnapDB.IO.FileStructure.TransactionalFileStructure.CreateInMemory(System.Int32,System.Guid[])">
       <summary>
             Creates a new archive file that is completely in memory.
-             </summary>
+            </summary>
       <param name="blockSize">
         <markup>
           <include item="SMCMissingParamTag">
@@ -3733,21 +3699,14 @@
     </member>
     <member name="F:SnapDB.IO.Unmanaged.BlockArguments.SupportsWriting">
       <summary>
-            Notifies the calling class if this block supports 
+            Notifies the calling class if this block supports
             writing without requiring this function to be called again if <see cref="F:SnapDB.IO.Unmanaged.BlockArguments.IsWriting" /> was set to <c>false</c>.
             </summary>
     </member>
     <member name="T:SnapDB.IO.Unmanaged.CollectionEventArgs">
       <summary>
-            Initializes a new instance of the <see cref="T:SnapDB.IO.Unmanaged.CollectionEventArgs" /> class.
+            Represents a collection of event arguments.
             </summary>
-      <param name="releasePage">The action to release a page.</param>
-      <param name="collectionMode">The memory pool collection mode.</param>
-      <param name="desiredPageReleaseCount">The desired number of pages to release during collection.</param>
-      <remarks>
-            This constructor initializes a new instance of the <see cref="T:SnapDB.IO.Unmanaged.CollectionEventArgs" /> class.
-            It sets the desired page release count, the action to release a page, and the memory pool collection mode.
-            </remarks>
     </member>
     <member name="M:SnapDB.IO.Unmanaged.CollectionEventArgs.#ctor(System.Action{System.Int32},SnapDB.IO.Unmanaged.MemoryPoolCollectionMode,System.Int32)">
       <summary>
@@ -3764,7 +3723,7 @@
     </member>
     <member name="P:SnapDB.IO.Unmanaged.CollectionEventArgs.DesiredPageReleaseCount">
       <summary>
-            When <see cref="P:SnapDB.IO.Unmanaged.CollectionEventArgs.CollectionMode" /> is <see cref="F:SnapDB.IO.Unmanaged.MemoryPoolCollectionMode.Emergency" /> or 
+            When <see cref="P:SnapDB.IO.Unmanaged.CollectionEventArgs.CollectionMode" /> is <see cref="F:SnapDB.IO.Unmanaged.MemoryPoolCollectionMode.Emergency" /> or
             <see cref="F:SnapDB.IO.Unmanaged.MemoryPoolCollectionMode.Critical" /> this field contains the number of pages
             that need to be released by all of the objects. This value will automatically decrement
             every time a page has been released.
@@ -3815,25 +3774,23 @@
     </member>
     <member name="T:SnapDB.IO.Unmanaged.Memory">
       <summary>
-            This class is used to allocate and free unmanaged memory.  
+            This class is used to allocate and free unmanaged memory.
             To release memory allocated through this class, call the Dispose() method of the return value.
             </summary>
-      <remarks>
-            .NET does not respond well when managing tens of GBs of ram.  If a very large buffer pool must be created,
-            it would be good to allocate that buffer pool in unmanaged memory.
-            </remarks>
     </member>
     <member name="M:SnapDB.IO.Unmanaged.Memory.#ctor(System.Int32)">
       <summary>
             Allocates unmanaged memory. The block is uninitialized.
             </summary>
-      <param name="requestedSize">The desired number of bytes to allocate. 
-            Be sure to check the actual size in the return class.</param>
+      <param name="requestedSize">
+            The desired number of bytes to allocate.
+            Be sure to check the actual size in the return class.
+            </param>
       <returns>The allocated memory.</returns>
     </member>
     <member name="P:SnapDB.IO.Unmanaged.Memory.Address">
       <summary>
-            The pointer to the first byte of this unmanaged memory. 
+            The pointer to the first byte of this unmanaged memory.
             Equals <see cref="F:System.IntPtr.Zero" /> if memory has been released.
             </summary>
     </member>
@@ -3853,7 +3810,7 @@
     </member>
     <member name="M:SnapDB.IO.Unmanaged.Memory.Copy(System.Byte*,System.Byte*,System.Int32)">
       <summary>
-            Does a safe copy of data from one location to another. 
+            Does a safe copy of data from one location to another.
             A safe copy allows for the source and destination to overlap.
             </summary>
       <param name="src">A pointer to the source location from which data will be copied.</param>
@@ -3862,7 +3819,7 @@
     </member>
     <member name="M:SnapDB.IO.Unmanaged.Memory.Copy(System.IntPtr,System.IntPtr,System.Int32)">
       <summary>
-            Does a safe copy of data from one location to another. 
+            Does a safe copy of data from one location to another.
             A safe copy allows for the source and destination to overlap.
             </summary>
       <param name="src">A pointer to the source location from which data will be copied.</param>
@@ -3918,18 +3875,20 @@
       <summary>
             Requests a page from the buffered pool.
             If there is not a free one available, method will block
-            and request a collection of unused pages by raising 
+            and request a collection of unused pages by raising
             <see cref="E:SnapDB.IO.Unmanaged.MemoryPool.RequestCollection" /> event.
             </summary>
       <param name="index">the index id of the page that was allocated</param>
-      <param name="addressPointer"> outputs a address that can be used
+      <param name="addressPointer">
+            outputs a address that can be used
             to access this memory address.  You cannot call release with this parameter.
-            Use the returned index to release pages.</param>
+            Use the returned index to release pages.
+            </param>
       <remarks>
             IMPORTANT NOTICE: Be careful when calling this method as the calling thread
             will block if no memory is available to have a background collection to occur.
-            There is a possiblity for a deadlock if calling this method from within a lock.
-            The page allocated will not be initialized, 
+            There is a possibility for a deadlock if calling this method from within a lock.
+            The page allocated will not be initialized,
             so assume that the data is garbage.
             </remarks>
     </member>
@@ -3941,7 +3900,7 @@
     </member>
     <member name="P:SnapDB.IO.Unmanaged.MemoryPool.CurrentCapacity">
       <summary>
-            Gets the number of bytes that have been allocated to this buffer pool 
+            Gets the number of bytes that have been allocated to this buffer pool
             by the OS.
             </summary>
     </member>
@@ -4002,9 +3961,10 @@
             Releases the page back to the buffer pool for reallocation.
             </summary>
       <param name="pageIndex">A value of zero or less will return silently.</param>
-      <remarks>The page released will not be initialized.
-            Releasing a page is on the honor system.  
-            Rereferencing a released page will most certainly cause 
+      <remarks>
+            The page released will not be initialized.
+            Releasing a page is on the honor system.
+            Re-referencing a released page will most certainly cause
             unexpected crashing or data corruption or any other unexplained behavior.
             </remarks>
     </member>
@@ -4022,7 +3982,7 @@
       <remarks>
             IMPORTANT NOTICE: Do not call <see cref="M:SnapDB.IO.Unmanaged.MemoryPool.AllocatePage(System.Int32@,System.IntPtr@)" /> via the thread
             that raises this event. Also, be careful about entering a lock via this thread
-            because a potential deadlock might occur. 
+            because a potential deadlock might occur.
             Also, Do not remove a handler from within a lock context as the remove
             blocks until all events have been called. A potential for another deadlock.
             </remarks>
@@ -4082,7 +4042,7 @@
     </member>
     <member name="F:SnapDB.IO.Unmanaged.MemoryPoolCollectionMode.Critical">
       <summary>
-            This means any memory that can be released should be released. 
+            This means any memory that can be released should be released.
             If no memory is released after this pass, an out of memory exception will occur.
             </summary>
     </member>
@@ -4258,7 +4218,7 @@
     </member>
     <member name="M:SnapDB.IO.Unmanaged.MemoryPoolStreamCore.ReadBlock(System.Int64,System.IntPtr@,System.Int32@)">
       <summary>
-            Reads from the underlying stream the requested set of data. 
+            Reads from the underlying stream the requested set of data.
             This function is more user friendly than calling GetBlock().
             </summary>
       <param name="position">The starting position of the read.</param>
@@ -4268,8 +4228,8 @@
     <member name="T:SnapDB.IO.Unmanaged.TargetUtilizationLevels">
       <summary>
             Determines the desired buffer pool utilization level.
-            Setting to Low will cause collection cycles to occur more often to keep the 
-            utilization level to low. 
+            Setting to Low will cause collection cycles to occur more often to keep the
+            utilization level to low.
             </summary>
     </member>
     <member name="F:SnapDB.IO.Unmanaged.TargetUtilizationLevels.Low">
@@ -4396,7 +4356,7 @@
     </member>
     <member name="M:SnapDB.IO.Unmanaged.UnmanagedMemoryStreamCore.ReadBlock(System.Int64,System.IntPtr@,System.Int32@)">
       <summary>
-            Reads from the underlying stream the requested set of data. 
+            Reads from the underlying stream the requested set of data.
             This function is more user friendly than calling GetBlock().
             </summary>
       <param name="position">The starting position of the read.</param>
@@ -4960,7 +4920,7 @@
     </member>
     <member name="T:SnapDB.Security.NonceGenerator">
       <summary>
-            Used to generate Nonce values. 
+            Used to generate Nonce values.
             </summary>
     </member>
     <member name="M:SnapDB.Security.NonceGenerator.#ctor(System.Int32)">
@@ -5273,7 +5233,7 @@
     </member>
     <member name="M:SnapDB.Security.SecureStreamClientBase.TryAuthenticate(System.IO.Stream,System.Boolean,System.IO.Stream@)">
       <summary>
-            Attempts to authenticate the supplied stream. 
+            Attempts to authenticate the supplied stream.
             </summary>
       <param name="stream">The stream to authenticate</param>
       <param name="useSsl">
@@ -5405,7 +5365,7 @@
     </member>
     <member name="M:SnapDB.Security.SecureStreamServer`1.AddUserIntegratedSecurity(System.String,`0)">
       <summary>
-            Adds the specified user 
+            Adds the specified user
             </summary>
       <param name="username">the username to add</param>
       <param name="userToken">The token data associated with this user</param>
@@ -5461,7 +5421,7 @@
     </member>
     <member name="M:SnapDB.Security.SecurityExtensions.SecureEquals(System.Byte[],System.Byte[])">
       <summary>
-            Does a time constant comparison of the two byte arrays. 
+            Does a time constant comparison of the two byte arrays.
             </summary>
       <param name="a">
         <markup>
@@ -5484,7 +5444,6 @@
       <returns>true if both arrays are equal</returns>
       <remarks>
             If a or b is <c>null</c>, function returns immediately with a <c>false</c>.
-            
             Certain cryptographic attacks can occur by comparing the amount of time it
             takes to do certain operations. Comparing two byte arrays is one example.
             Therefore this method should take constant time to do a comparison of two arrays.
@@ -5492,7 +5451,7 @@
     </member>
     <member name="M:SnapDB.Security.SecurityExtensions.SecureEquals(System.Byte[],System.Byte[],System.Int32,System.Int32)">
       <summary>
-            Does a time constant comparison of the two byte arrays. 
+            Does a time constant comparison of the two byte arrays.
             </summary>
       <param name="a"></param>
       <param name="b"></param>
@@ -5501,7 +5460,6 @@
       <returns>true if both arrays are equal</returns>
       <remarks>
             If a or b is <c>null</c>, function returns immediately with a <c>false</c>.
-            
             Certain cryptographic attacks can occur by comparing the amount of time it
             takes to do certain operations. Comparing two byte arrays is one example.
             Therefore this method should take constant time to do a comparison of two arrays.
@@ -5509,7 +5467,7 @@
     </member>
     <member name="M:SnapDB.Security.SecurityExtensions.SecureEquals(System.Guid,System.Guid)">
       <summary>
-            Does a time constant comparison of the two GUIDs. 
+            Does a time constant comparison of the two GUIDs.
             </summary>
       <param name="a">
         <markup>
@@ -5729,7 +5687,7 @@
             Provides simple password based authentication that uses Secure Remote Password.
             </summary>
       <remarks>
-            It is safe to store the user's credential on the server. This is a zero knowledge 
+            It is safe to store the user's credential on the server. This is a zero knowledge
             password proof, meaning if this database is compromised, a brute force attack
             is the only way to reveal the password.
             </remarks>
@@ -5796,7 +5754,7 @@
     <member name="T:SnapDB.Security.Authentication.IntegratedSecurityClient">
       <summary>
             Uses windows integrated security to authentication.
-            This uses NTLM in non-domain environments 
+            This uses NTLM in non-domain environments
             and Kerberos in domain environments.
             </summary>
     </member>
@@ -5818,8 +5776,10 @@
             Authenticates the client using the supplied stream.
             </summary>
       <param name="stream">the stream to use to authenticate the connection.</param>
-      <param name="additionalChallenge">Additional data that much match between the client and server
-            for the connection to succeed.</param>
+      <param name="additionalChallenge">
+            Additional data that much match between the client and server
+            for the connection to succeed.
+            </param>
       <returns>
             True if authentication succeded, false otherwise.
             </returns>
@@ -5827,7 +5787,7 @@
     <member name="T:SnapDB.Security.Authentication.IntegratedSecurityServer">
       <summary>
             Uses windows integrated security to authentication.
-            This uses NTLM in non-domain environments 
+            This uses NTLM in non-domain environments
             and Kerberos in domain environments.
             </summary>
     </member>
@@ -5870,8 +5830,10 @@
             </summary>
       <param name="stream">The stream to autenticate</param>
       <param name="userToken">the user token associated with the identity match</param>
-      <param name="additionalChallenge">Additional data that much match between the client and server
-            for the connection to succeed.</param>
+      <param name="additionalChallenge">
+            Additional data that much match between the client and server
+            for the connection to succeed.
+            </param>
       <returns>true if successful authentication. False otherwise.</returns>
     </member>
     <member name="F:SnapDB.Security.Authentication.IntegratedSecurityServer.Users">
@@ -5969,7 +5931,7 @@
             Provides simple password based authentication that uses Secure Remote Password.
             </summary>
       <remarks>
-            It is safe to store the user's credential on the server. This is a zero knowledge 
+            It is safe to store the user's credential on the server. This is a zero knowledge
             password proof, meaning if this database is compromised, a brute force attack
             is the only way to reveal the password.
             </remarks>
@@ -6058,7 +6020,7 @@
     </member>
     <member name="T:SnapDB.Security.Authentication.IUserToken">
       <summary>
-            An interface for token data that is associated with a user. 
+            An interface for token data that is associated with a user.
             </summary>
     </member>
     <member name="M:SnapDB.Security.Authentication.IUserToken.Load(System.IO.Stream)">
@@ -6196,7 +6158,7 @@
     </member>
     <member name="M:SnapDB.Security.Authentication.ScramServer.AuthenticateAsServer(System.IO.Stream,System.Byte[])">
       <summary>
-            Requests that the provided stream be authenticated 
+            Requests that the provided stream be authenticated
             </summary>
       <param name="stream">
         <markup>
@@ -6207,8 +6169,10 @@
           </include>
         </markup>
       </param>
-      <param name="additionalChallenge">Additional data to include in the challenge. If using SSL certificates, 
-            adding the thumbprint to the challenge will allow detecting man in the middle attacks.</param>
+      <param name="additionalChallenge">
+            Additional data to include in the challenge. If using SSL certificates,
+            adding the thumbprint to the challenge will allow detecting man in the middle attacks.
+            </param>
       <returns>
         <markup>
           <include item="SMCMissingTag">
@@ -6452,7 +6416,7 @@
             Provides simple password based authentication that uses SCRAM.
             </summary>
       <remarks>
-            It is safe to store the user's credential on the server. This is a zero knowledge 
+            It is safe to store the user's credential on the server. This is a zero knowledge
             password proof, meaning if this database is compromised, a brute force attack
             is the only way to reveal the password.
             </remarks>
@@ -6564,7 +6528,7 @@
     </member>
     <member name="M:SnapDB.Security.Authentication.SrpClient.#ctor(System.String,System.String)">
       <summary>
-            Creates a client that will authenticate with the specified 
+            Creates a client that will authenticate with the specified
             username and password.
             </summary>
       <param name="username">the username</param>
@@ -6622,7 +6586,7 @@
     </member>
     <member name="M:SnapDB.Security.Authentication.SrpServer.AuthenticateAsServer(System.IO.Stream,System.Byte[])">
       <summary>
-            Requests that the provided stream be authenticated 
+            Requests that the provided stream be authenticated
             </summary>
       <param name="stream">
         <markup>
@@ -6633,8 +6597,10 @@
           </include>
         </markup>
       </param>
-      <param name="additionalChallenge">Additional data to include in the challenge. If using SSL certificates, 
-            adding the thumbprint to the challenge will allow detecting man in the middle attacks.</param>
+      <param name="additionalChallenge">
+            Additional data to include in the challenge. If using SSL certificates,
+            adding the thumbprint to the challenge will allow detecting man in the middle attacks.
+            </param>
       <returns>
         <markup>
           <include item="SMCMissingTag">
@@ -6899,7 +6865,7 @@
             Provides simple password based authentication that uses Secure Remote Password.
             </summary>
       <remarks>
-            It is safe to store the user's credential on the server. This is a zero knowledge 
+            It is safe to store the user's credential on the server. This is a zero knowledge
             password proof, meaning if this database is compromised, a brute force attack
             is the only way to reveal the password.
             </remarks>
@@ -7100,19 +7066,19 @@
     </member>
     <member name="P:SnapDB.Snap.DistinctTreeStream`2.IsAlwaysSequential">
       <summary>
-            Gets if the stream is always in sequential order. Do not return true unless it is guaranteed that 
+            Gets if the stream is always in sequential order. Do not return true unless it is guaranteed that
             the data read from this stream is sequential.
             </summary>
     </member>
     <member name="P:SnapDB.Snap.DistinctTreeStream`2.NeverContainsDuplicates">
       <summary>
-            Gets if the stream will never return duplicate keys. Do not return true unless it is guaranteed that 
+            Gets if the stream will never return duplicate keys. Do not return true unless it is guaranteed that
             the data read from this stream will never contain duplicates.
             </summary>
     </member>
     <member name="M:SnapDB.Snap.DistinctTreeStream`2.ReadNext(`0,`1)">
       <summary>
-            Advances the stream to the next value. 
+            Advances the stream to the next value.
             If before the beginning of the stream, advances to the first value
             </summary>
       <param name="key">
@@ -7146,7 +7112,6 @@
             If Combined KeyValue encoding
             byte type = 1
             Guid KeyValueEncodingMethod
-            
             If Individual Compression
             byte type = 2
             Guid KeyEncodingMethod
@@ -7184,7 +7149,7 @@
             </summary>
       <param name="other">An object to compare with this object.</param>
       <returns>
-            A value that indicates the relative order of the objects being compared. The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other" /> parameter.Zero This object is equal to <paramref name="other" />. Greater than zero This object is greater than <paramref name="other" />. 
+            A value that indicates the relative order of the objects being compared. The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other" /> parameter.Zero This object is equal to <paramref name="other" />. Greater than zero This object is greater than <paramref name="other" />.
             </returns>
     </member>
     <member name="M:SnapDB.Snap.EncodingDefinition.CompareTo(System.Object)">
@@ -7193,7 +7158,7 @@
             </summary>
       <param name="obj">An object to compare with this instance. </param>
       <returns>
-            A value that indicates the relative order of the objects being compared. The return value has these meanings: Value Meaning Less than zero This instance precedes <paramref name="obj" /> in the sort order. Zero This instance occurs in the same position in the sort order as <paramref name="obj" />. Greater than zero This instance follows <paramref name="obj" /> in the sort order. 
+            A value that indicates the relative order of the objects being compared. The return value has these meanings: Value Meaning Less than zero This instance precedes <paramref name="obj" /> in the sort order. Zero This instance occurs in the same position in the sort order as <paramref name="obj" />. Greater than zero This instance follows <paramref name="obj" /> in the sort order.
             </returns>
       <exception cref="T:System.ArgumentException">
         <paramref name="obj" /> is not the same type as this instance. </exception>
@@ -7223,7 +7188,7 @@
     </member>
     <member name="F:SnapDB.Snap.EncodingDefinition.FixedSizeIndividualEncoding">
       <summary>
-            Represents a FixedSize combined encoding method made up of two individual fixed size IDs. 
+            Represents a FixedSize combined encoding method made up of two individual fixed size IDs.
             Functionally implemented the same as <see cref="F:SnapDB.Snap.EncodingDefinition.FixedSizeCombinedEncoding" /></summary>
     </member>
     <member name="F:SnapDB.Snap.EncodingDefinition.FixedSizeIndividualGuid">
@@ -7233,7 +7198,7 @@
     </member>
     <member name="M:SnapDB.Snap.EncodingDefinition.GetHashCode">
       <summary>
-            Serves as a hash function for a particular type. 
+            Serves as a hash function for a particular type.
             </summary>
       <returns>
             A hash code for the current <see cref="T:System.Object" />.
@@ -7462,7 +7427,7 @@
     </member>
     <member name="P:SnapDB.Snap.SnapTypeBase.GenericTypeGuid">
       <summary>
-            The GUID uniquely defining this type. 
+            The GUID uniquely defining this type.
             It is important to uniquely tie 1 type to 1 GUID.
             </summary>
     </member>
@@ -7530,7 +7495,6 @@
       <typeparam name="T">A class that has a default constructor</typeparam>
       <remarks>
             It is highly recommended to override many of the base class methods as many of these methods are slow.
-            
             The following methods should be overriden if possible:
             Read(byte*)
             Write(byte*)
@@ -7541,9 +7505,8 @@
             IsBetween(T,T)
             CompareTo(byte*)
             IsLessThanOrEqualTo(byte*, byte*)
-            
             For better random I/O inserts, it is also a good idea to implement a custom
-            <see cref="T:SnapDB.Snap.SnapTypeCustomMethods`1" /> that overrides 
+            <see cref="T:SnapDB.Snap.SnapTypeCustomMethods`1" /> that overrides
             the <see cref="M:SnapDB.Snap.SnapTypeCustomMethods`1.BinarySearch(System.Byte*,`0,System.Int32,System.Int32)" /> method.
             </remarks>
     </member>
@@ -7900,19 +7863,19 @@
     </member>
     <member name="P:SnapDB.Snap.TreeStream`2.IsAlwaysSequential">
       <summary>
-            Gets if the stream is always in sequential order. Do not return true unless it is guaranteed that 
+            Gets if the stream is always in sequential order. Do not return true unless it is guaranteed that
             the data read from this stream is sequential.
             </summary>
     </member>
     <member name="P:SnapDB.Snap.TreeStream`2.NeverContainsDuplicates">
       <summary>
-            Gets if the stream will never return duplicate keys. Do not return true unless it is guaranteed that 
+            Gets if the stream will never return duplicate keys. Do not return true unless it is guaranteed that
             the data read from this stream will never contain duplicates.
             </summary>
     </member>
     <member name="M:SnapDB.Snap.TreeStream`2.Read(`0,`1)">
       <summary>
-            Advances the stream to the next value. 
+            Advances the stream to the next value.
             If before the beginning of the stream, advances to the first value
             </summary>
       <param name="key">
@@ -7938,7 +7901,7 @@
     </member>
     <member name="M:SnapDB.Snap.TreeStream`2.ReadNext(`0,`1)">
       <summary>
-            Advances the stream to the next value. 
+            Advances the stream to the next value.
             If before the beginning of the stream, advances to the first value
             </summary>
       <param name="key">
@@ -8038,13 +8001,13 @@
     </member>
     <member name="T:SnapDB.Snap.Collection.SortedPointBuffer`2">
       <summary>
-            A temporary point buffer that is designed to write unsorted data to it, 
-            then read the data back out sorted. 
+            A temporary point buffer that is designed to write unsorted data to it,
+            then read the data back out sorted.
             </summary>
       <typeparam name="TKey">The key type to use.</typeparam>
       <typeparam name="TValue">The value type to use.</typeparam>
       <remarks>
-            This class is not thread safe. 
+            This class is not thread safe.
             </remarks>
     </member>
     <member name="M:SnapDB.Snap.Collection.SortedPointBuffer`2.#ctor(System.Int32,System.Action{`0,`0})">
@@ -8074,7 +8037,7 @@
     </member>
     <member name="P:SnapDB.Snap.Collection.SortedPointBuffer`2.IsAlwaysSequential">
       <summary>
-            Gets if the stream is always in sequential order. Do not return <c>true</c> unless it is guaranteed that 
+            Gets if the stream is always in sequential order. Do not return <c>true</c> unless it is guaranteed that
             the data read from this stream is sequential.
             </summary>
     </member>
@@ -8100,13 +8063,13 @@
     </member>
     <member name="P:SnapDB.Snap.Collection.SortedPointBuffer`2.NeverContainsDuplicates">
       <summary>
-            Gets if the stream will never return duplicate keys. Do not return <c>true</c> unless it is guaranteed that 
+            Gets if the stream will never return duplicate keys. Do not return <c>true</c> unless it is guaranteed that
             the data read from this stream will never contain duplicates.
             </summary>
     </member>
     <member name="M:SnapDB.Snap.Collection.SortedPointBuffer`2.ReadNext(`0,`1)">
       <summary>
-            Advances the stream to the next value. 
+            Advances the stream to the next value.
             If before the beginning of the stream, advances to the first value
             </summary>
       <param name="key">
@@ -8157,7 +8120,7 @@
     </member>
     <member name="M:SnapDB.Snap.Definitions.IndividualEncodingDefinitionBase.Create``1">
       <summary>
-            Constructs a new class based on this encoding method. 
+            Constructs a new class based on this encoding method.
             </summary>
       <typeparam name="T">The type of this base class.</typeparam>
       <returns>
@@ -8222,7 +8185,7 @@
     </member>
     <member name="P:SnapDB.Snap.Definitions.MatchFilterDefinitionBase.FilterType">
       <summary>
-            The filter GUID. 
+            The filter GUID.
             </summary>
     </member>
     <member name="T:SnapDB.Snap.Definitions.PairEncodingDefinitionBase">
@@ -8241,7 +8204,7 @@
     </member>
     <member name="M:SnapDB.Snap.Definitions.PairEncodingDefinitionBase.Create``2">
       <summary>
-            Constructs a new class based on this encoding method. 
+            Constructs a new class based on this encoding method.
             </summary>
       <typeparam name="TKey">The key for this encoding method.</typeparam>
       <typeparam name="TValue">The value for this encoding method.</typeparam>
@@ -8278,7 +8241,7 @@
     </member>
     <member name="M:SnapDB.Snap.Definitions.SeekFilterDefinitionBase.Create``1(SnapDB.IO.BinaryStreamBase)">
       <summary>
-            Determines if a key-value is contained in the filter
+            Determines if a key-value is contained in the filter.
             </summary>
       <param name="stream">The value to check.</param>
       <typeparam name="TKey">
@@ -8301,13 +8264,13 @@
     </member>
     <member name="P:SnapDB.Snap.Definitions.SeekFilterDefinitionBase.FilterType">
       <summary>
-            The filter GUID. 
+            The filter GUID.
             </summary>
     </member>
     <member name="T:SnapDB.Snap.Encoding.EncodingLibrary">
       <summary>
             Contains all of the fundamental encoding methods. Types implementing <see cref="T:SnapDB.Snap.SnapTypeBase`1" />
-            will automatically register when passed to one of the child methods. 
+            will automatically register when passed to one of the child methods.
             </summary>
     </member>
     <member name="M:SnapDB.Snap.Encoding.EncodingLibrary.GetEncodingMethod``2(SnapDB.Snap.EncodingDefinition)">
@@ -8420,7 +8383,7 @@
     </member>
     <member name="P:SnapDB.Snap.Encoding.IndividualEncodingBase`1.MaxCompressionSize">
       <summary>
-            Gets the maximum amount of space required by the compression algorithm. 
+            Gets the maximum amount of space required by the compression algorithm.
             </summary>
     </member>
     <member name="P:SnapDB.Snap.Encoding.IndividualEncodingBase`1.UsesPreviousValue">
@@ -8452,7 +8415,7 @@
     </member>
     <member name="P:SnapDB.Snap.Encoding.PairEncodingBase`2.ContainsEndOfStreamSymbol">
       <summary>
-            Gets if the stream supports a symbol that 
+            Gets if the stream supports a symbol that
             represents that the end of the stream has been encountered.
             </summary>
       <remarks>
@@ -8461,7 +8424,6 @@
             word is 0xFF, the encoding has specifically
             designated this as the end of the stream. Therefore, calls to
             Decompress will result in an end of stream exception.
-            
             Failing to reserve a code as the end of stream will mean that
             streaming points will include its own symbol to represent the end of the
             stream, taking 1 extra byte per point encoded.
@@ -8546,7 +8508,7 @@
     </member>
     <member name="T:SnapDB.Snap.Filters.FilterLibrary">
       <summary>
-            Contains all of the filters for the <see cref="N:SnapDB.Snap" />. 
+            Contains all of the filters for the <see cref="N:SnapDB.Snap" />.
             </summary>
     </member>
     <member name="M:SnapDB.Snap.Filters.FilterLibrary.GetMatchFilter``2(System.Guid,SnapDB.IO.BinaryStreamBase)">
@@ -8977,7 +8939,7 @@
     </member>
     <member name="P:SnapDB.Snap.Filters.SeekFilterBase`1.FilterType">
       <summary>
-            The filter guid 
+            The filter guid
             </summary>
     </member>
     <member name="M:SnapDB.Snap.Filters.SeekFilterBase`1.NextWindow">
@@ -8988,7 +8950,7 @@
     </member>
     <member name="M:SnapDB.Snap.Filters.SeekFilterBase`1.Reset">
       <summary>
-            Resets the iterative nature of the filter. 
+            Resets the iterative nature of the filter.
             </summary>
       <remarks>
             Since a time filter is a set of date ranges, this will reset the frame so a
@@ -9175,9 +9137,9 @@
       </typeparam>
       <returns>A <see cref="!:KeySeekFilterBase&lt;TKey&gt;" /> that will be able to do this parsing.</returns>
       <remarks>
-            Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013. 
-                          Interval = 0.1 seconds.
-                          Tolerance = 0.001 seconds.
+            Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013.
+            Interval = 0.1 seconds.
+            Tolerance = 0.001 seconds.
             </remarks>
     </member>
     <member name="M:SnapDB.Snap.Filters.TimestampSeekFilter.CreateFromIntervalData``1(System.DateTime,System.DateTime,System.TimeSpan,System.TimeSpan,System.TimeSpan)">
@@ -9200,9 +9162,9 @@
       </typeparam>
       <returns>A <see cref="!:KeySeekFilterBase&lt;TKey&gt;" /> that will be able to do this parsing.</returns>
       <remarks>
-            Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013. 
-                          MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
-                          Tolerance = 0.001 seconds.
+            Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013.
+            MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
+            Tolerance = 0.001 seconds.
             </remarks>
     </member>
     <member name="M:SnapDB.Snap.Filters.TimestampSeekFilter.CreateFromIntervalData``1(System.UInt64,System.UInt64,System.UInt64,System.UInt64)">
@@ -9224,9 +9186,9 @@
       </typeparam>
       <returns>A <see cref="!:KeySeekFilterBase&lt;TKey&gt;" /> that will be able to do this parsing.</returns>
       <remarks>
-            Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013. 
-                          MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
-                          Tolerance = 0.001 seconds.
+            Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013.
+            MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
+            Tolerance = 0.001 seconds.
             </remarks>
     </member>
     <member name="M:SnapDB.Snap.Filters.TimestampSeekFilter.CreateFromIntervalData``1(System.UInt64,System.UInt64,System.UInt64,System.UInt64,System.UInt64)">
@@ -9249,9 +9211,9 @@
       </typeparam>
       <returns>A <see cref="!:KeySeekFilterBase&lt;TKey&gt;" /> that will be able to do this parsing.</returns>
       <remarks>
-            Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013. 
-                          MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
-                          Tolerance = 0.001 seconds.
+            Example uses. FirstTime = 1/1/2013. LastTime = 1/2/2013.
+            MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
+            Tolerance = 0.001 seconds.
             </remarks>
     </member>
     <member name="M:SnapDB.Snap.Filters.TimestampSeekFilter.CreateFromRange``1(System.DateTime,System.DateTime)">
@@ -9483,7 +9445,7 @@
     </member>
     <member name="T:SnapDB.Snap.Services.ArchiveList">
       <summary>
-            Manages the complete list of archive resources and the 
+            Manages the complete list of archive resources and the
             associated reading and writing that goes along with it.
             </summary>
     </member>
@@ -9561,7 +9523,7 @@
     </member>
     <member name="T:SnapDB.Snap.Services.ArchiveList`2">
       <summary>
-            Manages the complete list of archive resources and the 
+            Manages the complete list of archive resources and the
             associated reading and writing that goes along with it.
             </summary>
       <typeparam name="TKey">
@@ -9614,7 +9576,7 @@
     <member name="M:SnapDB.Snap.Services.ArchiveList`2.CreateNewClientResources">
       <summary>
             Creates an object that can be used to get updated snapshots from this <see cref="!:ArchiveListOfT&lt;TKey,TValue&gt;" />.
-            Client must call <see cref="M:System.IDisposable.Dispose" /> method when finished with these resources as they will not 
+            Client must call <see cref="M:System.IDisposable.Dispose" /> method when finished with these resources as they will not
             automatically be reclaimed by the garbage collector. Class will not be initiallized until calling <see cref="M:SnapDB.Snap.Services.ArchiveListSnapshot`2.UpdateSnapshot" />.
             </summary>
       <returns>
@@ -9667,7 +9629,7 @@
     <member name="M:SnapDB.Snap.Services.ArchiveList`2.IsFileBeingUsed(SnapDB.Snap.Storage.SortedTreeTable{`0,`1})">
       <summary>
             Determines if the provided file is currently in use
-            by any resource. 
+            by any resource.
             </summary>
       <param name="sortedTree"> file to search for.</param>
       <returns>
@@ -9737,7 +9699,7 @@
     </member>
     <member name="M:SnapDB.Snap.Services.ArchiveListEditor.RenewArchiveSnapshot(System.Guid)">
       <summary>
-            Renews the snapshot of the archive file. This will acquire the latest 
+            Renews the snapshot of the archive file. This will acquire the latest
             read transaction so all new snapshots will use this later version.
             </summary>
       <param name="archiveId">the ID of the archive snapshot to renew</param>
@@ -9817,7 +9779,7 @@
     </member>
     <member name="P:SnapDB.Snap.Services.ArchiveListLogSettings.IsFileBacked">
       <summary>
-            Gets if this archive log will be file backed. 
+            Gets if this archive log will be file backed.
             This is true as long as <see cref="P:SnapDB.Snap.Services.ArchiveListLogSettings.LogPath" /> is assigned
             a value.
             </summary>
@@ -9853,7 +9815,7 @@
     </member>
     <member name="P:SnapDB.Snap.Services.ArchiveListLogSettings.LogPath">
       <summary>
-            The path to store all log files. Can be an empty string to 
+            The path to store all log files. Can be an empty string to
             not enable file based logging.
             </summary>
     </member>
@@ -9923,7 +9885,7 @@
       <summary>
             A set of all import paths to load upon initialization.
             Be sure to include all paths that existed last time the service
-            restarted since the ArchiveListLog processes immediately upon 
+            restarted since the ArchiveListLog processes immediately upon
             construction.
             </summary>
     </member>
@@ -10017,7 +9979,7 @@
     </member>
     <member name="E:SnapDB.Snap.Services.ArchiveListSnapshot`2.DisposeRequested">
       <summary>
-            Signals that a disposal of this object has been requested. 
+            Signals that a disposal of this object has been requested.
             </summary>
       <remarks>
             A race condition exists such that this class gets a dispose request before the client
@@ -10192,7 +10154,7 @@
       <summary>
             Forces a commit to the disk subsystem. Once this returns, the data will not
             be lost due to an application crash or unexpected shutdown.
-            Hard commits can take 100ms or longer depending on how much data has to be committed. 
+            Hard commits can take 100ms or longer depending on how much data has to be committed.
             This requires two consecutive hardware cache flushes.
             </summary>
     </member>
@@ -10208,10 +10170,10 @@
     </member>
     <member name="M:SnapDB.Snap.Services.ClientDatabaseBase.SoftCommit">
       <summary>
-            Forces a soft commit on the database. A soft commit 
+            Forces a soft commit on the database. A soft commit
             only commits data to memory. This allows other clients to read the data.
             While soft committed, this data could be lost during an unexpected shutdown.
-            Soft commits usually occur within microseconds. 
+            Soft commits usually occur within microseconds.
             </summary>
     </member>
     <member name="T:SnapDB.Snap.Services.ClientDatabaseBase`2">
@@ -10257,7 +10219,7 @@
     </member>
     <member name="M:SnapDB.Snap.Services.ClientDatabaseBase`2.Write(SnapDB.Snap.TreeStream{`0,`1})">
       <summary>
-            Writes the tree stream to the database. 
+            Writes the tree stream to the database.
             </summary>
       <param name="stream">All of the key-value pairs to add to the database.</param>
     </member>
@@ -10675,7 +10637,6 @@
             </summary>
       <remarks>
             A centralized server hosting model for a SortedTreeStore.
-            
             This class contains all of the databases, client connections,
             sockets, user authentication, and core settings for the SortedTreeStore.
             </remarks>
@@ -11057,7 +11018,7 @@
     </member>
     <member name="P:SnapDB.Snap.Services.Configuration.AdvancedServerDatabaseConfig`2.DirectoryMethod">
       <summary>
-            Gets the method of how the directory will be stored. Defaults to 
+            Gets the method of how the directory will be stored. Defaults to
             top directory only.
             </summary>
     </member>
@@ -11076,7 +11037,7 @@
     </member>
     <member name="P:SnapDB.Snap.Services.Configuration.AdvancedServerDatabaseConfig`2.FinalWritePaths">
       <summary>
-            The list of directories where final files can be placed written. 
+            The list of directories where final files can be placed written.
             If nothing is specified, the main directory is used.
             </summary>
     </member>
@@ -11226,14 +11187,14 @@
     </member>
     <member name="F:SnapDB.Snap.Services.Net.ServerResponse.ServerNameTooLong">
       <summary>
-            Occurs during initial connection. 
-            Indicates that the server name 
+            Occurs during initial connection.
+            Indicates that the server name
             string was longer than 100 characters.
             </summary>
     </member>
     <member name="F:SnapDB.Snap.Services.Net.ServerResponse.ServerNameDoesNotMatch">
       <summary>
-            Occurs when the server name 
+            Occurs when the server name
             specificed in the initial connection
             does not match this server.
             </summary>
@@ -11247,8 +11208,10 @@
       <summary>
             Creates a <see cref="T:SnapDB.Snap.Services.Net.SnapNetworkClient" /></summary>
       <param name="settings">The config to use for the client</param>
-      <param name="credentials">The network credentials to use. 
-            If left null, the computers current credentials are use.</param>
+      <param name="credentials">
+            The network credentials to use.
+            If left null, the computers current credentials are use.
+            </param>
       <param name="useSsl">Specifies if ssl encryption is desired for the connection.</param>
     </member>
     <member name="M:SnapDB.Snap.Services.Net.SnapNetworkClient.Dispose(System.Boolean)">
@@ -11409,7 +11372,7 @@
     </member>
     <member name="P:SnapDB.Snap.Services.Net.SnapSocketListenerSettings.LocalTcpPort">
       <summary>
-            The local TCP port to host on. 
+            The local TCP port to host on.
             </summary>
     </member>
     <member name="M:SnapDB.Snap.Services.Net.SnapSocketListenerSettings.Save(System.IO.Stream)">
@@ -11453,7 +11416,7 @@
     </member>
     <member name="M:SnapDB.Snap.Services.Net.SnapStreamingClient.#ctor">
       <summary>
-            Allows derived classes to call <see cref="M:SnapDB.Snap.Services.Net.SnapStreamingClient.Initialize(System.IO.Stream,SnapDB.Security.SecureStreamClientBase,System.Boolean)" /> after the inheriting class 
+            Allows derived classes to call <see cref="M:SnapDB.Snap.Services.Net.SnapStreamingClient.Initialize(System.IO.Stream,SnapDB.Security.SecureStreamClientBase,System.Boolean)" /> after the inheriting class
             has done something in the constructor.
             </summary>
     </member>
@@ -11550,7 +11513,7 @@
     </member>
     <member name="M:SnapDB.Snap.Services.Net.SnapStreamingServer.#ctor">
       <summary>
-            Allows derived classes to call <see cref="M:SnapDB.Snap.Services.Net.SnapStreamingServer.Initialize(SnapDB.Security.SecureStreamServer{SnapDB.Snap.Services.Net.SocketUserPermissions},System.IO.Stream,SnapDB.Snap.Services.SnapServer,System.Boolean)" /> after the inheriting class 
+            Allows derived classes to call <see cref="M:SnapDB.Snap.Services.Net.SnapStreamingServer.Initialize(SnapDB.Security.SecureStreamServer{SnapDB.Snap.Services.Net.SocketUserPermissions},System.IO.Stream,SnapDB.Snap.Services.SnapServer,System.Boolean)" /> after the inheriting class
             has done something in the constructor.
             </summary>
     </member>
@@ -11681,7 +11644,7 @@
             Gets if the user can perform admin operations
             </summary>
       <remarks>
-            Admin operations would include 
+            Admin operations would include
             Detatching/Deleting/Moving
             archive file.
             </remarks>
@@ -11777,7 +11740,7 @@
       <summary>
             Forces a commit to the disk subsystem. Once this returns, the data will not
             be lost due to an application crash or unexpected shutdown.
-            Hard commits can take 100ms or longer depending on how much data has to be committed. 
+            Hard commits can take 100ms or longer depending on how much data has to be committed.
             This requires two consecutive hardware cache flushes.
             </summary>
     </member>
@@ -11816,15 +11779,15 @@
     </member>
     <member name="M:SnapDB.Snap.Services.Net.StreamingClientDatabase`2.SoftCommit">
       <summary>
-            Forces a soft commit on the database. A soft commit 
+            Forces a soft commit on the database. A soft commit
             only commits data to memory. This allows other clients to read the data.
             While soft committed, this data could be lost during an unexpected shutdown.
-            Soft commits usually occur within microseconds. 
+            Soft commits usually occur within microseconds.
             </summary>
     </member>
     <member name="M:SnapDB.Snap.Services.Net.StreamingClientDatabase`2.StartBulkWriting">
       <summary>
-            Due to the blocking nature of streams, this helper class can substantially 
+            Due to the blocking nature of streams, this helper class can substantially
             improve the performance of writing streaming points to the historian.
             </summary>
       <returns>
@@ -11838,7 +11801,7 @@
     </member>
     <member name="M:SnapDB.Snap.Services.Net.StreamingClientDatabase`2.Write(SnapDB.Snap.TreeStream{`0,`1})">
       <summary>
-            Writes the tree stream to the database. 
+            Writes the tree stream to the database.
             </summary>
       <param name="stream">all of the key/value pairs to add to the database.</param>
     </member>
@@ -12590,7 +12553,7 @@
     </member>
     <member name="P:SnapDB.Snap.Services.Reader.SortedTreeEngineReaderOptions.MaxScanCount">
       <summary>
-            The maximum number of points to scan to get the results set. 
+            The maximum number of points to scan to get the results set.
             This includes any point that was filtered
             </summary>
     </member>
@@ -12721,7 +12684,7 @@
     </member>
     <member name="P:SnapDB.Snap.Services.Writer.ArchiveInitializerSettings.DesiredRemainingSpace">
       <summary>
-            The desired number of bytes to leave on the disk after a rollover has completed. 
+            The desired number of bytes to leave on the disk after a rollover has completed.
             Otherwise, pick a different directory or throw an out of disk space exception.
             </summary>
       <remarks>
@@ -12872,7 +12835,7 @@
     <member name="P:SnapDB.Snap.Services.Writer.CombineFilesSettings.CombineOnFileCount">
       <summary>
             The number of files with the specified <see cref="P:SnapDB.Snap.Services.Writer.CombineFilesSettings.MatchFlag" />
-            before they will be combined. 
+            before they will be combined.
             </summary>
       <remarks>
             Must be between 2 and 1000.
@@ -12892,8 +12855,8 @@
             Time is in milliseconds.
             </summary>
       <remarks>
-            Default is every 60,000 milliseconds. 
-            Must be between 1 second and 10 minutes. 
+            Default is every 60,000 milliseconds.
+            Must be between 1 second and 10 minutes.
             Anything outside this range will substitute for the closest valid value.
             </remarks>
     </member>
@@ -13008,8 +12971,10 @@
       <summary>
             Appends this data to this stage. Also queues up for deletion if necessary.
             </summary>
-      <param name="args">arguments handed to this class from either the 
-            PrestageWriter or another StageWriter of a previous generation</param>
+      <param name="args">
+            arguments handed to this class from either the
+            PrestageWriter or another StageWriter of a previous generation
+            </param>
       <remarks>
             This method must be called in a single threaded manner.
             </remarks>
@@ -13116,7 +13081,7 @@
     </member>
     <member name="P:SnapDB.Snap.Services.Writer.FirstStageWriterSettings.RolloverInterval">
       <summary>
-            The number of milliseconds before data is flushed to the disk. 
+            The number of milliseconds before data is flushed to the disk.
             </summary>
       <remarks>
             Must be between 1,000 ms and 60,000 ms.
@@ -13161,7 +13126,7 @@
     </member>
     <member name="T:SnapDB.Snap.Services.Writer.PrebufferRolloverArgs`2">
       <summary>
-            A set of variables that are generated in the prebuffer stage that are provided to the onRollover 
+            A set of variables that are generated in the prebuffer stage that are provided to the onRollover
             <see cref="T:System.Action" /> passed to the constructor of <see cref="T:SnapDB.Snap.Services.Writer.PrebufferWriter`2" />.
             </summary>
       <typeparam name="TKey">The key</typeparam>
@@ -13176,18 +13141,18 @@
     </member>
     <member name="F:SnapDB.Snap.Services.Writer.PrebufferRolloverArgs`2.Stream">
       <summary>
-            The stream of points that need to be rolled over. 
+            The stream of points that need to be rolled over.
             </summary>
     </member>
     <member name="F:SnapDB.Snap.Services.Writer.PrebufferRolloverArgs`2.TransactionId">
       <summary>
-            The transaction id assoicated with the points in this buffer. 
+            The transaction id assoicated with the points in this buffer.
             This is the id of the last point in this buffer.
             </summary>
     </member>
     <member name="T:SnapDB.Snap.Services.Writer.PrebufferWriter`2">
       <summary>
-            Where uncommitted data is collected before it is 
+            Where uncommitted data is collected before it is
             inserted into an archive file in a bulk operation.
             </summary>
       <typeparam name="TKey">
@@ -13228,7 +13193,7 @@
     </member>
     <member name="M:SnapDB.Snap.Services.Writer.PrebufferWriter`2.Dispose(System.Boolean)">
       <summary>
-            Disposes the underlying queues contained in this class. 
+            Disposes the underlying queues contained in this class.
             This method is not thread safe.
             It is assumed this will be called after <see cref="M:SnapDB.Snap.Services.Writer.PrebufferWriter`2.Stop" />.
             </summary>
@@ -13242,7 +13207,7 @@
     </member>
     <member name="P:SnapDB.Snap.Services.Writer.PrebufferWriter`2.LatestTransactionId">
       <summary>
-            Gets the latest transaction id which is a sequential counter 
+            Gets the latest transaction id which is a sequential counter
             based on the number of insert operations that have occured.
             </summary>
     </member>
@@ -13315,7 +13280,7 @@
     </member>
     <member name="P:SnapDB.Snap.Services.Writer.PrebufferWriterSettings.RolloverPointCount">
       <summary>
-            The number of points before a rollover is queued. This should be before the maximum point 
+            The number of points before a rollover is queued. This should be before the maximum point
             count since once the maximum point count has been reached, a thread pause will result.
             </summary>
       <remarks>
@@ -13468,7 +13433,7 @@
     </member>
     <member name="P:SnapDB.Snap.Services.Writer.RolloverLogSettings.IsFileBacked">
       <summary>
-            Gets if this archive log will be file backed. 
+            Gets if this archive log will be file backed.
             This is true as long as <see cref="P:SnapDB.Snap.Services.Writer.RolloverLogSettings.LogPath" /> is assigned
             a value.
             </summary>
@@ -13504,7 +13469,7 @@
     </member>
     <member name="P:SnapDB.Snap.Services.Writer.RolloverLogSettings.LogPath">
       <summary>
-            The path to store all log files. Can be an empty string to 
+            The path to store all log files. Can be an empty string to
             not enable file based logging.
             </summary>
     </member>
@@ -13636,7 +13601,7 @@
     </member>
     <member name="P:SnapDB.Snap.Services.Writer.SimplifiedArchiveInitializerSettings.DesiredRemainingSpace">
       <summary>
-            The desired number of bytes to leave on the disk after a rollover has completed. 
+            The desired number of bytes to leave on the disk after a rollover has completed.
             Otherwise, pick a different directory or throw an out of disk space exception.
             </summary>
       <remarks>
@@ -13734,7 +13699,7 @@
       <typeparam name="TValue">The value</typeparam>
       <remarks>
             Transaction IDs are long values, starting with zero. The reason behind this, even if 2 billion transactions
-            could happen per second, it would still take over 100 years without an application restart to loop around. 
+            could happen per second, it would still take over 100 years without an application restart to loop around.
             Realistically a therotical peak would be 200 million transactions per second (An Interlocked.Increment).
             </remarks>
     </member>
@@ -13982,37 +13947,37 @@
     </member>
     <member name="F:SnapDB.Snap.Storage.FileFlags.Stage2">
       <summary>
-            Indicates that the file is in Stage 2. 
+            Indicates that the file is in Stage 2.
             </summary>
     </member>
     <member name="F:SnapDB.Snap.Storage.FileFlags.Stage3">
       <summary>
-            Indicates that the file is in Stage 3. 
+            Indicates that the file is in Stage 3.
             </summary>
     </member>
     <member name="F:SnapDB.Snap.Storage.FileFlags.Stage4">
       <summary>
-            Indicates that the file is in Stage 4. 
+            Indicates that the file is in Stage 4.
             </summary>
     </member>
     <member name="F:SnapDB.Snap.Storage.FileFlags.Stage5">
       <summary>
-            Indicates that the file is in Stage 5. 
+            Indicates that the file is in Stage 5.
             </summary>
     </member>
     <member name="F:SnapDB.Snap.Storage.FileFlags.Stage6">
       <summary>
-            Indicates that the file is in Stage 6. 
+            Indicates that the file is in Stage 6.
             </summary>
     </member>
     <member name="F:SnapDB.Snap.Storage.FileFlags.Stage7">
       <summary>
-            Indicates that the file is in Stage 7. 
+            Indicates that the file is in Stage 7.
             </summary>
     </member>
     <member name="F:SnapDB.Snap.Storage.FileFlags.Stage8">
       <summary>
-            Indicates that the file is in Stage 8. 
+            Indicates that the file is in Stage 8.
             </summary>
     </member>
     <member name="F:SnapDB.Snap.Storage.FileFlags.Stage9">
@@ -14022,7 +13987,7 @@
     </member>
     <member name="T:SnapDB.Snap.Storage.SortedTreeFile">
       <summary>
-            Represents a individual self-contained archive file. 
+            Represents a individual self-contained archive file.
             </summary>
       <remarks></remarks>
     </member>
@@ -14085,7 +14050,7 @@
     </member>
     <member name="M:SnapDB.Snap.Storage.SortedTreeFile.Dispose">
       <summary>
-            Closes the archive file. If there is a current transaction, 
+            Closes the archive file. If there is a current transaction,
             that transaction is immediately rolled back and disposed.
             </summary>
     </member>
@@ -14102,7 +14067,7 @@
     </member>
     <member name="P:SnapDB.Snap.Storage.SortedTreeFile.IsDisposed">
       <summary>
-            Determines if the archive file has been disposed. 
+            Determines if the archive file has been disposed.
             </summary>
     </member>
     <member name="P:SnapDB.Snap.Storage.SortedTreeFile.IsMemoryFile">
@@ -14143,7 +14108,7 @@
     </member>
     <member name="M:SnapDB.Snap.Storage.SortedTreeFile.OpenOrCreateTable``2(SnapDB.Snap.EncodingDefinition,System.Int32)">
       <summary>
-            Opens the default table for this TKey and TValue. If it does not exists, 
+            Opens the default table for this TKey and TValue. If it does not exists,
             it will be created with the provided compression method.
             </summary>
       <param name="storageMethod">The method of compression to utilize in this table.</param>
@@ -14177,7 +14142,7 @@
     </member>
     <member name="M:SnapDB.Snap.Storage.SortedTreeFile.OpenOrCreateTable``2(SnapDB.Snap.EncodingDefinition,System.String,System.Int32)">
       <summary>
-            Opens the default table for this TKey and TValue. If it does not exists, 
+            Opens the default table for this TKey and TValue. If it does not exists,
             it will be created with the provided compression method.
             </summary>
       <param name="storageMethod">The method of compression to utilize in this table.</param>
@@ -14212,7 +14177,7 @@
     </member>
     <member name="M:SnapDB.Snap.Storage.SortedTreeFile.OpenTable``2">
       <summary>
-            Opens the default table for this TKey and TValue. 
+            Opens the default table for this TKey and TValue.
             </summary>
       <typeparam name="TKey">The key</typeparam>
       <typeparam name="TValue">The value</typeparam>
@@ -14223,7 +14188,7 @@
     </member>
     <member name="M:SnapDB.Snap.Storage.SortedTreeFile.OpenTable``2(System.String)">
       <summary>
-            Opens the default table for this TKey and TValue. 
+            Opens the default table for this TKey and TValue.
             </summary>
       <param name="tableName">the name of an internal table</param>
       <typeparam name="TKey">The key</typeparam>
@@ -14405,7 +14370,7 @@
     </member>
     <member name="T:SnapDB.Snap.Storage.SortedTreeTable`2">
       <summary>
-            Represents an individual table contained within the file. 
+            Represents an individual table contained within the file.
             </summary>
       <typeparam name="TKey">
         <markup>
@@ -14474,9 +14439,9 @@
       <remarks>
             Concurrent editing of a file is not supported. Subsequent calls will
             throw an exception rather than blocking. This is to encourage
-            proper synchronization at a higher layer. 
+            proper synchronization at a higher layer.
             Wrap the return value of this function in a Using block so the dispose
-            method is always called. 
+            method is always called.
             </remarks>
     </member>
     <member name="M:SnapDB.Snap.Storage.SortedTreeTable`2.BeginRead">
@@ -14494,7 +14459,7 @@
     </member>
     <member name="M:SnapDB.Snap.Storage.SortedTreeTable`2.Dispose">
       <summary>
-            Closes the archive file. If there is a current transaction, 
+            Closes the archive file. If there is a current transaction,
             that transaction is immediately rolled back and disposed.
             </summary>
     </member>
@@ -14505,7 +14470,7 @@
     </member>
     <member name="P:SnapDB.Snap.Storage.SortedTreeTable`2.IsDisposed">
       <summary>
-            Determines if the archive file has been disposed. 
+            Determines if the archive file has been disposed.
             </summary>
     </member>
     <member name="P:SnapDB.Snap.Storage.SortedTreeTable`2.LastKey">
@@ -14648,7 +14613,8 @@
       <param name="lowerBounds">the first key in the tree</param>
       <param name="upperBounds">the last key in the tree</param>
       <remarks>
-            If the tree is empty, lowerBounds will be greater than upperBounds</remarks>
+            If the tree is empty, lowerBounds will be greater than upperBounds
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Storage.SortedTreeTableReadSnapshot`2.GetTreeScanner">
       <summary>
@@ -14670,7 +14636,7 @@
     </member>
     <member name="T:SnapDB.Snap.Storage.SortedTreeTableSnapshotInfo`2">
       <summary>
-            Aquires a read transaction on the current archive partition. This will allow all user created
+            Acquires a read transaction on the current archive partition. This will allow all user created
             transactions to have snapshot isolation of the entire data set.
             </summary>
       <typeparam name="TKey">
@@ -14707,11 +14673,11 @@
     </member>
     <member name="T:SnapDB.Snap.Streaming.StreamEncodingBase`2">
       <summary>
-            Encoding that is stream based. This encoding is similar to <see cref="T:SnapDB.Snap.Encoding.PairEncodingBase`2" />
-            except it contains end of stream data.
+            An abstract base class for defining stream encoding methods used to encode and decode
+            key-value pairs of types <typeparamref name="TKey" /> and <typeparamref name="TValue" />.
             </summary>
-      <typeparam name="TKey"></typeparam>
-      <typeparam name="TValue"></typeparam>
+      <typeparam name="TKey">The type of the keys to be encoded and decoded.</typeparam>
+      <typeparam name="TValue">The type of the values to be encoded and decoded.</typeparam>
     </member>
     <member name="M:SnapDB.Snap.Streaming.StreamEncodingBase`2.#ctor">
       <summary>
@@ -14724,7 +14690,7 @@
     </member>
     <member name="M:SnapDB.Snap.Streaming.StreamEncodingBase`2.Encode(SnapDB.IO.BinaryStreamBase,`0,`1)">
       <summary>
-            Encodes the current key/value to the stream.
+            Encodes the current key-value to the stream.
             </summary>
       <param name="stream">The stream to write to.</param>
       <param name="currentKey">The key to write.</param>
@@ -14743,7 +14709,7 @@
     </member>
     <member name="M:SnapDB.Snap.Streaming.StreamEncodingBase`2.TryDecode(SnapDB.IO.BinaryStreamBase,`0,`1)">
       <summary>
-            Attempts to read the next point from the stream. 
+            Attempts to read the next point from the stream.
             </summary>
       <param name="stream">The stream to read from</param>
       <param name="key">The key to store the value to.</param>
@@ -14753,13 +14719,13 @@
     </member>
     <member name="M:SnapDB.Snap.Streaming.StreamEncodingBase`2.WriteEndOfStream(SnapDB.IO.BinaryStreamBase)">
       <summary>
-            Writes the end of the stream symbol to the <see cref="!:stream" />.
+            Writes the end of the stream symbol to the <paramref name="stream" />.
             </summary>
-      <param name="stream">the stream to write to</param>
+      <param name="stream">The stream to write to.</param>
     </member>
     <member name="T:SnapDB.Snap.Tree.FixedSizeNode`2">
       <summary>
-            A node for a <see cref="T:SnapDB.Snap.Tree.SortedTree" /> that is encoded in a fixed width. 
+            A node for a <see cref="T:SnapDB.Snap.Tree.SortedTree" /> that is encoded in a fixed width.
             This allows binary searches and faster writing.
             </summary>
       <typeparam name="TKey">The type of keys stored in the nodes.</typeparam>
@@ -15093,11 +15059,13 @@
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.AppendSequentialStream(SnapDB.Snap.Tree.InsertStreamHelper{`0,`1},System.Boolean@)">
       <summary>
             Requests that the current stream is inserted into the tree. Sequential insertion can only occur while the stream
-            is in order and is entirely past the end of the tree. 
+            is in order and is entirely past the end of the tree.
             </summary>
       <param name="stream">the stream data to insert</param>
-      <param name="isFull">if returning from this function while the node is not yet full, this means the stream 
-            can no longer be inserted sequentially and we must break out to the root and insert one at a time.</param>
+      <param name="isFull">
+            if returning from this function while the node is not yet full, this means the stream
+            can no longer be inserted sequentially and we must break out to the root and insert one at a time.
+            </param>
     </member>
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNode`2.Clone(System.Byte)">
       <summary>
@@ -15353,7 +15321,7 @@
     <member name="M:SnapDB.Snap.Tree.GenericEncodedNodeScanner`2.OnNoadReload">
       <summary>
             Occurs when a node's data is reset.
-            Derived classes can override this 
+            Derived classes can override this
             method if fields need to be reset when a node is loaded.
             </summary>
     </member>
@@ -15631,7 +15599,7 @@
     </member>
     <member name="M:SnapDB.Snap.Tree.Node`1.#ctor(SnapDB.IO.BinaryStreamPointerBase,System.Int32,System.Byte)">
       <summary>
-            The constructor that is to be used to if not inheriting this object. 
+            The constructor that is to be used to if not inheriting this object.
             Automatically initializes the node.
             </summary>
       <param name="stream">
@@ -16118,7 +16086,7 @@
     </member>
     <member name="M:SnapDB.Snap.Tree.Node`1.SetNodeIndex(System.UInt32)">
       <summary>
-            Sets the node data to the following node index. 
+            Sets the node data to the following node index.
             The node must be initialized before calling this method.
             </summary>
       <param name="nodeIndex">
@@ -16133,7 +16101,7 @@
     </member>
     <member name="P:SnapDB.Snap.Tree.Node`1.StartOfDataPosition">
       <summary>
-            The position that points to the location right after the header which is the 
+            The position that points to the location right after the header which is the
             start of the data within the node.
             </summary>
     </member>
@@ -16149,7 +16117,7 @@
     </member>
     <member name="P:SnapDB.Snap.Tree.Node`1.UpperKey">
       <summary>
-            The upper bounds of the node. This is an exclusive bounds and is valid 
+            The upper bounds of the node. This is an exclusive bounds and is valid
             when there is a sibling to the right. If there is no sibling to the right,
             it should still be valid except for the maximum key value condition.
             </summary>
@@ -16166,7 +16134,7 @@
     </member>
     <member name="T:SnapDB.Snap.Tree.SortedTree`2">
       <summary>
-            Provides the basic user methods with any derived B+Tree.  
+            Provides the basic user methods with any derived B+Tree.
             This base class translates all of the core methods into simple methods
             that must be implemented by classes derived from this base class.
             </summary>
@@ -16190,7 +16158,7 @@
       </typeparam>
       <remarks>
             This class does not support concurrent read operations.  This is due to the caching method of each tree.
-            If concurrent read operations are desired, clone the tree.  
+            If concurrent read operations are desired, clone the tree.
             Trees cannot be cloned if the user plans to write to the tree.
             </remarks>
     </member>
@@ -16210,7 +16178,7 @@
     <member name="P:SnapDB.Snap.Tree.SortedTree`2.AutoFlush">
       <summary>
             The sorted tree will not continually call the <see cref="M:SnapDB.Snap.Tree.SortedTree`2.Flush" /> method every time the header is changed.
-            When setting this to false, flushes must be manually invoked. Failing to do this can corrupt the SortedTree. 
+            When setting this to false, flushes must be manually invoked. Failing to do this can corrupt the SortedTree.
             Only set if you can guarantee that <see cref="M:SnapDB.Snap.Tree.SortedTree`2.Flush" /> will be called before disposing this class.
             </summary>
     </member>
@@ -16291,7 +16259,7 @@
     </member>
     <member name="P:SnapDB.Snap.Tree.SortedTree`2.IsDirty">
       <summary>
-            Gets if the sorted tree needs to be flushed to the disk. 
+            Gets if the sorted tree needs to be flushed to the disk.
             </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.SortedTree`2.LeafStorage">
@@ -16379,11 +16347,13 @@
     <member name="M:SnapDB.Snap.Tree.SortedTreeNodeBase`2.AppendSequentialStream(SnapDB.Snap.Tree.InsertStreamHelper{`0,`1},System.Boolean@)">
       <summary>
             Requests that the current stream is inserted into the tree. Sequentail insertion can only occur while the stream
-            is in order and is entirely past the end of the tree. 
+            is in order and is entirely past the end of the tree.
             </summary>
       <param name="stream">the stream data to insert</param>
-      <param name="isFull">if returning from this function while the node is not yet full, this means the stream 
-            can no longer be inserted sequentially and we must break out to the root and insert one at a time.</param>
+      <param name="isFull">
+            if returning from this function while the node is not yet full, this means the stream
+            can no longer be inserted sequentially and we must break out to the root and insert one at a time.
+            </param>
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeNodeBase`2.CanCombineWithSiblings(`0,System.Boolean@,System.Boolean@)">
       <summary>
@@ -16504,7 +16474,7 @@
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeNodeBase`2.InsertUnlessFull(System.Int32,`0,`1)">
       <summary>
-            Inserts the provided key into the current node. 
+            Inserts the provided key into the current node.
             Note: A duplicate key has already been detected and will never be passed to this function.
             </summary>
       <param name="index">
@@ -17256,7 +17226,7 @@
     </member>
     <member name="P:SnapDB.Snap.Tree.SortedTreeScannerBase`2.IsAlwaysSequential">
       <summary>
-            Gets if the stream is always in sequential order. Do not return true unless it is guaranteed that 
+            Gets if the stream is always in sequential order. Do not return true unless it is guaranteed that
             the data read from this stream is sequential.
             </summary>
     </member>
@@ -17298,7 +17268,7 @@
     </member>
     <member name="P:SnapDB.Snap.Tree.SortedTreeScannerBase`2.NeverContainsDuplicates">
       <summary>
-            Gets if the stream will never return duplicate keys. Do not return true unless it is guaranteed that 
+            Gets if the stream will never return duplicate keys. Do not return true unless it is guaranteed that
             the data read from this stream will never contain duplicates.
             </summary>
     </member>
@@ -17310,7 +17280,7 @@
     <member name="M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.OnNoadReload">
       <summary>
             Occurs when a node's data is reset.
-            Derived classes can override this 
+            Derived classes can override this
             method if fields need to be reset when a node is loaded.
             </summary>
     </member>
@@ -17321,7 +17291,7 @@
       <param name="key">the key to write the results to</param>
       <param name="value">the value to write the results to</param>
       <returns>
-            True if a point is found. 
+            True if a point is found.
             False if the end of the stream has been encountered.
             </returns>
     </member>
@@ -17368,8 +17338,8 @@
     </member>
     <member name="P:SnapDB.Snap.Tree.SortedTreeScannerBase`2.PointerVersion">
       <summary>
-            The pointer version of the <see cref="P:SnapDB.Snap.Tree.SortedTreeScannerBase`2.Pointer" />. 
-            Compare to Stream.PointerVersion to find out if 
+            The pointer version of the <see cref="P:SnapDB.Snap.Tree.SortedTreeScannerBase`2.Pointer" />.
+            Compare to Stream.PointerVersion to find out if
             this pointer is current.
             </summary>
     </member>
@@ -17377,7 +17347,6 @@
       <summary>
             Note: This method will read each leaf node in reverse order. However, each leaf itself will be sorted
             ascending, only when moving from leaf node to leave node will this occur in reverse order.
-            
             Note: This functionality should be used only to inspect the contests of a file, and not be
             used to attempt supporting reverse readings of files.
             </summary>
@@ -17441,7 +17410,7 @@
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.ReadNext(`0,`1)">
       <summary>
-            Advances the stream to the next value. 
+            Advances the stream to the next value.
             If before the beginning of the stream, advances to the first value.
             </summary>
       <param name="key">
@@ -17467,39 +17436,43 @@
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.ReadWhile(`0,`1,`0)">
       <summary>
-            Continues to advance the stream 
+            Continues to advance the stream
             but stops short of returning the point that is equal to
             the provided key.
             </summary>
       <param name="key">Where to store the key</param>
       <param name="value">Where to store the value</param>
-      <param name="upperBounds">the test condition. Will return <c>false</c> if the returned point would have 
-            exceedd this value</param>
+      <param name="upperBounds">
+            the test condition. Will return <c>false</c> if the returned point would have
+            exceedd this value
+            </param>
       <returns>
-            Returns <c>true</c> if the point returned is valid. 
+            Returns <c>true</c> if the point returned is valid.
             Returns <c>false</c> if:
-                The point read is greater than or equal to <see cref="!:upperBounds" />.
-                The end of the stream is reached.
-                The end of the current node has been reached.
+            The point read is greater than or equal to <see cref="!:upperBounds" />.
+            The end of the stream is reached.
+            The end of the current node has been reached.
             </returns>
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.ReadWhile(`0,`1,`0,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})">
       <summary>
-            Using the provided filter, continues to advance the stream 
+            Using the provided filter, continues to advance the stream
             but stops short of returning the point that is equal to
             the provided key.
             </summary>
       <param name="key">Where to store the key.</param>
       <param name="value">Where to store the value.</param>
-      <param name="upperBounds">the test condition. Will return <c>false</c> if the returned point would have 
-            exceedd this value</param>
+      <param name="upperBounds">
+            the test condition. Will return <c>false</c> if the returned point would have
+            exceedd this value
+            </param>
       <param name="filter">the filter to apply to the reading.</param>
       <returns>
-            Returns true if the point returned is valid. 
+            Returns true if the point returned is valid.
             Returns <c>false</c> if:
-                The point read is greater than or equal to <see cref="!:upperBounds" />.
-                The end of the stream is reached.
-                The end of the current node has been reached.
+            The point read is greater than or equal to <see cref="!:upperBounds" />.
+            The end of the stream is reached.
+            The end of the current node has been reached.
             </returns>
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.ReadWhileCatchAll(`0,`1,`0)">
@@ -17608,7 +17581,7 @@
     </member>
     <member name="P:SnapDB.Snap.Tree.SortedTreeScannerBase`2.RightSiblingNodeIndex">
       <summary>
-            The node index of the next sibling. 
+            The node index of the next sibling.
             uint.MaxValue means there is no sibling to the right.
             </summary>
     </member>
@@ -17679,8 +17652,10 @@
       <param name="nodeKey">the first key in the <see cref="!:pointer" />. Only uses the key portion of the TKeyValue</param>
       <param name="pointer">the index of the later node</param>
       <param name="level">the level of the node being added</param>
-      <remarks>This class will add the new node data to the parent node, 
-            or create a new root if the current root is split.</remarks>
+      <remarks>
+            This class will add the new node data to the parent node,
+            or create a new root if the current root is split.
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.SparseIndex`1.CanCombineWithSiblings(`0,System.Byte,System.Boolean@,System.Boolean@)">
       <summary>
@@ -17693,7 +17668,7 @@
     </member>
     <member name="M:SnapDB.Snap.Tree.SparseIndex`1.Get(`0,System.Byte)">
       <summary>
-            Gets the data for the following key. 
+            Gets the data for the following key.
             </summary>
       <param name="key">The key to look up. Only uses the key portion of the TKeyValue</param>
       <param name="level">
@@ -17737,7 +17712,7 @@
     </member>
     <member name="M:SnapDB.Snap.Tree.SparseIndex`1.Initialize(SnapDB.IO.BinaryStreamPointerBase,System.Int32,System.Func{System.UInt32},System.Byte,System.UInt32)">
       <summary>
-            Creates a sparse index on the tree. 
+            Creates a sparse index on the tree.
             </summary>
       <param name="stream">The stream to use to write the index</param>
       <param name="blockSize">The size of each node that will be used by this index.</param>
@@ -17764,8 +17739,8 @@
     </member>
     <member name="E:SnapDB.Snap.Tree.SparseIndex`1.RootHasChanged">
       <summary>
-            Event raised when the root of the tree changes, 
-            thus <see cref="P:SnapDB.Snap.Tree.SparseIndex`1.RootNodeIndexAddress" /> and <see cref="P:SnapDB.Snap.Tree.SparseIndex`1.RootNodeLevel" /> 
+            Event raised when the root of the tree changes,
+            thus <see cref="P:SnapDB.Snap.Tree.SparseIndex`1.RootNodeIndexAddress" /> and <see cref="P:SnapDB.Snap.Tree.SparseIndex`1.RootNodeLevel" />
             need to be saved to the header.
             </summary>
     </member>
@@ -18072,7 +18047,7 @@
     </member>
     <member name="M:SnapDB.Snap.Tree.Specialized.SparseIndexWriter`1.#ctor">
       <summary>
-            Creates a new sparse index. 
+            Creates a new sparse index.
             </summary>
     </member>
     <member name="M:SnapDB.Snap.Tree.Specialized.SparseIndexWriter`1.Add(System.UInt32,`0,System.UInt32)">
@@ -18082,8 +18057,10 @@
       <param name="leftPointer">The pointer to the left element, Only used to prime the list.</param>
       <param name="nodeKey">the first key in the <see cref="!:pointer" />. Only uses the key portion of the TKeyValue</param>
       <param name="pointer">the index of the later node</param>
-      <remarks>This class will add the new node data to the parent node, 
-            or create a new root if the current root is split.</remarks>
+      <remarks>
+            This class will add the new node data to the parent node,
+            or create a new root if the current root is split.
+            </remarks>
     </member>
     <member name="P:SnapDB.Snap.Tree.Specialized.SparseIndexWriter`1.Count">
       <summary>
@@ -19070,8 +19047,8 @@
     </member>
     <member name="T:SnapDB.Snap.Types.TimestampBase`1">
       <summary>
-            Base implementation of a historian key. 
-            These are the required functions that are 
+            Base implementation of a historian key.
+            These are the required functions that are
             necessary for the historian engine to operate
             </summary>
       <typeparam name="TKey"></typeparam>
@@ -19087,13 +19064,13 @@
     </member>
     <member name="F:SnapDB.Snap.Types.TimestampBase`1.Timestamp">
       <summary>
-            The timestamp stored as native ticks. 
+            The timestamp stored as native ticks.
             </summary>
     </member>
     <member name="T:SnapDB.Snap.Types.TimestampPointIdBase`1">
       <summary>
-            Base implementation of a historian key. 
-            These are the required functions that are 
+            Base implementation of a historian key.
+            These are the required functions that are
             necessary for the historian engine to operate
             </summary>
       <typeparam name="TKey"></typeparam>
@@ -19129,8 +19106,8 @@
       <param name="x">The first string to compare.</param>
       <param name="y">The second string to compare.</param>
       <returns>
-            A signed integer that indicates the relative values of <paramref name="x" /> and <paramref name="y" />, 
-            as shown in the following table: 
+            A signed integer that indicates the relative values of <paramref name="x" /> and <paramref name="y" />,
+            as shown in the following table:
             -1 if <paramref name="x" /> is less than <paramref name="y" />,
             0 if <paramref name="x" /> equals <paramref name="y" />,
             1 if <paramref name="x" /> is greater than <paramref name="y" />.
@@ -19138,10 +19115,13 @@
     </member>
     <member name="T:SnapDB.Threading.AtomicInt64">
       <summary>
+            Represents an atomic 64-bit signed integer.
+            </summary>
+      <remarks>
             Since 64 bit reads/asignments are not atomic on a 32-bit process, this class
             wraps the <see cref="T:System.Threading.Interlocked" /> class to if using a 32-bit process to ensure
             atomic reads and writes.
-            </summary>
+            </remarks>
     </member>
     <member name="M:SnapDB.Threading.AtomicInt64.#ctor(System.Int64)">
       <summary>
@@ -19160,10 +19140,6 @@
       <summary>
             Gets or sets the value of the AtomicInt64.
             </summary>
-      <remarks>
-            For 64-bit processes, the value is directly read or written.
-            For 32-bit processes, atomic operations are used for thread-safety.
-            </remarks>
     </member>
     <member name="T:SnapDB.Threading.DisposableReadLock">
       <summary>
@@ -19281,11 +19257,11 @@
             WARNING: This lock should be used in a Using block, and duplicate calls to Lock without releasing will cause a deadlock.
             </summary>
       <remarks>
-            After writing this class I did some review of the methodology. 
+            After writing this class I did some review of the methodology.
             Reviewing this article: http://www.adammil.net/blog/v111_Creating_High-Performance_Locks_and_Lock-free_Code_for_NET_.html
             Brings up stability issues with the lock. Namely what happens when unhandled exceptions occurs when acquiring and releasing the lock.
             I have intentionally left out any kind of protection against this as it severly reduces the speed of this code. Therefore
-            do not use this locking method where a Thread.Abort() might be used as a control method. 
+            do not use this locking method where a Thread.Abort() might be used as a control method.
             </remarks>
     </member>
     <member name="M:SnapDB.Threading.HalfLock.#ctor">
@@ -19298,8 +19274,8 @@
             Duplicate calls to this within the same thread will cause a deadlock.
             </summary>
       <returns>
-            A structure that will release the lock. 
-            This struct will always be the exact same value. Therefore it can be 
+            A structure that will release the lock.
+            This struct will always be the exact same value. Therefore it can be
             stored once if desired, however, be careful when using it this way as inproper synchronization
             will be easier to occur.
             </returns>
@@ -19316,7 +19292,7 @@
     </member>
     <member name="T:SnapDB.Threading.ReaderWriterLockEasy">
       <summary>
-            A simplified implementation of a <see cref="T:System.Threading.ReaderWriterLockSlim" />. This allows for more 
+            A simplified implementation of a <see cref="T:System.Threading.ReaderWriterLockSlim" />. This allows for more
             user friendly code to be written.
             </summary>
     </member>
@@ -19357,7 +19333,7 @@
             can cause other waiting threads to throw <see cref="T:System.ObjectDisposedException" />.
             This class makes disposing of the class thread safe as well.
             Note: Not properly disposing of this class can cause all threads waiting on this
-            class to wait indefinitely. 
+            class to wait indefinitely.
             </remarks>
     </member>
     <member name="M:SnapDB.Threading.SafeManualResetEvent.#ctor(System.Boolean)">
@@ -19395,7 +19371,7 @@
             </summary>
       <typeparam name="T"></typeparam>
       <remarks>
-            This is useful when needing to process data on a certain thread. On instance is 
+            This is useful when needing to process data on a certain thread. On instance is
             when preparing data that needs to then be processed on the UI thread. Just construct
             this class on the UI thread, then when any thread raises an event, this event will be
             queued on the UI thread.
@@ -19419,7 +19395,7 @@
     <member name="M:SnapDB.Threading.SynchronousEvent`1.Dispose">
       <summary>
             Prevents any future events from processing and
-            attempts to cancel a pending operation. 
+            attempts to cancel a pending operation.
             Function returns before any attempts to cancel are successful.
             </summary>
     </member>
@@ -19431,9 +19407,9 @@
     </member>
     <member name="T:SnapDB.Threading.ThreadSafeList`1">
       <summary>
-            This list allows for iterating through the list 
+            This list allows for iterating through the list
             while object can be removed from the list. Once an object has been
-            removed, is garenteed not to be called again by a seperate thread. 
+            removed, is garenteed not to be called again by a seperate thread.
             </summary>
       <typeparam name="T">The type of elements in the list.</typeparam>
     </member>
@@ -19459,13 +19435,13 @@
             Returns an enumerator that iterates through the collection.
             </summary>
       <returns>
-            A <see cref="T:System.Collections.Generic.IEnumerator`1" /> that can be used to 
+            A <see cref="T:System.Collections.Generic.IEnumerator`1" /> that can be used to
             iterate through the collection.
             </returns>
     </member>
     <member name="M:SnapDB.Threading.ThreadSafeList`1.Remove(`0)">
       <summary>
-            Removes an item from the list. 
+            Removes an item from the list.
             </summary>
       <param name="item">The item to remove from the list.</param>
       <returns>
@@ -19479,8 +19455,8 @@
     </member>
     <member name="M:SnapDB.Threading.ThreadSafeList`1.RemoveAndWait(`0)">
       <summary>
-            Removes an item from the list. 
-            This method will block until the item has successfully been removed 
+            Removes an item from the list.
+            This method will block until the item has successfully been removed
             and will no longer show up in the iterator.
             DO NOT call this function from within a ForEach loop as it will block indefinately
             since the for each loop reads all items.
@@ -19528,11 +19504,11 @@
             WARNING: This lock should be used in a Using block, and duplicate calls to Lock without releasing will cause a deadlock.
             </summary>
       <remarks>
-            After writing this class I did some review of the methodology. 
+            After writing this class I did some review of the methodology.
             Reviewing this article: http://www.adammil.net/blog/v111_Creating_High-Performance_Locks_and_Lock-free_Code_for_NET_.html
             Brings up stability issues with the lock. Namely what happens when unhandled exceptions occurs when acquiring and releasing the lock.
             I have intentionally left out any kind of protection against this as it severly reduces the speed of this code. Therefore
-            do not use this locking method where a Thread.Abort() might be used as a control method. 
+            do not use this locking method where a Thread.Abort() might be used as a control method.
             </remarks>
     </member>
     <member name="M:SnapDB.Threading.TinyLock.#ctor">
@@ -19546,8 +19522,8 @@
             Duplicate calls to this within the same thread will cause a deadlock.
             </summary>
       <returns>
-            A structure that will release the lock. 
-            This struct will always be the exact same value. Therefore it can be 
+            A structure that will release the lock.
+            This struct will always be the exact same value. Therefore it can be
             stored once if desired, however, be careful when using it this way as inproper synchronization
             will be easier to occur.
             </returns>
@@ -19630,12 +19606,10 @@
             when the socket makes any kind of blocking call, such as flusing to an underlying socket. Upon returning
             from this command, calling <see cref="M:SnapDB.Threading.WorkerThreadSynchronization.EndSafeToCallbackRegion" /> will return this class to a state where callback
             will not be executed.
-            
-            It is critical that <see cref="M:SnapDB.Threading.WorkerThreadSynchronization.BeginSafeToCallbackRegion" />, <see cref="M:SnapDB.Threading.WorkerThreadSynchronization.EndSafeToCallbackRegion" />, and 
+            It is critical that <see cref="M:SnapDB.Threading.WorkerThreadSynchronization.BeginSafeToCallbackRegion" />, <see cref="M:SnapDB.Threading.WorkerThreadSynchronization.EndSafeToCallbackRegion" />, and
             <see cref="M:SnapDB.Threading.WorkerThreadSynchronization.PulseSafeToCallback" /> only be called by the worker thread, as these methods are not thread safe and
             control the state of the <see cref="T:SnapDB.Threading.WorkerThreadSynchronization" />.
-            
-            In easy terms. When you (the worker) get a convenient time, I need to do something that might modify your 
+            In easy terms. When you (the worker) get a convenient time, I need to do something that might modify your
             current working state. Let me know when I can do that.
             </remarks>
     </member>
@@ -19649,7 +19623,7 @@
             Enters a region where a callback can occur.
             </summary>
       <remarks>
-            A good place to put this is before a long 
+            A good place to put this is before a long
             action where it is possible that the thread
             might be blocked.
             </remarks>
@@ -19661,17 +19635,17 @@
     </member>
     <member name="M:SnapDB.Threading.WorkerThreadSynchronization.PulseSafeToCallback">
       <summary>
-            Signals that if any callbacks are pending, 
+            Signals that if any callbacks are pending,
             go ahead and run them now. Otherwise, wait.
             </summary>
       <remarks>
-            This method will be inlined and has virtually no 
+            This method will be inlined and has virtually no
             overhead so long as a callback is not waiting.
             </remarks>
     </member>
     <member name="M:SnapDB.Threading.WorkerThreadSynchronization.RequestCallback(System.Action)">
       <summary>
-            Requests that the following action be completed as soon as reasonably possible. 
+            Requests that the following action be completed as soon as reasonably possible.
             This will either be done immediately, or be queued for the next approriate time.
             </summary>
       <param name="callback">action to perform</param>

@@ -34,32 +34,31 @@ namespace SnapDB.Threading;
 /// A timer event that occurs on a specific interval at a specific offset.
 /// This class is thread safe.
 /// </summary>
-public class EventTimer
-    : DisposableLoggingClassBase
+public class EventTimer : DisposableLoggingClassBase
 {
-    /// <summary>
-    /// Occurs when the timer elapses.
-    /// Event occurs on the ThreadPool
-    /// </summary>
-    public event Action Elapsed;
+    #region [ Members ]
 
-    private ScheduledTask m_timer;
-    private readonly TimeSpan m_period;
     private readonly TimeSpan m_dayOffset;
-    private readonly object m_syncRoot;
     private bool m_isRunning;
-    private bool m_stopping;
-    private bool m_disposed;
 
     private readonly LogStackMessages m_message;
+    private readonly TimeSpan m_period;
+    private bool m_stopping;
+    private readonly object m_syncRoot;
+
+    private ScheduledTask m_timer;
+    private bool m_disposed;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Initializes a new instance of the EventTimer class with the specified period and day offset.
     /// </summary>
     /// <param name="period">The time interval between timer ticks.</param>
     /// <param name="dayOffset">The time offset added to each tick.</param>
-    private EventTimer(TimeSpan period, TimeSpan dayOffset)
-        : base(MessageClass.Component)
+    private EventTimer(TimeSpan period, TimeSpan dayOffset) : base(MessageClass.Component)
     {
         m_stopping = false;
         m_syncRoot = new object();
@@ -70,39 +69,9 @@ public class EventTimer
         Log.InitialStackMessages.Union("Event Timer Details", $"EventTimer: {m_period} in {m_dayOffset}");
     }
 
-    /// <summary>
-    /// This timer will reliably fire the directory polling every interval.
-    /// </summary>
-    private void m_timer_Running(object sender, EventArgs<ScheduledTaskRunningReason> e)
-    {
-        //This cannot be combined with m_directoryPolling because 
-        //Scheduled task does not support managing multiple conflicting timers.
-        if (e.Argument == ScheduledTaskRunningReason.Disposing)
-            return;
+    #endregion
 
-        if (m_stopping)
-            return;
-
-        if (Elapsed is not null)
-        {
-            try
-            {
-                using (Logger.AppendStackMessages(m_message))
-                {
-                    Elapsed();
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Publish(MessageLevel.Error, "Event Timer Exception on raising event.", null, null, ex);
-            }
-        }
-
-        if (m_stopping)
-            return;
-
-        RestartTimer();
-    }
+    #region [ Properties ]
 
     /// <summary>
     /// Gets or sets a value indicating whether the timer is enabled.
@@ -122,7 +91,7 @@ public class EventTimer
                 Stop();
         }
     }
-    
+
     /// <summary>
     /// Gets the time remaining until the next execution of the timer.
     /// </summary>
@@ -143,18 +112,15 @@ public class EventTimer
         }
     }
 
-    private void RestartTimer()
-    {
-        long current = DateTime.UtcNow.Ticks;
-        long subtractOffset = current - m_dayOffset.Ticks;
-        long remainderTicks = m_period.Ticks - subtractOffset % m_period.Ticks;
-        int delay = (int)(remainderTicks / TimeSpan.TicksPerMillisecond) + 1;
+    #endregion
 
-        if (delay < 10)
-            delay += (int)m_period.TotalMilliseconds;
+    #region [ Methods ]
 
-        m_timer.Start(delay);
-    }
+    /// <summary>
+    /// Occurs when the timer elapses.
+    /// Event occurs on the ThreadPool
+    /// </summary>
+    public event Action Elapsed;
 
     /// <summary>
     /// Starts the event timer.
@@ -168,10 +134,10 @@ public class EventTimer
         {
             if (m_disposed)
                 return;
-                
+
             if (m_isRunning)
                 return;
-                
+
             m_isRunning = true;
             m_timer = new ScheduledTask();
             m_timer.Running += m_timer_Running;
@@ -207,6 +173,7 @@ public class EventTimer
             m_stopping = false;
             m_isRunning = false;
         }
+
         Log.Publish(MessageLevel.Info, "EventTimer Started");
     }
 
@@ -224,8 +191,58 @@ public class EventTimer
             m_disposed = true;
             Stop();
         }
+
         base.Dispose(disposing);
     }
+
+    /// <summary>
+    /// This timer will reliably fire the directory polling every interval.
+    /// </summary>
+    private void m_timer_Running(object sender, EventArgs<ScheduledTaskRunningReason> e)
+    {
+        //This cannot be combined with m_directoryPolling because 
+        //Scheduled task does not support managing multiple conflicting timers.
+        if (e.Argument == ScheduledTaskRunningReason.Disposing)
+            return;
+
+        if (m_stopping)
+            return;
+
+        if (Elapsed is not null)
+            try
+            {
+                using (Logger.AppendStackMessages(m_message))
+                {
+                    Elapsed();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Publish(MessageLevel.Error, "Event Timer Exception on raising event.", null, null, ex);
+            }
+
+        if (m_stopping)
+            return;
+
+        RestartTimer();
+    }
+
+    private void RestartTimer()
+    {
+        long current = DateTime.UtcNow.Ticks;
+        long subtractOffset = current - m_dayOffset.Ticks;
+        long remainderTicks = m_period.Ticks - subtractOffset % m_period.Ticks;
+        int delay = (int)(remainderTicks / TimeSpan.TicksPerMillisecond) + 1;
+
+        if (delay < 10)
+            delay += (int)m_period.TotalMilliseconds;
+
+        m_timer.Start(delay);
+    }
+
+    #endregion
+
+    #region [ Static ]
 
     /// <summary>
     /// Creates a new instance of the <see cref="EventTimer"/> class with the specified period and day offset.
@@ -260,4 +277,5 @@ public class EventTimer
         return new EventTimer(new TimeSpan((long)(periodInMinutes * TimeSpan.TicksPerMinute)), new TimeSpan((long)(dayOffsetInMinutes * TimeSpan.TicksPerMinute)));
     }
 
+    #endregion
 }

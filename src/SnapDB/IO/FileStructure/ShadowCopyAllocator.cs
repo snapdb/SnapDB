@@ -32,28 +32,21 @@ namespace SnapDB.IO.FileStructure;
 /// <summary>
 /// This class will make shadow copies of blocks or, if the block has never been written to, prepare the block to be written to.
 /// </summary>
-internal unsafe class ShadowCopyAllocator
-    : IndexParser
+internal unsafe class ShadowCopyAllocator : IndexParser
 {
     #region [ Members ]
 
-    /// <summary>
-    /// This address is used to determine if the block being referenced is an old block or a new one.
-    /// Any addresses greater than or equal to this are new blocks for this transaction. Values before this are old.
-    /// </summary>
-    private readonly uint m_lastReadOnlyBlock;
-
-    /// <summary>
-    /// The file being read.
-    /// </summary>
-    private readonly SubFileHeader? m_subFileHeader;
-
-    /// <summary>
-    /// The FileAllocationTable that can be used to allocate space.
-    /// </summary>
+    // The FileAllocationTable that can be used to allocate space.
     private readonly FileHeaderBlock m_fileHeaderBlock;
 
     private readonly SubFileDiskIoSessionPool m_ioSessions;
+
+    // This address is used to determine if the block being referenced is an old block or a new one.
+    // Any addresses greater than or equal to this are new blocks for this transaction. Values before this are old.
+    private readonly uint m_lastReadOnlyBlock;
+
+    // The file being read.
+    private readonly SubFileHeader m_subFileHeader;
 
     #endregion
 
@@ -63,16 +56,17 @@ internal unsafe class ShadowCopyAllocator
     /// Creates a <see cref="ShadowCopyAllocator"/> that is used make shadow copies of blocks.
     /// </summary>
     /// <param name="ioSessions"></param>
-    public ShadowCopyAllocator(SubFileDiskIoSessionPool ioSessions)
-        : base(ioSessions)
+    public ShadowCopyAllocator(SubFileDiskIoSessionPool ioSessions) : base(ioSessions)
     {
         if (ioSessions is null)
             throw new ArgumentNullException(nameof(ioSessions));
+
         if (ioSessions.IsReadOnly)
             throw new ArgumentException("DataReader is read only", nameof(ioSessions));
+
         m_lastReadOnlyBlock = ioSessions.LastReadonlyBlock;
         m_fileHeaderBlock = ioSessions.Header;
-        m_subFileHeader = ioSessions.File;
+        m_subFileHeader = ioSessions.File ?? throw new NullReferenceException("Cannot create shadow copy allocator: IO session file is null");
         m_ioSessions = ioSessions;
     }
 
@@ -81,8 +75,8 @@ internal unsafe class ShadowCopyAllocator
     #region [ Methods ]
 
     /// <summary>
-    /// This will make a shadow copy of the block that contains the position provided.  
-    /// If the block does not exist, space is allocated and the indexes are 
+    /// This will make a shadow copy of the block that contains the position provided.
+    /// If the block does not exist, space is allocated and the indexes are
     /// set up to allow the block to be written to.
     /// </summary>
     /// <param name="positionIndex">The position the application intents to write to.</param>
@@ -99,59 +93,50 @@ internal unsafe class ShadowCopyAllocator
             wasShadowed = true;
             return DataClusterAddress;
         }
+
         wasShadowed = false;
         return DataClusterAddress;
     }
-
-    #region [ Shadow Copy Index Blocks ]
 
     private void ShadowCopyIndexIndirectBlocks()
     {
         if (FirstIndirectOffset != 0) // Quadruple Indirect
         {
-            if (ShadowCopyIndexIndirect(ref FourthIndirectBlockAddress, FourthIndirectBaseIndex, BlockType.IndexIndirect4, FourthIndirectOffset, DataClusterAddress))
-            {
-                if (ShadowCopyIndexIndirect(ref ThirdIndirectBlockAddress, ThirdIndirectBaseIndex, BlockType.IndexIndirect3, ThirdIndirectOffset, FourthIndirectBlockAddress))
-                {
-                    if (ShadowCopyIndexIndirect(ref SecondIndirectBlockAddress, SecondIndirectBaseIndex, BlockType.IndexIndirect2, SecondIndirectOffset, ThirdIndirectBlockAddress))
-                    {
-                        if (ShadowCopyIndexIndirect(ref FirstIndirectBlockAddress, FirstIndirectBaseIndex, BlockType.IndexIndirect1, FirstIndirectOffset, SecondIndirectBlockAddress))
-                        {
-                            m_subFileHeader.QuadrupleIndirectBlock = FirstIndirectBlockAddress;
-                        }
-                    }
-                }
-            }
+            if (!ShadowCopyIndexIndirect(ref FourthIndirectBlockAddress, FourthIndirectBaseIndex, BlockType.IndexIndirect4, FourthIndirectOffset, DataClusterAddress))
+                return;
+
+            if (!ShadowCopyIndexIndirect(ref ThirdIndirectBlockAddress, ThirdIndirectBaseIndex, BlockType.IndexIndirect3, ThirdIndirectOffset, FourthIndirectBlockAddress))
+                return;
+
+            if (!ShadowCopyIndexIndirect(ref SecondIndirectBlockAddress, SecondIndirectBaseIndex, BlockType.IndexIndirect2, SecondIndirectOffset, ThirdIndirectBlockAddress))
+                return;
+
+            if (ShadowCopyIndexIndirect(ref FirstIndirectBlockAddress, FirstIndirectBaseIndex, BlockType.IndexIndirect1, FirstIndirectOffset, SecondIndirectBlockAddress))
+                m_subFileHeader.QuadrupleIndirectBlock = FirstIndirectBlockAddress;
         }
         else if (SecondIndirectOffset != 0) // Triple Indirect
         {
-            if (ShadowCopyIndexIndirect(ref FourthIndirectBlockAddress, FourthIndirectBaseIndex, BlockType.IndexIndirect4, FourthIndirectOffset, DataClusterAddress))
-            {
-                if (ShadowCopyIndexIndirect(ref ThirdIndirectBlockAddress, ThirdIndirectBaseIndex, BlockType.IndexIndirect3, ThirdIndirectOffset, FourthIndirectBlockAddress))
-                {
-                    if (ShadowCopyIndexIndirect(ref SecondIndirectBlockAddress, SecondIndirectBaseIndex, BlockType.IndexIndirect2, SecondIndirectOffset, ThirdIndirectBlockAddress))
-                    {
-                        m_subFileHeader.TripleIndirectBlock = SecondIndirectBlockAddress;
-                    }
-                }
-            }
+            if (!ShadowCopyIndexIndirect(ref FourthIndirectBlockAddress, FourthIndirectBaseIndex, BlockType.IndexIndirect4, FourthIndirectOffset, DataClusterAddress))
+                return;
+
+            if (!ShadowCopyIndexIndirect(ref ThirdIndirectBlockAddress, ThirdIndirectBaseIndex, BlockType.IndexIndirect3, ThirdIndirectOffset, FourthIndirectBlockAddress))
+                return;
+
+            if (ShadowCopyIndexIndirect(ref SecondIndirectBlockAddress, SecondIndirectBaseIndex, BlockType.IndexIndirect2, SecondIndirectOffset, ThirdIndirectBlockAddress))
+                m_subFileHeader.TripleIndirectBlock = SecondIndirectBlockAddress;
         }
         else if (ThirdIndirectOffset != 0) // Double Indirect
         {
-            if (ShadowCopyIndexIndirect(ref FourthIndirectBlockAddress, FourthIndirectBaseIndex, BlockType.IndexIndirect4, FourthIndirectOffset, DataClusterAddress))
-            {
-                if (ShadowCopyIndexIndirect(ref ThirdIndirectBlockAddress, ThirdIndirectBaseIndex, BlockType.IndexIndirect3, ThirdIndirectOffset, FourthIndirectBlockAddress))
-                {
-                    m_subFileHeader.DoubleIndirectBlock = ThirdIndirectBlockAddress;
-                }
-            }
+            if (!ShadowCopyIndexIndirect(ref FourthIndirectBlockAddress, FourthIndirectBaseIndex, BlockType.IndexIndirect4, FourthIndirectOffset, DataClusterAddress))
+                return;
+
+            if (ShadowCopyIndexIndirect(ref ThirdIndirectBlockAddress, ThirdIndirectBaseIndex, BlockType.IndexIndirect3, ThirdIndirectOffset, FourthIndirectBlockAddress))
+                m_subFileHeader.DoubleIndirectBlock = ThirdIndirectBlockAddress;
         }
         else if (FourthIndirectOffset != 0) // Single Indirect
         {
             if (ShadowCopyIndexIndirect(ref FourthIndirectBlockAddress, FourthIndirectBaseIndex, BlockType.IndexIndirect4, FourthIndirectOffset, DataClusterAddress))
-            {
                 m_subFileHeader.SingleIndirectBlock = FourthIndirectBlockAddress;
-            }
         }
         else // Immediate
         {
@@ -171,6 +156,7 @@ internal unsafe class ShadowCopyAllocator
     private bool ShadowCopyIndexIndirect(ref uint sourceBlockAddress, uint indexValue, BlockType blockType, int remoteAddressOffset, uint remoteBlockAddress)
     {
         uint indexIndirectBlock;
+
         // Make a copy of the index block referenced
 
         // If the block does not exist, create it.
@@ -187,8 +173,9 @@ internal unsafe class ShadowCopyAllocator
             sourceBlockAddress = indexIndirectBlock;
             return true;
         }
+
         // If the data page is an old page, allocate space to create a new copy.
-        else if (sourceBlockAddress <= m_lastReadOnlyBlock)
+        if (sourceBlockAddress <= m_lastReadOnlyBlock)
         {
             indexIndirectBlock = m_fileHeaderBlock.AllocateFreeBlocks(1);
             m_subFileHeader.TotalBlockCount++;
@@ -197,13 +184,14 @@ internal unsafe class ShadowCopyAllocator
             sourceBlockAddress = indexIndirectBlock;
             return true;
         }
+
         // The page has already been copied. Use the existing address.
         ReadThenWriteIndexIndirectBlock(sourceBlockAddress, sourceBlockAddress, indexValue, blockType, remoteAddressOffset, remoteBlockAddress);
         return false;
     }
 
     /// <summary>
-    /// Makes a shadow copy of an index indirect block and updates a remote address. 
+    /// Makes a shadow copy of an index indirect block and updates a remote address.
     /// </summary>
     /// <param name="sourceBlockAddress">the address of the source.</param>
     /// <param name="destinationBlockAddress">the address of the destination. This can be the same as the source.</param>
@@ -217,11 +205,11 @@ internal unsafe class ShadowCopyAllocator
 
         if (sourceBlockAddress == destinationBlockAddress)
         {
-            if (*(int*)(bufferSource.Pointer + (remoteAddressOffset << 2)) != remoteBlockAddress)
-            {
-                bufferSource.WriteToExistingBlock(destinationBlockAddress, blockType, indexValue);
-                WriteIndexIndirectBlock(bufferSource.Pointer, remoteAddressOffset, remoteBlockAddress);
-            }
+            if (*(int*)(bufferSource.Pointer + (remoteAddressOffset << 2)) == remoteBlockAddress)
+                return;
+
+            bufferSource.WriteToExistingBlock(destinationBlockAddress, blockType, indexValue);
+            WriteIndexIndirectBlock(bufferSource.Pointer, remoteAddressOffset, remoteBlockAddress);
         }
         else
         {
@@ -231,6 +219,7 @@ internal unsafe class ShadowCopyAllocator
             destination.WriteToNewBlock(destinationBlockAddress, blockType, indexValue);
             Memory.Copy(bufferSource.Pointer, destination.Pointer, destination.Length);
             WriteIndexIndirectBlock(destination.Pointer, remoteAddressOffset, remoteBlockAddress);
+
             m_ioSessions.SwapIndex();
         }
     }
@@ -246,10 +235,6 @@ internal unsafe class ShadowCopyAllocator
         *(uint*)(pointer + (remoteAddressOffset << 2)) = remoteBlockAddress;
     }
 
-    #endregion
-
-    #region [ Data Block Shadow Copy ]
-
     /// <summary>
     /// Makes a copy of the data block. Returns <c>true</c> if a copy was made, otherwise <c>false</c> if no copy was made.
     /// </summary>
@@ -258,27 +243,28 @@ internal unsafe class ShadowCopyAllocator
     {
         // If the page does not exist -or-
         // If the data page is an old page, allocate space to create a new copy.
-        if (DataClusterAddress == 0 || DataClusterAddress <= m_lastReadOnlyBlock)
-        {
-            uint dataBlockAddress = m_fileHeaderBlock.AllocateFreeBlocks(1);
-            if (DataClusterAddress == 0)
-                m_subFileHeader.DataBlockCount++;
+        if (DataClusterAddress != 0 && DataClusterAddress > m_lastReadOnlyBlock)
+            return false; // The page has already been copied, use the existing address.
 
-            m_subFileHeader.TotalBlockCount++;
-            ShadowCopyDataCluster(DataClusterAddress, BaseVirtualAddressIndexValue, dataBlockAddress);
-            DataClusterAddress = dataBlockAddress;
-            return true;
-        }
+        uint dataBlockAddress = m_fileHeaderBlock.AllocateFreeBlocks(1);
 
-        // The page has already been copied, use the existing address.
-        return false;
+        if (DataClusterAddress == 0)
+            m_subFileHeader.DataBlockCount++;
+
+        m_subFileHeader.TotalBlockCount++;
+        ShadowCopyDataCluster(DataClusterAddress, BaseVirtualAddressIndexValue, dataBlockAddress);
+        DataClusterAddress = dataBlockAddress;
+
+        return true;
     }
 
     /// <summary>
     /// Makes a shadow copy of a data cluster.
     /// </summary>
-    /// <param name="sourceClusterAddress">the address of the first block in the cluster. 
-    /// If address is zero, it simply creates an empty cluster.</param>
+    /// <param name="sourceClusterAddress">
+    /// the address of the first block in the cluster.
+    /// If address is zero, it simply creates an empty cluster.
+    /// </param>
     /// <param name="indexValue">the index value of this first block.</param>
     /// <param name="destinationClusterAddress">the first block of the destination cluster.</param>
     private void ShadowCopyDataCluster(uint sourceClusterAddress, uint indexValue, uint destinationClusterAddress)
@@ -300,8 +286,6 @@ internal unsafe class ShadowCopyAllocator
             Memory.Clear(m_ioSessions.SourceData.Pointer, m_ioSessions.SourceData.Length);
         }
     }
-
-    #endregion
 
     #endregion
 }

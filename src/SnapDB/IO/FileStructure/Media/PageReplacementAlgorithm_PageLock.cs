@@ -30,15 +30,22 @@ namespace SnapDB.IO.FileStructure.Media;
 
 internal partial class PageReplacementAlgorithm
 {
+    #region [ Members ]
+
     /// <summary>
     /// Used to hold a lock on a page to prevent it from being collected by the collection engine.
     /// </summary>
-    internal abstract class PageLock
-        : BinaryStreamIoSessionBase, IEquatable<PageLock>
+    internal abstract class PageLock : BinaryStreamIoSessionBase, IEquatable<PageLock>
     {
-        private readonly PageReplacementAlgorithm m_parent;
+        #region [ Members ]
+
         private readonly int m_hashCode;
+        private readonly PageReplacementAlgorithm m_parent;
         private bool m_disposed;
+
+        #endregion
+
+        #region [ Constructors ]
 
         /// <summary>
         /// Creates an unallocated block.
@@ -57,12 +64,20 @@ internal partial class PageReplacementAlgorithm
             }
         }
 
+        #endregion
+
+        #region [ Properties ]
+
         /// <summary>
         /// Gets the page index associated with the page
-        /// that is cached. 
+        /// that is cached.
         /// Returns a -1 if no page is currently being used.
         /// </summary>
         public int CurrentPageIndex { get; private set; }
+
+        #endregion
+
+        #region [ Methods ]
 
         /// <summary>
         /// Releases a lock.
@@ -72,29 +87,9 @@ internal partial class PageReplacementAlgorithm
             CurrentPageIndex = -1;
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (!m_disposed)
-            {
-                CurrentPageIndex = -1; // Reset current page index.
-                m_disposed = true; // Mark object as disposed.
-                
-                if (disposing)
-                {
-                    lock (m_parent.m_syncRoot) // Lock the parent's synchronization root for thread safety.
-                    {
-                        if (!m_parent.m_disposed)
-                            m_parent.m_arrayIndexLocks.Remove(this); // If parent is not already disposed, remove this instance from the parent's list of locks.
-                    }
-                }
-            }
-
-            base.Dispose(disposing);
-        }
-
 
         /// <summary>
-        /// Attempts to get a sub page. 
+        /// Attempts to get a sub page.
         /// </summary>
         /// <param name="position">The absolute position in the stream to get the page for.</param>
         /// <param name="location">A pointer for the page.</param>
@@ -140,7 +135,8 @@ internal partial class PageReplacementAlgorithm
         /// <param name="memoryPoolIndex">The memory pool index for this data</param>
         /// <param name="wasPageAdded">Determines if the page provided was indeed added to the list.</param>
         /// <returns>The pointer to the page for this position</returns>
-        /// <remarks>If <see cref="wasPageAdded"/> is <c>false</c>, the calling function should 
+        /// <remarks>
+        /// If <see cref="wasPageAdded"/> is <c>false</c>, the calling function should
         /// return the page back to the memory pool.
         /// </remarks>
         public nint GetOrAddPage(long position, nint startOfMemoryPoolPage, int memoryPoolIndex, out bool wasPageAdded)
@@ -191,6 +187,36 @@ internal partial class PageReplacementAlgorithm
         }
 
         /// <summary>
+        /// Serves as a hash function for a particular type.
+        /// </summary>
+        /// <returns>
+        /// A hash code for the current <see cref="T:System.Object"/>.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
+        public override int GetHashCode()
+        {
+            return m_hashCode;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!m_disposed)
+            {
+                CurrentPageIndex = -1; // Reset current page index.
+                m_disposed = true; // Mark object as disposed.
+
+                if (disposing)
+                    lock (m_parent.m_syncRoot) // Lock the parent's synchronization root for thread safety.
+                    {
+                        if (!m_parent.m_disposed)
+                            m_parent.m_arrayIndexLocks.Remove(this); // If parent is not already disposed, remove this instance from the parent's list of locks.
+                    }
+            }
+
+            base.Dispose(disposing);
+        }
+
+        /// <summary>
         /// Indicates whether the current object is equal to another object of the same type.
         /// </summary>
         /// <returns>
@@ -202,16 +228,8 @@ internal partial class PageReplacementAlgorithm
             return other is null;
         }
 
-        /// <summary>
-        /// Serves as a hash function for a particular type. 
-        /// </summary>
-        /// <returns>
-        /// A hash code for the current <see cref="T:System.Object"/>.
-        /// </returns>
-        /// <filterpriority>2</filterpriority>
-        public override int GetHashCode()
-        {
-            return m_hashCode;
-        }
+        #endregion
     }
+
+    #endregion
 }

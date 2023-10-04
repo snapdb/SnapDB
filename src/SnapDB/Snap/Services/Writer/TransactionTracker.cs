@@ -33,25 +33,49 @@ namespace SnapDB.Snap.Services.Writer;
 /// <typeparam name="TValue">The value</typeparam>
 /// <remarks>
 /// Transaction IDs are long values, starting with zero. The reason behind this, even if 2 billion transactions
-/// could happen per second, it would still take over 100 years without an application restart to loop around. 
+/// could happen per second, it would still take over 100 years without an application restart to loop around.
 /// Realistically a therotical peak would be 200 million transactions per second (An Interlocked.Increment).
 /// </remarks>
-public class TransactionTracker<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class TransactionTracker<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Members ]
 
     /// <summary>
     /// An internal class created for each thread that is waiting for a transaction to committ.
     /// </summary>
     private class WaitForCommit : IDisposable
     {
-        public long TransactionId { get; }
+        #region [ Members ]
+
         private ManualResetEvent m_resetEvent;
+
+        #endregion
+
+        #region [ Constructors ]
+
         public WaitForCommit(long transactionId)
         {
             TransactionId = transactionId;
             m_resetEvent = new ManualResetEvent(false);
+        }
+
+        #endregion
+
+        #region [ Properties ]
+
+        public long TransactionId { get; }
+
+        #endregion
+
+        #region [ Methods ]
+
+        public void Dispose()
+        {
+            if (m_resetEvent is not null)
+            {
+                m_resetEvent.Dispose();
+                m_resetEvent = null;
+            }
         }
 
         public void Wait()
@@ -64,23 +88,21 @@ public class TransactionTracker<TKey, TValue>
             m_resetEvent.Set();
         }
 
-        public void Dispose()
-        {
-            if (m_resetEvent is not null)
-            {
-                m_resetEvent.Dispose();
-                m_resetEvent = null;
-            }
-        }
+        #endregion
     }
 
-    private readonly object m_syncRoot;
-    private long m_transactionSoftCommitted;
-    private long m_transactionHardCommitted;
-    private readonly PrebufferWriter<TKey, TValue> m_prebuffer;
     private readonly FirstStageWriter<TKey, TValue> m_firstStageWriter;
-    private readonly List<WaitForCommit> m_waitingForSoftCommit;
+    private readonly PrebufferWriter<TKey, TValue> m_prebuffer;
+
+    private readonly object m_syncRoot;
+    private long m_transactionHardCommitted;
+    private long m_transactionSoftCommitted;
     private readonly List<WaitForCommit> m_waitingForHardCommit;
+    private readonly List<WaitForCommit> m_waitingForSoftCommit;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new transaction tracker that monitors the provided buffers.
@@ -99,6 +121,66 @@ public class TransactionTracker<TKey, TValue>
         m_firstStageWriter = firstStageWriter;
         m_firstStageWriter.RolloverComplete += TransactionSoftCommitted;
         m_firstStageWriter.SequenceNumberCommitted += TransactionHardCommitted;
+    }
+
+    #endregion
+
+    #region [ Methods ]
+
+    /// <summary>
+    /// Wait for the specified transaction to commit to memory.
+    /// </summary>
+    /// <param name="transactionId"></param>
+    public void WaitForSoftCommit(long transactionId)
+    {
+        lock (m_syncRoot)
+        {
+            if (m_transactionSoftCommitted > transactionId)
+                return;
+        }
+
+        m_prebuffer.Commit(transactionId);
+
+        using WaitForCommit wait = new(transactionId);
+        lock (m_syncRoot)
+        {
+            if (m_transactionSoftCommitted > transactionId)
+                return;
+            m_waitingForSoftCommit.Add(wait);
+        }
+
+        wait.Wait();
+    }
+
+    /// <summary>
+    /// Waits for the specified transaction to commit to the disk.
+    /// </summary>
+    /// <param name="transactionId"></param>
+    public void WaitForHardCommit(long transactionId)
+    {
+        bool triggerSoft = false;
+        lock (m_syncRoot)
+        {
+            if (m_transactionHardCommitted > transactionId)
+                return;
+            if (m_transactionSoftCommitted > transactionId)
+                triggerSoft = true;
+        }
+
+        if (triggerSoft)
+            m_prebuffer.Commit(transactionId);
+        m_firstStageWriter.Commit(transactionId);
+
+
+        using WaitForCommit wait = new(transactionId);
+        lock (m_syncRoot)
+        {
+            if (m_transactionHardCommitted > transactionId)
+                return;
+            m_waitingForHardCommit.Add(wait);
+        }
+
+        wait.Wait();
     }
 
     /// <summary>
@@ -143,55 +225,5 @@ public class TransactionTracker<TKey, TValue>
         }
     }
 
-    /// <summary>
-    /// Wait for the specified transaction to commit to memory.
-    /// </summary>
-    /// <param name="transactionId"></param>
-    public void WaitForSoftCommit(long transactionId)
-    {
-        lock (m_syncRoot)
-        {
-            if (m_transactionSoftCommitted > transactionId)
-                return;
-        }
-        m_prebuffer.Commit(transactionId);
-
-        using WaitForCommit wait = new(transactionId);
-        lock (m_syncRoot)
-        {
-            if (m_transactionSoftCommitted > transactionId)
-                return;
-            m_waitingForSoftCommit.Add(wait);
-        }
-        wait.Wait();
-    }
-
-    /// <summary>
-    /// Waits for the specified transaction to commit to the disk.
-    /// </summary>
-    /// <param name="transactionId"></param>
-    public void WaitForHardCommit(long transactionId)
-    {
-        bool triggerSoft = false;
-        lock (m_syncRoot)
-        {
-            if (m_transactionHardCommitted > transactionId)
-                return;
-            if (m_transactionSoftCommitted > transactionId)
-                triggerSoft = true;
-        }
-        if (triggerSoft)
-            m_prebuffer.Commit(transactionId);
-        m_firstStageWriter.Commit(transactionId);
-
-
-        using WaitForCommit wait = new(transactionId);
-        lock (m_syncRoot)
-        {
-            if (m_transactionHardCommitted > transactionId)
-                return;
-            m_waitingForHardCommit.Add(wait);
-        }
-        wait.Wait();
-    }
+    #endregion
 }

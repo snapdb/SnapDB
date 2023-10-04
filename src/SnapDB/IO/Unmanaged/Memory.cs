@@ -33,18 +33,11 @@ using Gemstone.Diagnostics;
 namespace SnapDB.IO.Unmanaged;
 
 /// <summary>
-/// This class is used to allocate and free unmanaged memory.  
+/// This class is used to allocate and free unmanaged memory.
 /// To release memory allocated through this class, call the Dispose() method of the return value.
 /// </summary>
-/// <remarks>
-/// .NET does not respond well when managing tens of GBs of ram.  If a very large buffer pool must be created,
-/// it would be good to allocate that buffer pool in unmanaged memory.
-/// </remarks>
-public sealed class Memory
-    : IDisposable
+public sealed class Memory : IDisposable
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(Memory), MessageClass.Component);
-
     #region [ Members ]
 
     private nint m_address;
@@ -56,8 +49,10 @@ public sealed class Memory
     /// <summary>
     /// Allocates unmanaged memory. The block is uninitialized.
     /// </summary>
-    /// <param name="requestedSize">The desired number of bytes to allocate. 
-    /// Be sure to check the actual size in the return class.</param>
+    /// <param name="requestedSize">
+    /// The desired number of bytes to allocate.
+    /// Be sure to check the actual size in the return class.
+    /// </param>
     /// <returns>The allocated memory.</returns>
     public Memory(int requestedSize)
     {
@@ -82,7 +77,7 @@ public sealed class Memory
     #region [ Properties ]
 
     /// <summary>
-    /// The pointer to the first byte of this unmanaged memory. 
+    /// The pointer to the first byte of this unmanaged memory.
     /// Equals <see cref="IntPtr.Zero"/> if memory has been released.
     /// </summary>
     public nint Address => m_address;
@@ -97,6 +92,31 @@ public sealed class Memory
     #region [ Methods ]
 
     /// <summary>
+    /// Releases all the resources used by the <see cref="Memory"/> object.
+    /// </summary>
+    public void Dispose()
+    {
+        Size = 0;
+        nint value = Interlocked.Exchange(ref m_address, nint.Zero);
+
+        if (value == nint.Zero)
+            return;
+
+        try
+        {
+            Marshal.FreeHGlobal(value);
+        }
+        catch (Exception ex)
+        {
+            s_log.Publish(MessageLevel.Error, "Unexpected Exception while releasing unmanaged memory", null, null, ex);
+        }
+        finally
+        {
+            GC.SuppressFinalize(this);
+        }
+    }
+
+    /// <summary>
     /// Releases the allocated memory back to the OS.
     /// Same thing as calling Dispose().
     /// </summary>
@@ -105,37 +125,14 @@ public sealed class Memory
         Dispose();
     }
 
-    /// <summary>
-    /// Releases all the resources used by the <see cref="Memory"/> object.
-    /// </summary>
-    public void Dispose()
-    {
-        Size = 0;
-        nint value = Interlocked.Exchange(ref m_address, nint.Zero);
-        if (value != nint.Zero)
-        {
-            try
-            {
-                Marshal.FreeHGlobal(value);
-            }
-            catch (Exception ex)
-            {
-                s_log.Publish(MessageLevel.Error, "Unexpected Exception while releasing unmanaged memory", null, null, ex);
-            }
-            finally
-            {
-                GC.SuppressFinalize(this);
-            }
-        }
-    }
-
     #endregion
 
+    #region [ Static ]
 
-    #region [ Methods ]
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(Memory), MessageClass.Component);
 
     /// <summary>
-    /// Does a safe copy of data from one location to another. 
+    /// Does a safe copy of data from one location to another.
     /// A safe copy allows for the source and destination to overlap.
     /// </summary>
     /// <param name="src">A pointer to the source location from which data will be copied.</param>
@@ -147,7 +144,7 @@ public sealed class Memory
     }
 
     /// <summary>
-    /// Does a safe copy of data from one location to another. 
+    /// Does a safe copy of data from one location to another.
     /// A safe copy allows for the source and destination to overlap.
     /// </summary>
     /// <param name="src">A pointer to the source location from which data will be copied.</param>
@@ -166,15 +163,12 @@ public sealed class Memory
     public static unsafe void Clear(byte* pointer, int length)
     {
         int i;
+
         for (i = 0; i <= length - 8; i += 8)
-        {
             *(long*)(pointer + i) = 0;
-        }
 
         for (; i < length; i++)
-        {
             pointer[i] = 0;
-        }
     }
 
     /// <summary>

@@ -24,8 +24,8 @@
 //
 //******************************************************************************************************
 
-using SnapDB.IO.Unmanaged;
 using SnapDB.IO;
+using SnapDB.IO.Unmanaged;
 
 namespace SnapDB.Snap;
 
@@ -34,15 +34,21 @@ namespace SnapDB.Snap;
 /// </summary>
 public abstract class SnapTypeBase
 {
+    #region [ Constructors ]
+
     /// <summary>
     /// Ensures that only <see cref="SnapTypeBase{T}"/> inherits from this class.
     /// </summary>
     protected internal SnapTypeBase()
     {
-
     }
+
+    #endregion
+
+    #region [ Properties ]
+
     /// <summary>
-    /// The GUID uniquely defining this type. 
+    /// The GUID uniquely defining this type.
     /// It is important to uniquely tie 1 type to 1 GUID.
     /// </summary>
     public abstract Guid GenericTypeGuid { get; }
@@ -51,6 +57,10 @@ public abstract class SnapTypeBase
     /// Gets the size of this class when serialized.
     /// </summary>
     public abstract int Size { get; }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Sets the provided key to it's minimum value.
@@ -78,7 +88,7 @@ public abstract class SnapTypeBase
     /// </summary>
     /// <param name="stream">The stream to write to.</param>
     public abstract void Write(BinaryStreamBase stream);
-    
+
     /// <summary>
     /// Reads the provided key from the stream.
     /// </summary>
@@ -88,7 +98,9 @@ public abstract class SnapTypeBase
         byte[] data = new byte[Size];
         stream.Read(data, 0, data.Length);
         fixed (byte* lp = data)
+        {
             Read(lp);
+        }
     }
 
     /// <summary>
@@ -99,7 +111,10 @@ public abstract class SnapTypeBase
     {
         byte[] data = new byte[Size];
         fixed (byte* lp = data)
+        {
             Write(lp);
+        }
+
         stream.Write(data, 0, data.Length);
     }
 
@@ -133,4 +148,5 @@ public abstract class SnapTypeBase
         Memory.Copy(source, destination, Size);
     }
 
+    #endregion
 }

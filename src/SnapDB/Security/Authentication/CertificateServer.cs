@@ -30,12 +30,22 @@ namespace SnapDB.Security.Authentication;
 
 public class CertificateServer
 {
+    #region [ Members ]
+
     public CertificateUserCredentials Users;
+
+    #endregion
+
+    #region [ Constructors ]
 
     public CertificateServer()
     {
         Users = new CertificateUserCredentials();
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     public string AuthenticateAsServer(Stream stream)
     {
@@ -48,10 +58,11 @@ public class CertificateServer
         {
             return null;
         }
+
         if (Users.Exists(negotiateStream.RemoteIdentity))
-        {
             return "";
-        }
         return "";
     }
+
+    #endregion
 }

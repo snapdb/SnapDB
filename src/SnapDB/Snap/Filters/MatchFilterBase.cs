@@ -35,10 +35,16 @@ namespace SnapDB.Snap.Filters;
 /// <typeparam name="TValue">The value to match.</typeparam>
 public abstract class MatchFilterBase<TKey, TValue>
 {
+    #region [ Properties ]
+
     /// <summary>
     /// The filter GUID.
     /// </summary>
     public abstract Guid FilterType { get; }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Serializes the filter to a stream.
@@ -52,4 +58,6 @@ public abstract class MatchFilterBase<TKey, TValue>
     /// <param name="key">The key to check.</param>
     /// <param name="value">The value to check.</param>
     public abstract bool Contains(TKey key, TValue value);
+
+    #endregion
 }

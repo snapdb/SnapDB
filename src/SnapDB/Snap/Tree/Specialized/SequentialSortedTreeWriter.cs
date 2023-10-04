@@ -34,10 +34,9 @@ namespace SnapDB.Snap.Tree.Specialized;
 /// </summary>
 /// <typeparam name="TKey">The type of keys stored in the tree.</typeparam>
 /// <typeparam name="TValue">The type of values stored in the tree.</typeparam>
-public static class SequentialSortedTreeWriter<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public static class SequentialSortedTreeWriter<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Static ]
 
     /// <summary>
     /// Writes the supplied stream to the binary stream.
@@ -92,4 +91,6 @@ public static class SequentialSortedTreeWriter<TKey, TValue>
         header.IsDirty = true;
         header.SaveHeader(stream);
     }
+
+    #endregion
 }

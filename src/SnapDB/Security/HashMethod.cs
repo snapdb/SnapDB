@@ -35,14 +35,17 @@ public enum HashMethod : byte
     /// Uses Hash and HMAC Sha1
     /// </summary>
     Sha1 = 0,
+
     /// <summary>
     /// Uses Hash and HMAC Sha2-256
     /// </summary>
     Sha256 = 1,
+
     /// <summary>
     /// Uses Hash and HMAC Sha2-384
     /// </summary>
     Sha384 = 2,
+
     /// <summary>
     /// Uses Hash and HMAC Sha2-512
     /// </summary>

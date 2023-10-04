@@ -31,16 +31,27 @@ namespace SnapDB.IO.Unmanaged;
 /// </summary>
 public partial class UnmanagedMemoryStream
 {
+    #region [ Members ]
+
     // Nested Types
-    private class IoSession
-        : BinaryStreamIoSessionBase
+    private class IoSession : BinaryStreamIoSessionBase
     {
+        #region [ Members ]
+
         private readonly UnmanagedMemoryStream m_stream;
+
+        #endregion
+
+        #region [ Constructors ]
 
         public IoSession(UnmanagedMemoryStream stream)
         {
             m_stream = stream ?? throw new ArgumentNullException(nameof(stream));
         }
+
+        #endregion
+
+        #region [ Methods ]
 
         public override void GetBlock(BlockArguments args)
         {
@@ -51,5 +62,9 @@ public partial class UnmanagedMemoryStream
         public override void Clear()
         {
         }
+
+        #endregion
     }
+
+    #endregion
 }

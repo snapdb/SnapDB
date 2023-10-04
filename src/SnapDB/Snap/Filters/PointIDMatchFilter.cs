@@ -29,21 +29,22 @@
 
 
 using System.Data;
-using SnapDB.Snap.Types;
 using System.Runtime.CompilerServices;
-using static SnapDB.Snap.Filters.PointIdMatchFilterBitArray;
 using SnapDB.IO;
+using SnapDB.Snap.Types;
+using static SnapDB.Snap.Filters.PointIdMatchFilterBitArray;
 
 namespace SnapDB.Snap.Filters;
 
 public partial class PointIdMatchFilter
 {
+    #region [ Static ]
+
     /// <summary>
     /// Creates a filter from the provided <paramref name="pointId"/>.
     /// </summary>
     /// <param name="pointId">Point ID to include in the filter.</param>
-    public static MatchFilterBase<TKey, TValue> CreateFromPointId<TKey, TValue>(ulong pointId)
-        where TKey : TimestampPointIdBase<TKey>, new()
+    public static MatchFilterBase<TKey, TValue> CreateFromPointId<TKey, TValue>(ulong pointId) where TKey : TimestampPointIdBase<TKey>, new()
     {
         if (pointId < 8 * 1024 * 64) // 64KB of space, 524288
             return new BitArrayFilter<TKey, TValue>(new[] { pointId }, pointId);
@@ -65,8 +66,7 @@ public partial class PointIdMatchFilter
     /// The match filter includes keys whose point IDs match any of the point IDs in the <paramref name="listOfPointIDs"/> collection.
     /// The appropriate filter type is chosen based on the maximum point ID value in the list.
     /// </remarks>
-    public static MatchFilterBase<TKey, TValue> CreateFromList<TKey, TValue>(IEnumerable<ulong> listOfPointIDs)
-        where TKey : TimestampPointIdBase<TKey>, new()
+    public static MatchFilterBase<TKey, TValue> CreateFromList<TKey, TValue>(IEnumerable<ulong> listOfPointIDs) where TKey : TimestampPointIdBase<TKey>, new()
     {
         MatchFilterBase<TKey, TValue> filter;
         ulong maxValue = 0;
@@ -101,8 +101,7 @@ public partial class PointIdMatchFilter
     /// The match filter is deserialized from the binary stream based on its version and data format.
     /// </remarks>
     [MethodImpl(MethodImplOptions.NoOptimization)]
-    private static MatchFilterBase<TKey, TValue> CreateFromStream<TKey, TValue>(BinaryStreamBase stream)
-        where TKey : TimestampPointIdBase<TKey>, new()
+    private static MatchFilterBase<TKey, TValue> CreateFromStream<TKey, TValue>(BinaryStreamBase stream) where TKey : TimestampPointIdBase<TKey>, new()
     {
         MatchFilterBase<TKey, TValue> filter;
         byte version = stream.ReadUInt8();
@@ -136,7 +135,9 @@ public partial class PointIdMatchFilter
             default:
                 throw new VersionNotFoundException("Unknown Version");
         }
+
         return filter;
     }
 
+    #endregion
 }

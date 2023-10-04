@@ -33,18 +33,68 @@ namespace SnapDB.Threading;
 /// WARNING: This lock should be used in a Using block, and duplicate calls to Lock without releasing will cause a deadlock.
 /// </summary>
 /// <remarks>
-/// After writing this class I did some review of the methodology. 
+/// After writing this class I did some review of the methodology.
 /// Reviewing this article: http://www.adammil.net/blog/v111_Creating_High-Performance_Locks_and_Lock-free_Code_for_NET_.html
 /// Brings up stability issues with the lock. Namely what happens when unhandled exceptions occurs when acquiring and releasing the lock.
 /// I have intentionally left out any kind of protection against this as it severly reduces the speed of this code. Therefore
-/// do not use this locking method where a Thread.Abort() might be used as a control method. 
+/// do not use this locking method where a Thread.Abort() might be used as a control method.
 /// </remarks>
 public class TinyLock
 {
-    private const int Unlocked = 0;
+    #region [ Members ]
+
+    /// <summary>
+    /// A structure that will allow releasing of a lock. This is returned by <see cref="Lock"/>.
+    /// </summary>
+    public readonly struct TinyLockRelease : IDisposable
+    {
+        #region [ Members ]
+
+        private readonly TinyLock m_tinyLock;
+
+        #endregion
+
+        #region [ Constructors ]
+
+        internal TinyLockRelease(TinyLock tinyLock)
+        {
+            if (tinyLock is null)
+                throw new ArgumentNullException(nameof(tinyLock));
+
+            if (tinyLock.m_release.m_tinyLock is not null)
+                throw new Exception("Object is already locked");
+
+            m_tinyLock = tinyLock;
+        }
+
+        #endregion
+
+        #region [ Methods ]
+
+        /// <summary>
+        /// Releases an acquired lock.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Dispose()
+        {
+            // Decided to do an Interlocked command as it implies a full memory fense.
+            Interlocked.Exchange(ref m_tinyLock.m_lock, Unlocked);
+            // A volatile write implies that even if this is inlined, the unlock will never be reordered above its current location.
+            // m_tinyLock.m_lock = Unlocked;
+        }
+
+        #endregion
+    }
+
     private const int Locked = 1;
+
+    private const int Unlocked = 0;
     private int m_lock;
     private readonly TinyLockRelease m_release;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a <see cref="TinyLock"/>.
@@ -55,13 +105,17 @@ public class TinyLock
         m_release = new TinyLockRelease(this);
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Acquires an exclusive lock on this class. Place call in a using block.
     /// Duplicate calls to this within the same thread will cause a deadlock.
     /// </summary>
     /// <returns>
-    /// A structure that will release the lock. 
-    /// This struct will always be the exact same value. Therefore it can be 
+    /// A structure that will release the lock.
+    /// This struct will always be the exact same value. Therefore it can be
     /// stored once if desired, however, be careful when using it this way as inproper synchronization
     /// will be easier to occur.
     /// </returns>
@@ -70,7 +124,7 @@ public class TinyLock
     {
         if (Interlocked.Exchange(ref m_lock, Locked) != Unlocked) // If I successfully changed the state from unlocked to locked, then I now acquire the lock.
             LockSlower();
-        
+
         return m_release;
     }
 
@@ -85,33 +139,5 @@ public class TinyLock
             spin.SpinOnce();
     }
 
-    /// <summary>
-    /// A structure that will allow releasing of a lock. This is returned by <see cref="Lock"/>.
-    /// </summary>
-    public readonly struct TinyLockRelease : IDisposable
-    {
-        private readonly TinyLock m_tinyLock;
-        internal TinyLockRelease(TinyLock tinyLock)
-        {
-            if (tinyLock is null)
-                throw new ArgumentNullException(nameof(tinyLock));
-            
-            if (tinyLock.m_release.m_tinyLock is not null)
-                throw new Exception("Object is already locked");
-            
-            m_tinyLock = tinyLock;
-        }
-
-        /// <summary>
-        /// Releases an acquired lock.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Dispose()
-        {
-            // Decided to do an Interlocked command as it implies a full memory fense.
-            Interlocked.Exchange(ref m_tinyLock.m_lock, Unlocked);
-            // A volatile write implies that even if this is inlined, the unlock will never be reordered above its current location.
-            // m_tinyLock.m_lock = Unlocked;
-        }
-    }
+    #endregion
 }

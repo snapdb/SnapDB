@@ -24,20 +24,25 @@
 //
 //******************************************************************************************************
 
-using Gemstone.IO.StreamExtensions;
 using System.Data;
+using Gemstone.IO.StreamExtensions;
 
 namespace SnapDB.Snap.Services.Writer;
 
 /// <summary>
 /// All of the settings for the prebuffer writer
 /// </summary>
-public class PrebufferWriterSettings
-    : SettingsBase<PrebufferWriterSettings>
+public class PrebufferWriterSettings : SettingsBase<PrebufferWriterSettings>
 {
-    private int m_rolloverInterval = 100;
+    #region [ Members ]
+
     private int m_maximumPointCount = 10000;
+    private int m_rolloverInterval = 100;
     private int m_rolloverPointCount = 5000;
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// The maximum interval to wait in milliseconds before taking the prebuffer and rolling it into a Stage 0 Archive.
@@ -52,17 +57,11 @@ public class PrebufferWriterSettings
         {
             TestForEditable();
             if (value < 1)
-            {
                 m_rolloverInterval = 1;
-            }
             else if (value > 1000)
-            {
                 m_rolloverInterval = 1000;
-            }
             else
-            {
                 m_rolloverInterval = value;
-            }
         }
     }
 
@@ -79,22 +78,16 @@ public class PrebufferWriterSettings
         {
             TestForEditable();
             if (value < 1000)
-            {
                 m_maximumPointCount = 1000;
-            }
             else if (value > 100000)
-            {
                 m_maximumPointCount = 100000;
-            }
             else
-            {
                 m_maximumPointCount = value;
-            }
         }
     }
 
     /// <summary>
-    /// The number of points before a rollover is queued. This should be before the maximum point 
+    /// The number of points before a rollover is queued. This should be before the maximum point
     /// count since once the maximum point count has been reached, a thread pause will result.
     /// </summary>
     /// <remarks>
@@ -107,19 +100,17 @@ public class PrebufferWriterSettings
         {
             TestForEditable();
             if (value < 1000)
-            {
                 m_rolloverPointCount = 1000;
-            }
             else if (value > 100000)
-            {
                 m_rolloverPointCount = 100000;
-            }
             else
-            {
                 m_rolloverPointCount = value;
-            }
         }
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     public override void Save(Stream stream)
     {
@@ -142,7 +133,6 @@ public class PrebufferWriterSettings
                 break;
             default:
                 throw new VersionNotFoundException("Unknown Version Code: " + version);
-
         }
     }
 
@@ -150,4 +140,6 @@ public class PrebufferWriterSettings
     {
         //Nothing to validate 
     }
+
+    #endregion
 }

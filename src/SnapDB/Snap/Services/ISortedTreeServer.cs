@@ -31,9 +31,13 @@ namespace SnapDB.Snap.Services;
 /// </summary>
 public interface ISortedTreeServer : IDisposable
 {
+    #region [ Methods ]
+
     /// <summary>
     /// Creates a client connection to the server.
     /// </summary>
     /// <returns></returns>
     SnapClient CreateClientHost();
+
+    #endregion
 }

@@ -30,13 +30,19 @@ namespace SnapDB.Security.Authentication;
 /// Provides simple password based authentication that uses SCRAM.
 /// </summary>
 /// <remarks>
-/// It is safe to store the user's credential on the server. This is a zero knowledge 
+/// It is safe to store the user's credential on the server. This is a zero knowledge
 /// password proof, meaning if this database is compromised, a brute force attack
 /// is the only way to reveal the password.
 /// </remarks>
 public class ScramUserCredentials
 {
+    #region [ Members ]
+
     private readonly Dictionary<ReadonlyByteArray, ScramUserCredential> m_users = new();
+
+    #endregion
+
+    #region [ Methods ]
 
     public bool TryLookup(byte[] username, out ScramUserCredential user)
     {
@@ -55,6 +61,5 @@ public class ScramUserCredentials
         }
     }
 
+    #endregion
 }
-
-

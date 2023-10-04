@@ -32,10 +32,10 @@ namespace SnapDB.Snap.Services;
 /// Core functionality for any setting of <see cref="SnapServer"/> or any child setting.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public abstract class SettingsBase<T>
-    : ImmutableObjectAutoBase<T>
-    where T : SettingsBase<T>
+public abstract class SettingsBase<T> : ImmutableObjectAutoBase<T> where T : SettingsBase<T>
 {
+    #region [ Methods ]
+
     /// <summary>
     /// Saves the setting to the supplied stream
     /// </summary>
@@ -53,4 +53,5 @@ public abstract class SettingsBase<T>
     /// </summary>
     public abstract void Validate();
 
+    #endregion
 }

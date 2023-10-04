@@ -25,8 +25,8 @@
 //******************************************************************************************************
 
 using System.Runtime.InteropServices;
-using Gemstone.Diagnostics;
 using Gemstone;
+using Gemstone.Diagnostics;
 using SnapDB.Collections;
 using SnapDB.IO.Unmanaged;
 using SnapDB.Threading;
@@ -37,29 +37,42 @@ namespace SnapDB.IO.FileStructure.Media;
 /// A functional wrapper around a <see cref="FileStream"/>
 /// specific to how the <see cref="TransactionalFileStructure"/> uses the <see cref="FileStream"/>.
 /// </summary>
-internal sealed class CustomFileStream
-    : IDisposable
+internal sealed class CustomFileStream : IDisposable
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(CustomFileStream), MessageClass.Component);
+    #region [ Members ]
 
-    // Needed since this class computes footer check-sums.
-    private bool m_disposed;
-
-    private FileStream? m_stream;
-    private int m_streamUsers;
     private readonly ResourceQueue<byte[]> m_bufferQueue;
 
     /// <summary>
-    /// Lock this first. Allows the <see cref="m_stream"/> item to be replaced in 
-    /// a synchronized fashion. 
+    /// Lock this first. Allows the <see cref="m_stream"/> item to be replaced in
+    /// a synchronized fashion.
     /// </summary>
     private readonly ReaderWriterLockEasy m_isUsingStream = new();
+
+    private readonly AtomicInt64 m_length = new();
+
+    private FileStream? m_stream;
+    private int m_streamUsers;
 
     /// <summary>
     /// Needed to properly synchronize read and write operations.
     /// </summary>
     private readonly object m_syncRoot;
-    private readonly AtomicInt64 m_length = new();
+
+    // Needed since this class computes footer check-sums.
+    private bool m_disposed;
+
+    #endregion
+
+    #region [ Constructors ]
+
+    /// <summary>
+    /// Creates a resource list that everyone shares.
+    /// </summary>
+    static CustomFileStream()
+    {
+        s_resourceList = new ResourceQueueCollection<int, byte[]>(blockSize => () => new byte[blockSize], 10, 20);
+    }
 
     /// <summary>
     /// Creates a new CustomFileStream
@@ -102,6 +115,8 @@ internal sealed class CustomFileStream
     }
 #endif
 
+    #endregion
+
     #region [ Properties ]
 
     /// <summary>
@@ -137,6 +152,30 @@ internal sealed class CustomFileStream
     #endregion
 
     #region [ Methods ]
+
+    /// <summary>
+    /// Releases all the resources used by the <see cref="CustomFileStream"/> object.
+    /// </summary>
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+
+        if (m_disposed)
+            return;
+
+        try
+        {
+            using (m_isUsingStream.EnterWriteLock())
+            {
+                m_stream?.Dispose();
+                m_stream = null;
+            }
+        }
+        finally
+        {
+            m_disposed = true; // Prevent duplicate dispose.
+        }
+    }
 
     /// <summary>
     /// Opens the underlying file stream.
@@ -203,7 +242,7 @@ internal sealed class CustomFileStream
 
                     len = results.Result;
                 }
-                
+
                 totalLengthRead += len;
 
                 if (len == length)
@@ -325,16 +364,12 @@ internal sealed class CustomFileStream
             m_bufferQueue.Enqueue(buffer);
 
             if (waitForWriteToDisk)
-            {
                 FlushFileBuffers();
-            }
             else
-            {
                 using (m_isUsingStream.EnterReadLock())
                 {
                     m_stream!.Flush(false);
                 }
-            }
         }
         finally
         {
@@ -386,26 +421,6 @@ internal sealed class CustomFileStream
         }
     }
 
-    private void ReopenFile()
-    {
-        using (m_isUsingStream.EnterWriteLock())
-        {
-            string fileName = m_stream!.Name;
-
-            try
-            {
-                m_stream.Dispose();
-                m_stream = null;
-            }
-            catch (Exception ex)
-            {
-                s_log.Publish(MessageLevel.Info, "Error when disposing stream", null, null, ex);
-            }
-
-            m_stream = new FileStream(fileName, FileMode.Open, IsReadOnly ? FileAccess.Read : FileAccess.ReadWrite, IsSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
-        }
-    }
-
     /// <summary>
     /// Reopens the file with different permissions.
     /// </summary>
@@ -426,33 +441,36 @@ internal sealed class CustomFileStream
         }
     }
 
-    /// <summary>
-    /// Releases all the resources used by the <see cref="CustomFileStream"/> object.
-    /// </summary>
-    public void Dispose()
+    private void ReopenFile()
     {
-        GC.SuppressFinalize(this);
-
-        if (m_disposed)
-            return;
-        
-        try
+        using (m_isUsingStream.EnterWriteLock())
         {
-            using (m_isUsingStream.EnterWriteLock())
+            string fileName = m_stream!.Name;
+
+            try
             {
-                m_stream?.Dispose();
+                m_stream.Dispose();
                 m_stream = null;
             }
-        }
-        finally
-        {
-            m_disposed = true; // Prevent duplicate dispose.
+            catch (Exception ex)
+            {
+                s_log.Publish(MessageLevel.Info, "Error when disposing stream", null, null, ex);
+            }
+
+            m_stream = new FileStream(fileName, FileMode.Open, IsReadOnly ? FileAccess.Read : FileAccess.ReadWrite, IsSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
         }
     }
 
     #endregion
 
     #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(CustomFileStream), MessageClass.Component);
+
+    /// <summary>
+    /// Queues byte[] blocks.
+    /// </summary>
+    private static readonly ResourceQueueCollection<int, byte[]> s_resourceList;
 
     /// <summary>
     /// Creates a file with the supplied name.
@@ -483,19 +501,6 @@ internal sealed class CustomFileStream
         }
 
         return new CustomFileStream(ioBlockSize, fileStructureBlockSize, fileName, isReadOnly, isSharingEnabled);
-    }
-
-    /// <summary>
-    /// Queues byte[] blocks.
-    /// </summary>
-    private static readonly ResourceQueueCollection<int, byte[]> s_resourceList;
-
-    /// <summary>
-    /// Creates a resource list that everyone shares.
-    /// </summary>
-    static CustomFileStream()
-    {
-        s_resourceList = new ResourceQueueCollection<int, byte[]>(blockSize => () => new byte[blockSize], 10, 20);
     }
 
     #endregion

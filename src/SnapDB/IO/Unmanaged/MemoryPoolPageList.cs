@@ -23,9 +23,13 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
+#pragma warning disable CS0649
 
-using Gemstone.Diagnostics;
+using System.Runtime.InteropServices;
 using Gemstone;
+using Gemstone.Console;
+using Gemstone.Diagnostics;
+using Gemstone.Units;
 using SnapDB.Collections;
 using SnapDB.Threading;
 
@@ -37,64 +41,50 @@ namespace SnapDB.IO.Unmanaged;
 /// <remarks>
 /// This class is not thread-safe.
 /// </remarks>
-internal class MemoryPoolPageList
-    : IDisposable
+internal class MemoryPoolPageList : IDisposable
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(MemoryPoolPageList), MessageClass.Component);
-
     #region [ Members ]
 
     /// <summary>
-    /// Points to each windows API allocation.
-    /// </summary>
-    private readonly List<Memory> m_memoryBlocks;
-
-    /// <summary>
-    /// A bit array that references each page and determines if the page is free.
-    /// Set means page is free, cleared means page is either being used, or was never allocated from Windows.
-    /// </summary>
-    private readonly BitArray m_isPageFree;
-
-    /// <summary>
-    /// The number of pages that exist within a Windows API allocation.
-    /// </summary>
-    private readonly int m_pagesPerMemoryBlock;
-    private readonly int m_pagesPerMemoryBlockShiftBits;
-    private readonly int m_pagesPerMemoryBlockMask;
-    /// <summary>
-    /// The number of bytes per Windows API allocation block
-    /// </summary>
-    private readonly int m_memoryBlockSize;
-    private readonly object m_syncRoot;
-
-    /// <summary>
-    /// Gets the number of memory blocks that have been allocated from Windows API.
-    /// </summary>
-    private int m_memoryBlockAllocations;
-
-    /// <summary>
-    /// The number of pages that have been used.
-    /// </summary>
-    private int m_usedPageCount;
-
-    private bool m_disposed;
-
-    /// <summary>
-    /// Each page will be exactly this size (based on RAM).
-    /// </summary>
-    public readonly int PageSize;
-
-    /// <summary>
-    /// The maximum supported number of bytes that can be allocated based
+    /// Defines the maximum supported number of bytes that can be allocated based
     /// on the amount of RAM in the system. This is not user-configurable.
     /// </summary>
     public readonly long MemoryPoolCeiling;
 
+    /// <summary>
+    /// Defines number of bytes in RAM that a page will exactly occupy.
+    /// </summary>
+    public readonly int PageSize;
+
+    // A bit array that references each page and determines if the page is free.
+    // Set means page is free, cleared means page is either being used, or was never allocated from Windows.
+    private readonly BitArray m_isPageFree;
+
     private readonly AtomicInt64 m_maximumPoolSize = new();
+
+    // Gets the number of unmanaged memory blocks that have been allocated.
+    private int m_memoryBlockAllocations;
+
+    // Points to each windows API allocation.
+    private readonly List<Memory?> m_memoryBlocks;
+
+    // The number of bytes per Windows API allocation block.
+    private readonly int m_memoryBlockSize;
+
+    // The number of pages that exist within an unmanaged memory allocation.
+    private readonly int m_pagesPerMemoryBlock;
+    private readonly int m_pagesPerMemoryBlockMask;
+    private readonly int m_pagesPerMemoryBlockShiftBits;
+    private readonly object m_syncRoot;
+
+    // The number of pages that have been used.
+    private int m_usedPageCount;
+
+    private bool m_disposed;
 
     #endregion
 
-    #region [ Constructor ]
+    #region [ Constructors ]
 
     /// <summary>
     /// Create a thread safe list of MemoryPool pages.
@@ -109,12 +99,8 @@ internal class MemoryPoolPageList
         m_syncRoot = new object();
         PageSize = pageSize;
 
-        // TODO: JRC - determine if these should be added to Gemstone core:
-        long totalMemory = int.MaxValue;
-        long availableMemory = int.MaxValue;
-
-        //long totalMemory = (long)Common.GetTotalPhysicalMemory();
-        //long availableMemory = (long)Common.GetAvailablePhysicalMemory();
+        long totalMemory = (long)GetTotalPhysicalMemory();
+        long availableMemory = (long)GetAvailablePhysicalMemory();
 
         if (!Environment.Is64BitProcess)
         {
@@ -138,6 +124,7 @@ internal class MemoryPoolPageList
         {
             MaximumPoolSize = Math.Max(Math.Min(MemoryPoolCeiling, maximumBufferSize), MemoryPool.MinimumTestedSupportedMemoryFloor);
         }
+
         s_log.Publish(MessageLevel.Info, "Memory Pool Maximum Defaulted To: " + MaximumPoolSize / 1024 / 1024 + "MB of Ram");
 
         m_memoryBlockAllocations = 0;
@@ -146,7 +133,7 @@ internal class MemoryPoolPageList
         m_pagesPerMemoryBlockMask = m_pagesPerMemoryBlock - 1;
         m_pagesPerMemoryBlockShiftBits = BitMath.CountBitsSet((uint)m_pagesPerMemoryBlockMask);
         m_isPageFree = new BitArray(false);
-        m_memoryBlocks = new List<Memory>();
+        m_memoryBlocks = new List<Memory?>();
     }
 
 #if DEBUG
@@ -166,12 +153,12 @@ internal class MemoryPoolPageList
     /// </summary>
     public long MaximumPoolSize
     {
-        get => m_maximumPoolSize;
+        get => m_maximumPoolSize.Value;
         private set => m_maximumPoolSize.Value = value;
     }
 
     /// <summary>
-    /// Gets the number of bytes that have been allocated to this buffer pool 
+    /// Gets the number of bytes that have been allocated to this buffer pool
     /// by the OS.
     /// </summary>
     public long CurrentCapacity => m_memoryBlockAllocations * (long)m_memoryBlockSize;
@@ -185,9 +172,7 @@ internal class MemoryPoolPageList
     /// <summary>
     /// Gets if there is any free space.
     /// </summary>
-    public long FreeSpaceBytes =>
-        // In case a race condition yields a negative value.
-        Math.Max(CurrentCapacity - CurrentAllocatedSize, 0);
+    public long FreeSpaceBytes => Math.Max(CurrentCapacity - CurrentAllocatedSize, 0); // In case a race condition yields a negative value.
 
     /// <summary>
     /// Gets if the pool is currently full.
@@ -197,6 +182,32 @@ internal class MemoryPoolPageList
     #endregion
 
     #region [ Methods ]
+
+    /// <summary>
+    /// Disposes of all of the memory on the list.
+    /// </summary>
+    public void Dispose()
+    {
+        lock (m_syncRoot)
+        {
+            if (m_disposed)
+                return;
+
+            try
+            {
+                foreach (Memory? block in m_memoryBlocks)
+                    block?.Dispose();
+
+                m_memoryBlockAllocations = 0;
+                m_isPageFree.ClearAll();
+                m_memoryBlocks.Clear();
+            }
+            finally
+            {
+                m_disposed = true; // Prevent duplicate dispose.
+            }
+        }
+    }
 
     /// <summary>
     /// Requests a new block from the buffer pool.
@@ -212,6 +223,7 @@ internal class MemoryPoolPageList
                 throw new ObjectDisposedException(GetType().FullName);
 
             index = m_isPageFree.FindSetBit();
+
             if (index < 0)
             {
                 index = -1;
@@ -225,12 +237,14 @@ internal class MemoryPoolPageList
 
             int allocationIndex = index >> m_pagesPerMemoryBlockShiftBits;
             int blockOffset = index & m_pagesPerMemoryBlockMask;
-            Memory block = m_memoryBlocks[allocationIndex];
+            Memory? block = m_memoryBlocks[allocationIndex];
+
             if (block is null)
             {
                 s_log.Publish(MessageLevel.Warning, MessageFlags.BugReport, "Memory Block inside Memory Pool is null. Possible race condition.");
                 throw new NullReferenceException("Memory Block is null");
             }
+
             if (block.Address == nint.Zero)
             {
                 s_log.Publish(MessageLevel.Warning, MessageFlags.BugReport, "Memory Block inside Memory Pool was released prematurely. Possible race condition.");
@@ -254,6 +268,7 @@ internal class MemoryPoolPageList
         if (index > 0)
         {
             index--;
+
             lock (m_syncRoot)
             {
                 if (m_disposed)
@@ -293,20 +308,20 @@ internal class MemoryPoolPageList
 
             for (int x = 0; x < m_memoryBlocks.Capacity; x++)
             {
+                if (m_memoryBlocks[x] is null)
+                    continue;
 
-                if (m_memoryBlocks[x] is not null)
-                {
-                    if (m_isPageFree.AreAllBitsCleared(x * m_pagesPerMemoryBlock, m_pagesPerMemoryBlock))
-                    {
-                        m_memoryBlocks[x].Dispose();
-                        m_memoryBlocks[x] = null;
-                        m_memoryBlockAllocations--;
+                if (!m_isPageFree.AreAllBitsCleared(x * m_pagesPerMemoryBlock, m_pagesPerMemoryBlock))
+                    continue;
 
-                        if (CurrentCapacity <= size)
-                            return CurrentCapacity;
-                    }
-                }
+                m_memoryBlocks[x]!.Dispose();
+                m_memoryBlocks[x] = null;
+                m_memoryBlockAllocations--;
+
+                if (CurrentCapacity <= size)
+                    return CurrentCapacity;
             }
+
             return CurrentCapacity;
         }
     }
@@ -335,6 +350,7 @@ internal class MemoryPoolPageList
     {
         long sizeBefore;
         long sizeAfter;
+
         lock (m_syncRoot)
         {
             if (m_disposed)
@@ -354,43 +370,16 @@ internal class MemoryPoolPageList
             }
 
             sizeAfter = CurrentCapacity;
-
         }
 
         return sizeBefore != sizeAfter;
     }
 
-    /// <summary>
-    /// Disposes of all of the memory on the list.
-    /// </summary>
-    public void Dispose()
-    {
-        lock (m_syncRoot)
-        {
-            if (!m_disposed)
-            {
-                try
-                {
-                    foreach (Memory block in m_memoryBlocks)
-                    {
-                        block.Dispose();
-                    }
-                    m_memoryBlockAllocations = 0;
-                    m_isPageFree.ClearAll();
-                    m_memoryBlocks.Clear();
-                }
-
-                finally
-                {
-                    m_disposed = true; // Prevent duplicate dispose.
-                }
-            }
-        }
-    }
-
     #endregion
 
     #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(MemoryPoolPageList), MessageClass.Component);
 
     /// <summary>
     /// Calculates the memory pool ceiling based on the memory block size and the total physical system memory.
@@ -410,7 +399,7 @@ internal class MemoryPoolPageList
         size = Math.Min(size, physicalUpperLimit);
 
         // Round down the size to the nearest allocation size (memory block size).
-        size = size - size % memoryBlockSize; // Rounds down to the nearest allocation size.
+        size -= size % memoryBlockSize; // Rounds down to the nearest allocation size.
 
         // Return the calculated memory pool ceiling.
         return size;
@@ -423,19 +412,80 @@ internal class MemoryPoolPageList
     /// <param name="totalSystemMemory">The total amount of system memory.</param>
     /// <returns>The recommended block size.</returns>
     /// <remarks>
-    /// The recommended block size is the <see cref="totalSystemMemory"/> divided by 1000 
+    /// The recommended block size is the <see cref="totalSystemMemory"/> divided by 1000
     /// but must be a multiple of the system allocation size and the page size and cannot be larger than 1GB
     /// </remarks>
     private static int CalculateMemoryBlockSize(int pageSize, long totalSystemMemory)
     {
         long targetMemoryBlockSize = totalSystemMemory / 1000;
+
         targetMemoryBlockSize = Math.Min(targetMemoryBlockSize, 1024 * 1024 * 1024);
-        targetMemoryBlockSize = targetMemoryBlockSize - targetMemoryBlockSize % pageSize;
+        targetMemoryBlockSize -= targetMemoryBlockSize % pageSize;
         targetMemoryBlockSize = (int)Math.Max(targetMemoryBlockSize, pageSize);
         targetMemoryBlockSize = (int)BitMath.RoundUpToNearestPowerOfTwo((ulong)targetMemoryBlockSize);
 
         return (int)targetMemoryBlockSize;
     }
 
+    // Gets the total physical system memory.
+    private static ulong GetTotalPhysicalMemory()
+    {
+        if (Common.IsPosixEnvironment)
+        {
+            string output = Command.Execute("awk", "'/MemTotal/ {print $2}' /proc/meminfo").StandardOutput;
+            return ulong.Parse(output) * SI2.Kilo;
+        }
+
+        MEMORYSTATUSEX memStatus = new();
+        return GlobalMemoryStatusEx(memStatus) ? memStatus.ullTotalPhys : 0;
+    }
+
+    // Gets the available physical system memory.
+    private static ulong GetAvailablePhysicalMemory()
+    {
+        if (Common.IsPosixEnvironment)
+        {
+            string output = Command.Execute("awk", "'/MemAvailable/ {print $2}' /proc/meminfo").StandardOutput;
+            return ulong.Parse(output) * SI2.Kilo;
+        }
+
+        MEMORYSTATUSEX memStatus = new();
+        return GlobalMemoryStatusEx(memStatus) ? memStatus.ullAvailPhys : 0;
+    }
+
+    [return: MarshalAs(UnmanagedType.Bool)]
+    [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    private static extern bool GlobalMemoryStatusEx([In] [Out] MEMORYSTATUSEX lpBuffer);
+
     #endregion
+
+    // ReSharper disable IdentifierTypo
+    // ReSharper disable InconsistentNaming
+    // ReSharper disable NotAccessedField.Local
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    private class MEMORYSTATUSEX
+    {
+        #region [ Members ]
+
+        public uint dwLength;
+        public uint dwMemoryLoad;
+        public ulong ullAvailExtendedVirtual;
+        public ulong ullAvailPageFile;
+        public ulong ullAvailPhys;
+        public ulong ullAvailVirtual;
+        public ulong ullTotalPageFile;
+        public ulong ullTotalPhys;
+        public ulong ullTotalVirtual;
+
+        #endregion
+
+        #region [ Constructors ]
+
+        public MEMORYSTATUSEX()
+        {
+            dwLength = (uint)Marshal.SizeOf(typeof(MEMORYSTATUSEX));
+        }
+
+        #endregion
+    }
 }

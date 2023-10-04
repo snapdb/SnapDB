@@ -30,14 +30,15 @@ using SnapDB.Snap.Definitions;
 
 namespace SnapDB.Snap.Filters;
 
-public class TimestampSeekFilterDefinition
-    : SeekFilterDefinitionBase
+public class TimestampSeekFilterDefinition : SeekFilterDefinitionBase
 {
-
-    // {0F0F9478-DC42-4EEF-9F26-231A942EF1FA}
-    public static Guid FilterGuid = new(0x0f0f9478, 0xdc42, 0x4eef, 0x9f, 0x26, 0x23, 0x1a, 0x94, 0x2e, 0xf1, 0xfa);
+    #region [ Properties ]
 
     public override Guid FilterType => FilterGuid;
+
+    #endregion
+
+    #region [ Methods ]
 
     public override SeekFilterBase<TKey> Create<TKey>(BinaryStreamBase stream)
     {
@@ -47,4 +48,12 @@ public class TimestampSeekFilterDefinition
         return (SeekFilterBase<TKey>)rv;
     }
 
+    #endregion
+
+    #region [ Static ]
+
+    // {0F0F9478-DC42-4EEF-9F26-231A942EF1FA}
+    public static Guid FilterGuid = new(0x0f0f9478, 0xdc42, 0x4eef, 0x9f, 0x26, 0x23, 0x1a, 0x94, 0x2e, 0xf1, 0xfa);
+
+    #endregion
 }

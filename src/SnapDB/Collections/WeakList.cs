@@ -33,14 +33,17 @@ namespace SnapDB.Collections;
 /// This list is thread-safe and allows enumeration while adding and removing from the list.
 /// </summary>
 /// <typeparam name="T">List type.</typeparam>
-public class WeakList<T> : IEnumerable<T>
-    where T : class
+public class WeakList<T> : IEnumerable<T> where T : class
 {
+    #region [ Members ]
+
     /// <summary>
     /// Contains a snapshot of the data so read operations can be non-blocking.
     /// </summary>
     private class Snapshot
     {
+        #region [ Members ]
+
         // This is a special case list where all items in the list are weak referenced. Only include 
         // instances that are strong referenced somewhere. 
         // For example, delegates will not work in this list unless it is strong referenced in the instance.
@@ -49,12 +52,20 @@ public class WeakList<T> : IEnumerable<T>
         // collected at the next GC cycle.
         public WeakReference?[] Items;
         public int Size;
-           
+
+        #endregion
+
+        #region [ Constructors ]
+
         public Snapshot(int capacity)
         {
             Items = new WeakReference[capacity];
             Size = 0;
         }
+
+        #endregion
+
+        #region [ Methods ]
 
         /// <summary>
         /// Grows the snapshot, doubling the size of the number of entries.
@@ -73,7 +84,7 @@ public class WeakList<T> : IEnumerable<T>
 
                 if (reference.Target is T)
                     itemCount++;
-                
+
                 else
                     Items[x] = null;
             }
@@ -81,11 +92,7 @@ public class WeakList<T> : IEnumerable<T>
             // Copies the snapshot.
             int capacity = Math.Max(itemCount * 2, 8);
 
-            Snapshot clone = new(capacity)
-            {
-                Items = new WeakReference[capacity],
-                Size = 0
-            };
+            Snapshot clone = new(capacity) { Items = new WeakReference[capacity], Size = 0 };
 
             foreach (WeakReference? reference in Items)
             {
@@ -133,7 +140,7 @@ public class WeakList<T> : IEnumerable<T>
         }
 
         /// <summary>
-        /// Attempts to add <paramref name="item"/> to the list. 
+        /// Attempts to add <paramref name="item"/> to the list.
         /// </summary>
         /// <param name="item"></param>
         /// <returns><c>true</c> if added, <c>false</c> otherwise.</returns>
@@ -152,6 +159,8 @@ public class WeakList<T> : IEnumerable<T>
 
             return true;
         }
+
+        #endregion
     }
 
     /// <summary>
@@ -159,9 +168,16 @@ public class WeakList<T> : IEnumerable<T>
     /// </summary>
     public struct Enumerator : IEnumerator<T?>
     {
+        #region [ Members ]
+
+        private int m_currentIndex;
+
         private readonly WeakReference?[] m_items;
         private readonly int m_lastItem;
-        private int m_currentIndex;
+
+        #endregion
+
+        #region [ Constructors ]
 
         /// <summary>
         /// Creates a <see cref="Enumerator"/>.
@@ -175,6 +191,10 @@ public class WeakList<T> : IEnumerable<T>
             m_currentIndex = -1;
             Current = null;
         }
+
+        #endregion
+
+        #region [ Properties ]
 
         /// <summary>
         /// Gets the element in the collection at the current position of the enumerator.
@@ -191,6 +211,18 @@ public class WeakList<T> : IEnumerable<T>
         /// The current element in the collection.
         /// </returns>
         readonly object? IEnumerator.Current => Current;
+
+        #endregion
+
+        #region [ Methods ]
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            Current = null;
+        }
 
         /// <summary>
         /// Advances the enumerator to the next valid item in the collection.
@@ -215,7 +247,7 @@ public class WeakList<T> : IEnumerable<T>
                 {
                     // If the weak reference can be resolved to an item of type T, set the current item and return true.
                     Current = item;
-                    
+
                     return true;
                 }
 
@@ -230,21 +262,24 @@ public class WeakList<T> : IEnumerable<T>
         /// <summary>
         /// Sets the enumerator to its initial position, which is before the first element in the collection.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created. </exception><filterpriority>2</filterpriority>
+        /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created. </exception>
+        /// <filterpriority>2</filterpriority>
         public void Reset()
         {
             Current = null;
             m_currentIndex = -1;
         }
 
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose() => Current = null;
+        #endregion
     }
 
-    private readonly object m_syncRoot;
     private Snapshot m_data;
+
+    private readonly object m_syncRoot;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a <see cref="WeakList{T}"/>
@@ -254,6 +289,10 @@ public class WeakList<T> : IEnumerable<T>
         m_syncRoot = new object();
         m_data = new Snapshot(8);
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Clears all of the times in the list. Method is thread safe.
@@ -292,7 +331,9 @@ public class WeakList<T> : IEnumerable<T>
     public void Remove(T item)
     {
         lock (m_syncRoot)
+        {
             m_data.Remove(item);
+        }
     }
 
     /// <summary>
@@ -314,7 +355,10 @@ public class WeakList<T> : IEnumerable<T>
     /// <returns>
     /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
     /// </returns>
-    IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+    IEnumerator<T> IEnumerable<T>.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 
     /// <summary>
     /// Returns an enumerator that iterates through a collection.
@@ -322,5 +366,10 @@ public class WeakList<T> : IEnumerable<T>
     /// <returns>
     /// An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
     /// </returns>
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    #endregion
 }

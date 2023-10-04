@@ -32,22 +32,12 @@ namespace SnapDB.Snap.Services;
 /// <summary>
 /// Represents a single historian database.
 /// </summary>
-public abstract class ClientDatabaseBase<TKey, TValue>
-    : ClientDatabaseBase, IDatabaseReader<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public abstract class ClientDatabaseBase<TKey, TValue> : ClientDatabaseBase, IDatabaseReader<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
-    /// <summary>
-    /// Reads data from the SortedTreeEngine with the provided read options and server side filters.
-    /// </summary>
-    /// <param name="readerOptions">Read options supplied to the reader. Can be <c>null</c>.</param>
-    /// <param name="keySeekFilter">A seek based filter to follow. Can be <c>null</c>.</param>
-    /// <param name="keyMatchFilter">A match based filter to follow. Can be <c>null</c>.</param>
-    /// <returns>A stream that will read the specified data.</returns>
-    public abstract TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions, SeekFilterBase<TKey> keySeekFilter, MatchFilterBase<TKey, TValue>? keyMatchFilter);
+    #region [ Methods ]
 
     /// <summary>
-    /// Writes the tree stream to the database. 
+    /// Writes the tree stream to the database.
     /// </summary>
     /// <param name="stream">All of the key-value pairs to add to the database.</param>
     public abstract void Write(TreeStream<TKey, TValue> stream);
@@ -59,4 +49,14 @@ public abstract class ClientDatabaseBase<TKey, TValue>
     /// <param name="value">The value associated with the key to write.</param>
     public abstract void Write(TKey key, TValue value);
 
+    /// <summary>
+    /// Reads data from the SortedTreeEngine with the provided read options and server side filters.
+    /// </summary>
+    /// <param name="readerOptions">Read options supplied to the reader. Can be <c>null</c>.</param>
+    /// <param name="keySeekFilter">A seek based filter to follow. Can be <c>null</c>.</param>
+    /// <param name="keyMatchFilter">A match based filter to follow. Can be <c>null</c>.</param>
+    /// <returns>A stream that will read the specified data.</returns>
+    public abstract TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions, SeekFilterBase<TKey> keySeekFilter, MatchFilterBase<TKey, TValue>? keyMatchFilter);
+
+    #endregion
 }

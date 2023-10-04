@@ -26,9 +26,9 @@
 
 namespace SnapDB.Snap.Types;
 
-public class SnapCustomMethodsUInt32
-    : SnapTypeCustomMethods<SnapUInt32>
+public class SnapCustomMethodsUInt32 : SnapTypeCustomMethods<SnapUInt32>
 {
+    #region [ Methods ]
 
     public override unsafe int BinarySearch(byte* pointer, SnapUInt32 key2, int recordCount, int keyValueSize)
     {
@@ -58,7 +58,7 @@ public class SnapCustomMethodsUInt32
         int searchHigherBoundsIndex = recordCount - 1;
         while (searchLowerBoundsIndex <= searchHigherBoundsIndex)
         {
-            int currentTestIndex = searchLowerBoundsIndex + (searchHigherBoundsIndex - searchLowerBoundsIndex >> 1);
+            int currentTestIndex = searchLowerBoundsIndex + ((searchHigherBoundsIndex - searchLowerBoundsIndex) >> 1);
 
             uint compareKey = *(uint*)(pointer + keyValueSize * currentTestIndex);
 
@@ -67,6 +67,7 @@ public class SnapCustomMethodsUInt32
                 LastFoundIndex = currentTestIndex;
                 return currentTestIndex;
             }
+
             if (key > compareKey) // Key > CompareKey
                 searchLowerBoundsIndex = currentTestIndex + 1;
             else
@@ -76,4 +77,6 @@ public class SnapCustomMethodsUInt32
         LastFoundIndex = searchLowerBoundsIndex;
         return ~searchLowerBoundsIndex;
     }
+
+    #endregion
 }

@@ -31,10 +31,13 @@ namespace SnapDB.Snap.Services;
 /// </summary>
 public interface IToServerSettings
 {
+    #region [ Methods ]
+
     /// <summary>
     /// Creates a <see cref="ServerSettings"/> configuration that can be used for <see cref="SnapServer"/>
     /// </summary>
     /// <returns></returns>
     ServerSettings ToServerSettings();
 
+    #endregion
 }

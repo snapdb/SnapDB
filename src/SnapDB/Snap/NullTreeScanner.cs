@@ -31,19 +31,9 @@ namespace SnapDB.Snap;
 /// </summary>
 /// <typeparam name="TKey">The type of keys in the stream (must be a reference type).</typeparam>
 /// <typeparam name="TValue">The type of values in the stream (must be a reference type).</typeparam>
-public class NullTreeScanner<TKey, TValue>
-    : SeekableTreeStream<TKey, TValue>
-    where TKey : class, new()
-    where TValue : class, new()
+public class NullTreeScanner<TKey, TValue> : SeekableTreeStream<TKey, TValue> where TKey : class, new() where TValue : class, new()
 {
-    /// <summary>
-    /// Gets a static instance of the <see cref="NullTreeScanner{TKey, TValue}"/> class for convenience.
-    /// </summary>
-    public static SeekableTreeStream<TKey, TValue> Instance
-    {
-        get;
-        private set;
-    }
+    #region [ Constructors ]
 
     /// <summary>
     /// Static constructor to initialize the static instance of the <see cref="NullTreeScanner{TKey, TValue}"/> class.
@@ -61,6 +51,18 @@ public class NullTreeScanner<TKey, TValue>
         Dispose();
     }
 
+    #endregion
+
+    #region [ Methods ]
+
+    /// <summary>
+    /// Seeks to the specified key (not implemented, as this is a null stream).
+    /// </summary>
+    /// <param name="key">The key to seek to (not used).</param>
+    public override void SeekToKey(TKey key)
+    {
+    }
+
     /// <summary>
     /// Reads the next key-value pair (always returns false since this is a null stream).
     /// </summary>
@@ -72,11 +74,14 @@ public class NullTreeScanner<TKey, TValue>
         return false;
     }
 
+    #endregion
+
+    #region [ Static ]
+
     /// <summary>
-    /// Seeks to the specified key (not implemented, as this is a null stream).
+    /// Gets a static instance of the <see cref="NullTreeScanner{TKey, TValue}"/> class for convenience.
     /// </summary>
-    /// <param name="key">The key to seek to (not used).</param>
-    public override void SeekToKey(TKey key)
-    {
-    }
+    public static SeekableTreeStream<TKey, TValue> Instance { get; private set; }
+
+    #endregion
 }

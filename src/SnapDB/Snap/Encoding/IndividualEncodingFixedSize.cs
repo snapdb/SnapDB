@@ -31,11 +31,15 @@ namespace SnapDB.Snap.Encoding;
 /// <summary>
 /// A single encoding method for a fixed size encoding
 /// </summary>
-internal class IndividualEncodingFixedSize<T>
-    : IndividualEncodingBase<T>
-    where T : SnapTypeBase<T>, new()
+internal class IndividualEncodingFixedSize<T> : IndividualEncodingBase<T> where T : SnapTypeBase<T>, new()
 {
+    #region [ Members ]
+
     private readonly int m_size;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a fixed size encoding class for a single key.
@@ -45,8 +49,12 @@ internal class IndividualEncodingFixedSize<T>
         m_size = new T().Size;
     }
 
+    #endregion
+
+    #region [ Properties ]
+
     /// <summary>
-    /// Gets if the stream supports a symbol that 
+    /// Gets if the stream supports a symbol that
     /// represents that the end of the stream has been encountered.
     /// </summary>
     /// <remarks>
@@ -55,7 +63,6 @@ internal class IndividualEncodingFixedSize<T>
     /// word is 0xFF, the encoding has specifically
     /// designated this as the end of the stream. Therefore, calls to
     /// Decompress will result in an end of stream exception.
-    /// 
     /// Failing to reserve a code as the end of stream will mean that
     /// streaming points will include its own symbol to represent the end of the
     /// stream, taking 1 extra byte per point encoded.
@@ -82,6 +89,10 @@ internal class IndividualEncodingFixedSize<T>
     /// too small will corrupt data and be next to impossible to track down the point of corruption
     /// </summary>
     public override int MaxCompressionSize => m_size;
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Encodes <paramref name="value"/> to the provided <paramref name="stream"/>.
@@ -145,4 +156,6 @@ internal class IndividualEncodingFixedSize<T>
     {
         return new IndividualEncodingFixedSize<T>();
     }
+
+    #endregion
 }

@@ -28,29 +28,42 @@ using System.Collections;
 namespace SnapDB.Threading;
 
 /// <summary>
-/// This list allows for iterating through the list 
+/// This list allows for iterating through the list
 /// while object can be removed from the list. Once an object has been
-/// removed, is garenteed not to be called again by a seperate thread. 
+/// removed, is garenteed not to be called again by a seperate thread.
 /// </summary>
 /// <typeparam name="T">The type of elements in the list.</typeparam>
-public partial class ThreadSafeList<T>
-    : IEnumerable<T>
+public partial class ThreadSafeList<T> : IEnumerable<T>
 {
+    #region [ Members ]
+
     private class Wrapper
     {
-        public int ReferencedCount;
+        #region [ Members ]
+
         public readonly T Item;
+        public int ReferencedCount;
+
+        #endregion
+
+        #region [ Constructors ]
 
         public Wrapper(T item)
         {
             Item = item;
         }
+
+        #endregion
     }
 
     private readonly SortedList<long, Wrapper> m_list;
     private long m_sequenceNumber;
     private readonly object m_syncRoot;
     private long m_version;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new <see cref="ThreadSafeList{T}"/>.
@@ -62,6 +75,10 @@ public partial class ThreadSafeList<T>
         m_sequenceNumber = 0;
         m_version = 0;
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Adds the supplied item to the list.
@@ -78,8 +95,8 @@ public partial class ThreadSafeList<T>
     }
 
     /// <summary>
-    /// Removes an item from the list. 
-    /// This method will block until the item has successfully been removed 
+    /// Removes an item from the list.
+    /// This method will block until the item has successfully been removed
     /// and will no longer show up in the iterator.
     /// DO NOT call this function from within a ForEach loop as it will block indefinately
     /// since the for each loop reads all items.
@@ -93,7 +110,6 @@ public partial class ThreadSafeList<T>
         lock (m_syncRoot)
         {
             for (int x = 0; x < m_list.Count; x++)
-            {
                 if (m_list.Values[x].Item.Equals(item))
                 {
                     itemToRemove = m_list.Values[x];
@@ -101,21 +117,18 @@ public partial class ThreadSafeList<T>
                     m_version++;
                     break;
                 }
-            }
         }
 
         if (itemToRemove is null)
             return false;
 
         while (Interlocked.CompareExchange(ref itemToRemove.ReferencedCount, -1, 0) is not 0)
-        {
             wait.SpinOnce();
-        }
         return true;
     }
 
     /// <summary>
-    /// Removes an item from the list. 
+    /// Removes an item from the list.
     /// </summary>
     /// <param name="item">The item to remove from the list.</param>
     public bool Remove(T item)
@@ -124,7 +137,6 @@ public partial class ThreadSafeList<T>
         lock (m_syncRoot)
         {
             for (int x = 0; x < m_list.Count; x++)
-            {
                 if (m_list.Values[x].Item.Equals(item))
                 {
                     itemToRemove = m_list.Values[x];
@@ -132,7 +144,6 @@ public partial class ThreadSafeList<T>
                     m_version++;
                     break;
                 }
-            }
         }
 
         if (itemToRemove is null)
@@ -150,13 +161,11 @@ public partial class ThreadSafeList<T>
         lock (m_syncRoot)
         {
             for (int x = 0; x < m_list.Count; x++)
-            {
                 if (condition(m_list.Values[x].Item))
                 {
                     m_list.RemoveAt(x);
                     m_version++;
                 }
-            }
         }
     }
 
@@ -167,16 +176,14 @@ public partial class ThreadSafeList<T>
     public void ForEach(Action<T> action)
     {
         foreach (T item in this)
-        {
             action(item);
-        }
     }
 
     /// <summary>
     /// Returns an enumerator that iterates through the collection.
     /// </summary>
     /// <returns>
-    /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to 
+    /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to
     /// iterate through the collection.
     /// </returns>
     /// <filterpriority>1</filterpriority>
@@ -196,4 +203,6 @@ public partial class ThreadSafeList<T>
     {
         return GetEnumerator();
     }
+
+    #endregion
 }

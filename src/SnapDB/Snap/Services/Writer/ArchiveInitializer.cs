@@ -34,11 +34,15 @@ namespace SnapDB.Snap.Services.Writer;
 /// <summary>
 /// Creates new archive files based on user settings.
 /// </summary>
-public class ArchiveInitializer<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Members ]
+
     private readonly ReaderWriterLockEasy m_lock;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a <see cref="ArchiveInitializer{TKey,TValue}"/>
@@ -51,10 +55,18 @@ public class ArchiveInitializer<TKey, TValue>
         m_lock = new ReaderWriterLockEasy();
     }
 
+    #endregion
+
+    #region [ Properties ]
+
     /// <summary>
     /// Gets current settings.
     /// </summary>
     public ArchiveInitializerSettings Settings { get; private set; }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Replaces the existing settings with this new set.
@@ -83,17 +95,16 @@ public class ArchiveInitializer<TKey, TValue>
         {
             if (Settings.IsMemoryArchive)
             {
-                SortedTreeFile af = SortedTreeFile.CreateInMemory(blockSize: 4096, flags: Settings.Flags.ToArray());
+                SortedTreeFile af = SortedTreeFile.CreateInMemory(4096, Settings.Flags.ToArray());
                 return af.OpenOrCreateTable<TKey, TValue>(Settings.EncodingMethod);
             }
             else
             {
                 string fileName = CreateArchiveName(GetPathWithEnoughSpace(estimatedSize));
-                SortedTreeFile af = SortedTreeFile.CreateFile(fileName, blockSize: 4096, flags: Settings.Flags.ToArray());
+                SortedTreeFile af = SortedTreeFile.CreateFile(fileName, 4096, Settings.Flags.ToArray());
                 return af.OpenOrCreateTable<TKey, TValue>(Settings.EncodingMethod);
             }
         }
-
     }
 
     /// <summary>
@@ -110,13 +121,13 @@ public class ArchiveInitializer<TKey, TValue>
         {
             if (Settings.IsMemoryArchive)
             {
-                SortedTreeFile af = SortedTreeFile.CreateInMemory(blockSize: 4096, flags: Settings.Flags.ToArray());
+                SortedTreeFile af = SortedTreeFile.CreateInMemory(4096, Settings.Flags.ToArray());
                 return af.OpenOrCreateTable<TKey, TValue>(Settings.EncodingMethod);
             }
             else
             {
                 string fileName = CreateArchiveName(GetPathWithEnoughSpace(estimatedSize), startKey, endKey);
-                SortedTreeFile af = SortedTreeFile.CreateFile(fileName, blockSize: 4096, flags: Settings.Flags.ToArray());
+                SortedTreeFile af = SortedTreeFile.CreateFile(fileName, 4096, Settings.Flags.ToArray());
                 return af.OpenOrCreateTable<TKey, TValue>(Settings.EncodingMethod);
             }
         }
@@ -159,7 +170,7 @@ public class ArchiveInitializer<TKey, TValue>
                 rootPath = Path.Combine(rootPath, time.Year.ToString());
                 break;
             case ArchiveDirectoryMethod.YearMonth:
-                rootPath = Path.Combine(rootPath, time.Year.ToString() + time.Month.ToString("00"));
+                rootPath = Path.Combine(rootPath, time.Year + time.Month.ToString("00"));
                 break;
             case ArchiveDirectoryMethod.YearThenMonth:
                 rootPath = Path.Combine(rootPath, time.Year.ToString() + '\\' + time.Month.ToString("00"));
@@ -168,7 +179,7 @@ public class ArchiveInitializer<TKey, TValue>
 
         if (!Directory.Exists(rootPath))
             Directory.CreateDirectory(rootPath);
-        
+
         return rootPath;
     }
 
@@ -176,9 +187,9 @@ public class ArchiveInitializer<TKey, TValue>
     {
         if (estimatedSize < 0)
             return Settings.WritePath.FirstOrDefault() ?? throw new InvalidOperationException("No write path defined");
-        
+
         long remainingSpace = Settings.DesiredRemainingSpace;
-        
+
         foreach (string path in Settings.WritePath)
         {
             FilePath.GetAvailableFreeSpace(path, out long freeSpace, out _);
@@ -186,7 +197,9 @@ public class ArchiveInitializer<TKey, TValue>
             if (freeSpace - estimatedSize > remainingSpace)
                 return path;
         }
-        
+
         throw new InvalidOperationException("Out of free space");
     }
+
+    #endregion
 }

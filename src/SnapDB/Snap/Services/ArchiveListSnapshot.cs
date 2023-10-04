@@ -31,21 +31,14 @@ namespace SnapDB.Snap.Services;
 /// <summary>
 /// Provides a list of resources that each system transaction could be using.
 /// </summary>
-public class ArchiveListSnapshot<TKey, TValue> : IDisposable
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class ArchiveListSnapshot<TKey, TValue> : IDisposable where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
-    /// <summary>
-    /// Signals that a disposal of this object has been requested. 
-    /// </summary>
-    /// <remarks>
-    /// A race condition exists such that this class gets a dispose request before the client
-    /// registers this event. Therefore, be sure to check <see cref="IsDisposeRequested"/>
-    /// after assigning the event handler.
-    /// </remarks>
-    public event Action? DisposeRequested;
+    #region [ Members ]
 
-    private readonly object m_syncDisposing;
+    /// <summary>
+    /// A callback to get the latest list of resources from <see cref="ArchiveList{TKey,TValue}"/>.
+    /// </summary>
+    private Action<ArchiveListSnapshot<TKey, TValue>> m_acquireResources;
 
     private ManualResetEvent m_connectionDisposed;
 
@@ -54,16 +47,17 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     /// </summary>
     private Action<ArchiveListSnapshot<TKey, TValue>> m_onDisposed;
 
-    /// <summary>
-    /// A callback to get the latest list of resources from <see cref="ArchiveList{TKey,TValue}"/>.
-    /// </summary>
-    private Action<ArchiveListSnapshot<TKey, TValue>> m_acquireResources;
+    private readonly object m_syncDisposing;
 
     /// <summary>
     /// Contains an array of all of the resources currently used by this transaction.
     /// This field can be null or any element of this array can also be null.
     /// </summary>
     private ArchiveTableSummary<TKey, TValue>?[] m_tables;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates an <see cref="ArchiveListSnapshot{TKey,TValue}"/>.
@@ -78,6 +72,10 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
         m_tables = Array.Empty<ArchiveTableSummary<TKey, TValue>>();
         m_connectionDisposed = new ManualResetEvent(false);
     }
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets the list of all partitions that are currently in use.  Set partition to null to indicate
@@ -102,19 +100,6 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     }
 
     /// <summary>
-    /// Attempts to get the file for the provided fileId
-    /// </summary>
-    /// <param name="fileId"></param>
-    /// <returns>Null if not found</returns>
-    public ArchiveTableSummary<TKey, TValue>? TryGetFile(Guid fileId)
-    {
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
-
-        return m_tables.Where(table => table is not null).FirstOrDefault(table => table!.FileId == fileId);
-    }
-
-    /// <summary>
     /// Gets if the engine is requesting that this snapshot gets disposed.
     /// if this is true this means the engine is waiting for the release
     /// of this object before it can continue its next task.
@@ -126,6 +111,10 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     /// </summary>
     public bool IsDisposed { get; private set; }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Disposes this class, releasing all resource locks.
     /// </summary>
@@ -133,7 +122,7 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
     {
         if (IsDisposed)
             return;
-        
+
         m_connectionDisposed.Set();
 
         lock (m_syncDisposing)
@@ -144,9 +133,32 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
 
         m_onDisposed?.Invoke(this);
         m_onDisposed = null!;
-        
+
         m_acquireResources = null!;
         IsDisposed = true;
+    }
+
+    /// <summary>
+    /// Signals that a disposal of this object has been requested.
+    /// </summary>
+    /// <remarks>
+    /// A race condition exists such that this class gets a dispose request before the client
+    /// registers this event. Therefore, be sure to check <see cref="IsDisposeRequested"/>
+    /// after assigning the event handler.
+    /// </remarks>
+    public event Action? DisposeRequested;
+
+    /// <summary>
+    /// Attempts to get the file for the provided fileId
+    /// </summary>
+    /// <param name="fileId"></param>
+    /// <returns>Null if not found</returns>
+    public ArchiveTableSummary<TKey, TValue>? TryGetFile(Guid fileId)
+    {
+        if (IsDisposed)
+            throw new ObjectDisposedException(GetType().FullName);
+
+        return m_tables.Where(table => table is not null).FirstOrDefault(table => table!.FileId == fileId);
     }
 
     /// <summary>
@@ -173,10 +185,12 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable
         {
             if (m_connectionDisposed is null)
                 return;
-            
+
             m_connectionDisposed.WaitOne();
             m_connectionDisposed.Dispose();
             m_connectionDisposed = null!;
         }
     }
+
+    #endregion
 }

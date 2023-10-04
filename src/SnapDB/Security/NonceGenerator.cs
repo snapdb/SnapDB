@@ -30,18 +30,26 @@ using System.Security.Cryptography;
 namespace SnapDB.Security;
 
 /// <summary>
-/// Used to generate Nonce values. 
+/// Used to generate Nonce values.
 /// </summary>
 public unsafe class NonceGenerator
 {
+    #region [ Members ]
+
     /// <summary>
     /// A sequence number to ensure that duplicates are never created
     /// </summary>
     private long m_nonceNumber;
+
     /// <summary>
     /// The secure random number that serves as the basis for this nonce
     /// </summary>
     private readonly byte[] m_startingNonce;
+
+    #endregion
+
+    #region [ Constructors ]
+
     /// <summary>
     /// Creates a nonce generator of the specified length.
     /// </summary>
@@ -56,6 +64,10 @@ public unsafe class NonceGenerator
         rng.GetBytes(m_startingNonce);
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Gets the next nonce value.
     /// </summary>
@@ -69,7 +81,9 @@ public unsafe class NonceGenerator
             *(long*)lp ^= date;
             *(long*)(lp + rv.Length - 8) ^= value;
         }
+
         return rv;
     }
 
+    #endregion
 }

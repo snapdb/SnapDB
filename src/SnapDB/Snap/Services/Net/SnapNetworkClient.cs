@@ -24,46 +24,47 @@
 //
 //******************************************************************************************************
 
-using SnapDB.Security;
 using System.Net;
 using System.Net.Sockets;
+using SnapDB.Security;
 
 namespace SnapDB.Snap.Services.Net;
 
 /// <summary>
 /// A client that communicates over a network socket.
 /// </summary>
-public class SnapNetworkClient
-    : SnapStreamingClient
+public class SnapNetworkClient : SnapStreamingClient
 {
-    private bool m_disposed;
+    #region [ Members ]
+
     private readonly TcpClient m_client;
+    private bool m_disposed;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a <see cref="SnapNetworkClient"/>
     /// </summary>
     /// <param name="settings">The config to use for the client</param>
-    /// <param name="credentials">The network credentials to use. 
-    /// If left null, the computers current credentials are use.</param>
+    /// <param name="credentials">
+    /// The network credentials to use.
+    /// If left null, the computers current credentials are use.
+    /// </param>
     /// <param name="useSsl">Specifies if ssl encryption is desired for the connection.</param>
     public SnapNetworkClient(SnapNetworkClientSettings settings, SecureStreamClientBase credentials = null, bool useSsl = false)
     {
         if (credentials is null)
         {
             if (settings.UseIntegratedSecurity)
-            {
                 credentials = new SecureStreamClientIntegratedSecurity();
-            }
             else
-            {
                 credentials = new SecureStreamClientDefault();
-            }
         }
 
         if (!IPAddress.TryParse(settings.ServerNameOrIp, out IPAddress ip))
-        {
             ip = Dns.GetHostAddresses(settings.ServerNameOrIp)[0];
-        }
 
         IPEndPoint server = new(ip, settings.NetworkPort);
 
@@ -74,6 +75,10 @@ public class SnapNetworkClient
         Initialize(new NetworkStream(m_client.Client), credentials, useSsl);
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Releases the unmanaged resources used by the <see cref="SnapNetworkClient"/> object and optionally releases the managed resources.
     /// </summary>
@@ -82,13 +87,12 @@ public class SnapNetworkClient
     {
         if (!m_disposed)
         {
-            base.Dispose(disposing);    // Call base class Dispose().
+            base.Dispose(disposing); // Call base class Dispose().
 
             try
             {
                 // This will be done regardless of whether the object is finalized or disposed.
                 if (disposing)
-                {
                     try
                     {
                         m_client.Client.Shutdown(SocketShutdown.Both);
@@ -96,14 +100,14 @@ public class SnapNetworkClient
                     }
                     catch (Exception)
                     {
-
                     }
-                }
             }
             finally
             {
-                m_disposed = true;          // Prevent duplicate dispose.
+                m_disposed = true; // Prevent duplicate dispose.
             }
         }
     }
+
+    #endregion
 }

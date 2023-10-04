@@ -38,23 +38,30 @@ namespace SnapDB.Security.Authentication;
 /// </summary>
 public class SrpClient
 {
-    private readonly PbdkfCredentials m_credentials;
+    #region [ Members ]
 
-    //The SRP Mechanism
-    private int m_srpByteLength;
-    private SrpStrength m_strength;
-    private SrpConstants m_param;
     private Srp6Client m_client;
+
+    private readonly PbdkfCredentials m_credentials;
     private IDigest m_hash;
+    private SrpConstants m_param;
+    private byte[] m_resumeTicket;
 
     /// <summary>
     /// Session Resume Details
     /// </summary>
     private byte[] m_sessionSecret;
-    private byte[] m_resumeTicket;
+
+    //The SRP Mechanism
+    private int m_srpByteLength;
+    private SrpStrength m_strength;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
-    /// Creates a client that will authenticate with the specified 
+    /// Creates a client that will authenticate with the specified
     /// username and password.
     /// </summary>
     /// <param name="username">the username</param>
@@ -70,6 +77,32 @@ public class SrpClient
         m_credentials = new PbdkfCredentials(username, password);
         if (m_credentials.UsernameBytes.Length > 1024)
             throw new ArgumentException("Username cannot consume more than 1024 bytes encoded as UTF8", nameof(username));
+    }
+
+    #endregion
+
+    #region [ Methods ]
+
+    public bool AuthenticateAsClient(Stream stream, byte[] additionalChallenge = null)
+    {
+        additionalChallenge ??= new byte[] { };
+
+        stream.Write((short)m_credentials.UsernameBytes.Length);
+        stream.Write(m_credentials.UsernameBytes);
+
+        if (m_resumeTicket is not null)
+        {
+            //resume
+            stream.Write((byte)2);
+            stream.Flush();
+
+            return ResumeSession(stream, additionalChallenge);
+        }
+
+        stream.Write((byte)1);
+        stream.Flush();
+
+        return Authenticate(stream, additionalChallenge);
     }
 
     private void SetSrpStrength(SrpStrength strength)
@@ -90,31 +123,6 @@ public class SrpClient
             HashMethod.Sha512 => new Sha512Digest(),
             _ => throw new Exception("Unsupported Hash Method")
         };
-    }
-
-    public bool AuthenticateAsClient(Stream stream, byte[] additionalChallenge = null)
-    {
-        if (additionalChallenge is null)
-            additionalChallenge = new byte[] { };
-
-        stream.Write((short)m_credentials.UsernameBytes.Length);
-        stream.Write(m_credentials.UsernameBytes);
-
-        if (m_resumeTicket is not null)
-        {
-            //resume
-            stream.Write((byte)2);
-            stream.Flush();
-
-            return ResumeSession(stream, additionalChallenge);
-        }
-        else
-        {
-            stream.Write((byte)1);
-            stream.Flush();
-
-            return Authenticate(stream, additionalChallenge);
-        }
     }
 
     private bool ResumeSession(Stream stream, byte[] additionalChallenge)
@@ -142,8 +150,8 @@ public class SrpClient
 
                 return serverProof.SecureEquals(serverProofCheck);
             }
-
         }
+
         m_sessionSecret = null;
         m_resumeTicket = null;
         return Authenticate(stream, additionalChallenge);
@@ -194,12 +202,12 @@ public class SrpClient
                 m_sessionSecret = m_hash.ComputeHash(pubABytes, sBytes, pubBBytes).Combine(m_hash.ComputeHash(pubBBytes, sBytes, pubABytes));
                 return true;
             }
+
             return false;
         }
+
         return false;
     }
 
-
+    #endregion
 }
-
-

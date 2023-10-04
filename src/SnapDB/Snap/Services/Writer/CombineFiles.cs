@@ -36,20 +36,23 @@ namespace SnapDB.Snap.Services.Writer;
 /// Represents a series of stages that an archive file progresses through
 /// in order to properly condition the data.
 /// </summary>
-public class CombineFiles<TKey, TValue>
-    : DisposableLoggingClassBase
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
-    private readonly object m_syncRoot;
-    private bool m_disposed;
-    private ScheduledTask m_rolloverTask;
-    private readonly ManualResetEvent m_rolloverComplete;
-    private readonly CombineFilesSettings m_settings;
+    #region [ Members ]
+
+    private readonly ArchiveList<TKey, TValue> m_archiveList;
 
     private readonly SimplifiedArchiveInitializer<TKey, TValue> m_createNextStageFile;
-    private readonly ArchiveList<TKey, TValue> m_archiveList;
+    private readonly ManualResetEvent m_rolloverComplete;
     private readonly RolloverLog m_rolloverLog;
+    private ScheduledTask m_rolloverTask;
+    private readonly CombineFilesSettings m_settings;
+    private readonly object m_syncRoot;
+    private bool m_disposed;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a stage writer.
@@ -57,8 +60,7 @@ public class CombineFiles<TKey, TValue>
     /// <param name="settings">the settings for this stage</param>
     /// <param name="archiveList">the archive list</param>
     /// <param name="rolloverLog">the rollover log</param>
-    public CombineFiles(CombineFilesSettings settings, ArchiveList<TKey, TValue> archiveList, RolloverLog rolloverLog)
-            : base(MessageClass.Framework)
+    public CombineFiles(CombineFilesSettings settings, ArchiveList<TKey, TValue> archiveList, RolloverLog rolloverLog) : base(MessageClass.Framework)
     {
         m_settings = settings.CloneReadonly();
         m_settings.Validate();
@@ -71,6 +73,30 @@ public class CombineFiles<TKey, TValue>
         m_rolloverTask.Running += OnExecute;
         //m_rolloverTask.UnhandledException += OnException;
         m_rolloverTask.Start(m_settings.ExecuteTimer);
+    }
+
+    #endregion
+
+    #region [ Methods ]
+
+    /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="LogSourceBase"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (!m_disposed)
+        {
+            m_disposed = true;
+
+            if (disposing)
+            {
+                m_rolloverTask?.Dispose();
+                m_rolloverTask = null;
+            }
+        }
+
+        base.Dispose(disposing);
     }
 
     // TODO: JRC - think about custom exception handling messages with SafeInvoke for missing UnhandledException above
@@ -128,17 +154,17 @@ public class CombineFiles<TKey, TValue>
                     size += list[x].SortedTreeTable.BaseFile.ArchiveSize;
                     if (size > m_settings.CombineOnFileSize)
                     {
-                        if (x != list.Count - 1)//If not the last entry
+                        if (x != list.Count - 1) //If not the last entry
                             list.RemoveRange(x + 1, list.Count - x - 1);
                         break;
                     }
                 }
+
                 if (size > m_settings.CombineOnFileSize)
                     shouldRollover = true;
 
                 if (shouldRollover)
                 {
-
                     TKey startKey = new();
                     TKey endKey = new();
                     startKey.SetMax();
@@ -161,10 +187,7 @@ public class CombineFiles<TKey, TValue>
 
                     RolloverLogFile logFile = null;
 
-                    Action<Guid> createLog = (x) =>
-                    {
-                        logFile = m_rolloverLog.Create(listIds, x);
-                    };
+                    Action<Guid> createLog = x => { logFile = m_rolloverLog.Create(listIds, x); };
 
                     using (UnionReader<TKey, TValue> reader = new(list))
                     {
@@ -178,11 +201,8 @@ public class CombineFiles<TKey, TValue>
                             edit.Add(dest);
 
                             foreach (ArchiveTableSummary<TKey, TValue> table in list)
-                            {
                                 edit.TryRemoveAndDelete(table.FileId);
-                            }
                         }
-
                     }
 
                     logFile?.Delete();
@@ -195,22 +215,5 @@ public class CombineFiles<TKey, TValue>
         }
     }
 
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="LogSourceBase"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (!m_disposed)
-        {
-            m_disposed = true;
-
-            if (disposing)
-            {
-                m_rolloverTask?.Dispose();
-                m_rolloverTask = null;
-            }
-        }
-        base.Dispose(disposing);
-    }
+    #endregion
 }

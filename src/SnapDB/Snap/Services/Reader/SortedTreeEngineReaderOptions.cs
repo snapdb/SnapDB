@@ -24,8 +24,8 @@
 //
 //******************************************************************************************************
 
-using SnapDB.IO;
 using System.Data;
+using SnapDB.IO;
 
 namespace SnapDB.Snap.Services.Reader;
 
@@ -34,14 +34,7 @@ namespace SnapDB.Snap.Services.Reader;
 /// </summary>
 public class SortedTreeEngineReaderOptions
 {
-    /// <summary>
-    /// Default options. Same as default constructor
-    /// </summary>
-    public static SortedTreeEngineReaderOptions? Default
-    {
-        get;
-        private set;
-    }
+    #region [ Constructors ]
 
     static SortedTreeEngineReaderOptions()
     {
@@ -83,6 +76,35 @@ public class SortedTreeEngineReaderOptions
         }
     }
 
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// The time before the query times out.
+    /// </summary>
+    public TimeSpan Timeout { get; }
+
+    /// <summary>
+    /// The maximum number of points to return. 0 means no limit.
+    /// </summary>
+    public long MaxReturnedCount { get; }
+
+    /// <summary>
+    /// The maximum number of points to scan to get the results set.
+    /// This includes any point that was filtered
+    /// </summary>
+    public long MaxScanCount { get; }
+
+    /// <summary>
+    /// The maximum number of seeks permitted
+    /// </summary>
+    public long MaxSeekCount { get; }
+
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Writes this data to the <see cref="stream"/>.
     /// </summary>
@@ -96,36 +118,14 @@ public class SortedTreeEngineReaderOptions
         stream.Write(MaxSeekCount);
     }
 
-    /// <summary>
-    /// The time before the query times out.
-    /// </summary>
-    public TimeSpan Timeout
-    {
-        get;
-    }
+    #endregion
+
+    #region [ Static ]
 
     /// <summary>
-    /// The maximum number of points to return. 0 means no limit.
+    /// Default options. Same as default constructor
     /// </summary>
-    public long MaxReturnedCount
-    {
-        get;
-    }
+    public static SortedTreeEngineReaderOptions? Default { get; private set; }
 
-    /// <summary>
-    /// The maximum number of points to scan to get the results set. 
-    /// This includes any point that was filtered
-    /// </summary>
-    public long MaxScanCount
-    {
-        get;
-    }
-
-    /// <summary>
-    /// The maximum number of seeks permitted
-    /// </summary>
-    public long MaxSeekCount
-    {
-        get;
-    }
+    #endregion
 }

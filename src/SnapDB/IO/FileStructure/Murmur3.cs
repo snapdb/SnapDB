@@ -29,14 +29,18 @@
 // http://en.wikipedia.org/wiki/MurmurHash
 // http://code.google.com/p/smhasher/wiki/MurmurHash3
 
+#pragma warning disable CS0649 // Field is never assigned to, and will always have its default value
+
 namespace SnapDB.IO.FileStructure;
 
 /// <summary>
-/// A specialized implementation of Murmur3 that requires the data be aligned 
+/// A specialized implementation of Murmur3 that requires the data be aligned
 /// to 16-byte boundaries.
 /// </summary>
 internal static unsafe class Murmur3
 {
+    #region [ Static ]
+
     /// <summary>
     /// Computes the MurmurHash3 checksum for the given byte data.
     /// </summary>
@@ -57,11 +61,11 @@ internal static unsafe class Murmur3
 
         // Cast the byte data to ulong blocks for processing.
         ulong* blocks = (ulong*)bb;
-        int nblocks = length >> 4;
+        int blockCount = length >> 4;
         ulong h1 = seed;
         ulong h2 = seed;
 
-        for (int i = 0; i < nblocks; i++)
+        for (int i = 0; i < blockCount; i++)
         {
             ulong k1 = blocks[2 * i + 0];
             ulong k2 = blocks[2 * i + 1];
@@ -88,7 +92,6 @@ internal static unsafe class Murmur3
         }
 
         // Process the tail section of the data.
-
         h1 ^= (ulong)length;
         h2 ^= (ulong)length;
 
@@ -114,14 +117,16 @@ internal static unsafe class Murmur3
         checksum1 = h1;
         checksum2 = h2;
     }
+
+    #endregion
 }
 
+// Provides helper methods for performing operations on 64-bit integers (ulong).
 [Obsolete("For testing only")]
-/// <summary>
-/// Provides helper methods for performing operations on 64-bit integers (ulong).
-/// </summary>
 internal static class IntHelpers
 {
+    #region [ Static ]
+
     /// <summary>
     /// Rotates the bits of a 64-bit integer left by the specified number of bits.
     /// </summary>
@@ -150,29 +155,73 @@ internal static class IntHelpers
     /// <param name="bb">The byte array containing the data.</param>
     /// <param name="pos">The position in the byte array from which to read.</param>
     /// <returns>The extracted 64-bit integer.</returns>
-        public static unsafe ulong GetUInt64(this byte[] bb, int pos)
+    public static unsafe ulong GetUInt64(this byte[] bb, int pos)
     {
         // We only read aligned longs, so a simple casting is enough
-        fixed (byte* pbyte = &bb[pos])
+        fixed (byte* ptr = &bb[pos])
         {
-            return *(ulong*)pbyte;
+            return *(ulong*)ptr;
         }
     }
+
+    #endregion
 }
 
 [Obsolete("For testing only")]
 internal class Murmur3Orig
 {
-    // 128 bit output, 64 bit platform version
+    #region [ Members ]
 
-    public static ulong ReadSize = 16;
-    private static readonly ulong s_c1 = 0x87c37b91114253d5L;
-    private static readonly ulong s_c2 = 0x4cf5ad432745937fL;
+    private ulong m_h1;
+    private ulong m_h2;
 
     private ulong m_length;
     private uint m_seed; // If want to start with a seed, create a constructor.
-    private ulong m_h1;
-    private ulong m_h2;
+
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// Gets the computed hash value as a byte array.
+    /// </summary>
+    public byte[] Hash
+    {
+        get
+        {
+            // Finalize the hash values by XORing and mixing.
+            m_h1 ^= m_length;
+            m_h2 ^= m_length;
+
+            m_h1 += m_h2;
+            m_h2 += m_h1;
+
+            m_h1 = MixFinal(m_h1);
+            m_h2 = MixFinal(m_h2);
+
+            m_h1 += m_h2;
+            m_h2 += m_h1;
+
+            // Create a byte array to store the hash result.
+            byte[] hash = new byte[ReadSize];
+
+            // Copy the 64-bit hash values into the byte array.
+            Array.Copy(BitConverter.GetBytes(m_h1), 0, hash, 0, 8);
+            Array.Copy(BitConverter.GetBytes(m_h2), 0, hash, 8, 8);
+
+            return hash;
+        }
+    }
+
+    #endregion
+
+    #region [ Methods ]
+
+    public byte[] ComputeHash(byte[] bb)
+    {
+        ProcessBytes(bb);
+        return Hash;
+    }
 
     private void MixBody(ulong k1, ulong k2)
     {
@@ -189,40 +238,6 @@ internal class Murmur3Orig
         m_h2 = m_h2 * 5 + 0x38495ab5;
     }
 
-    private static ulong MixKey1(ulong k1)
-    {
-        k1 *= s_c1;
-        k1 = k1.RotateLeft(31);
-        k1 *= s_c2;
-        return k1;
-    }
-
-    private static ulong MixKey2(ulong k2)
-    {
-        k2 *= s_c2;
-        k2 = k2.RotateLeft(33);
-        k2 *= s_c1;
-        return k2;
-    }
-
-    private static ulong MixFinal(ulong k)
-    {
-        // Avalanche bits.
-
-        k ^= k >> 33;
-        k *= 0xff51afd7ed558ccdL;
-        k ^= k >> 33;
-        k *= 0xc4ceb9fe1a85ec53L;
-        k ^= k >> 33;
-        return k;
-    }
-
-    public byte[] ComputeHash(byte[] bb)
-    {
-        ProcessBytes(bb);
-        return Hash;
-    }
-
     private void ProcessBytes(byte[] bb)
     {
         m_h1 = m_seed;
@@ -232,7 +247,7 @@ internal class Murmur3Orig
         int pos = 0;
         ulong remaining = (ulong)bb.Length;
 
-        // Read 128 bits, 16 bytes, 2 longs in eacy cycle.
+        // Read 128 bits, 16 bytes, 2 longs in each cycle.
         while (remaining >= ReadSize)
         {
             ulong k1 = bb.GetUInt64(pos);
@@ -314,34 +329,44 @@ internal class Murmur3Orig
         m_h2 ^= MixKey2(k2);
     }
 
-    /// <summary>
-    /// Gets the computed hash value as a byte array.
-    /// </summary>
-    public byte[] Hash
+    #endregion
+
+    #region [ Static ]
+
+    // 128 bit output, 64 bit platform version
+
+    public static ulong ReadSize = 16;
+    private static readonly ulong s_c1 = 0x87c37b91114253d5L;
+    private static readonly ulong s_c2 = 0x4cf5ad432745937fL;
+
+    private static ulong MixKey1(ulong k1)
     {
-        get
-        {
-            // Finalize the hash values by XORing and mixing.
-            m_h1 ^= m_length;
-            m_h2 ^= m_length;
-
-            m_h1 += m_h2;
-            m_h2 += m_h1;
-
-            m_h1 = MixFinal(m_h1);
-            m_h2 = MixFinal(m_h2);
-
-            m_h1 += m_h2;
-            m_h2 += m_h1;
-
-            // Create a byte array to store the hash result.
-            byte[] hash = new byte[ReadSize];
-
-            // Copy the 64-bit hash values into the byte array.
-            Array.Copy(BitConverter.GetBytes(m_h1), 0, hash, 0, 8);
-            Array.Copy(BitConverter.GetBytes(m_h2), 0, hash, 8, 8);
-
-            return hash;
-        }
+        k1 *= s_c1;
+        k1 = k1.RotateLeft(31);
+        k1 *= s_c2;
+        return k1;
     }
+
+    private static ulong MixKey2(ulong k2)
+    {
+        k2 *= s_c2;
+        k2 = k2.RotateLeft(33);
+        k2 *= s_c1;
+
+        return k2;
+    }
+
+    private static ulong MixFinal(ulong k)
+    {
+        // Avalanche bits.
+        k ^= k >> 33;
+        k *= 0xff51afd7ed558ccdL;
+        k ^= k >> 33;
+        k *= 0xc4ceb9fe1a85ec53L;
+        k ^= k >> 33;
+
+        return k;
+    }
+
+    #endregion
 }

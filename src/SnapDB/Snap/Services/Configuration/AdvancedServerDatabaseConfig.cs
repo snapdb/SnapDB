@@ -33,8 +33,8 @@
 
 using Gemstone.StringExtensions;
 using Gemstone.Units;
-using SnapDB.Snap.Services.Writer;
 using SnapDB.IO;
+using SnapDB.Snap.Services.Writer;
 using SnapDB.Snap.Storage;
 
 namespace SnapDB.Snap.Services.Configuration;
@@ -42,14 +42,18 @@ namespace SnapDB.Snap.Services.Configuration;
 /// <summary>
 /// Creates a configuration for the database to utilize.
 /// </summary>
-public class AdvancedServerDatabaseConfig<TKey, TValue>
-    : IToServerDatabaseSettings
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSettings where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
-    private readonly string m_mainPath;
+    #region [ Members ]
+
     private string m_finalFileExtension;
     private string m_intermediateFileExtension;
+
+    private readonly string m_mainPath;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Gets a database config.
@@ -74,8 +78,12 @@ public class AdvancedServerDatabaseConfig<TKey, TValue>
         CacheFlushInterval = 100;
     }
 
+    #endregion
+
+    #region [ Properties ]
+
     /// <summary>
-    /// Gets the method of how the directory will be stored. Defaults to 
+    /// Gets the method of how the directory will be stored. Defaults to
     /// top directory only.
     /// </summary>
     public ArchiveDirectoryMethod DirectoryMethod { get; set; }
@@ -136,7 +144,7 @@ public class AdvancedServerDatabaseConfig<TKey, TValue>
     public List<string> ImportPaths { get; }
 
     /// <summary>
-    /// The list of directories where final files can be placed written. 
+    /// The list of directories where final files can be placed written.
     /// If nothing is specified, the main directory is used.
     /// </summary>
     public List<string> FinalWritePaths { get; }
@@ -150,6 +158,7 @@ public class AdvancedServerDatabaseConfig<TKey, TValue>
     /// Gets the supported encoding methods for streaming data. This list is in a prioritized order.
     /// </summary>
     public List<EncodingDefinition> StreamingEncodingMethods { get; }
+
     /// <summary>
     /// Gets if writing will be supported
     /// </summary>
@@ -172,36 +181,9 @@ public class AdvancedServerDatabaseConfig<TKey, TValue>
     /// </remarks>
     public int CacheFlushInterval { get; set; }
 
-    #region [ IToServerDatabaseSettings ]
+    #endregion
 
-    /// <summary>
-    /// Converts the current instance of the database settings to a <see cref="ServerDatabaseSettings"/> object.
-    /// </summary>
-    /// <returns>A <see cref="ServerDatabaseSettings"/> object representing the database settings.</returns>
-    public ServerDatabaseSettings ToServerDatabaseSettings()
-    {
-        ServerDatabaseSettings settings = new()
-        {
-            DatabaseName = DatabaseName
-        };
-
-        if (SupportsWriting)
-            ToWriteProcessorSettings(settings.WriteProcessor);
-
-        settings.SupportsWriting = SupportsWriting;
-        ToArchiveListSettings(settings.ArchiveList);
-
-        settings.RolloverLog.LogPath = m_mainPath;
-        settings.KeyType = new TKey().GenericTypeGuid;
-        settings.ValueType = new TValue().GenericTypeGuid;
-
-        if (StreamingEncodingMethods.Count == 0)
-            settings.StreamingEncodingMethods.Add(EncodingDefinition.FixedSizeCombinedEncoding);
-        else
-            settings.StreamingEncodingMethods.AddRange(StreamingEncodingMethods);
-
-        return settings;
-    }
+    #region [ Methods ]
 
     private void ToWriteProcessorSettings(WriteProcessorSettings settings)
     {
@@ -226,8 +208,8 @@ public class AdvancedServerDatabaseConfig<TKey, TValue>
         settings.PrebufferWriter.RolloverPointCount = 25000;
 
         // 10 seconds
-        settings.FirstStageWriter.MaximumAllowedMb = 100;   // about 10 million points
-        settings.FirstStageWriter.RolloverSizeMb = 100;     // about 10 million points
+        settings.FirstStageWriter.MaximumAllowedMb = 100; // about 10 million points
+        settings.FirstStageWriter.RolloverSizeMb = 100; // about 10 million points
         settings.FirstStageWriter.RolloverInterval = DiskFlushInterval; // 10 seconds
         settings.FirstStageWriter.EncodingMethod = ArchiveEncodingMethod;
         settings.FirstStageWriter.FinalSettings.ConfigureOnDisk(new[] { m_mainPath }, SI2.Giga, ArchiveDirectoryMethod.TopDirectoryOnly, ArchiveEncodingMethod, "stage1", intermediateFilePendingExtension, intermediateFileFinalExtension, FileFlags.Stage1, FileFlags.IntermediateFile);
@@ -239,18 +221,10 @@ public class AdvancedServerDatabaseConfig<TKey, TValue>
             CombineFilesSettings rollover = new();
 
             if (remainingStages > 0)
-            {
-                rollover.ArchiveSettings.ConfigureOnDisk(new[] { m_mainPath }, SI2.Giga,
-                    ArchiveDirectoryMethod.TopDirectoryOnly, ArchiveEncodingMethod, "stage" + stage,
-                    intermediateFilePendingExtension, intermediateFileFinalExtension, FileFlags.GetStage(stage), FileFlags.IntermediateFile);
-            }
+                rollover.ArchiveSettings.ConfigureOnDisk(new[] { m_mainPath }, SI2.Giga, ArchiveDirectoryMethod.TopDirectoryOnly, ArchiveEncodingMethod, "stage" + stage, intermediateFilePendingExtension, intermediateFileFinalExtension, FileFlags.GetStage(stage), FileFlags.IntermediateFile);
             else
-            {
                 // Final staging file
-                rollover.ArchiveSettings.ConfigureOnDisk(finalPaths, DesiredRemainingSpace,
-                    DirectoryMethod, ArchiveEncodingMethod, DatabaseName.ToNonNullNorEmptyString("stage" + stage).RemoveInvalidFileNameCharacters(),
-                    finalFilePendingExtension, finalFileFinalExtension, FileFlags.GetStage(stage));
-            }
+                rollover.ArchiveSettings.ConfigureOnDisk(finalPaths, DesiredRemainingSpace, DirectoryMethod, ArchiveEncodingMethod, DatabaseName.ToNonNullNorEmptyString("stage" + stage).RemoveInvalidFileNameCharacters(), finalFilePendingExtension, finalFileFinalExtension, FileFlags.GetStage(stage));
 
             rollover.LogPath = m_mainPath;
             rollover.ExecuteTimer = 1000;
@@ -280,6 +254,36 @@ public class AdvancedServerDatabaseConfig<TKey, TValue>
 
         listSettings.LogSettings.LogPath = m_mainPath;
     }
+
+    /// <summary>
+    /// Converts the current instance of the database settings to a <see cref="ServerDatabaseSettings"/> object.
+    /// </summary>
+    /// <returns>A <see cref="ServerDatabaseSettings"/> object representing the database settings.</returns>
+    public ServerDatabaseSettings ToServerDatabaseSettings()
+    {
+        ServerDatabaseSettings settings = new() { DatabaseName = DatabaseName };
+
+        if (SupportsWriting)
+            ToWriteProcessorSettings(settings.WriteProcessor);
+
+        settings.SupportsWriting = SupportsWriting;
+        ToArchiveListSettings(settings.ArchiveList);
+
+        settings.RolloverLog.LogPath = m_mainPath;
+        settings.KeyType = new TKey().GenericTypeGuid;
+        settings.ValueType = new TValue().GenericTypeGuid;
+
+        if (StreamingEncodingMethods.Count == 0)
+            settings.StreamingEncodingMethods.Add(EncodingDefinition.FixedSizeCombinedEncoding);
+        else
+            settings.StreamingEncodingMethods.AddRange(StreamingEncodingMethods);
+
+        return settings;
+    }
+
+    #endregion
+
+    #region [ Static ]
 
     private static void ValidateExtension(string extension, out string pending, out string final)
     {

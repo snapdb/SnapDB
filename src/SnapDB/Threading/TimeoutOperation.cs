@@ -31,12 +31,19 @@ namespace SnapDB.Threading;
 /// </summary>
 public class TimeoutOperation
 {
+    #region [ Members ]
+
+    private Action m_callback;
+    private RegisteredWaitHandle m_registeredHandle;
+    private ManualResetEvent m_resetEvent;
+
     // ToDo: Figure out how to allow for a weak referenced callback.
 
     private readonly object m_syncRoot = new();
-    private RegisteredWaitHandle m_registeredHandle;
-    private ManualResetEvent m_resetEvent;
-    private Action m_callback;
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Registers a timeout callback to be executed at specified intervals.
@@ -57,22 +64,6 @@ public class TimeoutOperation
         }
     }
 
-    private void BeginRun(object state, bool isTimeout)
-    {
-        lock (m_syncRoot)
-        {
-            if (m_registeredHandle is null)
-                return;
-            
-            m_registeredHandle.Unregister(null);
-            m_resetEvent.Dispose();
-            m_callback();
-            m_resetEvent = null;
-            m_registeredHandle = null;
-            m_callback = null;
-        }
-    }
-
     /// <summary>
     /// Cancels a previously registered timeout callback.
     /// </summary>
@@ -90,4 +81,22 @@ public class TimeoutOperation
             }
         }
     }
+
+    private void BeginRun(object state, bool isTimeout)
+    {
+        lock (m_syncRoot)
+        {
+            if (m_registeredHandle is null)
+                return;
+
+            m_registeredHandle.Unregister(null);
+            m_resetEvent.Dispose();
+            m_callback();
+            m_resetEvent = null;
+            m_registeredHandle = null;
+            m_callback = null;
+        }
+    }
+
+    #endregion
 }

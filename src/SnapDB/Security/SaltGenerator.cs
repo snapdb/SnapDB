@@ -33,6 +33,8 @@ namespace SnapDB.Security;
 /// </summary>
 public static class SaltGenerator
 {
+    #region [ Static ]
+
     /// <summary>
     /// Creates a salt of the specified length.
     /// </summary>
@@ -47,4 +49,6 @@ public static class SaltGenerator
         rng.GetBytes(salt);
         return salt;
     }
+
+    #endregion
 }

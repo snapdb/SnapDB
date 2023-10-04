@@ -23,6 +23,7 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 using SnapDB.IO.FileStructure.Media;
 using SnapDB.IO.Unmanaged;
@@ -31,35 +32,31 @@ namespace SnapDB.IO.FileStructure;
 
 public partial class SubFileStream
 {
+    #region [ Members ]
+
     /// <summary>
     /// An IoSession for the sub file stream.
     /// </summary>
-    private unsafe class IoSession
-        : BinaryStreamIoSessionBase
+    private unsafe class IoSession : BinaryStreamIoSessionBase
     {
         #region [ Members ]
 
-        /// <summary>
-        /// The address parser.
-        /// </summary>
-        private IndexParser m_parser;
+        private readonly int m_blockDataLength;
 
-        /// <summary>
-        /// The shadow copier if the address translation allows for editing.
-        /// </summary>
-        private ShadowCopyAllocator m_pager;
-
-        private readonly SubFileStream m_stream;
-
-        /// <summary>
-        /// Contains the read and write buffer.
-        /// </summary>
+        // Contains the read and write buffer.
         private SubFileDiskIoSessionPool m_ioSessions;
-        private bool m_disposed;
 
         private readonly bool m_isReadOnly;
-        private readonly int m_blockDataLength;
         private readonly uint m_lastEditedBlock;
+
+        // The shadow copier if the address translation allows for editing.
+        private ShadowCopyAllocator m_pager = default!;
+
+        // The address parser.
+        private IndexParser m_parser;
+
+        private readonly SubFileStream m_stream;
+        private bool m_disposed;
 
         #endregion
 
@@ -77,7 +74,6 @@ public partial class SubFileStream
             {
                 m_parser = new IndexParser(m_ioSessions);
             }
-
             else
             {
                 m_pager = new ShadowCopyAllocator(m_ioSessions);
@@ -89,45 +85,11 @@ public partial class SubFileStream
 
         #region [ Properties ]
 
-        private DiskIoSession DataIoSession => m_ioSessions.SourceData;
+        private DiskIoSession? DataIoSession => m_ioSessions.SourceData;
 
         #endregion
 
         #region [ Methods ]
-
-        /// <summary>
-        /// Releases the unmanaged resources used by the <see cref="IoSession"/> object and optionally releases the managed resources.
-        /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (!m_disposed)
-            {
-                try
-                {
-                    // This will be done regardless of whether the object is finalized or disposed.
-
-                    if (disposing)
-                    {
-                        if (m_ioSessions is not null)
-                        {
-                            m_ioSessions.Dispose();
-                            m_ioSessions = null;
-                        }
-
-                        // This will be done only when the object is disposed by calling Dispose().
-                    }
-                }
-
-                finally
-                {
-                    m_parser = null;
-                    m_pager = null;
-                    m_disposed = true;          // Prevent duplicate dispose.
-                    base.Dispose(disposing);    // Call base class Dispose().
-                }
-            }
-        }
 
         /// <summary>
         /// Sets the current usage of the <see cref="BinaryStreamIoSessionBase"/> to <c>null</c>.
@@ -152,14 +114,15 @@ public partial class SubFileStream
         {
             int blockDataLength = m_blockDataLength;
             long pos = args.Position;
+
             if (IsDisposed || m_ioSessions.IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
             if (pos < 0)
-                throw new ArgumentOutOfRangeException("position", "cannot be negative");
+                throw new ArgumentOutOfRangeException(nameof(args), "position cannot be negative");
 
             if (pos >= blockDataLength * (uint.MaxValue - 1))
-                throw new ArgumentOutOfRangeException("position", "position reaches past the end of the file.");
+                throw new ArgumentOutOfRangeException(nameof(args), "position reaches past the end of the file.");
 
             uint physicalBlockIndex;
             uint indexPosition;
@@ -187,11 +150,10 @@ public partial class SubFileStream
                 if (physicalBlockIndex == 0)
                     throw new Exception("Failure to shadow copy the page.");
 
-                DataIoSession.WriteToExistingBlock(physicalBlockIndex, BlockType.DataBlock, indexPosition);
+                DataIoSession!.WriteToExistingBlock(physicalBlockIndex, BlockType.DataBlock, indexPosition);
                 args.FirstPointer = (nint)DataIoSession.Pointer;
                 args.SupportsWriting = true;
             }
-
             else
             {
                 // Reading
@@ -200,12 +162,44 @@ public partial class SubFileStream
                 if (physicalBlockIndex <= 0)
                     throw new Exception("Page does not exist");
 
-                DataIoSession.Read(physicalBlockIndex, BlockType.DataBlock, indexPosition);
+                DataIoSession!.Read(physicalBlockIndex, BlockType.DataBlock, indexPosition);
                 args.FirstPointer = (nint)DataIoSession.Pointer;
                 args.SupportsWriting = !m_isReadOnly && physicalBlockIndex > m_lastEditedBlock;
             }
         }
 
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="IoSession"/> object and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (m_disposed)
+                return;
+
+            try
+            {
+                if (!disposing)
+                    return;
+
+                if (m_ioSessions is null)
+                    return;
+
+                m_ioSessions.Dispose();
+                m_ioSessions = null!;
+            }
+
+            finally
+            {
+                m_parser = null!;
+                m_pager = null!;
+                m_disposed = true; // Prevent duplicate dispose.
+                base.Dispose(disposing); // Call base class Dispose().
+            }
+        }
+
         #endregion
     }
+
+    #endregion
 }

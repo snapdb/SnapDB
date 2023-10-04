@@ -31,12 +31,18 @@ namespace SnapDB.Security.Authentication;
 /// </summary>
 public class ScramServerSession
 {
+    #region [ Members ]
+
     public string Username;
+
+    #endregion
+
+    #region [ Constructors ]
 
     public ScramServerSession(string username)
     {
         Username = username;
     }
+
+    #endregion
 }
-
-

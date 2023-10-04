@@ -30,32 +30,37 @@ namespace SnapDB.Security.Authentication;
 /// Specifies the bit strength of the SRP algorithm.
 /// </summary>
 public enum SrpStrength
-    : int
 {
     /// <summary>
     /// Bit strength takes 1x (approximately 20ms on a 3.4Ghz PC) to secure the channel.
     /// </summary>
     Bits1024 = 1024,
+
     /// <summary>
     /// Bit strength takes 3x to secure channel.
     /// </summary>
     Bits1536 = 1536,
+
     /// <summary>
     /// Bit strength takes 6.5x to secure channel.
     /// </summary>
     Bits2048 = 2048,
+
     /// <summary>
     /// Bit strength takes 21x to secure channel.
     /// </summary>
     Bits3072 = 3072,
+
     /// <summary>
     /// Bit strength takes 47x to secure channel.
     /// </summary>
     Bits4096 = 4096,
+
     /// <summary>
     /// Bit strength takes 154x to secure channel.
     /// </summary>
     Bits6144 = 6144,
+
     /// <summary>
     /// Bit strength takes 366x to secure channel.
     /// </summary>

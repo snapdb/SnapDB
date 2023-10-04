@@ -31,15 +31,20 @@ using SnapDB.Snap.Definitions;
 namespace SnapDB.Snap.Filters;
 
 /// <summary>
-/// Contains all of the filters for the <see cref="Snap"/>. 
+/// Contains all of the filters for the <see cref="Snap"/>.
 /// </summary>
 public class FilterLibrary
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(FilterLibrary), MessageClass.Framework);
+    #region [ Members ]
 
-    private readonly object m_syncRoot;
     private readonly Dictionary<Guid, MatchFilterDefinitionBase> m_filters;
     private readonly Dictionary<Guid, SeekFilterDefinitionBase> m_seekFilters;
+
+    private readonly object m_syncRoot;
+
+    #endregion
+
+    #region [ Constructors ]
 
     internal FilterLibrary()
     {
@@ -47,6 +52,10 @@ public class FilterLibrary
         m_filters = new Dictionary<Guid, MatchFilterDefinitionBase>();
         m_seekFilters = new Dictionary<Guid, SeekFilterDefinitionBase>();
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Registers a match filter definition to the collection of filters.
@@ -81,9 +90,7 @@ public class FilterLibrary
     /// <param name="stream">The binary stream to associate with the match filter.</param>
     /// <returns>The match filter instance if found; otherwise, an exception is thrown.</returns>
     /// <exception cref="Exception">Thrown when the match filter is not found.</exception>
-    public MatchFilterBase<TKey, TValue> GetMatchFilter<TKey, TValue>(Guid filter, BinaryStreamBase stream)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+    public MatchFilterBase<TKey, TValue> GetMatchFilter<TKey, TValue>(Guid filter, BinaryStreamBase stream) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         try
         {
@@ -95,13 +102,12 @@ public class FilterLibrary
         }
         catch (Exception ex)
         {
-            s_log.Publish(MessageLevel.Error, "Match Filter Exception",
-                $"ID: {filter.ToString()} Key: {typeof(TKey).ToString()} Value: {typeof(TValue).ToString()}", null, ex);
+            s_log.Publish(MessageLevel.Error, "Match Filter Exception", $"ID: {filter.ToString()} Key: {typeof(TKey)} Value: {typeof(TValue)}", null, ex);
 
             throw;
         }
-        s_log.Publish(MessageLevel.Info, "Missing Match Filter",
-            $"ID: {filter.ToString()} Key: {typeof(TKey).ToString()} Value: {typeof(TValue).ToString()}");
+
+        s_log.Publish(MessageLevel.Info, "Missing Match Filter", $"ID: {filter.ToString()} Key: {typeof(TKey)} Value: {typeof(TValue)}");
 
         throw new Exception("Filter not found");
     }
@@ -114,8 +120,7 @@ public class FilterLibrary
     /// <param name="stream">The binary stream to associate with the seek filter.</param>
     /// <returns>The seek filter instance if found; otherwise, an exception is thrown.</returns>
     /// <exception cref="Exception">Thrown when the seek filter is not found.</exception>
-    public SeekFilterBase<TKey> GetSeekFilter<TKey>(Guid filter, BinaryStreamBase stream)
-        where TKey : SnapTypeBase<TKey>, new()
+    public SeekFilterBase<TKey> GetSeekFilter<TKey>(Guid filter, BinaryStreamBase stream) where TKey : SnapTypeBase<TKey>, new()
     {
         try
         {
@@ -127,14 +132,21 @@ public class FilterLibrary
         }
         catch (Exception ex)
         {
-            s_log.Publish(MessageLevel.Error, "Seek Filter Exception",
-                $"ID: {filter.ToString()} Key: {typeof(TKey).ToString()}", null, ex);
+            s_log.Publish(MessageLevel.Error, "Seek Filter Exception", $"ID: {filter.ToString()} Key: {typeof(TKey)}", null, ex);
 
             throw;
         }
 
-        s_log.Publish(MessageLevel.Info, "Missing Seek Filter", $"ID: {filter.ToString()} Key: {typeof(TKey).ToString()}");
+        s_log.Publish(MessageLevel.Info, "Missing Seek Filter", $"ID: {filter.ToString()} Key: {typeof(TKey)}");
 
         throw new Exception("Filter not found");
     }
+
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(FilterLibrary), MessageClass.Framework);
+
+    #endregion
 }

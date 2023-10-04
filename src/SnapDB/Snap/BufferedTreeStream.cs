@@ -28,17 +28,24 @@ namespace SnapDB.Snap;
 
 public partial class UnionTreeStream<TKey, TValue>
 {
+    #region [ Members ]
+
     /// <summary>
     /// A wrapper around a <see cref="TreeStream{TKey,TValue}"/> that primarily supports peeking
     /// a value from a stream.
     /// </summary>
-    private class BufferedTreeStream
-        : IDisposable
+    private class BufferedTreeStream : IDisposable
     {
-        public TreeStream<TKey, TValue> Stream;
-        public bool IsValid;
+        #region [ Members ]
+
         public readonly TKey CacheKey = new();
         public readonly TValue CacheValue = new();
+        public bool IsValid;
+        public TreeStream<TKey, TValue> Stream;
+
+        #endregion
+
+        #region [ Constructors ]
 
         /// <summary>
         /// Creates a new instance of the <see cref="BufferedTreeStream"/> class.
@@ -53,6 +60,22 @@ public partial class UnionTreeStream<TKey, TValue>
 
             Stream = stream;
             EnsureCache();
+        }
+
+        #endregion
+
+        #region [ Methods ]
+
+        /// <summary>
+        /// Disposes of the <see cref="BufferedTreeStream"/> and its underlying stream.
+        /// </summary>
+        public void Dispose()
+        {
+            if (Stream is not null)
+            {
+                Stream.Dispose();
+                Stream = null;
+            }
         }
 
         /// <summary>
@@ -86,6 +109,7 @@ public partial class UnionTreeStream<TKey, TValue>
                 CacheValue.CopyTo(value);
                 return;
             }
+
             throw new Exception("Cache is not valid. Programming Error.");
         }
 
@@ -101,18 +125,8 @@ public partial class UnionTreeStream<TKey, TValue>
             value.CopyTo(CacheValue);
         }
 
-        /// <summary>
-        /// Disposes of the <see cref="BufferedTreeStream"/> and its underlying stream.
-        /// </summary>
-        public void Dispose()
-        {
-            if (Stream is not null)
-            {
-                Stream.Dispose();
-                Stream = null;
-            }
-
-        }
+        #endregion
     }
 
+    #endregion
 }

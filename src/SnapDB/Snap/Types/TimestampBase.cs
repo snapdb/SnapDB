@@ -27,19 +27,23 @@
 namespace SnapDB.Snap.Types;
 
 /// <summary>
-/// Base implementation of a historian key. 
-/// These are the required functions that are 
+/// Base implementation of a historian key.
+/// These are the required functions that are
 /// necessary for the historian engine to operate
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
-public abstract class TimestampBase<TKey>
-    : SnapTypeBase<TKey>, IHasTimestampField
-    where TKey : SnapTypeBase<TKey>, new()
+public abstract class TimestampBase<TKey> : SnapTypeBase<TKey>, IHasTimestampField where TKey : SnapTypeBase<TKey>, new()
 {
+    #region [ Members ]
+
     /// <summary>
-    /// The timestamp stored as native ticks. 
+    /// The timestamp stored as native ticks.
     /// </summary>
     public ulong Timestamp;
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Attempts to get the timestamp field of a point. This function might fail if the datetime field
@@ -54,8 +58,10 @@ public abstract class TimestampBase<TKey>
             timestamp = new DateTime((long)Timestamp);
             return true;
         }
+
         timestamp = DateTime.MinValue;
         return false;
-
     }
+
+    #endregion
 }

@@ -29,23 +29,16 @@ using SnapDB.IO.FileStructure;
 namespace SnapDB.Snap.Storage;
 
 /// <summary>
-/// Represents an individual table contained within the file. 
+/// Represents an individual table contained within the file.
 /// </summary>
-public partial class SortedTreeTable<TKey, TValue>
-    : IDisposable
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public partial class SortedTreeTable<TKey, TValue> : IDisposable where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
 
-    private readonly SubFileName m_fileName;
-    private readonly TransactionalFileStructure m_fileStructure;
     private Editor m_activeEditor;
 
-    /// <summary>
-    /// Gets the archive file where this table exists.
-    /// </summary>
-    public SortedTreeFile BaseFile { get; }
+    private readonly SubFileName m_fileName;
+    private readonly TransactionalFileStructure m_fileStructure;
 
     #endregion
 
@@ -73,7 +66,12 @@ public partial class SortedTreeTable<TKey, TValue>
     #region [ Properties ]
 
     /// <summary>
-    /// Determines if the archive file has been disposed. 
+    /// Gets the archive file where this table exists.
+    /// </summary>
+    public SortedTreeFile BaseFile { get; }
+
+    /// <summary>
+    /// Determines if the archive file has been disposed.
     /// </summary>
     public bool IsDisposed { get; private set; }
 
@@ -93,6 +91,20 @@ public partial class SortedTreeTable<TKey, TValue>
     #endregion
 
     #region [ Methods ]
+
+    /// <summary>
+    /// Closes the archive file. If there is a current transaction,
+    /// that transaction is immediately rolled back and disposed.
+    /// </summary>
+    public void Dispose()
+    {
+        if (!IsDisposed)
+        {
+            m_activeEditor?.Dispose();
+            m_fileStructure.Dispose();
+            IsDisposed = true;
+        }
+    }
 
     /// <summary>
     /// Acquires a read snapshot of the current archive file.
@@ -125,16 +137,16 @@ public partial class SortedTreeTable<TKey, TValue>
     /// <remarks>
     /// Concurrent editing of a file is not supported. Subsequent calls will
     /// throw an exception rather than blocking. This is to encourage
-    /// proper synchronization at a higher layer. 
+    /// proper synchronization at a higher layer.
     /// Wrap the return value of this function in a Using block so the dispose
-    /// method is always called. 
+    /// method is always called.
     /// </remarks>
     /// <example>
     /// using (ArchiveFile.ArchiveFileEditor editor = archiveFile.BeginEdit())
     /// {
-    ///     editor.AddPoint(key, value);
-    ///     editor.AddPoint(key, value);
-    ///     editor.Commit();
+    /// editor.AddPoint(key, value);
+    /// editor.AddPoint(key, value);
+    /// editor.Commit();
     /// }
     /// </example>
     public SortedTreeTableEditor<TKey, TValue> BeginEdit()
@@ -147,23 +159,10 @@ public partial class SortedTreeTable<TKey, TValue>
         return m_activeEditor;
     }
 
-    /// <summary>
-    /// Closes the archive file. If there is a current transaction, 
-    /// that transaction is immediately rolled back and disposed.
-    /// </summary>
-    public void Dispose()
-    {
-        if (!IsDisposed)
-        {
-            m_activeEditor?.Dispose();
-            m_fileStructure.Dispose();
-            IsDisposed = true;
-        }
-    }
+    #endregion
 
     ///// <summary>
     ///// Closes and deletes the Archive File. Also calls dispose.
     ///// If this is a memory archive, it will release the memory space to the buffer pool.
     ///// </summary>
-    #endregion
 }

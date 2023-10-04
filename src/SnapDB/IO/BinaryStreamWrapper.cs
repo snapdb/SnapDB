@@ -29,17 +29,26 @@ namespace SnapDB.IO;
 /// <summary>
 /// A simple wrapper of a <see cref="Stream"/>. Provides no caching functionality.
 /// </summary>
-public class BinaryStreamWrapper
-    : BinaryStreamBase
+public class BinaryStreamWrapper : BinaryStreamBase
 {
-    private readonly Stream m_stream;
+    #region [ Members ]
+
     private readonly bool m_ownsStream;
+    private readonly Stream m_stream;
+
+    #endregion
+
+    #region [ Constructors ]
 
     public BinaryStreamWrapper(Stream stream, bool ownsStream)
     {
         m_ownsStream = ownsStream;
         m_stream = stream;
     }
+
+    #endregion
+
+    #region [ Properties ]
 
     public override bool CanWrite => m_stream.CanWrite;
 
@@ -53,7 +62,7 @@ public class BinaryStreamWrapper
     /// Gets or sets the current position for the stream.
     /// </summary>
     /// <remarks>
-    /// It is important to use this to get or set the position from the underlying stream since 
+    /// It is important to use this to get or set the position from the underlying stream since
     /// this class buffers the results of the query. Setting this field does not guarantee that
     /// the underlying stream will get set. Call FlushToUnderlyingStream to accomplish this.
     /// </remarks>
@@ -62,6 +71,10 @@ public class BinaryStreamWrapper
         get => m_stream.Position;
         set => m_stream.Position = value;
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     public override void Write(byte value)
     {
@@ -88,13 +101,6 @@ public class BinaryStreamWrapper
         m_stream.Flush();
     }
 
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing && m_ownsStream)
-            m_stream.Dispose();
-        base.Dispose(disposing);
-    }
-
     public override void SetLength(long value)
     {
         m_stream.SetLength(value);
@@ -104,4 +110,13 @@ public class BinaryStreamWrapper
     {
         return m_stream.Read(value, offset, count);
     }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing && m_ownsStream)
+            m_stream.Dispose();
+        base.Dispose(disposing);
+    }
+
+    #endregion
 }

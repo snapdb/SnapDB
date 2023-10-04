@@ -27,19 +27,19 @@
 namespace SnapDB.Snap.Types;
 
 /// <summary>
-/// Base implementation of a historian key. 
-/// These are the required functions that are 
+/// Base implementation of a historian key.
+/// These are the required functions that are
 /// necessary for the historian engine to operate
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
-public abstract class TimestampPointIdBase<TKey>
-    : TimestampBase<TKey>
-    where TKey : SnapTypeBase<TKey>, new()
+public abstract class TimestampPointIdBase<TKey> : TimestampBase<TKey> where TKey : SnapTypeBase<TKey>, new()
 {
+    #region [ Members ]
+
     /// <summary>
     /// The ID number of the point.
     /// </summary>
     public ulong PointId;
 
-
+    #endregion
 }

@@ -34,14 +34,22 @@ namespace SnapDB.Snap.Definitions;
 /// </summary>
 public abstract class MatchFilterDefinitionBase
 {
+    #region [ Properties ]
+
     /// <summary>
-    /// The filter GUID. 
+    /// The filter GUID.
     /// </summary>
     public abstract Guid FilterType { get; }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Determines if a key-value pair is contained in the filter.
     /// </summary>
     /// <param name="stream">The value to check.</param>
     public abstract MatchFilterBase<TKey, TValue> Create<TKey, TValue>(BinaryStreamBase stream);
+
+    #endregion
 }

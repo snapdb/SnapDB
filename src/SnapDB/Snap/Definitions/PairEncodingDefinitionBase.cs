@@ -33,6 +33,8 @@ namespace SnapDB.Snap.Definitions;
 /// </summary>
 public abstract class PairEncodingDefinitionBase
 {
+    #region [ Properties ]
+
     /// <summary>
     /// The key type supported by the encoded method. Can be <c>null</c> if the encoding is not type specific.
     /// </summary>
@@ -48,13 +50,17 @@ public abstract class PairEncodingDefinitionBase
     /// </summary>
     public abstract EncodingDefinition Method { get; }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
-    /// Constructs a new class based on this encoding method. 
+    /// Constructs a new class based on this encoding method.
     /// </summary>
     /// <typeparam name="TKey">The key for this encoding method.</typeparam>
     /// <typeparam name="TValue">The value for this encoding method.</typeparam>
     /// <returns>The encoding method.</returns>
-    public abstract PairEncodingBase<TKey, TValue> Create<TKey, TValue>()
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new();
+    public abstract PairEncodingBase<TKey, TValue> Create<TKey, TValue>() where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new();
+
+    #endregion
 }

@@ -37,16 +37,20 @@ namespace SnapDB.Security;
 /// <summary>
 /// Creates a secure stream that connects to a server.
 /// </summary>
-public abstract class SecureStreamClientBase
-    : DisposableLoggingClassBase
+public abstract class SecureStreamClientBase : DisposableLoggingClassBase
 {
-    private static readonly X509Certificate2 s_tempCert;
+    #region [ Members ]
+
     private byte[] m_resumeTicket;
     private byte[] m_sessionSecret;
 
+    #endregion
+
+    #region [ Constructors ]
+
     static SecureStreamClientBase()
     {
-#if !SQLCLR
+    #if !SQLCLR
         try
         {
             s_tempCert = GenerateCertificate.CreateSelfSignedCertificate("CN=Local", 256, 1024);
@@ -54,44 +58,19 @@ public abstract class SecureStreamClientBase
         catch
         {
         }
-#endif
+    #endif
     }
 
-    protected internal SecureStreamClientBase()
-        : base(MessageClass.Component)
+    protected internal SecureStreamClientBase() : base(MessageClass.Component)
     {
-
     }
 
-    private bool TryConnectSsl(Stream stream, out SslStream ssl)
-    {
-        ssl = new SslStream(stream, false, UserCertificateValidationCallback, UserCertificateSelectionCallback, EncryptionPolicy.RequireEncryption);
-        try
-        {
-            ssl.AuthenticateAsClient("Local", null, SslProtocols.Tls12, false);
-        }
-        catch (Exception ex)
-        {
-            Log.Publish(MessageLevel.Info, "Authentication Failed", null, null, ex);
-            ssl.Dispose();
-            ssl = null;
-            return false;
-        }
-        return true;
-    }
+    #endregion
 
-    private X509Certificate UserCertificateSelectionCallback(object sender, string targetHost, X509CertificateCollection localCertificates, X509Certificate remoteCertificate, string[] acceptableIssuers)
-    {
-        return s_tempCert;
-    }
-
-    private bool UserCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-    {
-        return true;
-    }
+    #region [ Methods ]
 
     /// <summary>
-    /// Attempts to authenticate the supplied stream. 
+    /// Attempts to authenticate the supplied stream.
     /// </summary>
     /// <param name="stream">The stream to authenticate</param>
     /// <param name="useSsl"></param>
@@ -119,7 +98,6 @@ public abstract class SecureStreamClientBase
 
         try
         {
-
             try
             {
                 if (TryResumeSession(ref secureStream, stream2, certSignatures))
@@ -138,6 +116,7 @@ public abstract class SecureStreamClientBase
                     m_resumeTicket = stream2.ReadBytes(stream2.ReadNextByte());
                     m_sessionSecret = stream2.ReadBytes(stream2.ReadNextByte());
                 }
+
                 secureStream = stream2;
                 return true;
             }
@@ -151,14 +130,84 @@ public abstract class SecureStreamClientBase
             ssl?.Dispose();
             return false;
         }
+    }
 
+    /// <summary>
+    /// Attempts to authenticate the provided stream, disposing the secure stream upon completion.
+    /// </summary>
+    /// <param name="stream">the stream to authenticate</param>
+    /// <param name="useSsl">gets if SSL will be used to authenticate</param>
+    /// <returns>true if successful, false otherwise</returns>
+    public bool TryAuthenticate(Stream stream, bool useSsl = true)
+    {
+        Stream secureStream = null;
+        try
+        {
+            return TryAuthenticate(stream, useSsl, out secureStream);
+        }
+        finally
+        {
+            secureStream?.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Authenticates the supplied stream. Returns the secure stream.
+    /// </summary>
+    /// <param name="stream">the stream to authenticate</param>
+    /// <param name="useSsl">gets if SSL will be used to authenticate</param>
+    /// <returns></returns>
+    public Stream Authenticate(Stream stream, bool useSsl = true)
+    {
+        Stream secureStream = null;
+        try
+        {
+            if (TryAuthenticate(stream, useSsl, out secureStream))
+                return secureStream;
+            throw new AuthenticationException("Authentication Failed");
+        }
+        catch
+        {
+            secureStream?.Dispose();
+            throw;
+        }
+    }
+
+    protected abstract bool InternalTryAuthenticate(Stream stream, byte[] certSignatures);
+
+    private bool TryConnectSsl(Stream stream, out SslStream ssl)
+    {
+        ssl = new SslStream(stream, false, UserCertificateValidationCallback, UserCertificateSelectionCallback, EncryptionPolicy.RequireEncryption);
+        try
+        {
+            ssl.AuthenticateAsClient("Local", null, SslProtocols.Tls12, false);
+        }
+        catch (Exception ex)
+        {
+            Log.Publish(MessageLevel.Info, "Authentication Failed", null, null, ex);
+            ssl.Dispose();
+            ssl = null;
+            return false;
+        }
+
+        return true;
+    }
+
+    private X509Certificate UserCertificateSelectionCallback(object sender, string targetHost, X509CertificateCollection localCertificates, X509Certificate remoteCertificate, string[] acceptableIssuers)
+    {
+        return s_tempCert;
+    }
+
+    private bool UserCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+    {
+        return true;
     }
 
     private bool TryResumeSession(ref Stream secureStream, Stream stream2, byte[] certSignatures)
     {
-#if SQLCLR
+    #if SQLCLR
         return false;
-#else
+    #else
         if (m_resumeTicket is not null && m_sessionSecret is not null)
         {
             //Resume Session:
@@ -223,52 +272,16 @@ public abstract class SecureStreamClientBase
             m_resumeTicket = null;
             m_sessionSecret = null;
         }
+
         return false;
-#endif
+    #endif
     }
 
-    protected abstract bool InternalTryAuthenticate(Stream stream, byte[] certSignatures);
+    #endregion
 
-    /// <summary>
-    /// Attempts to authenticate the provided stream, disposing the secure stream upon completion.
-    /// </summary>
-    /// <param name="stream">the stream to authenticate</param>
-    /// <param name="useSsl">gets if SSL will be used to authenticate</param>
-    /// <returns>true if successful, false otherwise</returns>
-    public bool TryAuthenticate(Stream stream, bool useSsl = true)
-    {
-        Stream secureStream = null;
-        try
-        {
-            return TryAuthenticate(stream, useSsl, out secureStream);
-        }
-        finally
-        {
-            secureStream?.Dispose();
-        }
-    }
-    /// <summary>
-    /// Authenticates the supplied stream. Returns the secure stream.
-    /// </summary>
-    /// <param name="stream">the stream to authenticate</param>
-    /// <param name="useSsl">gets if SSL will be used to authenticate</param>
-    /// <returns></returns>
-    public Stream Authenticate(Stream stream, bool useSsl = true)
-    {
-        Stream secureStream = null;
-        try
-        {
-            if (TryAuthenticate(stream, useSsl, out secureStream))
-            {
-                return secureStream;
-            }
-            throw new AuthenticationException("Authentication Failed");
-        }
-        catch
-        {
-            secureStream?.Dispose();
-            throw;
-        }
-    }
+    #region [ Static ]
 
+    private static readonly X509Certificate2 s_tempCert;
+
+    #endregion
 }

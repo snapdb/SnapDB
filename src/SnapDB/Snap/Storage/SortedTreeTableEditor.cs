@@ -32,19 +32,27 @@ namespace SnapDB.Snap.Storage;
 
 public partial class SortedTreeTable<TKey, TValue>
 {
+    #region [ Members ]
+
     /// <summary>
     /// A single instance editor that is used
     /// to modifiy an archive file.
     /// </summary>
-    private class Editor
-        : SortedTreeTableEditor<TKey, TValue>
+    private class Editor : SortedTreeTableEditor<TKey, TValue>
     {
-        private bool m_disposed;
-        private SortedTreeTable<TKey, TValue> m_sortedTreeFile;
-        private readonly TransactionalEdit m_currentTransaction;
-        private SubFileStream m_subStream;
+        #region [ Members ]
+
         private BinaryStream m_binaryStream1;
+
+        private readonly TransactionalEdit m_currentTransaction;
+        private SortedTreeTable<TKey, TValue> m_sortedTreeFile;
+        private SubFileStream m_subStream;
         private SortedTree<TKey, TValue> m_tree;
+        private bool m_disposed;
+
+        #endregion
+
+        #region [ Constructors ]
 
         internal Editor(SortedTreeTable<TKey, TValue> sortedTreeFile)
         {
@@ -55,6 +63,10 @@ public partial class SortedTreeTable<TKey, TValue>
             m_tree = SortedTree<TKey, TValue>.Open(m_binaryStream1);
             m_tree.AutoFlush = false;
         }
+
+        #endregion
+
+        #region [ Methods ]
 
         /// <summary>
         /// Commits the edits to the current archive file and disposes of this class.
@@ -71,11 +83,13 @@ public partial class SortedTreeTable<TKey, TValue>
                 m_tree.Flush();
                 m_tree = null;
             }
+
             if (m_binaryStream1 is not null)
             {
                 m_binaryStream1.Dispose();
                 m_binaryStream1 = null;
             }
+
             if (m_subStream is not null)
             {
                 m_subStream.Dispose();
@@ -100,6 +114,7 @@ public partial class SortedTreeTable<TKey, TValue>
                 m_binaryStream1.Dispose();
                 m_binaryStream1 = null;
             }
+
             if (m_subStream is not null)
             {
                 m_subStream.Dispose();
@@ -168,24 +183,18 @@ public partial class SortedTreeTable<TKey, TValue>
         protected override void Dispose(bool disposing)
         {
             if (!m_disposed)
-            {
                 try
                 {
                     // This will be done regardless of whether the object is finalized or disposed.
-
                     if (disposing)
-                    {
                         Rollback();
-
-                        // This will be done only when the object is disposed by calling Dispose().
-                    }
+                    // This will be done only when the object is disposed by calling Dispose().
                 }
                 finally
                 {
-                    m_disposed = true;          // Prevent duplicate dispose.
-                    base.Dispose(disposing);    // Call base class Dispose().
+                    m_disposed = true; // Prevent duplicate dispose.
+                    base.Dispose(disposing); // Call base class Dispose().
                 }
-            }
         }
 
         private void InternalDispose()
@@ -194,5 +203,9 @@ public partial class SortedTreeTable<TKey, TValue>
             m_sortedTreeFile.m_activeEditor = null;
             m_sortedTreeFile = null;
         }
+
+        #endregion
     }
+
+    #endregion
 }

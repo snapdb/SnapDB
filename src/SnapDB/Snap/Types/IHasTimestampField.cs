@@ -31,6 +31,8 @@ namespace SnapDB.Snap.Types;
 /// </summary>
 public interface IHasTimestampField
 {
+    #region [ Methods ]
+
     /// <summary>
     /// Attempts to get the timestamp field of a point. This function might fail if the datetime field
     /// is not able to be converted.
@@ -38,4 +40,6 @@ public interface IHasTimestampField
     /// <param name="timestamp">An output field of the timestamp.</param>
     /// <returns><c>true</c> if a timestamp could be parsed; otherwise, <c>false</c>.</returns>
     bool TryGetDateTime(out DateTime timestamp);
+
+    #endregion
 }

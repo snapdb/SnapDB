@@ -24,19 +24,24 @@
 //
 //******************************************************************************************************
 
+using System.Data;
 using Gemstone.IO.StreamExtensions;
 using SnapDB.Immutables;
-using System.Data;
 
 namespace SnapDB.Snap.Services.Writer;
 
 /// <summary>
 /// The settings for the write processor.
 /// </summary>
-public class WriteProcessorSettings
-    : SettingsBase<WriteProcessorSettings>
+public class WriteProcessorSettings : SettingsBase<WriteProcessorSettings>
 {
+    #region [ Members ]
+
     private bool m_isEnabled;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// The default write processor settings.
@@ -54,6 +59,10 @@ public class WriteProcessorSettings
             return x;
         });
     }
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// The settings for the prebuffer.
@@ -82,6 +91,10 @@ public class WriteProcessorSettings
             m_isEnabled = false;
         }
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     public override void Save(Stream stream)
     {
@@ -132,9 +145,9 @@ public class WriteProcessorSettings
             FirstStageWriter.Validate();
 
             foreach (CombineFilesSettings stage in StagingRollovers)
-            {
                 stage.Validate();
-            }
         }
     }
+
+    #endregion
 }

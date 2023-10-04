@@ -30,17 +30,25 @@ namespace SnapDB.Snap.Services;
 
 public partial class ArchiveList<TKey, TValue>
 {
+    #region [ Members ]
+
     /// <summary>
     /// Provides a way to edit an <see cref="ArchiveList{TKey,TValue}"/> since all edits must be atomic.
     /// WARNING: Instancing this class on an <see cref="ArchiveList{TKey,TValue}"/> will lock the class
     /// until <see cref="Dispose"/> is called. Therefore, keep locks to a minimum and always
     /// use a Using block.
     /// </summary>
-    private class Editor
-        : ArchiveListEditor<TKey, TValue>
+    private class Editor : ArchiveListEditor<TKey, TValue>
     {
-        private bool m_disposed;
+        #region [ Members ]
+
         private ArchiveList<TKey, TValue> m_list;
+
+        private bool m_disposed;
+
+        #endregion
+
+        #region [ Constructors ]
 
         /// <summary>
         /// Creates an editor for the ArchiveList
@@ -52,8 +60,12 @@ public partial class ArchiveList<TKey, TValue>
             Monitor.Enter(m_list.m_syncRoot);
         }
 
+        #endregion
+
+        #region [ Methods ]
+
         /// <summary>
-        /// Renews the snapshot of the archive file. This will acquire the latest 
+        /// Renews the snapshot of the archive file. This will acquire the latest
         /// read transaction so all new snapshots will use this later version.
         /// </summary>
         /// <param name="archiveId">the ID of the archive snapshot to renew</param>
@@ -104,9 +116,7 @@ public partial class ArchiveList<TKey, TValue>
 
             SortedList<Guid, ArchiveTableSummary<TKey, TValue>> partitions = m_list.m_fileSummaries;
             if (!partitions.ContainsKey(archiveId))
-            {
                 return false;
-            }
 
             SortedTreeTable<TKey, TValue> tree = partitions[archiveId].SortedTreeTable;
             partitions.Remove(archiveId);
@@ -127,9 +137,7 @@ public partial class ArchiveList<TKey, TValue>
 
             SortedList<Guid, ArchiveTableSummary<TKey, TValue>> partitions = m_list.m_fileSummaries;
             if (!partitions.ContainsKey(archiveId))
-            {
                 return false;
-            }
 
             SortedTreeTable<TKey, TValue> tree = partitions[archiveId].SortedTreeTable;
             partitions.Remove(archiveId);
@@ -145,11 +153,9 @@ public partial class ArchiveList<TKey, TValue>
         protected override void Dispose(bool disposing)
         {
             if (!m_disposed)
-            {
                 try
                 {
                     // This will be done regardless of whether the object is finalized or disposed.
-
                     if (disposing)
                     {
                         m_disposed = true;
@@ -160,10 +166,13 @@ public partial class ArchiveList<TKey, TValue>
                 }
                 finally
                 {
-                    m_disposed = true;          // Prevent duplicate dispose.
-                    base.Dispose(disposing);    // Call base class Dispose().
+                    m_disposed = true; // Prevent duplicate dispose.
+                    base.Dispose(disposing); // Call base class Dispose().
                 }
-            }
         }
+
+        #endregion
     }
+
+    #endregion
 }

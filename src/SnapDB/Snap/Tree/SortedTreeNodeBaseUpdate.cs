@@ -28,6 +28,8 @@ namespace SnapDB.Snap.Tree;
 
 public unsafe partial class SortedTreeNodeBase<TKey, TValue>
 {
+    #region [ Methods ]
+
     /// <summary>
     /// Updates the provided key.
     /// </summary>
@@ -41,13 +43,9 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
         NavigateToNode(oldKey);
 
         if (newKey.IsLessThan(LowerKey))
-        {
             throw new Exception("Should never be here");
-        }
         if (newKey.IsGreaterThan(UpperKey))
-        {
             throw new Exception("Should never be here");
-        }
 
         InternalUpdateKey(oldKey, newKey);
     }
@@ -83,15 +81,11 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
         ptr = GetWritePointer() + HeaderSize + index * KeyValueSize;
 
         if (index > 0)
-        {
             if (!KeyMethods.IsGreaterThan(ptr - KeyValueSize, newKey))
                 throw new Exception("Cannot update the key because the sorting gets messed up");
-        }
         if (index < RecordCount - 1)
-        {
             if (!KeyMethods.IsGreaterThan(newKey, ptr + KeyValueSize))
                 throw new Exception("Cannot update the key because the sorting gets messed up");
-        }
 
         newKey.Write(ptr);
     }
@@ -107,4 +101,6 @@ public unsafe partial class SortedTreeNodeBase<TKey, TValue>
         ptr = GetWritePointer() + HeaderSize + index * KeyValueSize + KeySize;
         value.Write(ptr);
     }
+
+    #endregion
 }

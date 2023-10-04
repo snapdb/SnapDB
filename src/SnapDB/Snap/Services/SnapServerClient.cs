@@ -28,18 +28,25 @@ namespace SnapDB.Snap.Services;
 
 public partial class SnapServer
 {
+    #region [ Members ]
+
     /// <summary>
     /// A client wrapper around a <see cref="SnapServer"/>. This protects
-    /// the server from a client being able to manipulate it. 
+    /// the server from a client being able to manipulate it.
     /// (For example. Call the IDispose.Dispose method)
     /// </summary>
-    internal class Client
-        : SnapClient
+    internal class Client : SnapClient
     {
-        private bool m_disposed;
-        private readonly object m_syncRoot;
-        private SnapServer m_server;
+        #region [ Members ]
+
         private readonly Dictionary<string, ClientDatabaseBase> m_connectedDatabases;
+        private SnapServer m_server;
+        private readonly object m_syncRoot;
+        private bool m_disposed;
+
+        #endregion
+
+        #region [ Constructors ]
 
         /// <summary>
         /// Creates a <see cref="Client"/>
@@ -52,6 +59,10 @@ public partial class SnapServer
             m_server = server ?? throw new ArgumentNullException(nameof(server));
             server.RegisterClient(this);
         }
+
+        #endregion
+
+        #region [ Methods ]
 
         /// <summary>
         /// Gets the database that matches <see cref="databaseName"/>.
@@ -74,6 +85,7 @@ public partial class SnapServer
                     m_connectedDatabases.Add(databaseName, database);
                 }
             }
+
             return database;
         }
 
@@ -92,7 +104,7 @@ public partial class SnapServer
         /// </summary>
         /// <param name="databaseName">Name of database instance to access.</param>
         /// <returns>
-        ///   <c>true</c> if the database with the specified name exists within the server; otherwise, <c>false</c>.
+        /// <c>true</c> if the database with the specified name exists within the server; otherwise, <c>false</c>.
         /// </returns>
         public override bool Contains(string databaseName)
         {
@@ -115,22 +127,9 @@ public partial class SnapServer
             return m_server.GetDatabaseInfo();
         }
 
-        /// <summary>
-        /// Unregisters a client database.
-        /// </summary>
-        /// <param name="client">The client database to unregister.</param>
-        private void Unregister(ClientDatabaseBase client)
-        {
-            lock (m_syncRoot)
-            {
-                m_connectedDatabases.Remove(client.Info.DatabaseName.ToUpper());
-            }
-        }
-
         protected override void Dispose(bool disposing)
         {
             if (!m_disposed)
-            {
                 if (disposing)
                 {
                     lock (m_syncRoot)
@@ -144,8 +143,24 @@ public partial class SnapServer
                     m_server = null;
                     m_disposed = true;
                 }
-            }
+
             base.Dispose(disposing);
         }
+
+        /// <summary>
+        /// Unregisters a client database.
+        /// </summary>
+        /// <param name="client">The client database to unregister.</param>
+        private void Unregister(ClientDatabaseBase client)
+        {
+            lock (m_syncRoot)
+            {
+                m_connectedDatabases.Remove(client.Info.DatabaseName.ToUpper());
+            }
+        }
+
+        #endregion
     }
+
+    #endregion
 }

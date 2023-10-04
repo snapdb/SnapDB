@@ -24,16 +24,23 @@
 //
 //******************************************************************************************************
 
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Digests;
 using System.ComponentModel;
 using System.Text;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Digests;
 
 namespace SnapDB.Security.Authentication;
 
 internal static class Scram
 {
+    #region [ Members ]
+
     internal const int PasswordSize = 64;
+
+    #endregion
+
+    #region [ Static ]
+
     internal static readonly UTF8Encoding Utf8 = new(true);
     internal static readonly byte[] StringClientKey = Utf8.GetBytes("Client Key");
     internal static readonly byte[] StringServerKey = Utf8.GetBytes("Server Key");
@@ -61,9 +68,7 @@ internal static class Scram
             throw new Exception();
         byte[] rv = new byte[a.Length];
         for (int x = 0; x < a.Length; x++)
-        {
             rv[x] = (byte)(a[x] ^ b[x]);
-        }
         return rv;
     }
 
@@ -113,6 +118,6 @@ internal static class Scram
         using Pbkdf2 pass = new(HmacMethod.Sha512, passwordBytes, salt, iterations);
         return pass.GetBytes(PasswordSize);
     }
+
+    #endregion
 }
-
-

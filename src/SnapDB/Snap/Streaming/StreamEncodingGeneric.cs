@@ -33,14 +33,17 @@ namespace SnapDB.Snap.Streaming;
 /// </summary>
 /// <typeparam name="TKey">The type of the key.</typeparam>
 /// <typeparam name="TValue">The type of the value.</typeparam>
-internal class StreamEncodingGeneric<TKey, TValue>
-: StreamEncodingBase<TKey, TValue>
-where TKey : SnapTypeBase<TKey>, new()
-where TValue : SnapTypeBase<TValue>, new()
+internal class StreamEncodingGeneric<TKey, TValue> : StreamEncodingBase<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Members ]
+
     private readonly PairEncodingBase<TKey, TValue> m_encoding;
     private readonly TKey m_prevKey;
     private readonly TValue m_prevValue;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new <see cref="StreamEncodingGeneric{TKey,TValue}"/> based on the supplied <paramref name="encodingMethod"/>
@@ -53,10 +56,18 @@ where TValue : SnapTypeBase<TValue>, new()
         m_prevValue = new TValue();
     }
 
+    #endregion
+
+    #region [ Properties ]
+
     /// <summary>
     /// Gets the definition of the encoding used.
     /// </summary>
     public override EncodingDefinition EncodingMethod => m_encoding.EncodingMethod;
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Writes the end of the stream symbol to the <paramref name="stream"/>.
@@ -88,7 +99,7 @@ where TValue : SnapTypeBase<TValue>, new()
     }
 
     /// <summary>
-    /// Attempts to read the next point from the stream. 
+    /// Attempts to read the next point from the stream.
     /// </summary>
     /// <param name="stream">The stream to read from.</param>
     /// <param name="key">The key to store the value to.</param>
@@ -116,4 +127,6 @@ where TValue : SnapTypeBase<TValue>, new()
         m_prevKey.Clear();
         m_prevValue.Clear();
     }
+
+    #endregion
 }

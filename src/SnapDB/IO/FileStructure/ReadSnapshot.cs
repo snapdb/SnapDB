@@ -29,22 +29,15 @@ using SnapDB.IO.FileStructure.Media;
 namespace SnapDB.IO.FileStructure;
 
 /// <summary>
-/// Aquires a snapshot of the file system to browse in an isolated mannor.  
-/// This is read only and will also block the main file from being deleted. 
+/// Acquires a snapshot of the file system to browse in an isolated manner.
+/// This is read only and will also block the main file from being deleted.
 /// Therefore it is important to release this lock so the file can be deleted after a rollover.
 /// </summary>
 public class ReadSnapshot
 {
     #region [ Members ]
 
-    /// <summary>
-    /// The readonly snapshot of the archive file.
-    /// </summary>
-    private readonly FileHeaderBlock m_fileHeaderBlock;
-
-    /// <summary>
-    /// The underlying diskIO to do the reads against.
-    /// </summary>
+    // The underlying disk IO instance used to read snapshot data
     private readonly DiskIo m_dataReader;
 
     #endregion
@@ -54,12 +47,13 @@ public class ReadSnapshot
     /// <summary>
     /// Creates a readonly copy of a transaction.
     /// </summary>
-    /// <param name="dataReader"></param>
+    /// <param name="dataReader"><see cref="DiskIo"/> data reader.</param>
     internal ReadSnapshot(DiskIo dataReader)
     {
         if (dataReader is null)
             throw new ArgumentNullException(nameof(dataReader));
-        m_fileHeaderBlock = dataReader.LastCommittedHeader;
+
+        Header = dataReader.LastCommittedHeader;
         m_dataReader = dataReader;
     }
 
@@ -70,7 +64,7 @@ public class ReadSnapshot
     /// <summary>
     /// Gets the header of the file structure.
     /// </summary>
-    public FileHeaderBlock Header => m_fileHeaderBlock;
+    public FileHeaderBlock Header { get; }
 
     #endregion
 
@@ -82,10 +76,10 @@ public class ReadSnapshot
     /// <param name="fileIndex">The index of the file to open.</param>
     public SubFileStream OpenFile(int fileIndex)
     {
-        if (fileIndex < 0 || fileIndex >= m_fileHeaderBlock.Files.Count)
+        if (fileIndex < 0 || fileIndex >= Header.Files.Count)
             throw new ArgumentOutOfRangeException(nameof(fileIndex), "The file index provided could not be found in the header.");
 
-        return new SubFileStream(m_dataReader, m_fileHeaderBlock.Files[fileIndex], m_fileHeaderBlock, isReadOnly: true);
+        return new SubFileStream(m_dataReader, Header.Files[fileIndex], Header, true);
     }
 
     /// <summary>
@@ -93,20 +87,16 @@ public class ReadSnapshot
     /// </summary>
     public SubFileStream OpenFile(SubFileName fileName)
     {
-        for (int x = 0; x < m_fileHeaderBlock.Files.Count; x++)
+        for (int x = 0; x < Header.Files.Count; x++)
         {
-            SubFileHeader? file = m_fileHeaderBlock.Files[x];
-            if (file.FileName == fileName)
-            {
+            SubFileHeader? file = Header.Files[x];
+
+            if (file?.FileName == fileName)
                 return OpenFile(x);
-            }
         }
+
         throw new Exception("File does not exist");
     }
 
-
-
     #endregion
-
-
 }

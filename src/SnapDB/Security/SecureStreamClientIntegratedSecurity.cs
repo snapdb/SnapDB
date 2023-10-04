@@ -31,10 +31,15 @@ namespace SnapDB.Security;
 /// <summary>
 /// Creates a secure stream that connects to a server using windows Integrated Security.
 /// </summary>
-public class SecureStreamClientIntegratedSecurity
-    : SecureStreamClientBase
+public class SecureStreamClientIntegratedSecurity : SecureStreamClientBase
 {
+    #region [ Members ]
+
     private readonly IntegratedSecurityClient m_client;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new <see cref="SecureStreamClientIntegratedSecurity"/>
@@ -52,6 +57,10 @@ public class SecureStreamClientIntegratedSecurity
         m_client = new IntegratedSecurityClient(username, password, domain);
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Authenticates with the remote server.
     /// </summary>
@@ -62,9 +71,9 @@ public class SecureStreamClientIntegratedSecurity
     {
         stream.WriteByte((byte)AuthenticationMode.Integrated);
         if (m_client.TryAuthenticateAsClient(stream, certSignatures))
-        {
             return true;
-        }
         return false;
     }
+
+    #endregion
 }

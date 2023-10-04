@@ -33,24 +33,34 @@ namespace Org.BouncyCastle.Crypto.Agreement.Srp;
  */
 internal class Srp6Client
 {
-    private readonly SrpConstants m_param;
+    #region [ Members ]
+
+    protected BigInteger B;
 
     protected BigInteger PrivA;
     protected BigInteger PubA;
 
-    protected BigInteger B;
+    protected SecureRandom Random;
+    protected BigInteger S;
+    protected BigInteger U;
 
     protected BigInteger X;
-    protected BigInteger U;
-    protected BigInteger S;
 
-    protected SecureRandom Random;
+    private readonly SrpConstants m_param;
+
+    #endregion
+
+    #region [ Constructors ]
 
     public Srp6Client(SrpConstants param)
     {
-        this.m_param = param;
+        m_param = param;
         Random = new SecureRandom();
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /**
      * Generates client's credentials given the client's salt, identity and password
@@ -61,9 +71,9 @@ internal class Srp6Client
      */
     public virtual BigInteger GenerateClientCredentials(IDigest digest, byte[] salt, byte[] identity, byte[] password)
     {
-        this.X = Srp6Utilities.CalculateX(digest, m_param.N, salt, identity, password);
-        this.PrivA = SelectPrivateValue();
-        this.PubA = m_param.G.ModPow(PrivA, m_param.N);
+        X = Srp6Utilities.CalculateX(digest, m_param.N, salt, identity, password);
+        PrivA = SelectPrivateValue();
+        PubA = m_param.G.ModPow(PrivA, m_param.N);
 
         return PubA;
     }
@@ -76,9 +86,9 @@ internal class Srp6Client
      */
     public virtual BigInteger CalculateSecret(IDigest digest, BigInteger serverB)
     {
-        this.B = Srp6Utilities.ValidatePublicValue(m_param.N, serverB);
-        this.U = Srp6Utilities.CalculateU(digest, m_param.N, PubA, B);
-        this.S = CalculateS();
+        B = Srp6Utilities.ValidatePublicValue(m_param.N, serverB);
+        U = Srp6Utilities.CalculateU(digest, m_param.N, PubA, B);
+        S = CalculateS();
 
         return S;
     }
@@ -94,4 +104,6 @@ internal class Srp6Client
         BigInteger tmp = m_param.G.ModPow(X, m_param.N).Multiply(m_param.K).Mod(m_param.N);
         return B.Subtract(tmp).Mod(m_param.N).ModPow(exp, m_param.N);
     }
+
+    #endregion
 }

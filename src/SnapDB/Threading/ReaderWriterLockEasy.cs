@@ -29,11 +29,16 @@ namespace SnapDB.Threading;
 /// <summary>
 /// A read lock object.
 /// </summary>
-public struct DisposableReadLock
-    : IDisposable
+public struct DisposableReadLock : IDisposable
 {
+    #region [ Members ]
+
     private ReaderWriterLock? m_l;
-    
+
+    #endregion
+
+    #region [ Constructors ]
+
     /// <summary>
     /// Initializes a new instance of the DisposableReadLock class and acquires a reader lock.
     /// </summary>
@@ -44,6 +49,10 @@ public struct DisposableReadLock
         l.AcquireReaderLock(Timeout.Infinite);
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Releases the acquired reader lock, if it was acquired.
     /// </summary>
@@ -51,20 +60,27 @@ public struct DisposableReadLock
     {
         if (m_l is null)
             return;
-        
+
         m_l.ReleaseReaderLock();
         m_l = null;
     }
+
+    #endregion
 }
 
 /// <summary>
 /// A read lock object.
 /// </summary>
-public struct DisposableWriteLock
-    : IDisposable
+public struct DisposableWriteLock : IDisposable
 {
+    #region [ Members ]
+
     private ReaderWriterLock? m_l;
-    
+
+    #endregion
+
+    #region [ Constructors ]
+
     /// <summary>
     /// Initializes a new instance of the DisposableWriteLock class and acquires a writer lock on the specified ReaderWriterLock.
     /// </summary>
@@ -75,6 +91,10 @@ public struct DisposableWriteLock
         l.AcquireWriterLock(Timeout.Infinite);
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Releases the acquired writer lock on the associated ReaderWriterLock, allowing other threads to acquire locks.
     /// </summary>
@@ -82,19 +102,27 @@ public struct DisposableWriteLock
     {
         if (m_l is null)
             return;
-        
+
         m_l.ReleaseWriterLock();
         m_l = null;
     }
+
+    #endregion
 }
 
 /// <summary>
-/// A simplified implementation of a <see cref="ReaderWriterLockSlim"/>. This allows for more 
+/// A simplified implementation of a <see cref="ReaderWriterLockSlim"/>. This allows for more
 /// user friendly code to be written.
 /// </summary>
 public class ReaderWriterLockEasy
 {
+    #region [ Members ]
+
     private readonly ReaderWriterLock m_lock = new();
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Enters a read lock. Be sure to call within a using block.
@@ -112,4 +140,6 @@ public class ReaderWriterLockEasy
     {
         return new DisposableWriteLock(m_lock);
     }
+
+    #endregion
 }

@@ -28,28 +28,34 @@
 //******************************************************************************************************
 
 using System.Data;
+using Gemstone;
 using Gemstone.GuidExtensions;
 using Gemstone.IO.StreamExtensions;
-using Gemstone;
-using SnapDB.IO.FileStructure.Media;
 using SnapDB.Immutables;
+using SnapDB.IO.FileStructure.Media;
 
 namespace SnapDB.IO.FileStructure;
 
 /// <summary>
-/// Contains the information that is in the header page of an archive file.  
+/// Contains the information that is in the header page of an archive file.
 /// </summary>
-public class FileHeaderBlock
-    : ImmutableObjectBase<FileHeaderBlock>
+public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
 {
     #region [ Members ]
 
-    // The file header bytes which equals: "openHistorian 2.0 Archive\00"
-    private static readonly byte[] s_fileAllocationTableHeaderBytes = "openHistorian 2.0 Archive\0"u8.ToArray();
+    private const short FileAllocationHeaderVersion = 2;
 
     private const short FileAllocationReadTableVersion = 2;
     private const short FileAllocationWriteTableVersion = 2;
-    private const short FileAllocationHeaderVersion = 2;
+
+    // The GUID for this archive file system.
+    private Guid m_archiveId;
+
+    // The GUID to represent the type of this archive file.
+    private Guid m_archiveType;
+
+    // The version of the header.
+    private short m_headerVersion;
 
     // The size of the block.
 
@@ -59,17 +65,8 @@ public class FileHeaderBlock
     // The version number required to write to the file system.
     private short m_minimumWriteVersion;
 
-    // The version of the header.
-    private short m_headerVersion;
-
     // Since files are allocated sequentially, this value is the next file id that is not used.
     private ushort m_nextFileId;
-
-    // The GUID for this archive file system.
-    private Guid m_archiveId;
-
-    // The GUID to represent the type of this archive file.
-    private Guid m_archiveType;
 
     private Dictionary<short, byte[]>? m_unknownAttributes;
 
@@ -145,7 +142,7 @@ public class FileHeaderBlock
     public uint LastAllocatedBlock { get; private set; }
 
     /// <summary>
-    /// Returns the number of files that are in this file system. 
+    /// Returns the number of files that are in this file system.
     /// </summary>
     /// <returns>Number of files that are in this file system. </returns>
     public int FileCount => Files.Count;
@@ -178,33 +175,6 @@ public class FileHeaderBlock
         FileHeaderBlock clone = base.CloneEditable();
         clone.SnapshotSequenceNumber++;
         return clone;
-    }
-
-    /// <summary>
-    /// Requests that member fields be set to readonly. 
-    /// </summary>
-    protected override void SetMembersAsReadOnly()
-    {
-        Files.IsReadOnly = true;
-        Flags.IsReadOnly = true;
-    }
-
-    /// <summary>
-    /// Request that member fields be cloned and marked as editable.
-    /// </summary>
-    protected override void CloneMembersAsEditable()
-    {
-        if (!CanWrite)
-            throw new InvalidOperationException("This file cannot be modified because the file system version is not recognized");
-
-        Flags = Flags.CloneEditable();
-        Files = Files.CloneEditable();
-
-        if (m_userAttributes is not null)
-            m_userAttributes = new Dictionary<Guid, byte[]>(m_userAttributes);
-
-        if (m_unknownAttributes is not null) 
-            m_unknownAttributes = new Dictionary<short, byte[]>(m_unknownAttributes);
     }
 
     /// <summary>
@@ -244,7 +214,7 @@ public class FileHeaderBlock
         if (ContainsSubFile(fileName))
             throw new DuplicateNameException("Name already exists");
 
-        SubFileHeader node = new(m_nextFileId, fileName, isImmutable: false, isSimplified: IsSimplifiedFileFormat);
+        SubFileHeader node = new(m_nextFileId, fileName, false, IsSimplifiedFileFormat);
         m_nextFileId++;
         Files.Add(node);
 
@@ -259,27 +229,6 @@ public class FileHeaderBlock
     public bool ContainsSubFile(SubFileName fileName)
     {
         return Files.Any(file => file?.FileName == fileName);
-    }
-
-    /// <summary>
-    /// Checks all of the information in the header file 
-    /// to verify if it is valid.
-    /// </summary>
-    private bool IsFileAllocationTableValid()
-    {
-        if (ArchiveId == Guid.Empty)
-            return false;
-        
-        if (m_headerVersion < 0)
-            return false;
-        
-        if (m_minimumReadVersion < 0)
-            return false;
-        
-        if (m_minimumWriteVersion < 0)
-            return false;
-        
-        return true;
     }
 
     /// <summary>
@@ -308,8 +257,8 @@ public class FileHeaderBlock
         dataWriter.Write(m_archiveId.ToByteArray());
         dataWriter.Write(m_archiveType.ToByteArray());
         dataWriter.Write((short)Files.Count);
-        
-        foreach (SubFileHeader? node in Files) 
+
+        foreach (SubFileHeader? node in Files)
             node?.Save(dataWriter);
 
         // Metadata Flags
@@ -317,23 +266,20 @@ public class FileHeaderBlock
         {
             Encoding7Bit.WriteInt15(dataWriter.Write, (short)FileHeaderAttributes.FileFlags);
             Encoding7Bit.WriteInt15(dataWriter.Write, (short)(Flags.Count * 16));
-            
-            foreach (Guid flag in Flags) 
+
+            foreach (Guid flag in Flags)
                 dataWriter.Write(flag.ToLittleEndianBytes());
         }
 
         if (m_unknownAttributes is not null)
-        {
             foreach (KeyValuePair<short, byte[]> md in m_unknownAttributes)
             {
                 Encoding7Bit.WriteInt15(dataWriter.Write, md.Key);
                 Encoding7Bit.WriteInt15(dataWriter.Write, (short)md.Value.Length);
                 dataWriter.Write(md.Value);
             }
-        }
 
         if (m_userAttributes is not null)
-        {
             foreach (KeyValuePair<Guid, byte[]> md in m_userAttributes)
             {
                 Encoding7Bit.WriteInt15(dataWriter.Write, (short)FileHeaderAttributes.UserAttributes);
@@ -341,7 +287,6 @@ public class FileHeaderBlock
                 Encoding7Bit.WriteInt15(dataWriter.Write, (short)md.Value.Length);
                 dataWriter.Write(md.Value);
             }
-        }
 
         Encoding7Bit.WriteInt15(dataWriter.Write, (short)FileHeaderAttributes.EndOfAttributes);
         Encoding7Bit.WriteInt15(dataWriter.Write, 0);
@@ -350,8 +295,56 @@ public class FileHeaderBlock
             throw new Exception("the file size exceeds the allowable size.");
 
         WriteFooterData(dataBytes);
-        
+
         return dataBytes;
+    }
+
+    /// <summary>
+    /// Requests that member fields be set to readonly.
+    /// </summary>
+    protected override void SetMembersAsReadOnly()
+    {
+        Files.IsReadOnly = true;
+        Flags.IsReadOnly = true;
+    }
+
+    /// <summary>
+    /// Request that member fields be cloned and marked as editable.
+    /// </summary>
+    protected override void CloneMembersAsEditable()
+    {
+        if (!CanWrite)
+            throw new InvalidOperationException("This file cannot be modified because the file system version is not recognized");
+
+        Flags = Flags.CloneEditable();
+        Files = Files.CloneEditable();
+
+        if (m_userAttributes is not null)
+            m_userAttributes = new Dictionary<Guid, byte[]>(m_userAttributes);
+
+        if (m_unknownAttributes is not null)
+            m_unknownAttributes = new Dictionary<short, byte[]>(m_unknownAttributes);
+    }
+
+    /// <summary>
+    /// Checks all of the information in the header file
+    /// to verify if it is valid.
+    /// </summary>
+    private bool IsFileAllocationTableValid()
+    {
+        if (ArchiveId == Guid.Empty)
+            return false;
+
+        if (m_headerVersion < 0)
+            return false;
+
+        if (m_minimumReadVersion < 0)
+            return false;
+
+        if (m_minimumWriteVersion < 0)
+            return false;
+
+        return true;
     }
 
     /// <summary>
@@ -438,7 +431,7 @@ public class FileHeaderBlock
         Files = new ImmutableList<SubFileHeader?>(fileCount);
 
         for (int x = 0; x < fileCount; x++)
-            Files.Add(new SubFileHeader(dataReader, isImmutable: true, isSimplified: IsSimplifiedFileFormat));
+            Files.Add(new SubFileHeader(dataReader, true, IsSimplifiedFileFormat));
 
         Flags = new ImmutableList<Guid>();
 
@@ -457,6 +450,7 @@ public class FileHeaderBlock
                         dataLen -= 16;
                         Flags.Add(dataReader.ReadBytes(16).ToLittleEndianGuid());
                     }
+
                     break;
                 case FileHeaderAttributes.UserAttributes:
                     Guid flag = dataReader.ReadBytes(16).ToLittleEndianGuid();
@@ -507,7 +501,7 @@ public class FileHeaderBlock
         Files = new ImmutableList<SubFileHeader?>(fileCount);
 
         for (int x = 0; x < fileCount; x++)
-            Files.Add(new SubFileHeader(dataReader, isImmutable: true, isSimplified: false));
+            Files.Add(new SubFileHeader(dataReader, true, false));
 
         // TODO: check based on block length
         int userSpaceLength = dataReader.ReadInt32();
@@ -541,6 +535,9 @@ public class FileHeaderBlock
 
     #region [ Static ]
 
+    // The file header bytes which equals: "openHistorian 2.0 Archive\00"
+    private static readonly byte[] s_fileAllocationTableHeaderBytes = "openHistorian 2.0 Archive\0"u8.ToArray();
+
     /// <summary>
     /// Looks in the contents of a file for the block size of the file.
     /// </summary>
@@ -569,7 +566,7 @@ public class FileHeaderBlock
 
         byte blockSizePower = stream.ReadNextByte();
 
-        if (blockSizePower is > 30 or < 5) //Stored as 2^n power. 
+        if (blockSizePower is > 30 or < 5) // Stored as 2^n power. 
             throw new Exception("Block size of this file is not supported");
 
         int blockSize = 1 << blockSizePower;
@@ -603,13 +600,14 @@ public class FileHeaderBlock
             m_archiveType = Guid.Empty
         };
 
-        foreach (Guid f in flags) 
+        foreach (Guid f in flags)
             header.Flags.Add(f);
 
         header.IsReadOnly = true;
 
         return header;
     }
+
     /// <summary>
     /// Creates a new file header.
     /// </summary>
@@ -635,7 +633,7 @@ public class FileHeaderBlock
             m_archiveType = Guid.Empty
         };
 
-        foreach (Guid f in flags) 
+        foreach (Guid f in flags)
             header.Flags.Add(f);
 
         header.IsReadOnly = true;
@@ -646,8 +644,10 @@ public class FileHeaderBlock
     /// <summary>
     /// Opens a file header
     /// </summary>
-    /// <param name="data">The block of data to be loaded. The length of this block must be equal to the
-    /// block size of a partition.</param>
+    /// <param name="data">
+    /// The block of data to be loaded. The length of this block must be equal to the
+    /// block size of a partition.
+    /// </param>
     /// <returns></returns>
     public static FileHeaderBlock Open(byte[] data)
     {

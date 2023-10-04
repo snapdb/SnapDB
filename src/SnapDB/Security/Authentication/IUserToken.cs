@@ -27,32 +27,41 @@
 namespace SnapDB.Security.Authentication;
 
 /// <summary>
-/// An interface for token data that is associated with a user. 
+/// An interface for token data that is associated with a user.
 /// </summary>
 public interface IUserToken
 {
+    #region [ Methods ]
+
     /// <summary>
     /// Saves the token to a stream
     /// </summary>
     /// <param name="stream">the stream to save to</param>
     void Save(Stream stream);
+
     /// <summary>
     /// Loads the token from a stream
     /// </summary>
     /// <param name="stream">the stream to load from</param>
     void Load(Stream stream);
+
+    #endregion
 }
 
 /// <summary>
 /// An empty token that does not contain any data.
 /// </summary>
-public struct NullToken
-    : IUserToken
+public struct NullToken : IUserToken
 {
+    #region [ Methods ]
+
     public void Save(Stream stream)
     {
     }
+
     public void Load(Stream stream)
     {
     }
+
+    #endregion
 }

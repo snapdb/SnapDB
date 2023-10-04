@@ -33,31 +33,42 @@ namespace SnapDB.Security.Authentication;
 /// </summary>
 public class ScramServer
 {
+    #region [ Members ]
+
     /// <summary>
     /// Contains the user credentials database
     /// </summary>
     public readonly ScramUserCredentials Users;
+
     private readonly NonceGenerator m_nonce = new(16);
 
+    #endregion
+
+    #region [ Constructors ]
+
     /// <summary>
-    /// 
     /// </summary>
     public ScramServer()
     {
         Users = new ScramUserCredentials();
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
-    /// Requests that the provided stream be authenticated 
+    /// Requests that the provided stream be authenticated
     /// </summary>
     /// <param name="stream"></param>
-    /// <param name="additionalChallenge">Additional data to include in the challenge. If using SSL certificates, 
-    /// adding the thumbprint to the challenge will allow detecting man in the middle attacks.</param>
+    /// <param name="additionalChallenge">
+    /// Additional data to include in the challenge. If using SSL certificates,
+    /// adding the thumbprint to the challenge will allow detecting man in the middle attacks.
+    /// </param>
     /// <returns></returns>
     public ScramServerSession AuthenticateAsServer(Stream stream, byte[] additionalChallenge = null)
     {
-        if (additionalChallenge is null)
-            additionalChallenge = new byte[] { };
+        additionalChallenge ??= new byte[] { };
 
         byte[] usernameBytes = stream.ReadBytes();
         byte[] clientNonce = stream.ReadBytes();
@@ -88,11 +99,9 @@ public class ScramServer
             stream.Flush();
             return new ScramServerSession(user.UserName);
         }
+
         return null;
     }
 
-
-
+    #endregion
 }
-
-

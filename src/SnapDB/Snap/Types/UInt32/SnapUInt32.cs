@@ -28,26 +28,38 @@ using SnapDB.IO;
 
 namespace SnapDB.Snap.Types;
 
-public class SnapUInt32
-    : SnapTypeBase<SnapUInt32>
+public class SnapUInt32 : SnapTypeBase<SnapUInt32>
 {
+    #region [ Members ]
 
     public uint Value;
 
+    #endregion
+
+    #region [ Constructors ]
+
     public SnapUInt32()
     {
-
     }
+
     public SnapUInt32(uint value)
     {
         Value = value;
     }
+
+    #endregion
+
+    #region [ Properties ]
 
     public override Guid GenericTypeGuid =>
         // {03F4BD3A-D9CF-4358-B175-A9D38BE6715A}
         new(0x03f4bd3a, 0xd9cf, 0x4358, 0xb1, 0x75, 0xa9, 0xd3, 0x8b, 0xe6, 0x71, 0x5a);
 
     public override int Size => 4;
+
+    #endregion
+
+    #region [ Methods ]
 
     public override void CopyTo(SnapUInt32 destination)
     {
@@ -89,8 +101,6 @@ public class SnapUInt32
         stream.Write(Value);
     }
 
-    #region [ Optional Overrides ]
-
     // Read(byte*)
     // Write(byte*)
     // IsLessThan(T)
@@ -103,28 +113,32 @@ public class SnapUInt32
     {
         Value = *(uint*)stream;
     }
+
     public override unsafe void Write(byte* stream)
     {
         *(uint*)stream = Value;
     }
+
     public override bool IsLessThan(SnapUInt32 right)
     {
         return Value < right.Value;
     }
+
     public override bool IsEqualTo(SnapUInt32 right)
     {
         return Value == right.Value;
-
     }
+
     public override bool IsGreaterThan(SnapUInt32 right)
     {
         return Value > right.Value;
-
     }
+
     public override bool IsGreaterThanOrEqualTo(SnapUInt32 right)
     {
         return Value >= right.Value;
     }
+
     public override bool IsBetween(SnapUInt32 lowerBounds, SnapUInt32 upperBounds)
     {
         return lowerBounds.Value <= Value && Value < upperBounds.Value;

@@ -1,6 +1,4 @@
-﻿
-
-//******************************************************************************************************
+﻿//******************************************************************************************************
 //  MemoryPoolStream_IoSession.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
@@ -34,16 +32,27 @@ namespace SnapDB.IO.Unmanaged;
 /// </summary>
 public partial class MemoryPoolStream
 {
+    #region [ Members ]
+
     // Nested Types
-    private class IoSession
-        : BinaryStreamIoSessionBase
+    private class IoSession : BinaryStreamIoSessionBase
     {
+        #region [ Members ]
+
         private readonly MemoryPoolStream m_stream;
+
+        #endregion
+
+        #region [ Constructors ]
 
         public IoSession(MemoryPoolStream stream)
         {
             m_stream = stream ?? throw new ArgumentNullException(nameof(stream));
         }
+
+        #endregion
+
+        #region [ Methods ]
 
         public override void GetBlock(BlockArguments args)
         {
@@ -54,5 +63,9 @@ public partial class MemoryPoolStream
         public override void Clear()
         {
         }
+
+        #endregion
     }
+
+    #endregion
 }

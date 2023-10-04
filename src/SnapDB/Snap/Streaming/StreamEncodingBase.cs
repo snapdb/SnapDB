@@ -23,7 +23,6 @@
 //       Converted code to .NET core.
 //******************************************************************************************************
 
-using SnapDB.Snap.Encoding;
 using SnapDB.IO;
 
 namespace SnapDB.Snap.Streaming;
@@ -34,44 +33,47 @@ namespace SnapDB.Snap.Streaming;
 /// </summary>
 /// <typeparam name="TKey">The type of the keys to be encoded and decoded.</typeparam>
 /// <typeparam name="TValue">The type of the values to be encoded and decoded.</typeparam>
-public abstract class StreamEncodingBase<TKey, TValue>
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
-    {
+public abstract class StreamEncodingBase<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+{
+    #region [ Properties ]
 
-        /// <summary>
-        /// Gets the definition of the encoding used.
-        /// </summary>
-        public abstract EncodingDefinition EncodingMethod { get; }
+    /// <summary>
+    /// Gets the definition of the encoding used.
+    /// </summary>
+    public abstract EncodingDefinition EncodingMethod { get; }
 
-        /// <summary>
-        /// Writes the end of the stream symbol to the <paramref name="stream"/>.
-        /// </summary>
-        /// <param name="stream">The stream to write to.</param>
-        public abstract void WriteEndOfStream(BinaryStreamBase stream);
+    #endregion
 
-        /// <summary>
-        /// Encodes the current key-value to the stream.
-        /// </summary>
-        /// <param name="stream">The stream to write to.</param>
-        /// <param name="currentKey">The key to write.</param>
-        /// <param name="currentValue">The value to write.</param>
-        public abstract void Encode(BinaryStreamBase stream, TKey currentKey, TValue currentValue);
+    #region [ Methods ]
 
-        /// <summary>
-        /// Attempts to read the next point from the stream. 
-        /// </summary>
-        /// <param name="stream">The stream to read from</param>
-        /// <param name="key">The key to store the value to.</param>
-        /// <param name="value">The value to store to.</param>
-        /// <returns><c>true</c> if successful; <c>false</c> if end of the stream has been reached.</returns>
-        public abstract bool TryDecode(BinaryStreamBase stream, TKey key, TValue value);
+    /// <summary>
+    /// Writes the end of the stream symbol to the <paramref name="stream"/>.
+    /// </summary>
+    /// <param name="stream">The stream to write to.</param>
+    public abstract void WriteEndOfStream(BinaryStreamBase stream);
 
-        /// <summary>
-        /// Resets the encoder. Some encoders maintain streaming state data that should
-        /// be reset when reading from a new stream.
-        /// </summary>
-        public abstract void ResetEncoder();
+    /// <summary>
+    /// Encodes the current key-value to the stream.
+    /// </summary>
+    /// <param name="stream">The stream to write to.</param>
+    /// <param name="currentKey">The key to write.</param>
+    /// <param name="currentValue">The value to write.</param>
+    public abstract void Encode(BinaryStreamBase stream, TKey currentKey, TValue currentValue);
 
-    }
+    /// <summary>
+    /// Attempts to read the next point from the stream.
+    /// </summary>
+    /// <param name="stream">The stream to read from</param>
+    /// <param name="key">The key to store the value to.</param>
+    /// <param name="value">The value to store to.</param>
+    /// <returns><c>true</c> if successful; <c>false</c> if end of the stream has been reached.</returns>
+    public abstract bool TryDecode(BinaryStreamBase stream, TKey key, TValue value);
 
+    /// <summary>
+    /// Resets the encoder. Some encoders maintain streaming state data that should
+    /// be reset when reading from a new stream.
+    /// </summary>
+    public abstract void ResetEncoder();
+
+    #endregion
+}

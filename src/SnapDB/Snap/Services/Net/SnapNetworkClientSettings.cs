@@ -31,6 +31,8 @@ namespace SnapDB.Snap.Services.Net;
 /// </summary>
 public class SnapNetworkClientSettings
 {
+    #region [ Members ]
+
     /// <summary>
     /// The port number to connect to.
     /// </summary>
@@ -50,4 +52,6 @@ public class SnapNetworkClientSettings
     /// Gets/Sets if Ssl will be used in the authentication.
     /// </summary>
     public bool UseSsl = false;
+
+    #endregion
 }

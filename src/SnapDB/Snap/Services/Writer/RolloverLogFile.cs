@@ -27,10 +27,9 @@
 //
 //******************************************************************************************************
 
+using System.Security.Cryptography;
 using Gemstone.Diagnostics;
 using Gemstone.IO.StreamExtensions;
-using Gemstone.Security.Cryptography;
-using System.Security.Cryptography;
 
 namespace SnapDB.Snap.Services.Writer;
 
@@ -39,7 +38,17 @@ namespace SnapDB.Snap.Services.Writer;
 /// </summary>
 public class RolloverLogFile
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(RolloverLogFile), MessageClass.Framework);
+    #region [ Members ]
+
+    /// <summary>
+    /// Gets the destination file
+    /// </summary>
+    public readonly Guid DestinationFile;
+
+    /// <summary>
+    /// Gets the filename of this log file. String.Empty if not currently associated with a file.
+    /// </summary>
+    public readonly string FileName;
 
     /// <summary>
     /// Gets if the file is valid and not corrupt.
@@ -50,15 +59,15 @@ public class RolloverLogFile
     /// Gets all of the source files.
     /// </summary>
     public readonly List<Guid> SourceFiles = new();
-    /// <summary>
-    /// Gets the destination file
-    /// </summary>
-    public readonly Guid DestinationFile;
 
-    /// <summary>
-    /// Gets the filename of this log file. String.Empty if not currently associated with a file.
-    /// </summary>
-    public readonly string FileName;
+    #endregion
+
+    #region [ Constructors ]
+
+    static RolloverLogFile()
+    {
+        s_header = System.Text.Encoding.UTF8.GetBytes("Historian 2.0 Rollover Log");
+    }
 
     /// <summary>
     /// Creates a new rollover log
@@ -78,9 +87,7 @@ public class RolloverLogFile
         stream.Write((byte)1);
         stream.Write(SourceFiles.Count);
         foreach (Guid file in SourceFiles)
-        {
             stream.Write(file);
-        }
         stream.Write(destinationFile);
         stream.Write(SHA1.HashData(stream.ToArray()));
         File.WriteAllBytes(fileName, stream.ToArray());
@@ -104,14 +111,13 @@ public class RolloverLogFile
                 s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Expected file length is not long enough", fileName);
                 return;
             }
+
             for (int x = 0; x < s_header.Length; x++)
-            {
                 if (data[x] != s_header[x])
                 {
                     s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Incorrect File Header", fileName);
                     return;
                 }
-            }
 
             byte[] hash = new byte[20];
             Array.Copy(data, data.Length - 20, hash, 0, 20);
@@ -136,6 +142,7 @@ public class RolloverLogFile
                         count--;
                         SourceFiles.Add(stream.ReadGuid());
                     }
+
                     DestinationFile = stream.ReadGuid();
                     IsValid = true;
                     return;
@@ -152,6 +159,10 @@ public class RolloverLogFile
         }
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Recovers this rollover during an application crash.
     /// </summary>
@@ -162,15 +173,12 @@ public class RolloverLogFile
         {
             //If the destination file exists, the rollover is complete. Therefore remove any source file.
             if (edit.Contains(DestinationFile))
-            {
                 foreach (Guid source in SourceFiles)
-                {
                     if (edit.Contains(source))
                         edit.TryRemoveAndDelete(source);
-                }
-            }
             //Otherwise, delete the destination file (which is allow the ~d2 cleanup to occur).
         }
+
         Delete();
     }
 
@@ -190,9 +198,13 @@ public class RolloverLogFile
         }
     }
 
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(RolloverLogFile), MessageClass.Framework);
+
     private static readonly byte[] s_header;
-    static RolloverLogFile()
-    {
-        s_header = System.Text.Encoding.UTF8.GetBytes("Historian 2.0 Rollover Log");
-    }
+
+    #endregion
 }

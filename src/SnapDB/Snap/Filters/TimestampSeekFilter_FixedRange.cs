@@ -31,14 +31,20 @@ namespace SnapDB.Snap.Filters;
 
 public partial class TimestampSeekFilter
 {
-    private class FixedRange<TKey>
-        : SeekFilterBase<TKey>
-        where TKey : TimestampBase<TKey>, new()
+    #region [ Members ]
+
+    private class FixedRange<TKey> : SeekFilterBase<TKey> where TKey : TimestampBase<TKey>, new()
     {
+        #region [ Members ]
+
         private bool m_isEndReached;
 
         private readonly ulong m_start;
         private readonly ulong m_stop;
+
+        #endregion
+
+        #region [ Constructors ]
 
         private FixedRange()
         {
@@ -52,8 +58,7 @@ public partial class TimestampSeekFilter
         /// Creates a filter by reading from the stream.
         /// </summary>
         /// <param name="stream">The stream to read from.</param>
-        public FixedRange(BinaryStreamBase stream)
-            : this()
+        public FixedRange(BinaryStreamBase stream) : this()
         {
             m_start = stream.ReadUInt64();
             m_stop = stream.ReadUInt64();
@@ -68,8 +73,7 @@ public partial class TimestampSeekFilter
         /// </summary>
         /// <param name="firstTime">The start of the only window.</param>
         /// <param name="lastTime">The end of the only window.</param>
-        public FixedRange(ulong firstTime, ulong lastTime)
-            : this()
+        public FixedRange(ulong firstTime, ulong lastTime) : this()
         {
             m_start = firstTime;
             m_stop = lastTime;
@@ -79,6 +83,16 @@ public partial class TimestampSeekFilter
             EndOfRange.Timestamp = m_stop;
         }
 
+        #endregion
+
+        #region [ Properties ]
+
+        public override Guid FilterType => TimestampSeekFilterDefinition.FilterGuid;
+
+        #endregion
+
+        #region [ Methods ]
+
         /// <summary>
         /// Gets the next search window.
         /// </summary>
@@ -86,9 +100,7 @@ public partial class TimestampSeekFilter
         public override bool NextWindow()
         {
             if (m_isEndReached)
-            {
                 return false;
-            }
             StartOfRange.SetMin();
             StartOfRange.Timestamp = m_start;
             EndOfRange.SetMax();
@@ -98,7 +110,7 @@ public partial class TimestampSeekFilter
         }
 
         /// <summary>
-        /// Resets the iterative nature of the filter. 
+        /// Resets the iterative nature of the filter.
         /// </summary>
         /// <remarks>
         /// Since a time filter is a set of date ranges, this will reset the frame so a
@@ -124,7 +136,8 @@ public partial class TimestampSeekFilter
             stream.Write(m_stop);
         }
 
-        public override Guid FilterType => TimestampSeekFilterDefinition.FilterGuid;
+        #endregion
     }
 
+    #endregion
 }

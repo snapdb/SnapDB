@@ -24,22 +24,23 @@
 //
 //******************************************************************************************************
 
-using Gemstone.ArrayExtensions;
 using System.Runtime.CompilerServices;
+using Gemstone.ArrayExtensions;
 
 namespace SnapDB.Security;
 
 public static class SecurityExtensions
 {
+    #region [ Static ]
+
     /// <summary>
-    /// Does a time constant comparison of the two byte arrays. 
+    /// Does a time constant comparison of the two byte arrays.
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns>true if both arrays are equal</returns>
     /// <remarks>
     /// If a or b is <c>null</c>, function returns immediately with a <c>false</c>.
-    /// 
     /// Certain cryptographic attacks can occur by comparing the amount of time it
     /// takes to do certain operations. Comparing two byte arrays is one example.
     /// Therefore this method should take constant time to do a comparison of two arrays.
@@ -51,14 +52,12 @@ public static class SecurityExtensions
             return false;
         int difference = a.Length ^ b.Length;
         for (int i = 0; i < a.Length && i < b.Length; i++)
-        {
             difference |= a[i] ^ b[i];
-        }
         return difference == 0;
     }
 
     /// <summary>
-    /// Does a time constant comparison of the two byte arrays. 
+    /// Does a time constant comparison of the two byte arrays.
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
@@ -67,7 +66,6 @@ public static class SecurityExtensions
     /// <returns>true if both arrays are equal</returns>
     /// <remarks>
     /// If a or b is <c>null</c>, function returns immediately with a <c>false</c>.
-    /// 
     /// Certain cryptographic attacks can occur by comparing the amount of time it
     /// takes to do certain operations. Comparing two byte arrays is one example.
     /// Therefore this method should take constant time to do a comparison of two arrays.
@@ -80,14 +78,12 @@ public static class SecurityExtensions
             return false;
         int difference = a.Length ^ bLength;
         for (int ia = 0, ib = bPosition; ia < a.Length && ib < b.Length; ia++, ib++)
-        {
             difference |= a[ia] ^ b[ib];
-        }
         return difference == 0;
     }
 
     /// <summary>
-    /// Does a time constant comparison of the two GUIDs. 
+    /// Does a time constant comparison of the two GUIDs.
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
@@ -109,4 +105,5 @@ public static class SecurityExtensions
         return difference == 0;
     }
 
+    #endregion
 }

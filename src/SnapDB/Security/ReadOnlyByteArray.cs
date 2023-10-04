@@ -29,23 +29,40 @@ namespace SnapDB.Security;
 /// <summary>
 /// Provides a way for byte arrays to be added to sorted lists and dictionaries.
 /// </summary>
-public readonly struct ReadonlyByteArray
-    : IComparable<ReadonlyByteArray>, IEquatable<ReadonlyByteArray>
+public readonly struct ReadonlyByteArray : IComparable<ReadonlyByteArray>, IEquatable<ReadonlyByteArray>
 {
-    private readonly byte[] m_value;
+    #region [ Members ]
+
     private readonly int m_hashCode;
+    private readonly byte[] m_value;
+
+    #endregion
+
+    #region [ Constructors ]
 
     public ReadonlyByteArray(byte[] array)
     {
         m_value = array;
         if (array is null)
-        {
             m_hashCode = 0;
-        }
         else
-        {
             m_hashCode = ComputeHash(array);
-        }
+    }
+
+    #endregion
+
+    #region [ Methods ]
+
+    public override int GetHashCode()
+    {
+        return m_hashCode;
+    }
+
+    public override bool Equals(object other)
+    {
+        if (other is ReadonlyByteArray)
+            return Equals((ReadonlyByteArray)other);
+        return false;
     }
 
     public int CompareTo(ReadonlyByteArray other)
@@ -68,6 +85,7 @@ public readonly struct ReadonlyByteArray
             if (m_value[x] > other.m_value[x])
                 return 1;
         }
+
         return 0;
     }
 
@@ -82,19 +100,9 @@ public readonly struct ReadonlyByteArray
         return m_value.SequenceEqual(other.m_value);
     }
 
-    public override int GetHashCode()
-    {
-        return m_hashCode;
-    }
+    #endregion
 
-    public override bool Equals(object other)
-    {
-        if (other is ReadonlyByteArray)
-        {
-            return Equals((ReadonlyByteArray)other);
-        }
-        return false;
-    }
+    #region [ Static ]
 
     //http://stackoverflow.com/questions/16340/how-do-i-generate-a-hashcode-from-a-byte-array-in-c-sharp
     private static int ComputeHash(byte[] data)
@@ -115,4 +123,6 @@ public readonly struct ReadonlyByteArray
             return hash;
         }
     }
+
+    #endregion
 }

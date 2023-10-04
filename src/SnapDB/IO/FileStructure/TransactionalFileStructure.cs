@@ -23,29 +23,32 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
-using SnapDB.IO.FileStructure.Media;
 using Gemstone.Diagnostics;
+using SnapDB.IO.FileStructure.Media;
 
 namespace SnapDB.IO.FileStructure;
 
 /// <summary>
 /// This class is responsible for managing the transactions that occur on the file system.
-/// Therefore, it keeps up with the latest snapshot of the file allocation table, 
+/// Therefore, it keeps up with the latest snapshot of the file allocation table,
 /// permits only a single concurrent edit of the archive system, and determines when a file
 /// can be deleted when there are no read or write transactions. It also containst the IO system.
 /// </summary>
-public class TransactionalFileStructure
-    : IDisposable
+public class TransactionalFileStructure : IDisposable
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(TransactionalFileStructure), MessageClass.Component);
-
     #region [ Members ]
 
     /// <summary>
-    /// Determines if this object has been disposed.
+    /// Contains the current read transaction.
     /// </summary>
-    private bool m_disposed;
+    private ReadSnapshot m_currentReadTransaction;
+
+    /// <summary>
+    /// Contains the current active transaction. If this <c>null</c>, there is no active transaction.
+    /// </summary>
+    private TransactionalEdit? m_currentTransaction;
 
     /// <summary>
     /// Contains the disk IO subsystem for accessing the file.
@@ -53,14 +56,9 @@ public class TransactionalFileStructure
     private DiskIo m_diskIo;
 
     /// <summary>
-    /// Contains the current active transaction. If this <c>null</c>, there is no active transaction.
+    /// Determines if this object has been disposed.
     /// </summary>
-    private TransactionalEdit m_currentTransaction;
-
-    /// <summary>
-    /// Contains the current read transaction.
-    /// </summary>
-    private ReadSnapshot m_currentReadTransaction;
+    private bool m_disposed;
 
     #endregion
 
@@ -79,56 +77,9 @@ public class TransactionalFileStructure
     }
 #endif
 
-    /// <summary>
-    /// Creates a new archive file that is completely in memory.
-    ///  </summary>
-    public static TransactionalFileStructure CreateInMemory(int blockSize, params Guid[] flags)
-    {
-        DiskIo disk = DiskIo.CreateMemoryFile(Globals.MemoryPool, blockSize, flags);
-
-        return new TransactionalFileStructure(disk);
-    }
-
-    /// <summary>
-    /// Creates a new archive file using the provided file. File is editable.
-    /// </summary>
-    public static TransactionalFileStructure CreateFile(string fileName, int blockSize, params Guid[] flags)
-    {
-        if (fileName is null)
-            throw new ArgumentNullException(nameof(fileName));
-
-        if (File.Exists(fileName))
-            throw new Exception("fileName Already Exists");
-
-        DiskIo disk = DiskIo.CreateFile(fileName, Globals.MemoryPool, blockSize, flags);
-
-        return new TransactionalFileStructure(disk);
-    }
-
-    /// <summary>
-    /// Opens an existing file.
-    /// </summary>
-    public static TransactionalFileStructure OpenFile(string fileName, bool isReadOnly)
-    {
-        if (fileName is null)
-            throw new ArgumentNullException(nameof(fileName));
-
-        if (!File.Exists(fileName))
-            throw new Exception("fileName Does Not Exists");
-
-        DiskIo disk = DiskIo.OpenFile(fileName, Globals.MemoryPool, isReadOnly);
-
-        if (!isReadOnly && disk.LastCommittedHeader.IsSimplifiedFileFormat)
-        {
-            disk.Dispose();
-
-            throw new Exception("Cannot open a simplified file structure with write support.");
-        }
-
-        return new TransactionalFileStructure(disk);
-    }
-
     #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets the current size of the archive.
@@ -145,10 +96,42 @@ public class TransactionalFileStructure
     /// </summary>
     public string FileName => m_diskIo.FileName;
 
+    #endregion
+
     #region [ Methods ]
 
     /// <summary>
-    /// This will start a transactional edit on the file. 
+    /// Releases all the resources used by the <see cref="TransactionalFileStructure"/> object.
+    /// </summary>
+    public void Dispose()
+    {
+        if (m_disposed)
+            return;
+
+        try
+        {
+            if (m_currentTransaction is not null)
+            {
+                m_currentTransaction.Dispose();
+                m_currentTransaction = null;
+            }
+
+            if (m_diskIo is not null)
+            {
+                m_diskIo.Dispose();
+                m_diskIo = null!;
+            }
+        }
+
+        finally
+        {
+            GC.SuppressFinalize(this);
+            m_disposed = true; // Prevent duplicate dispose.
+        }
+    }
+
+    /// <summary>
+    /// This will start a transactional edit on the file.
     /// </summary>
     public TransactionalEdit BeginEdit()
     {
@@ -197,37 +180,60 @@ public class TransactionalFileStructure
         m_currentTransaction = null;
     }
 
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(TransactionalFileStructure), MessageClass.Component);
+
     /// <summary>
-    /// Releases all the resources used by the <see cref="TransactionalFileStructure"/> object.
+    /// Creates a new archive file that is completely in memory.
     /// </summary>
-    public void Dispose()
+    public static TransactionalFileStructure CreateInMemory(int blockSize, params Guid[] flags)
     {
-        if (!m_disposed)
+        DiskIo disk = DiskIo.CreateMemoryFile(Globals.MemoryPool, blockSize, flags);
+
+        return new TransactionalFileStructure(disk);
+    }
+
+    /// <summary>
+    /// Creates a new archive file using the provided file. File is editable.
+    /// </summary>
+    public static TransactionalFileStructure CreateFile(string fileName, int blockSize, params Guid[] flags)
+    {
+        if (fileName is null)
+            throw new ArgumentNullException(nameof(fileName));
+
+        if (File.Exists(fileName))
+            throw new Exception("fileName Already Exists");
+
+        DiskIo disk = DiskIo.CreateFile(fileName, Globals.MemoryPool, blockSize, flags);
+
+        return new TransactionalFileStructure(disk);
+    }
+
+    /// <summary>
+    /// Opens an existing file.
+    /// </summary>
+    public static TransactionalFileStructure OpenFile(string fileName, bool isReadOnly)
+    {
+        if (fileName is null)
+            throw new ArgumentNullException(nameof(fileName));
+
+        if (!File.Exists(fileName))
+            throw new Exception("fileName Does Not Exists");
+
+        DiskIo disk = DiskIo.OpenFile(fileName, Globals.MemoryPool, isReadOnly);
+
+        if (!isReadOnly && disk.LastCommittedHeader.IsSimplifiedFileFormat)
         {
-            try
-            {
-                if (m_currentTransaction is not null)
-                {
-                    m_currentTransaction.Dispose();
-                    m_currentTransaction = null;
-                }
+            disk.Dispose();
 
-                if (m_diskIo is not null)
-                {
-                    m_diskIo.Dispose();
-                    m_diskIo = null;
-                }
-            }
-
-            finally
-            {
-                GC.SuppressFinalize(this);
-                m_disposed = true; // Prevent duplicate dispose.
-            }
+            throw new Exception("Cannot open a simplified file structure with write support.");
         }
+
+        return new TransactionalFileStructure(disk);
     }
 
     #endregion
-
-
 }

@@ -24,12 +24,12 @@
 //
 //******************************************************************************************************
 
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using Gemstone.Diagnostics;
 using Gemstone.IO.StreamExtensions;
 using SnapDB.IO;
 using SnapDB.Security;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 
 // ReSharper disable SwitchStatementHandlesSomeKnownEnumValuesWithDefault
 namespace SnapDB.Snap.Services.Net;
@@ -37,17 +37,22 @@ namespace SnapDB.Snap.Services.Net;
 /// <summary>
 /// A client that communicates over a stream.
 /// </summary>
-public class SnapStreamingClient
-    : SnapClient
+public class SnapStreamingClient : SnapClient
 {
-    private bool m_disposed;
-    private Stream m_rawStream;
-    private Stream m_secureStream;
-    private RemoteBinaryStream m_stream;
-    private ClientDatabaseBase m_sortedTreeEngine;
-    private string m_historianDatabaseString;
+    #region [ Members ]
+
     private SecureStreamClientBase m_credentials;
     private Dictionary<string, DatabaseInfo> m_databaseInfos;
+    private string m_historianDatabaseString;
+    private Stream m_rawStream;
+    private Stream m_secureStream;
+    private ClientDatabaseBase m_sortedTreeEngine;
+    private RemoteBinaryStream m_stream;
+    private bool m_disposed;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a <see cref="SnapStreamingClient"/>
@@ -61,11 +66,62 @@ public class SnapStreamingClient
     }
 
     /// <summary>
-    /// Allows derived classes to call <see cref="Initialize"/> after the inheriting class 
+    /// Allows derived classes to call <see cref="Initialize"/> after the inheriting class
     /// has done something in the constructor.
     /// </summary>
     protected SnapStreamingClient()
     {
+    }
+
+    #endregion
+
+    #region [ Methods ]
+
+    /// <summary>
+    /// Gets the database that matches <see cref="databaseName"/>
+    /// </summary>
+    /// <param name="databaseName">the case insensitive name of the databse</param>
+    /// <returns></returns>
+    public override ClientDatabaseBase GetDatabase(string databaseName)
+    {
+        DatabaseInfo info = m_databaseInfos[databaseName.ToUpper()];
+        Type type = typeof(SnapStreamingClient);
+        MethodInfo method = type.GetMethod("InternalGetDatabase", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        // ReSharper disable once PossibleNullReferenceException
+        MethodInfo reflectionMethod = method.MakeGenericMethod(info.KeyType, info.ValueType);
+        ClientDatabaseBase db = (ClientDatabaseBase)reflectionMethod.Invoke(this, new object[] { databaseName });
+
+        return db;
+    }
+
+    /// <summary>
+    /// Accesses <see cref="ClientDatabaseBase{TKey,TValue}"/> for given <paramref name="databaseName"/>.
+    /// </summary>
+    /// <param name="databaseName">Name of database instance to access.</param>
+    /// <returns><see cref="ClientDatabaseBase{TKey,TValue}"/> for given <paramref name="databaseName"/>.</returns>
+    public override ClientDatabaseBase<TKey, TValue> GetDatabase<TKey, TValue>(string databaseName)
+    {
+        return GetDatabase<TKey, TValue>(databaseName, null);
+    }
+
+    /// <summary>
+    /// Gets basic information for every database connected to the server.
+    /// </summary>
+    /// <returns></returns>
+    public override List<DatabaseInfo> GetDatabaseInfo()
+    {
+        return m_databaseInfos.Values.ToList();
+    }
+
+    /// <summary>
+    /// Determines if <see cref="databaseName"/> is contained in the database.
+    /// </summary>
+    /// <param name="databaseName">Name of database instance to access.</param>
+    /// <returns></returns>
+    public override bool Contains(string databaseName)
+    {
+        return m_databaseInfos.ContainsKey(databaseName.ToUpper());
     }
 
     /// <summary>
@@ -118,6 +174,45 @@ public class SnapStreamingClient
         RefreshDatabaseInfo();
     }
 
+    /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="SnapNetworkClient"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (m_disposed)
+            return;
+
+        try
+        {
+            if (!disposing)
+                return;
+
+            m_sortedTreeEngine?.Dispose();
+
+            m_sortedTreeEngine = null;
+
+            try
+            {
+                m_stream.Write((byte)ServerCommand.Disconnect);
+                m_stream.Flush();
+            }
+            catch (Exception ex)
+            {
+                Logger.SwallowException(ex);
+            }
+
+            m_rawStream?.Dispose();
+
+            m_rawStream = null;
+        }
+        finally
+        {
+            m_disposed = true; // Prevent duplicate dispose.
+            base.Dispose(disposing); // Call base class Dispose().
+        }
+    }
+
     private void RefreshDatabaseInfo()
     {
         m_stream.Write((byte)ServerCommand.GetAllDatabases);
@@ -148,55 +243,12 @@ public class SnapStreamingClient
         }
     }
 
-    /// <summary>
-    /// Gets the database that matches <see cref="databaseName"/>
-    /// </summary>
-    /// <param name="databaseName">the case insensitive name of the databse</param>
-    /// <returns></returns>
-    public override ClientDatabaseBase GetDatabase(string databaseName)
-    {
-        DatabaseInfo info = m_databaseInfos[databaseName.ToUpper()];
-        Type type = typeof(SnapStreamingClient);
-        MethodInfo method = type.GetMethod("InternalGetDatabase", BindingFlags.NonPublic | BindingFlags.Instance);
-
-        // ReSharper disable once PossibleNullReferenceException
-        MethodInfo reflectionMethod = method.MakeGenericMethod(info.KeyType, info.ValueType);
-        ClientDatabaseBase db = (ClientDatabaseBase)reflectionMethod.Invoke(this, new object[] { databaseName });
-
-        return db;
-    }
-
     //Called through reflection. Its the only way to call a generic function only knowing the Types
     [MethodImpl(MethodImplOptions.NoOptimization)] //Prevents removing this method as it may appear unused.
-    private ClientDatabaseBase<TKey, TValue> InternalGetDatabase<TKey, TValue>(string databaseName)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+    private ClientDatabaseBase<TKey, TValue> InternalGetDatabase<TKey, TValue>(string databaseName) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         return GetDatabase<TKey, TValue>(databaseName, null);
     }
-
-    /// <summary>
-    /// Accesses <see cref="ClientDatabaseBase{TKey,TValue}"/> for given <paramref name="databaseName"/>.
-    /// </summary>
-    /// <param name="databaseName">Name of database instance to access.</param>
-    /// <returns><see cref="ClientDatabaseBase{TKey,TValue}"/> for given <paramref name="databaseName"/>.</returns>
-    public override ClientDatabaseBase<TKey, TValue> GetDatabase<TKey, TValue>(string databaseName) =>
-        GetDatabase<TKey, TValue>(databaseName, null);
-
-    /// <summary>
-    /// Gets basic information for every database connected to the server.
-    /// </summary>
-    /// <returns></returns>
-    public override List<DatabaseInfo> GetDatabaseInfo() =>
-        m_databaseInfos.Values.ToList();
-
-    /// <summary>
-    /// Determines if <see cref="databaseName"/> is contained in the database.
-    /// </summary>
-    /// <param name="databaseName">Name of database instance to access.</param>
-    /// <returns></returns>
-    public override bool Contains(string databaseName) =>
-        m_databaseInfos.ContainsKey(databaseName.ToUpper());
 
     /// <summary>
     /// Accesses <see cref="StreamingClientDatabase{TKey,TValue}"/> for given <paramref name="databaseName"/>.
@@ -204,14 +256,11 @@ public class SnapStreamingClient
     /// <param name="databaseName">Name of database instance to access.</param>
     /// <param name="encodingMethod"></param>
     /// <returns><see cref="StreamingClientDatabase{TKey,TValue}"/> for given <paramref name="databaseName"/>.</returns>
-    private StreamingClientDatabase<TKey, TValue> GetDatabase<TKey, TValue>(string databaseName, EncodingDefinition encodingMethod)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+    private StreamingClientDatabase<TKey, TValue> GetDatabase<TKey, TValue>(string databaseName, EncodingDefinition encodingMethod) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         DatabaseInfo dbInfo = m_databaseInfos[databaseName.ToUpper()];
 
-        if (encodingMethod is null)
-            encodingMethod = dbInfo.SupportedStreamingModes.First();
+        encodingMethod ??= dbInfo.SupportedStreamingModes.First();
 
         if (m_sortedTreeEngine is not null)
             throw new Exception($"Can only connect to one database at a time. Please disconnect from database{m_historianDatabaseString}");
@@ -256,42 +305,5 @@ public class SnapStreamingClient
         return db;
     }
 
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="SnapNetworkClient"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (m_disposed)
-            return;
-
-        try
-        {
-            if (!disposing)
-                return;
-
-            m_sortedTreeEngine?.Dispose();
-
-            m_sortedTreeEngine = null;
-
-            try
-            {
-                m_stream.Write((byte)ServerCommand.Disconnect);
-                m_stream.Flush();
-            }
-            catch (Exception ex)
-            {
-                Logger.SwallowException(ex);
-            }
-
-            m_rawStream?.Dispose();
-
-            m_rawStream = null;
-        }
-        finally
-        {
-            m_disposed = true;       // Prevent duplicate dispose.
-            base.Dispose(disposing); // Call base class Dispose().
-        }
-    }
+    #endregion
 }

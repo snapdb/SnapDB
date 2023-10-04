@@ -9,11 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Common.cs" />
-    <Compile Remove="Threading\WeakActionFast.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
     <PackageReference Include="Gemstone.Common" Version="1.0.100" />
     <PackageReference Include="Gemstone.Communication" Version="1.0.100" />

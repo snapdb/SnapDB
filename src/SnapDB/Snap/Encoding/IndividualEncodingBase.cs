@@ -24,8 +24,8 @@
 //
 //******************************************************************************************************
 
-using SnapDB.IO.Unmanaged;
 using SnapDB.IO;
+using SnapDB.IO.Unmanaged;
 
 namespace SnapDB.Snap.Encoding;
 
@@ -35,6 +35,8 @@ namespace SnapDB.Snap.Encoding;
 /// <typeparam name="T">The type of values to encode.</typeparam>
 public abstract class IndividualEncodingBase<T>
 {
+    #region [ Properties ]
+
     /// <summary>
     /// Gets a value indicating whether this encoding contains an end-of-stream symbol.
     /// </summary>
@@ -52,9 +54,13 @@ public abstract class IndividualEncodingBase<T>
     public abstract bool UsesPreviousValue { get; }
 
     /// <summary>
-    /// Gets the maximum amount of space required by the compression algorithm. 
+    /// Gets the maximum amount of space required by the compression algorithm.
     /// </summary>
     public abstract int MaxCompressionSize { get; }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Encodes <paramref name="value"/> and writes it to the specified binary <paramref name="stream"/>.
@@ -110,4 +116,5 @@ public abstract class IndividualEncodingBase<T>
     /// <returns>A clone.</returns>
     public abstract IndividualEncodingBase<T> Clone();
 
+    #endregion
 }

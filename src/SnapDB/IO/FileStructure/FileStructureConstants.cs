@@ -31,8 +31,12 @@ namespace SnapDB.IO.FileStructure;
 /// </summary>
 internal static class FileStructureConstants
 {
+    #region [ Members ]
+
     /// <summary>
     /// The number of bytes in the footer of a block.
     /// </summary>
     public const int BlockFooterLength = 32;
+
+    #endregion
 }

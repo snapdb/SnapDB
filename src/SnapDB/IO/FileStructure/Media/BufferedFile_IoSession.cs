@@ -31,33 +31,38 @@ namespace SnapDB.IO.FileStructure.Media;
 
 internal partial class BufferedFile
 {
+    #region [ Members ]
+
     /// <summary>
     /// The <see cref="BinaryStreamIoSessionBase"/> utilized by the <see cref="BufferedFile"/>.
     /// </summary>
-    private class IoSession
-        : PageReplacementAlgorithm.PageLock
+    private class IoSession : PageReplacementAlgorithm.PageLock
     {
-        private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(IoSession), MessageClass.Component);
+        #region [ Members ]
 
         /// <summary>
         /// The base stream
         /// </summary>
         private readonly BufferedFile m_stream;
+
         private bool m_disposed;
+
+        #endregion
+
+        #region [ Constructors ]
 
         /// <summary>
         /// Creates a new <see cref="IoSession"/>
         /// </summary>
         /// <param name="stream">The base class.</param>
         /// <param name="pageReplacement">The page replacement algorithm</param>
-        internal IoSession(BufferedFile stream, PageReplacementAlgorithm pageReplacement)
-            : base(pageReplacement)
+        internal IoSession(BufferedFile stream, PageReplacementAlgorithm pageReplacement) : base(pageReplacement)
         {
             m_stream = stream;
             m_stream.m_queue.Open();
         }
 
-#if DEBUG
+    #if DEBUG
         /// <summary>
         /// Releases the unmanaged resources before the <see cref="IoSession"/> object is reclaimed by <see cref="GC"/>.
         /// </summary>
@@ -66,7 +71,11 @@ internal partial class BufferedFile
             s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);
             Dispose(false);
         }
-#endif
+    #endif
+
+        #endregion
+
+        #region [ Methods ]
 
         /// <summary>
         /// Gets a block for the following I/O session.
@@ -92,5 +101,15 @@ internal partial class BufferedFile
 
             base.Dispose(disposing);
         }
+
+        #endregion
+
+        #region [ Static ]
+
+        private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(IoSession), MessageClass.Component);
+
+        #endregion
     }
+
+    #endregion
 }

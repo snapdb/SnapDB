@@ -32,7 +32,6 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Prng;
 using Org.BouncyCastle.Math;
-using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.X509;
@@ -50,6 +49,8 @@ namespace SnapDB.Security;
 /// </summary>
 public static class GenerateCertificate
 {
+    #region [ Static ]
+
     /// <summary>
     /// Opens a certificate, loading the private key of the PFX file.
     /// </summary>
@@ -96,7 +97,7 @@ public static class GenerateCertificate
         // The Certificate Generator
         X509V3CertificateGenerator certificateGenerator = new();
         certificateGenerator.SetSerialNumber(BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(long.MaxValue), random));
-        
+
         // TODO: JRC - check to see what has changed here and if this is necessary
         //certificateGenerator.SetSignatureAlgorithm(signatureAlgorithm);
 
@@ -142,8 +143,6 @@ public static class GenerateCertificate
     /// <returns></returns>
     public static X509Certificate2 CreateSelfSignedCertificate(string subjectDirName, int signatureBits, int keyStrength)
     {
-        DateTime startDate = DateTime.UtcNow.AddYears(-1);
-        DateTime endDate = DateTime.UtcNow.AddYears(100);
         switch (signatureBits)
         {
             case 160:
@@ -165,7 +164,7 @@ public static class GenerateCertificate
         KeyGenerationParameters keyGenerationParameters = new(random, keyStrength);
         RsaKeyPairGenerator keyPairGenerator = new();
         keyPairGenerator.Init(keyGenerationParameters);
-        AsymmetricCipherKeyPair encryptionKeys = keyPairGenerator.GenerateKeyPair();
+        keyPairGenerator.GenerateKeyPair();
 
         // TODO: JRC - check to see what has changed here and if this is necessary (see above for the same)
 
@@ -195,9 +194,11 @@ public static class GenerateCertificate
         //X509Certificate2 convertedCertificate = new(stream.ToArray(), "", X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
 
         //return convertedCertificate;
-        
+
         return null;
     }
+
+    #endregion
 
     //private static bool addCertToStore(X509Certificate2 cert, StoreName st, StoreLocation sl)
     //{

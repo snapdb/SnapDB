@@ -33,10 +33,15 @@ namespace SnapDB.Net;
 /// <summary>
 /// Represents a binary stream over a network connection.
 /// </summary>
-public class NetworkBinaryStream
-    : RemoteBinaryStream
+public class NetworkBinaryStream : RemoteBinaryStream
 {
+    #region [ Members ]
+
     private Socket m_socket;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NetworkBinaryStream"/> class.
@@ -45,8 +50,7 @@ public class NetworkBinaryStream
     /// <param name="timeout">The socket timeout in milliseconds.</param>
     /// <param name="workerThreadSynchronization">Optional worker thread synchronization object.</param>
     /// <exception cref="Exception"></exception>
-    public NetworkBinaryStream(Socket socket, int timeout = -1, WorkerThreadSynchronization? workerThreadSynchronization = null)
-        : base(new NetworkStream(socket), workerThreadSynchronization)
+    public NetworkBinaryStream(Socket socket, int timeout = -1, WorkerThreadSynchronization? workerThreadSynchronization = null) : base(new NetworkStream(socket), workerThreadSynchronization)
     {
         if (!BitConverter.IsLittleEndian)
             throw new Exception("BigEndian processors are not supported");
@@ -55,6 +59,10 @@ public class NetworkBinaryStream
         Timeout = timeout;
         m_socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
     }
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets the underlying socket used for communication.
@@ -92,17 +100,9 @@ public class NetworkBinaryStream
         }
     }
 
-    /// <summary>
-    /// Disposes of the <see cref="NetworkBinaryStream"/> instance, disconnecting the socket if necessary.
-    /// </summary>
-    /// <param name="disposing"><c>true</c> if called from <see cref="Dispose"/>, <c>false</c> if called from the finalizer.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-            Disconnect();
+    #endregion
 
-        base.Dispose(disposing);
-    }
+    #region [ Methods ]
 
     /// <summary>
     /// Disconnects the socket.
@@ -119,6 +119,7 @@ public class NetworkBinaryStream
             catch
             {
             }
+
             try
             {
                 socket.Close();
@@ -127,6 +128,21 @@ public class NetworkBinaryStream
             {
             }
         }
+
         WorkerThreadSynchronization.BeginSafeToCallbackRegion();
     }
+
+    /// <summary>
+    /// Disposes of the <see cref="NetworkBinaryStream"/> instance, disconnecting the socket if necessary.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> if called from <see cref="Dispose"/>, <c>false</c> if called from the finalizer.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+            Disconnect();
+
+        base.Dispose(disposing);
+    }
+
+    #endregion
 }

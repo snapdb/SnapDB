@@ -23,6 +23,7 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
+
 using SnapDB.IO.Unmanaged;
 
 namespace SnapDB;
@@ -32,13 +33,21 @@ namespace SnapDB;
 /// </summary>
 public static class Globals
 {
+    #region [ Constructors ]
+
+    static Globals()
+    {
+        MemoryPool = new MemoryPool();
+    }
+
+    #endregion
+
+    #region [ Static ]
+
     /// <summary>
     /// A global Memory Pool that uses 64KB pages.
     /// </summary>
     public static MemoryPool MemoryPool;
 
-    static Globals()
-    {
-        MemoryPool = new MemoryPool(65536);
-    }
+    #endregion
 }

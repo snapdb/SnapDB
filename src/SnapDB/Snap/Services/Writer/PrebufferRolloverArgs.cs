@@ -27,26 +27,29 @@
 namespace SnapDB.Snap.Services.Writer;
 
 /// <summary>
-/// A set of variables that are generated in the prebuffer stage that are provided to the onRollover 
+/// A set of variables that are generated in the prebuffer stage that are provided to the onRollover
 /// <see cref="Action"/> passed to the constructor of <see cref="PrebufferWriter{TKey,TValue}"/>.
 /// </summary>
 /// <typeparam name="TKey">The key</typeparam>
 /// <typeparam name="TValue">The value</typeparam>
-public class PrebufferRolloverArgs<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class PrebufferRolloverArgs<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Members ]
 
     /// <summary>
-    /// The stream of points that need to be rolled over. 
+    /// The stream of points that need to be rolled over.
     /// </summary>
     public readonly TreeStream<TKey, TValue> Stream;
 
     /// <summary>
-    /// The transaction id assoicated with the points in this buffer. 
+    /// The transaction id assoicated with the points in this buffer.
     /// This is the id of the last point in this buffer.
     /// </summary>
     public readonly long TransactionId;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a set of args
@@ -58,4 +61,6 @@ public class PrebufferRolloverArgs<TKey, TValue>
         Stream = stream;
         TransactionId = transactionId;
     }
+
+    #endregion
 }

@@ -36,18 +36,25 @@ namespace SnapDB.Security.Authentication;
 /// </summary>
 public class ScramClient
 {
+    #region [ Members ]
+
+    private byte[] m_clientKey;
+    private HMac m_clientSignature;
+    private HashMethod m_hashMethod;
+    private int m_iterations;
+
     private readonly NonceGenerator m_nonce = new(16);
-    private readonly byte[] m_usernameBytes;
     private readonly byte[] m_passwordBytes;
     private byte[] m_salt;
-    private int m_iterations;
     private byte[] m_saltedPassword;
     private byte[] m_serverKey;
-    private byte[] m_clientKey;
-    private byte[] m_storedKey;
-    private HMac m_clientSignature;
     private HMac m_serverSignature;
-    private HashMethod m_hashMethod;
+    private byte[] m_storedKey;
+    private readonly byte[] m_usernameBytes;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new set of client credentials.
@@ -60,77 +67,13 @@ public class ScramClient
         m_passwordBytes = Scram.Utf8.GetBytes(password.Normalize(NormalizationForm.FormKC));
     }
 
-    /// <summary>
-    /// Sets the server parameters and regenerates the salted password if 
-    /// the salt values have changed.
-    /// </summary>
-    /// <param name="hashMethod">the hashing method</param>
-    /// <param name="salt">the salt for the user credentials.</param>
-    /// <param name="iterations">the number of iterations.</param>
-    private void SetServerValues(HashMethod hashMethod, byte[] salt, int iterations)
-    {
-        bool hasPasswordDataChanged = false;
-        bool hasHashMethodChanged = false;
+    #endregion
 
-        if (m_salt is null || !salt.SecureEquals(m_salt))
-        {
-            hasPasswordDataChanged = true;
-            m_salt = salt;
-        }
-        if (iterations != m_iterations)
-        {
-            hasPasswordDataChanged = true;
-            m_iterations = iterations;
-        }
-        if (m_hashMethod != hashMethod)
-        {
-            m_hashMethod = hashMethod;
-            hasHashMethodChanged = true;
-        }
-
-        if (hasPasswordDataChanged)
-        {
-            m_saltedPassword = Scram.GenerateSaltedPassword(m_passwordBytes, m_salt, m_iterations);
-        }
-        if (hasPasswordDataChanged || hasHashMethodChanged)
-        {
-            m_serverKey = Scram.ComputeServerKey(m_hashMethod, m_saltedPassword);
-            m_clientKey = Scram.ComputeClientKey(m_hashMethod, m_saltedPassword);
-            m_storedKey = Scram.ComputeStoredKey(m_hashMethod, m_clientKey);
-            m_clientSignature = new HMac(Scram.CreateDigest(m_hashMethod));
-            m_clientSignature.Init(new KeyParameter(m_storedKey));
-
-            m_serverSignature = new HMac(Scram.CreateDigest(m_hashMethod));
-            m_serverSignature.Init(new KeyParameter(m_serverKey));
-        }
-    }
-
-    private byte[] ComputeClientSignature(byte[] authMessage)
-    {
-        byte[] result = new byte[m_clientSignature.GetMacSize()];
-        lock (m_clientSignature)
-        {
-            m_clientSignature.BlockUpdate(authMessage, 0, authMessage.Length);
-            m_clientSignature.DoFinal(result, 0);
-        }
-        return result;
-    }
-
-    private byte[] ComputeServerSignature(byte[] authMessage)
-    {
-        byte[] result = new byte[m_serverSignature.GetMacSize()];
-        lock (m_serverSignature)
-        {
-            m_serverSignature.BlockUpdate(authMessage, 0, authMessage.Length);
-            m_serverSignature.DoFinal(result, 0);
-        }
-        return result;
-    }
+    #region [ Methods ]
 
     public bool AuthenticateAsClient(Stream stream, byte[] additionalChallenge = null)
     {
-        if (additionalChallenge is null)
-            additionalChallenge = new byte[] { };
+        additionalChallenge ??= new byte[] { };
 
         byte[] clientNonce = m_nonce.Next();
         stream.WriteWithLength(m_usernameBytes);
@@ -154,6 +97,75 @@ public class ScramClient
         byte[] serverSignatureVerify = stream.ReadBytes();
         return serverSignature.SecureEquals(serverSignatureVerify);
     }
+
+    /// <summary>
+    /// Sets the server parameters and regenerates the salted password if
+    /// the salt values have changed.
+    /// </summary>
+    /// <param name="hashMethod">the hashing method</param>
+    /// <param name="salt">the salt for the user credentials.</param>
+    /// <param name="iterations">the number of iterations.</param>
+    private void SetServerValues(HashMethod hashMethod, byte[] salt, int iterations)
+    {
+        bool hasPasswordDataChanged = false;
+        bool hasHashMethodChanged = false;
+
+        if (m_salt is null || !salt.SecureEquals(m_salt))
+        {
+            hasPasswordDataChanged = true;
+            m_salt = salt;
+        }
+
+        if (iterations != m_iterations)
+        {
+            hasPasswordDataChanged = true;
+            m_iterations = iterations;
+        }
+
+        if (m_hashMethod != hashMethod)
+        {
+            m_hashMethod = hashMethod;
+            hasHashMethodChanged = true;
+        }
+
+        if (hasPasswordDataChanged)
+            m_saltedPassword = Scram.GenerateSaltedPassword(m_passwordBytes, m_salt, m_iterations);
+        if (hasPasswordDataChanged || hasHashMethodChanged)
+        {
+            m_serverKey = Scram.ComputeServerKey(m_hashMethod, m_saltedPassword);
+            m_clientKey = Scram.ComputeClientKey(m_hashMethod, m_saltedPassword);
+            m_storedKey = Scram.ComputeStoredKey(m_hashMethod, m_clientKey);
+            m_clientSignature = new HMac(Scram.CreateDigest(m_hashMethod));
+            m_clientSignature.Init(new KeyParameter(m_storedKey));
+
+            m_serverSignature = new HMac(Scram.CreateDigest(m_hashMethod));
+            m_serverSignature.Init(new KeyParameter(m_serverKey));
+        }
+    }
+
+    private byte[] ComputeClientSignature(byte[] authMessage)
+    {
+        byte[] result = new byte[m_clientSignature.GetMacSize()];
+        lock (m_clientSignature)
+        {
+            m_clientSignature.BlockUpdate(authMessage, 0, authMessage.Length);
+            m_clientSignature.DoFinal(result, 0);
+        }
+
+        return result;
+    }
+
+    private byte[] ComputeServerSignature(byte[] authMessage)
+    {
+        byte[] result = new byte[m_serverSignature.GetMacSize()];
+        lock (m_serverSignature)
+        {
+            m_serverSignature.BlockUpdate(authMessage, 0, authMessage.Length);
+            m_serverSignature.DoFinal(result, 0);
+        }
+
+        return result;
+    }
+
+    #endregion
 }
-
-

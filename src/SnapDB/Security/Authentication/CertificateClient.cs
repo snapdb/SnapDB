@@ -31,7 +31,13 @@ namespace SnapDB.Security.Authentication;
 
 public class CertificateClient
 {
+    #region [ Members ]
+
     private readonly NetworkCredential m_credentials;
+
+    #endregion
+
+    #region [ Constructors ]
 
     public CertificateClient()
     {
@@ -42,6 +48,10 @@ public class CertificateClient
     {
         m_credentials = new NetworkCredential(username, password, domain);
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     public bool AuthenticateAsClient(Stream stream)
     {
@@ -54,7 +64,9 @@ public class CertificateClient
         {
             return false;
         }
+
         return true;
     }
 
+    #endregion
 }

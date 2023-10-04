@@ -23,6 +23,7 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 using SnapDB.IO.FileStructure.Media;
 using SnapDB.IO.Unmanaged;
@@ -31,22 +32,22 @@ namespace SnapDB.IO.FileStructure;
 
 public partial class SubFileStream
 {
+    #region [ Members ]
+
     /// <summary>
     /// An IO Session for the sub file stream.
     /// </summary>
-    private unsafe class SimplifiedIoSession
-        : BinaryStreamIoSessionBase
+    private unsafe class SimplifiedIoSession : BinaryStreamIoSessionBase
     {
         #region [ Members ]
-
-        private readonly SubFileStream m_stream;
-
-        private bool m_disposed;
 
         private readonly int m_blockDataLength;
 
         private DiskIoSession m_dataIoSession;
 
+        private readonly SubFileStream m_stream;
+
+        private bool m_disposed;
 
         #endregion
 
@@ -64,44 +65,13 @@ public partial class SubFileStream
         #region [ Methods ]
 
         /// <summary>
-        /// Releases the unmanaged resources used by the <see cref="IoSession"/> object and optionally releases the managed resources.
-        /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (!m_disposed)
-            {
-                try
-                {
-                    // This will be done regardless of whether the object is finalized or disposed.
-
-                    if (disposing)
-                    {
-                        if (m_dataIoSession is not null)
-                        {
-                            m_dataIoSession.Dispose();
-                            m_dataIoSession = null;
-                        }
-
-                        // This will be done only when the object is disposed by calling Dispose().
-                    }
-                }
-                finally
-                {
-                    m_dataIoSession = null;
-                    m_disposed = true;          // Prevent duplicate dispose.
-                    base.Dispose(disposing);    // Call base class Dispose().
-                }
-            }
-        }
-
-        /// <summary>
         /// Sets the current usage of the <see cref="BinaryStreamIoSessionBase"/> to <c>null</c>.
         /// </summary>
         public override void Clear()
         {
             if (IsDisposed || m_dataIoSession.IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             m_dataIoSession.Clear();
         }
 
@@ -109,39 +79,70 @@ public partial class SubFileStream
         {
             int blockDataLength = m_blockDataLength;
             long pos = args.Position;
+
             if (IsDisposed || m_dataIoSession.IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
+
             if (pos < 0)
-                throw new ArgumentOutOfRangeException("position", "cannot be negative");
+                throw new ArgumentOutOfRangeException(nameof(args), "position cannot be negative");
+
             if (pos >= blockDataLength * (uint.MaxValue - 1))
-                throw new ArgumentOutOfRangeException("position", "position reaches past the end of the file.");
+                throw new ArgumentOutOfRangeException(nameof(args), "position reaches past the end of the file.");
 
             uint indexPosition;
 
-            if (pos <= uint.MaxValue) // 64-bit divide is twice as slow as 64-bit unsigned.
+            // 64-bit signed divide is twice as slow as 64-bit unsigned.
+            if (pos <= uint.MaxValue)
                 indexPosition = (uint)pos / (uint)blockDataLength;
             else
-                indexPosition = (uint)((ulong)pos / (ulong)blockDataLength); // 64-bit signed divide is twice as slow as 64-bit unsigned.
+                indexPosition = (uint)((ulong)pos / (ulong)blockDataLength);
 
             args.FirstPosition = indexPosition * blockDataLength;
             args.Length = blockDataLength;
 
             if (args.IsWriting)
-            {
                 throw new Exception("File is read only");
-            }
 
             // Reading
-            if (indexPosition >= m_stream.SubFile.DataBlockCount)
-                throw new ArgumentOutOfRangeException("position", "position reaches past the end of the file.");
-            
-            var physicalBlockIndex = m_stream.SubFile.DirectBlock + indexPosition;
+            if (indexPosition >= m_stream.SubFile!.DataBlockCount)
+                throw new ArgumentOutOfRangeException(nameof(args), "position reaches past the end of the file.");
+
+            uint physicalBlockIndex = m_stream.SubFile.DirectBlock + indexPosition;
 
             m_dataIoSession.Read(physicalBlockIndex, BlockType.DataBlock, indexPosition);
             args.FirstPointer = (nint)m_dataIoSession.Pointer;
             args.SupportsWriting = false;
         }
 
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="IoSession"/> object and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (m_disposed)
+                return;
+
+            try
+            {
+                if (!disposing)
+                    return;
+
+                if (m_dataIoSession is null)
+                    return;
+
+                m_dataIoSession.Dispose();
+            }
+            finally
+            {
+                m_dataIoSession = null!;
+                m_disposed = true; // Prevent duplicate dispose.
+                base.Dispose(disposing); // Call base class Dispose().
+            }
+        }
+
         #endregion
     }
+
+    #endregion
 }

@@ -25,9 +25,9 @@
 //******************************************************************************************************
 
 using Gemstone;
+using Gemstone.Diagnostics;
 using SnapDB.Collections;
 using SnapDB.IO.Unmanaged;
-using Gemstone.Diagnostics;
 
 namespace SnapDB.IO.FileStructure.Media;
 
@@ -37,18 +37,18 @@ namespace SnapDB.IO.FileStructure.Media;
 /// <remarks>
 /// This class is used by <see cref="BufferedFile"/> to decide which pages should be replaced.
 /// </remarks>
-internal partial class PageReplacementAlgorithm
-    : IDisposable
+internal partial class PageReplacementAlgorithm : IDisposable
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(PageReplacementAlgorithm), MessageClass.Component);
-
     #region [ Members ]
 
-    private bool m_disposed;
-    private readonly object m_syncRoot;
+    /// <summary>
+    /// Contains the currently active I/O sessions.
+    /// </summary>
+    private readonly WeakList<PageLock> m_arrayIndexLocks;
+
+    private readonly long m_maxValidPosition;
     private readonly int m_memoryPageSizeMask;
     private readonly int m_memoryPageSizeShiftBits;
-    private readonly long m_maxValidPosition;
 
     /// <summary>
     /// Contains a list of all the memory pages.
@@ -56,10 +56,9 @@ internal partial class PageReplacementAlgorithm
     /// <remarks>These items in the list are not in any particular order.</remarks>
     private readonly PageList m_pageList;
 
-    /// <summary>
-    /// Contains the currently active I/O sessions.
-    /// </summary>
-    private readonly WeakList<PageLock> m_arrayIndexLocks;
+    private readonly object m_syncRoot;
+
+    private bool m_disposed;
 
     #endregion
 
@@ -98,8 +97,6 @@ internal partial class PageReplacementAlgorithm
         m_arrayIndexLocks = new WeakList<PageLock>();
     }
 
-    #endregion
-
 #if DEBUG
     ~PageReplacementAlgorithm()
     {
@@ -108,14 +105,38 @@ internal partial class PageReplacementAlgorithm
     }
 #endif
 
+    #endregion
+
     #region [ Methods ]
+
+    /// <summary>
+    /// Releases all the resources used by the <see cref="PageReplacementAlgorithm"/> object.
+    /// </summary>
+    public void Dispose()
+    {
+        if (m_disposed)
+            return;
+
+        lock (m_syncRoot)
+        {
+            try
+            {
+                m_pageList.Dispose();
+            }
+            finally
+            {
+                GC.SuppressFinalize(this);
+                m_disposed = true; // Prevent duplicate dispose.
+            }
+        }
+    }
 
     // Two Methods Exist in PageLock subclass:
     // TryGetSubPage
     // GetOrAddPage
 
     /// <summary>
-    /// Attempts to add the page to this <see cref="PageReplacementAlgorithm"/>. 
+    /// Attempts to add the page to this <see cref="PageReplacementAlgorithm"/>.
     /// Fails if the page already exists.
     /// </summary>
     /// <param name="position">The absolute position that the page references</param>
@@ -140,7 +161,7 @@ internal partial class PageReplacementAlgorithm
 
             int positionIndex = (int)(position >> m_memoryPageSizeShiftBits);
 
-            if (m_pageList.TryGetPageIndex(positionIndex, out int pageIndex))
+            if (m_pageList.TryGetPageIndex(positionIndex, out int _))
                 return false;
 
             m_pageList.AddNewPage(positionIndex, locationOfPage, memoryPoolIndex);
@@ -178,27 +199,11 @@ internal partial class PageReplacementAlgorithm
         }
     }
 
-    /// <summary>
-    /// Releases all the resources used by the <see cref="PageReplacementAlgorithm"/> object.
-    /// </summary>
-    public void Dispose()
-    {
-        if (m_disposed)
-            return;
-        
-        lock (m_syncRoot)
-        {
-            try
-            {
-                m_pageList.Dispose();
-            }
-            finally
-            {
-                GC.SuppressFinalize(this);
-                m_disposed = true; // Prevent duplicate dispose.
-            }
-        }
-    }
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(PageReplacementAlgorithm), MessageClass.Component);
 
     #endregion
 }

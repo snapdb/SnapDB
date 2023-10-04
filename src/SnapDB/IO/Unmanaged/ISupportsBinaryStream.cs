@@ -29,9 +29,10 @@ namespace SnapDB.IO.Unmanaged;
 /// <summary>
 /// Implementing this interface allows a binary stream to be attached to a buffer.
 /// </summary>
-public interface ISupportsBinaryStream
-    : IDisposable
+public interface ISupportsBinaryStream : IDisposable
 {
+    #region [ Properties ]
+
     /// <summary>
     /// Gets the number of available simultaneous read and write sessions.
     /// </summary>
@@ -39,29 +40,26 @@ public interface ISupportsBinaryStream
     /// This value is used to determine if a binary stream can be cloned
     /// to improve read, write, and copy performance.
     /// </remarks>
-    int RemainingSupportedIoSessions
-    {
-        get;
-    }
+    int RemainingSupportedIoSessions { get; }
 
     /// <summary>
     /// Gets if the stream can be written to.
     /// </summary>
-    bool IsReadOnly
-    {
-        get;
-    }
+    bool IsReadOnly { get; }
 
     /// <summary>
     /// Gets if the stream has been disposed.
     /// </summary>
-    bool IsDisposed
-    {
-        get;
-    }
+    bool IsDisposed { get; }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Acquire an IO Session.
     /// </summary>
     BinaryStreamIoSessionBase CreateIoSession();
+
+    #endregion
 }

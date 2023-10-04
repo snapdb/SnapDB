@@ -37,11 +37,16 @@ namespace SnapDB.Snap;
 /// <typeparam name="T">The SnapTypeBase-derived type.</typeparam>
 /// <typeparam name="T">The SnapTypeBase-derived type.</typeparam>
 /// <typeparam name="T">The SnapTypeBase-derived type.</typeparam>
-public class SnapTypeCustomMethods<T>
-    where T : SnapTypeBase<T>, new()
+public class SnapTypeCustomMethods<T> where T : SnapTypeBase<T>, new()
 {
-    protected T TempKey = new();
+    #region [ Members ]
+
     protected int LastFoundIndex;
+    protected T TempKey = new();
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Performs a binary search within a memory block pointed to by <paramref name="pointer"/>.
@@ -72,7 +77,54 @@ public class SnapTypeCustomMethods<T>
                 return LastFoundIndex;
             }
         }
+
         return BinarySearch2(pointer, key, recordCount, keyValueSize);
+    }
+
+    /// <summary>
+    /// Gets if <paramref name="left"/> is greater than or equal to <paramref name="right"/>.
+    /// </summary>
+    /// <param name="left">The left operand to compare.</param>
+    /// <param name="right">The right operand to compare.</param>
+    /// <returns><c>true</c> if <paramref name="left"/> is greater than or equal to <paramref name="right"/>; otherwise, <c>false</c>.</returns>
+    public virtual unsafe bool IsGreaterThan(T left, byte* right)
+    {
+        return CompareTo(left, right) > 0;
+    }
+
+    /// <summary>
+    /// Gets if <paramref name="left"/> is greater than <paramref name="right"/>.
+    /// </summary>
+    /// <param name="left">The left operand to compare.</param>
+    /// <param name="right">The right operand to compare.</param>
+    /// <returns><c>true</c> if <paramref name="left"/> is greater than <paramref name="right"/>; otherwise, <c>false</c>.</returns>
+    public virtual unsafe bool IsGreaterThan(byte* left, T right)
+    {
+        return CompareTo(left, right) > 0;
+    }
+
+    /// <summary>
+    /// Compares <paramref name="left"/> to <paramref name="right"/>.
+    /// </summary>
+    /// <param name="left">The left operand to compare.</param>
+    /// <param name="right">The right operand to compare.</param>
+    /// <returns>A value indicating the relative order of <paramref name="left"/> and <paramref name="right"/>.</returns>
+    public virtual unsafe int CompareTo(T left, byte* right)
+    {
+        TempKey.Read(right);
+        return left.CompareTo(TempKey);
+    }
+
+    /// <summary>
+    /// Compares <paramref name="left"/> to <paramref name="right"/>.
+    /// </summary>
+    /// <param name="left">The left operand to compare.</param>
+    /// <param name="right">The right operand to compare.</param>
+    /// <returns>A value indicating the relative order of <paramref name="left"/> and <paramref name="right"/>.</returns>
+    public virtual unsafe int CompareTo(byte* left, T right)
+    {
+        TempKey.Read(left);
+        return TempKey.CompareTo(right);
     }
 
     /// <summary>
@@ -143,7 +195,7 @@ public class SnapTypeCustomMethods<T>
 
         while (searchLowerBoundsIndex <= searchHigherBoundsIndex)
         {
-            int currentTestIndex = searchLowerBoundsIndex + (searchHigherBoundsIndex - searchLowerBoundsIndex >> 1);
+            int currentTestIndex = searchLowerBoundsIndex + ((searchHigherBoundsIndex - searchLowerBoundsIndex) >> 1);
 
             compare = key.CompareTo(pointer + keyPointerSize * currentTestIndex);
 
@@ -152,6 +204,7 @@ public class SnapTypeCustomMethods<T>
                 LastFoundIndex = currentTestIndex;
                 return currentTestIndex;
             }
+
             if (compare > 0) // Key > CompareKey.
                 searchLowerBoundsIndex = currentTestIndex + 1;
             else
@@ -163,54 +216,5 @@ public class SnapTypeCustomMethods<T>
         return ~searchLowerBoundsIndex;
     }
 
-    #region [ Compare Operations ]
-
-    /// <summary>
-    /// Gets if <paramref name="left"/> is greater than or equal to <paramref name="right"/>.
-    /// </summary>
-    /// <param name="left">The left operand to compare.</param>
-    /// <param name="right">The right operand to compare.</param>
-    /// <returns><c>true</c> if <paramref name="left"/> is greater than or equal to <paramref name="right"/>; otherwise, <c>false</c>.</returns>
-    public virtual unsafe bool IsGreaterThan(T left, byte* right)
-    {
-        return CompareTo(left, right) > 0;
-    }
-
-    /// <summary>
-    /// Gets if <paramref name="left"/> is greater than <paramref name="right"/>.
-    /// </summary>
-    /// <param name="left">The left operand to compare.</param>
-    /// <param name="right">The right operand to compare.</param>
-    /// <returns><c>true</c> if <paramref name="left"/> is greater than <paramref name="right"/>; otherwise, <c>false</c>.</returns>
-    public virtual unsafe bool IsGreaterThan(byte* left, T right)
-    {
-        return CompareTo(left, right) > 0;
-    }
-
-    /// <summary>
-    /// Compares <paramref name="left"/> to <paramref name="right"/>.
-    /// </summary>
-    /// <param name="left">The left operand to compare.</param>
-    /// <param name="right">The right operand to compare.</param>
-    /// <returns>A value indicating the relative order of <paramref name="left"/> and <paramref name="right"/>.</returns>
-    public virtual unsafe int CompareTo(T left, byte* right)
-    {
-        TempKey.Read(right);
-        return left.CompareTo(TempKey);
-    }
-
-    /// <summary>
-    /// Compares <paramref name="left"/> to <paramref name="right"/>.
-    /// </summary>
-    /// <param name="left">The left operand to compare.</param>
-    /// <param name="right">The right operand to compare.</param>
-    /// <returns>A value indicating the relative order of <paramref name="left"/> and <paramref name="right"/>.</returns>
-    public virtual unsafe int CompareTo(byte* left, T right)
-    {
-        TempKey.Read(left);
-        return TempKey.CompareTo(right);
-    }
-
     #endregion
-
 }

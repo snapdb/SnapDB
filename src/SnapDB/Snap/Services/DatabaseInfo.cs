@@ -24,9 +24,9 @@
 //
 //******************************************************************************************************
 
-using SnapDB.IO;
 using System.Collections.ObjectModel;
 using System.Data;
+using SnapDB.IO;
 
 namespace SnapDB.Snap.Services;
 
@@ -35,6 +35,8 @@ namespace SnapDB.Snap.Services;
 /// </summary>
 public class DatabaseInfo
 {
+    #region [ Constructors ]
+
     /// <summary>
     /// Creates a <see cref="DatabaseInfo"/>
     /// </summary>
@@ -68,9 +70,7 @@ public class DatabaseInfo
                 int count = stream.ReadInt32();
                 EncodingDefinition[] definitions = new EncodingDefinition[count];
                 for (int x = 0; x < count; x++)
-                {
                     definitions[x] = new EncodingDefinition(stream);
-                }
                 SupportedStreamingModes = new ReadOnlyCollection<EncodingDefinition>(definitions);
                 KeyType = Library.GetSortedTreeType(KeyTypeId);
                 ValueType = Library.GetSortedTreeType(ValueTypeId);
@@ -79,6 +79,10 @@ public class DatabaseInfo
                 throw new VersionNotFoundException("Unknown version code.");
         }
     }
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets the name of the database
@@ -110,6 +114,10 @@ public class DatabaseInfo
     /// </summary>
     public ReadOnlyCollection<EncodingDefinition> SupportedStreamingModes { get; }
 
+    #endregion
+
+    #region [ Methods ]
+
     public void Save(BinaryStreamBase stream)
     {
         stream.Write((byte)1);
@@ -118,9 +126,8 @@ public class DatabaseInfo
         stream.Write(ValueTypeId);
         stream.Write(SupportedStreamingModes.Count);
         foreach (EncodingDefinition encoding in SupportedStreamingModes)
-        {
             encoding.Save(stream);
-        }
     }
 
+    #endregion
 }

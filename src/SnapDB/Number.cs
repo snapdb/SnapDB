@@ -10,7 +10,9 @@ namespace SnapDB;
 /// </summary>
 public static class Number
 {
-    private static readonly double[] s_powersOf10d = new double[] { 1f, 10f, 100f, 1000f, 10000f, 100000f, 1000000f, 10000000f, 100000000f, 1000000000f, 10000000000f, 100000000000f };
+    #region [ Static ]
+
+    private static readonly double[] s_powersOf10d = { 1f, 10f, 100f, 1000f, 10000f, 100000f, 1000000f, 10000000f, 100000000f, 1000000000f, 10000000000f, 100000000000f };
 
     /// <summary>
     /// Writes a floating-point value to a character array.
@@ -33,6 +35,7 @@ public static class Number
 
             return 3;
         }
+
         if (float.IsNegativeInfinity(value))
         {
             str[0] = 'n';
@@ -41,6 +44,7 @@ public static class Number
 
             return 3;
         }
+
         if (float.IsPositiveInfinity(value))
         {
             str[0] = 'n';
@@ -53,7 +57,7 @@ public static class Number
         if (value == 0)
         {
             str[0] = '0';
-            
+
             return 1;
         }
 
@@ -65,14 +69,12 @@ public static class Number
         const float zeroMax = 0.0001f;
         const float zeroMin = -0.0001f;
 
-        if (value > maxValue || value < minValue || value < zeroMax && value > zeroMin)
+        if (value > maxValue || value < minValue || (value < zeroMax && value > zeroMin))
         {
             // Not worth coding for this case.
             string T = value.ToString(CultureInfo.InvariantCulture);
             for (int x = 0; x < T.Length; x++)
-            {
                 str[pos + x] = T[pos + x];
-            }
 
             return T.Length;
         }
@@ -84,10 +86,7 @@ public static class Number
             pos++;
         }
 
-        int r = value >= 999999.5f ? 7 : value >= 99999.95f ? 6 : value >= 9999.995f ? 5 :
-            value >= 999.9995f ? 4 : value >= 99.99995f ? 3 : value >= 9.999995f ? 2 :
-            value >= 0.9999995f ? 1 : value >= 0.09999995f ? 0 : value >= 0.009999995f ? -1 :
-            value >= 0.0009999995f ? -2 : -3;
+        int r = value >= 999999.5f ? 7 : value >= 99999.95f ? 6 : value >= 9999.995f ? 5 : value >= 999.9995f ? 4 : value >= 99.99995f ? 3 : value >= 9.999995f ? 2 : value >= 0.9999995f ? 1 : value >= 0.09999995f ? 0 : value >= 0.009999995f ? -1 : value >= 0.0009999995f ? -2 : -3;
 
         int wholePrecision = r;
         int fracPrecision = 7 - r;
@@ -99,10 +98,8 @@ public static class Number
         double fraction = scaled - number;
 
         if (fraction >= 0.5)
-        {
             // Round
             number++;
-        }
 
         // Write the number
         ulong bcd = BinToReverseBcd(number);
@@ -138,8 +135,8 @@ public static class Number
             str[pos++] = (char)(48 + (bcd & 0xf));
             bcd >>= 4;
         }
-        return pos - position;
 
+        return pos - position;
     }
 
     private static int MeasureDigits(uint value)
@@ -180,7 +177,7 @@ public static class Number
         {
             if (value >= digits4)
                 return 4;
-            
+
             return 3;
         }
 
@@ -197,7 +194,7 @@ public static class Number
     /// <param name="destination">The character array where the value will be written.</param>
     /// <param name="position">The starting position in the character array.</param>
     /// <returns>The number of characters written to the array.</returns>
-        public static unsafe int WriteToChars2(this uint value, char[] destination, int position)
+    public static unsafe int WriteToChars2(this uint value, char[] destination, int position)
     {
         uint temp;
         int digits;
@@ -270,8 +267,7 @@ public static class Number
                 *wstr = (char)(48u + (value - temp * 10u));
                 wstr--;
                 value = temp;
-
-            } 
+            }
             while (value != 0);
 
             return digits;
@@ -317,7 +313,6 @@ public static class Number
 
         fixed (char* str = &destination[position])
         {
-
             if (value >= digits5)
             {
                 // 5,6,7,8,9,10
@@ -330,7 +325,6 @@ public static class Number
                     if (value >= digits9)
                         goto Digits9;
                     goto Digits8;
-
                 }
 
                 // 5,6,7
@@ -356,76 +350,290 @@ public static class Number
             goto Digits1;
 
 
+        Digits10:
 
-            Digits10:
+            if (value >= 4 * digits10)
+            {
+                value -= 4 * digits10;
+                digit += 4;
+            }
 
-            if (value >= 4 * digits10) { value -= 4 * digits10; digit += 4; }
-            if (value >= 2 * digits10) { value -= 2 * digits10; digit += 2; }
-            if (value >= 1 * digits10) { value -= 1 * digits10; digit += 1; }
-            str[pos] = (char)digit; pos += 1; digit = 48;
+            if (value >= 2 * digits10)
+            {
+                value -= 2 * digits10;
+                digit += 2;
+            }
+
+            if (value >= 1 * digits10)
+            {
+                value -= 1 * digits10;
+                digit += 1;
+            }
+
+            str[pos] = (char)digit;
+            pos += 1;
+            digit = 48;
 
         Digits9:
-            if (value >= 8 * digits9) { value -= 8 * digits9; digit += 8; }
-            if (value >= 4 * digits9) { value -= 4 * digits9; digit += 4; }
-            if (value >= 2 * digits9) { value -= 2 * digits9; digit += 2; }
-            if (value >= 1 * digits9) { value -= 1 * digits9; digit += 1; }
-            str[pos] = (char)digit; pos += 1; digit = 48;
+            if (value >= 8 * digits9)
+            {
+                value -= 8 * digits9;
+                digit += 8;
+            }
+
+            if (value >= 4 * digits9)
+            {
+                value -= 4 * digits9;
+                digit += 4;
+            }
+
+            if (value >= 2 * digits9)
+            {
+                value -= 2 * digits9;
+                digit += 2;
+            }
+
+            if (value >= 1 * digits9)
+            {
+                value -= 1 * digits9;
+                digit += 1;
+            }
+
+            str[pos] = (char)digit;
+            pos += 1;
+            digit = 48;
 
         Digits8:
-            if (value >= 8 * digits8) { value -= 8 * digits8; digit += 8; }
-            if (value >= 4 * digits8) { value -= 4 * digits8; digit += 4; }
-            if (value >= 2 * digits8) { value -= 2 * digits8; digit += 2; }
-            if (value >= 1 * digits8) { value -= 1 * digits8; digit += 1; }
-            str[pos] = (char)digit; pos += 1; digit = 48;
+            if (value >= 8 * digits8)
+            {
+                value -= 8 * digits8;
+                digit += 8;
+            }
+
+            if (value >= 4 * digits8)
+            {
+                value -= 4 * digits8;
+                digit += 4;
+            }
+
+            if (value >= 2 * digits8)
+            {
+                value -= 2 * digits8;
+                digit += 2;
+            }
+
+            if (value >= 1 * digits8)
+            {
+                value -= 1 * digits8;
+                digit += 1;
+            }
+
+            str[pos] = (char)digit;
+            pos += 1;
+            digit = 48;
 
         Digits7:
-            if (value >= 8 * digits7) { value -= 8 * digits7; digit += 8; }
-            if (value >= 4 * digits7) { value -= 4 * digits7; digit += 4; }
-            if (value >= 2 * digits7) { value -= 2 * digits7; digit += 2; }
-            if (value >= 1 * digits7) { value -= 1 * digits7; digit += 1; }
-            str[pos] = (char)digit; pos += 1; digit = 48;
+            if (value >= 8 * digits7)
+            {
+                value -= 8 * digits7;
+                digit += 8;
+            }
+
+            if (value >= 4 * digits7)
+            {
+                value -= 4 * digits7;
+                digit += 4;
+            }
+
+            if (value >= 2 * digits7)
+            {
+                value -= 2 * digits7;
+                digit += 2;
+            }
+
+            if (value >= 1 * digits7)
+            {
+                value -= 1 * digits7;
+                digit += 1;
+            }
+
+            str[pos] = (char)digit;
+            pos += 1;
+            digit = 48;
 
         Digits6:
-            if (value >= 8 * digits6) { value -= 8 * digits6; digit += 8; }
-            if (value >= 4 * digits6) { value -= 4 * digits6; digit += 4; }
-            if (value >= 2 * digits6) { value -= 2 * digits6; digit += 2; }
-            if (value >= 1 * digits6) { value -= 1 * digits6; digit += 1; }
-            str[pos] = (char)digit; pos += 1; digit = 48;
+            if (value >= 8 * digits6)
+            {
+                value -= 8 * digits6;
+                digit += 8;
+            }
+
+            if (value >= 4 * digits6)
+            {
+                value -= 4 * digits6;
+                digit += 4;
+            }
+
+            if (value >= 2 * digits6)
+            {
+                value -= 2 * digits6;
+                digit += 2;
+            }
+
+            if (value >= 1 * digits6)
+            {
+                value -= 1 * digits6;
+                digit += 1;
+            }
+
+            str[pos] = (char)digit;
+            pos += 1;
+            digit = 48;
 
         Digits5:
-            if (value >= 8 * digits5) { value -= 8 * digits5; digit += 8; }
-            if (value >= 4 * digits5) { value -= 4 * digits5; digit += 4; }
-            if (value >= 2 * digits5) { value -= 2 * digits5; digit += 2; }
-            if (value >= 1 * digits5) { value -= 1 * digits5; digit += 1; }
-            str[pos] = (char)digit; pos += 1; digit = 48;
+            if (value >= 8 * digits5)
+            {
+                value -= 8 * digits5;
+                digit += 8;
+            }
+
+            if (value >= 4 * digits5)
+            {
+                value -= 4 * digits5;
+                digit += 4;
+            }
+
+            if (value >= 2 * digits5)
+            {
+                value -= 2 * digits5;
+                digit += 2;
+            }
+
+            if (value >= 1 * digits5)
+            {
+                value -= 1 * digits5;
+                digit += 1;
+            }
+
+            str[pos] = (char)digit;
+            pos += 1;
+            digit = 48;
 
         Digits4:
-            if (value >= 8 * digits4) { value -= 8 * digits4; digit += 8; }
-            if (value >= 4 * digits4) { value -= 4 * digits4; digit += 4; }
-            if (value >= 2 * digits4) { value -= 2 * digits4; digit += 2; }
-            if (value >= 1 * digits4) { value -= 1 * digits4; digit += 1; }
-            str[pos] = (char)digit; pos += 1; digit = 48;
+            if (value >= 8 * digits4)
+            {
+                value -= 8 * digits4;
+                digit += 8;
+            }
+
+            if (value >= 4 * digits4)
+            {
+                value -= 4 * digits4;
+                digit += 4;
+            }
+
+            if (value >= 2 * digits4)
+            {
+                value -= 2 * digits4;
+                digit += 2;
+            }
+
+            if (value >= 1 * digits4)
+            {
+                value -= 1 * digits4;
+                digit += 1;
+            }
+
+            str[pos] = (char)digit;
+            pos += 1;
+            digit = 48;
 
         Digits3:
-            if (value >= 8 * digits3) { value -= 8 * digits3; digit += 8; }
-            if (value >= 4 * digits3) { value -= 4 * digits3; digit += 4; }
-            if (value >= 2 * digits3) { value -= 2 * digits3; digit += 2; }
-            if (value >= 1 * digits3) { value -= 1 * digits3; digit += 1; }
-            str[pos] = (char)digit; pos += 1; digit = 48;
+            if (value >= 8 * digits3)
+            {
+                value -= 8 * digits3;
+                digit += 8;
+            }
+
+            if (value >= 4 * digits3)
+            {
+                value -= 4 * digits3;
+                digit += 4;
+            }
+
+            if (value >= 2 * digits3)
+            {
+                value -= 2 * digits3;
+                digit += 2;
+            }
+
+            if (value >= 1 * digits3)
+            {
+                value -= 1 * digits3;
+                digit += 1;
+            }
+
+            str[pos] = (char)digit;
+            pos += 1;
+            digit = 48;
 
         Digits2:
-            if (value >= 8 * digits2) { value -= 8 * digits2; digit += 8; }
-            if (value >= 4 * digits2) { value -= 4 * digits2; digit += 4; }
-            if (value >= 2 * digits2) { value -= 2 * digits2; digit += 2; }
-            if (value >= 1 * digits2) { value -= 1 * digits2; digit += 1; }
-            str[pos] = (char)digit; pos += 1; digit = 48;
+            if (value >= 8 * digits2)
+            {
+                value -= 8 * digits2;
+                digit += 8;
+            }
+
+            if (value >= 4 * digits2)
+            {
+                value -= 4 * digits2;
+                digit += 4;
+            }
+
+            if (value >= 2 * digits2)
+            {
+                value -= 2 * digits2;
+                digit += 2;
+            }
+
+            if (value >= 1 * digits2)
+            {
+                value -= 1 * digits2;
+                digit += 1;
+            }
+
+            str[pos] = (char)digit;
+            pos += 1;
+            digit = 48;
 
         Digits1:
-            if (value >= 8 * digits1) { value -= 8 * digits1; digit += 8; }
-            if (value >= 4 * digits1) { value -= 4 * digits1; digit += 4; }
-            if (value >= 2 * digits1) { value -= 2 * digits1; digit += 2; }
-            if (value >= 1 * digits1) { value -= 1 * digits1; digit += 1; }
-            str[pos] = (char)digit; pos += 1; digit = 48;
+            if (value >= 8 * digits1)
+            {
+                value -= 8 * digits1;
+                digit += 8;
+            }
+
+            if (value >= 4 * digits1)
+            {
+                value -= 4 * digits1;
+                digit += 4;
+            }
+
+            if (value >= 2 * digits1)
+            {
+                value -= 2 * digits1;
+                digit += 2;
+            }
+
+            if (value >= 1 * digits1)
+            {
+                value -= 1 * digits1;
+                digit += 1;
+            }
+
+            str[pos] = (char)digit;
+            pos += 1;
+            digit = 48;
 
             return pos;
         }
@@ -445,10 +653,11 @@ public static class Number
             uint temp = value / 10u;
             result = (result << 4) | (byte)(value - temp * 10u);
             value = temp;
-
-        } while (value != 0);
+        }
+        while (value != 0);
 
         return result;
     }
 
+    #endregion
 }

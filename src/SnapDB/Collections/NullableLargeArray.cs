@@ -36,8 +36,14 @@ namespace SnapDB.Collections;
 /// <typeparam name="T">Array type.</typeparam>
 public class NullableLargeArray<T> : IEnumerable<T?>
 {
-    private readonly LargeArray<T?> m_list;
+    #region [ Members ]
+
     private readonly BitArray m_isUsed;
+    private readonly LargeArray<T?> m_list;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a <see cref="NullableLargeArray{T}"/>.
@@ -47,6 +53,40 @@ public class NullableLargeArray<T> : IEnumerable<T?>
         m_list = new LargeArray<T?>();
         m_isUsed = new BitArray(false, m_list.Capacity);
     }
+
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// Gets the number of items that can be stored in the array.
+    /// </summary>
+    public int Capacity => m_list.Capacity;
+
+    /// <summary>
+    /// Gets the number of non-null items that are in the array.
+    /// </summary>
+    public int CountUsed => m_isUsed.SetCount;
+
+    /// <summary>
+    /// Gets the number of available spaces in the array. Equal to <see cref="Capacity"/> - <see cref="CountUsed"/>.
+    /// </summary>
+    public int CountFree => m_isUsed.ClearCount;
+
+    /// <summary>
+    /// Gets the provided item from the array.
+    /// </summary>
+    /// <param name="index">The index of the item.</param>
+    /// <returns>The item at the specified index.</returns>
+    public T? this[int index]
+    {
+        get => GetValue(index);
+        set => SetValue(index, value);
+    }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Checks if the element at the specified index has a value.
@@ -81,32 +121,6 @@ public class NullableLargeArray<T> : IEnumerable<T?>
 
         value = default;
         return false;
-    }
-
-    /// <summary>
-    /// Gets the number of items that can be stored in the array.
-    /// </summary>
-    public int Capacity => m_list.Capacity;
-
-    /// <summary>
-    /// Gets the number of non-null items that are in the array.
-    /// </summary>
-    public int CountUsed => m_isUsed.SetCount;
-
-    /// <summary>
-    /// Gets the number of available spaces in the array. Equal to <see cref="Capacity"/> - <see cref="CountUsed"/>.
-    /// </summary>
-    public int CountFree => m_isUsed.ClearCount;
-
-    /// <summary>
-    /// Gets the provided item from the array. 
-    /// </summary>
-    /// <param name="index">The index of the item.</param>
-    /// <returns>The item at the specified index.</returns>
-    public T? this[int index]
-    {
-        get => GetValue(index);
-        set => SetValue(index, value);
     }
 
     /// <summary>
@@ -201,6 +215,20 @@ public class NullableLargeArray<T> : IEnumerable<T?>
     }
 
     /// <summary>
+    /// Clears all elements in the list
+    /// </summary>
+    public void Clear()
+    {
+        m_list.Clear();
+        m_isUsed.ClearAll();
+    }
+
+    private int FindFirstEmptyIndex()
+    {
+        return m_isUsed.FindClearedBit();
+    }
+
+    /// <summary>
     /// Returns an enumerator that iterates through the non-null elements of this collection.
     /// </summary>
     /// <returns>
@@ -212,22 +240,10 @@ public class NullableLargeArray<T> : IEnumerable<T?>
         return m_isUsed.GetAllSetBits().Select(index => m_list[index]).GetEnumerator();
     }
 
-    private int FindFirstEmptyIndex()
-    {
-        return m_isUsed.FindClearedBit();
-    }
-
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
     }
 
-    /// <summary>
-    /// Clears all elements in the list
-    /// </summary>
-    public void Clear()
-    {
-        m_list.Clear();
-        m_isUsed.ClearAll();
-    }
+    #endregion
 }

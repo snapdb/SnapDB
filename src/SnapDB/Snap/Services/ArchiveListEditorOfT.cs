@@ -34,11 +34,9 @@ namespace SnapDB.Snap.Services;
 /// until <see cref="ArchiveListEditor.Dispose"/> is called. Therefore, keep locks to a minimum and always
 /// use a Using block.
 /// </summary>
-public abstract class ArchiveListEditor<TKey, TValue>
-    : ArchiveListEditor
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public abstract class ArchiveListEditor<TKey, TValue> : ArchiveListEditor where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Methods ]
 
     /// <summary>
     /// Adds an archive file to the list with the given state information.
@@ -46,4 +44,5 @@ public abstract class ArchiveListEditor<TKey, TValue>
     /// <param name="sortedTree">archive table to add</param>
     public abstract void Add(SortedTreeTable<TKey, TValue> sortedTree);
 
+    #endregion
 }

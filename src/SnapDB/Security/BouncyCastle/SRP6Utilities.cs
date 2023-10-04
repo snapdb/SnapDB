@@ -28,6 +28,8 @@ namespace Org.BouncyCastle.Crypto.Agreement.Srp;
 
 internal static class Srp6Utilities
 {
+    #region [ Static ]
+
     public static BigInteger CalculateK(IDigest digest, BigInteger n, BigInteger g)
     {
         return HashPaddedPair(digest, n, n, g);
@@ -95,7 +97,7 @@ internal static class Srp6Utilities
     }
 
     /// <summary>
-    /// Pads a byte[] to the specified length, 
+    /// Pads a byte[] to the specified length,
     /// with zeroes at the start of the buffer.
     /// </summary>
     /// <param name="n"></param>
@@ -110,10 +112,12 @@ internal static class Srp6Utilities
             Array.Copy(bs, 0, tmp, length - bs.Length, bs.Length);
             bs = tmp;
         }
+
         return bs;
     }
+
     /// <summary>
-    /// Gets the byte representation of <see cref="n"/> that is padded to 
+    /// Gets the byte representation of <see cref="n"/> that is padded to
     /// match the byte length of <see cref="length"/>.
     /// </summary>
     /// <param name="n"></param>
@@ -123,4 +127,6 @@ internal static class Srp6Utilities
     {
         return GetPadded(n, length);
     }
+
+    #endregion
 }

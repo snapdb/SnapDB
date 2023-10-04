@@ -26,68 +26,6 @@ namespace SnapDB.Snap.Tree;
 
 public partial class SortedTreeNodeBase<TKey, TValue>
 {
-    //private TKey[] m_keys;
-    //private TValue[] m_values;
-
-    //public TKey[] Keys
-    //{
-    //    get
-    //    {
-    //        BuildKeyList();
-    //        return m_keys;
-    //    }
-    //}
-
-    //public TValue[] Values
-    //{
-    //    get
-    //    {
-    //        BuildKeyList();
-    //        return m_values;
-    //    }
-    //}
-
-    //public void WriteNodeData(StringBuilder sb)
-    //{
-    //    BuildKeyList();
-    //    sb.AppendLine(string.Format("Node Index: {0} Record Count: {1} Node Level: {2} " +
-    //                                "Right Sibling: {3} Left Sibling: {4} Lower Key: {5} Upper Key: {6}", NodeIndex, RecordCount,
-    //                                Level, RightSiblingNodeIndex, LeftSiblingNodeIndex, LowerKey, UpperKey));
-
-    //    foreach (TKey key in m_keys)
-    //    {
-    //        sb.Append(key.ToString());
-    //        sb.Append("\t");
-    //    }
-    //    sb.AppendLine();
-
-    //    foreach (TValue value in m_values)
-    //    {
-    //        sb.Append(value.ToString());
-    //        sb.Append("\t");
-    //    }
-    //    sb.AppendLine();
-    //}
-
-    //private void BuildKeyList()
-    //{
-    //    if (m_keys is null || m_keys.Length != RecordCount)
-    //    {
-    //        m_keys = new TKey[RecordCount];
-    //        m_values = new TValue[RecordCount];
-
-    //        for (int x = 0; x < RecordCount; x++)
-    //        {
-    //            m_keys[x] = new TKey();
-    //            m_values[x] = new TValue();
-    //        }
-    //    }
-    //    for (int x = 0; x < RecordCount; x++)
-    //    {
-    //        Read(x, m_keys[x], m_values[x]);
-    //    }
-    //}
-
     #region [ Methods ]
 
     /// <summary>
@@ -97,10 +35,9 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     {
         //Only need to do a seek if I'm not already on the first node.
         if (NodeIndex == uint.MaxValue || LeftSiblingNodeIndex != uint.MaxValue)
-        {
             SetNodeIndex(SparseIndex.GetFirstIndex(Level));
-        }
     }
+
     /// <summary>
     /// Seeks to the last node at this level of the tree
     /// </summary>
@@ -108,9 +45,7 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     {
         //Only need to do a seek if I'm not already on the last node.
         if (NodeIndex == uint.MaxValue || RightSiblingNodeIndex != uint.MaxValue)
-        {
             SetNodeIndex(SparseIndex.GetLastIndex(Level));
-        }
     }
 
     /// <summary>
@@ -197,6 +132,7 @@ public partial class SortedTreeNodeBase<TKey, TValue>
                 return;
             }
         }
+
         Read(index, value);
     }
 
@@ -217,6 +153,7 @@ public partial class SortedTreeNodeBase<TKey, TValue>
             Read(index, value);
             return true;
         }
+
         return TryGet2(key, value);
     }
 
@@ -241,4 +178,66 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     }
 
     #endregion
+
+    //private TKey[] m_keys;
+    //private TValue[] m_values;
+
+    //public TKey[] Keys
+    //{
+    //    get
+    //    {
+    //        BuildKeyList();
+    //        return m_keys;
+    //    }
+    //}
+
+    //public TValue[] Values
+    //{
+    //    get
+    //    {
+    //        BuildKeyList();
+    //        return m_values;
+    //    }
+    //}
+
+    //public void WriteNodeData(StringBuilder sb)
+    //{
+    //    BuildKeyList();
+    //    sb.AppendLine(string.Format("Node Index: {0} Record Count: {1} Node Level: {2} " +
+    //                                "Right Sibling: {3} Left Sibling: {4} Lower Key: {5} Upper Key: {6}", NodeIndex, RecordCount,
+    //                                Level, RightSiblingNodeIndex, LeftSiblingNodeIndex, LowerKey, UpperKey));
+
+    //    foreach (TKey key in m_keys)
+    //    {
+    //        sb.Append(key.ToString());
+    //        sb.Append("\t");
+    //    }
+    //    sb.AppendLine();
+
+    //    foreach (TValue value in m_values)
+    //    {
+    //        sb.Append(value.ToString());
+    //        sb.Append("\t");
+    //    }
+    //    sb.AppendLine();
+    //}
+
+    //private void BuildKeyList()
+    //{
+    //    if (m_keys is null || m_keys.Length != RecordCount)
+    //    {
+    //        m_keys = new TKey[RecordCount];
+    //        m_values = new TValue[RecordCount];
+
+    //        for (int x = 0; x < RecordCount; x++)
+    //        {
+    //            m_keys[x] = new TKey();
+    //            m_values[x] = new TValue();
+    //        }
+    //    }
+    //    for (int x = 0; x < RecordCount; x++)
+    //    {
+    //        Read(x, m_keys[x], m_values[x]);
+    //    }
+    //}
 }

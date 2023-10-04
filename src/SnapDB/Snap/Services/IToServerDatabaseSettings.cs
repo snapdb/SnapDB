@@ -26,16 +26,18 @@
 
 namespace SnapDB.Snap.Services;
 
-
 /// <summary>
 /// Allows the creation of <see cref="ServerDatabaseSettings"/> from a class that implements this method.
 /// </summary>
 public interface IToServerDatabaseSettings
 {
+    #region [ Methods ]
 
     /// <summary>
     /// Creates a <see cref="ServerDatabaseSettings"/> configuration that can be used for <see cref="SnapServerDatabase{TKey,TValue}"/>
     /// </summary>
     /// <returns></returns>
     ServerDatabaseSettings ToServerDatabaseSettings();
+
+    #endregion
 }

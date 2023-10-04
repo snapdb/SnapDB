@@ -26,32 +26,28 @@
 
 namespace SnapDB.Snap.Tree;
 
-
-public class InsertStreamHelper<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class InsertStreamHelper<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
-    public bool IsStillSequential;
-    public bool IsValid;
+    #region [ Members ]
+
     /// <summary>
     /// Determines if Key1 and Value1 are the current keys.
     /// Otherwise Key1 and Value2 are.
     /// </summary>
     public bool IsKvp1;
+
+    public bool IsStillSequential;
+    public bool IsValid;
     public TKey Key1;
     public TKey Key2;
+
+    public TreeStream<TKey, TValue> Stream;
     public TValue Value1;
     public TValue Value2;
 
-    public TreeStream<TKey, TValue> Stream;
+    #endregion
 
-    public TKey Key => IsKvp1 ? Key1 : Key2;
-
-    public TValue Value => IsKvp1 ? Value1 : Value2;
-
-    public TKey PrevKey => IsKvp1 ? Key2 : Key1;
-
-    public TValue PrevValue => IsKvp1 ? Value2 : Value1;
+    #region [ Constructors ]
 
     public InsertStreamHelper(TreeStream<TKey, TValue> stream)
     {
@@ -75,6 +71,22 @@ public class InsertStreamHelper<TKey, TValue>
         }
     }
 
+    #endregion
+
+    #region [ Properties ]
+
+    public TKey Key => IsKvp1 ? Key1 : Key2;
+
+    public TValue Value => IsKvp1 ? Value1 : Value2;
+
+    public TKey PrevKey => IsKvp1 ? Key2 : Key1;
+
+    public TValue PrevValue => IsKvp1 ? Value2 : Value1;
+
+    #endregion
+
+    #region [ Methods ]
+
     public void Next()
     {
         if (IsKvp1)
@@ -90,6 +102,7 @@ public class InsertStreamHelper<TKey, TValue>
             IsKvp1 = true;
         }
     }
+
     public void NextDoNotCheckSequential()
     {
         if (IsKvp1)
@@ -106,4 +119,5 @@ public class InsertStreamHelper<TKey, TValue>
         }
     }
 
+    #endregion
 }

@@ -32,13 +32,27 @@ namespace SnapDB.Snap.Services;
 /// until <see cref="Dispose"/> is called. Therefore, keep locks to a minimum and always
 /// use a Using block.
 /// </summary>
-public abstract class ArchiveListEditor
-    : IDisposable
+public abstract class ArchiveListEditor : IDisposable
 {
+    #region [ Members ]
+
     private bool m_disposed;
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
-    /// Renews the snapshot of the archive file. This will acquire the latest 
+    /// Releases all the resources used by the <see cref="ArchiveListEditor"/> object.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Renews the snapshot of the archive file. This will acquire the latest
     /// read transaction so all new snapshots will use this later version.
     /// </summary>
     /// <param name="archiveId">the ID of the archive snapshot to renew</param>
@@ -70,26 +84,15 @@ public abstract class ArchiveListEditor
     public abstract bool TryRemoveAndDelete(Guid archiveId);
 
     /// <summary>
-    /// Releases all the resources used by the <see cref="ArchiveListEditor"/> object.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
     /// Releases the unmanaged resources used by the <see cref="ArchiveListEditor"/> object and optionally releases the managed resources.
     /// </summary>
     /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
         if (!m_disposed)
-        {
             try
             {
                 // This will be done regardless of whether the object is finalized or disposed.
-
                 if (disposing)
                 {
                     // This will be done only when the object is disposed by calling Dispose().
@@ -97,8 +100,9 @@ public abstract class ArchiveListEditor
             }
             finally
             {
-                m_disposed = true;  // Prevent duplicate dispose.
+                m_disposed = true; // Prevent duplicate dispose.
             }
-        }
     }
+
+    #endregion
 }

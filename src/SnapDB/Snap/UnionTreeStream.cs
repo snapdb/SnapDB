@@ -31,19 +31,23 @@ namespace SnapDB.Snap;
 /// </summary>
 /// <typeparam name="TKey">The key type.</typeparam>
 /// <typeparam name="TValue">The value type.</typeparam>
-public partial class UnionTreeStream<TKey, TValue>
-    : TreeStream<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public partial class UnionTreeStream<TKey, TValue> : TreeStream<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
-    private BufferedTreeStream[] m_tablesOrigList;
-    private readonly UnionTreeStreamSortHelper m_sortedArchiveStreams;
+    #region [ Members ]
+
     private TreeStream<TKey, TValue> m_firstStream;
     private BufferedTreeStream m_firstTable;
 
-    private readonly TKey m_readWhileUpperBounds = new();
     private readonly TKey m_nextArchiveStreamLowerBounds = new();
     private readonly bool m_ownsStreams;
+
+    private readonly TKey m_readWhileUpperBounds = new();
+    private readonly UnionTreeStreamSortHelper m_sortedArchiveStreams;
+    private BufferedTreeStream[] m_tablesOrigList;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UnionTreeStream{TKey, TValue}"/> class.
@@ -60,42 +64,23 @@ public partial class UnionTreeStream<TKey, TValue>
         m_readWhileUpperBounds.SetMin();
 
         foreach (BufferedTreeStream table1 in m_sortedArchiveStreams.Items)
-        {
             table1.EnsureCache();
-        }
         m_sortedArchiveStreams.Sort();
 
         //Remove any duplicates
         RemoveDuplicatesIfExists();
 
         if (m_sortedArchiveStreams.Items.Length > 0)
-        {
             m_firstTable = m_sortedArchiveStreams[0];
-        }
         else
-        {
             m_firstTable = null;
-        }
 
         SetReadWhileUpperBoundsValue();
     }
 
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="UnionTreeStream{TKey, TValue}"/> and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (m_tablesOrigList is not null && m_ownsStreams)
-        {
-            foreach (BufferedTreeStream table in m_tablesOrigList)
-            {
-                table.Dispose();
-            }
-            m_tablesOrigList = null;
-        }
-        base.Dispose(disposing);
-    }
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets a value indicating whether this stream is always sequential.
@@ -106,7 +91,27 @@ public partial class UnionTreeStream<TKey, TValue>
     /// Gets a value indicating that this stream never contains duplicate values.
     /// </summary>
     public override bool NeverContainsDuplicates => true;
-        
+
+    #endregion
+
+    #region [ Methods ]
+
+    /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="UnionTreeStream{TKey, TValue}"/> and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (m_tablesOrigList is not null && m_ownsStreams)
+        {
+            foreach (BufferedTreeStream table in m_tablesOrigList)
+                table.Dispose();
+            m_tablesOrigList = null;
+        }
+
+        base.Dispose(disposing);
+    }
+
     /// <summary>
     /// Reads the next key-value pair from the stream.
     /// </summary>
@@ -118,11 +123,10 @@ public partial class UnionTreeStream<TKey, TValue>
         if (m_firstStream is not null && m_firstStream.Read(key, value))
         {
             if (key.IsLessThan(m_readWhileUpperBounds))
-            {
                 return true;
-            }
             m_firstTable.WriteToCache(key, value);
         }
+
         return Read2(key, value);
     }
 
@@ -142,6 +146,7 @@ public partial class UnionTreeStream<TKey, TValue>
                 m_firstStream = m_firstTable.Stream;
                 return true;
             }
+
             // The end of the steam has been reached.
             return false;
         }
@@ -188,9 +193,7 @@ public partial class UnionTreeStream<TKey, TValue>
         {
             //If only 1 stream, we can't resort, so we are done.
             if (!m_sortedArchiveStreams[0].IsValid)
-            {
                 return false;
-            }
         }
 
         m_firstStream = null; //Ensure that the if block is executed when repeating this function call.
@@ -198,7 +201,6 @@ public partial class UnionTreeStream<TKey, TValue>
     }
 
     //-------------------------------------------------------------
-
 
 
     /// <summary>
@@ -220,7 +222,7 @@ public partial class UnionTreeStream<TKey, TValue>
             return 1;
         if (!item2.IsValid)
             return -1;
-        return item1.CacheKey.CompareTo(item2.CacheKey);// item1.CurrentKey.CompareTo(item2.CurrentKey);
+        return item1.CacheKey.CompareTo(item2.CacheKey); // item1.CurrentKey.CompareTo(item2.CurrentKey);
     }
 
     /// <summary>
@@ -229,19 +231,14 @@ public partial class UnionTreeStream<TKey, TValue>
     private void RemoveDuplicatesIfExists()
     {
         if (m_sortedArchiveStreams.Items.Length > 1)
-        {
             if (CompareStreams(m_sortedArchiveStreams[0], m_sortedArchiveStreams[1]) == 0 && m_sortedArchiveStreams[0].IsValid)
-            {
                 //If a duplicate entry is found, advance the position of the duplicate entry
                 RemoveDuplicatesFromList();
-            }
-        }
     }
 
     /// <summary>
     /// Call this function when the same point exists in multiple archive files. It will
     /// read past the duplicate point in all other archive files and then resort the tables.
-    /// 
     /// Assums that the archiveStream's cached value is current.
     /// </summary>
     private void RemoveDuplicatesFromList()
@@ -251,7 +248,6 @@ public partial class UnionTreeStream<TKey, TValue>
 
         int lastDuplicateIndex = -1;
         for (int index = 1; index < m_sortedArchiveStreams.Items.Length; index++)
-        {
             if (CompareStreams(m_sortedArchiveStreams[0], m_sortedArchiveStreams[index]) == 0)
             {
                 m_sortedArchiveStreams[index].ReadToCache();
@@ -261,7 +257,6 @@ public partial class UnionTreeStream<TKey, TValue>
             {
                 break;
             }
-        }
 
         //Resorts the list in reverse order.
         for (int j = lastDuplicateIndex; j > 0; j--)
@@ -269,22 +264,19 @@ public partial class UnionTreeStream<TKey, TValue>
     }
 
     /// <summary>
-    /// Sets the read while upper bounds value. 
-    /// Which is the lesser of 
+    /// Sets the read while upper bounds value.
+    /// Which is the lesser of
     /// The first point in the adjacent table or
     /// The end of the current seek window.
-    ///  </summary>
+    /// </summary>
     private void SetReadWhileUpperBoundsValue()
     {
         if (m_sortedArchiveStreams.Items.Length > 1 && m_sortedArchiveStreams[1].IsValid)
-        {
             m_sortedArchiveStreams[1].CacheKey.CopyTo(m_nextArchiveStreamLowerBounds);
-        }
         else
-        {
             m_nextArchiveStreamLowerBounds.SetMax();
-        }
         m_nextArchiveStreamLowerBounds.CopyTo(m_readWhileUpperBounds);
     }
 
+    #endregion
 }

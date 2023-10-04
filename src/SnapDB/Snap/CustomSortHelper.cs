@@ -32,12 +32,18 @@ namespace SnapDB.Snap;
 /// <typeparam name="T">The type of items to be sorted.</typeparam>
 public class CustomSortHelper<T>
 {
+    #region [ Members ]
+
     /// <summary>
     /// All of the items in this list.
     /// </summary>
     public T[] Items;
 
     private readonly Func<T, T, bool> m_isLessThan;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new custom sort helper and presorts the list.
@@ -51,6 +57,10 @@ public class CustomSortHelper<T>
         Sort();
     }
 
+    #endregion
+
+    #region [ Properties ]
+
     /// <summary>
     /// Indexer to get or set the specified item in the list.
     /// </summary>
@@ -61,6 +71,10 @@ public class CustomSortHelper<T>
         get => Items[index];
         set => Items[index] = value;
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Resorts the entire list using an insertion sort routine.
@@ -81,6 +95,7 @@ public class CustomSortHelper<T>
                 Items[currentIndex + 1] = Items[currentIndex];
                 currentIndex--;
             }
+
             Items[currentIndex + 1] = itemToInsert;
         }
     }
@@ -100,7 +115,9 @@ public class CustomSortHelper<T>
             Items[currentIndex - 1] = Items[currentIndex];
             currentIndex++;
         }
+
         Items[currentIndex - 1] = itemToMove;
     }
 
+    #endregion
 }

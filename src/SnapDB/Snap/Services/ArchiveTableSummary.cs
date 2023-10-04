@@ -32,9 +32,7 @@ namespace SnapDB.Snap.Services;
 /// Contains an immutable class of the current table
 /// along with its most recent snapshot.
 /// </summary>
-public class ArchiveTableSummary<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class ArchiveTableSummary<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Constructors ]
 

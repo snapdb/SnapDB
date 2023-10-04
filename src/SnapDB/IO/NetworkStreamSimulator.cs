@@ -32,10 +32,18 @@ namespace SnapDB.IO;
 /// </summary>
 public class NetworkStreamSimulator
 {
+    #region [ Members ]
+
     private class InternalStreams : Stream
     {
-        private readonly IsolatedQueue<byte> m_sendQueue;
+        #region [ Members ]
+
         private readonly IsolatedQueue<byte> m_receiveQueue;
+        private readonly IsolatedQueue<byte> m_sendQueue;
+
+        #endregion
+
+        #region [ Constructors ]
 
         public InternalStreams(IsolatedQueue<byte> sendQueue, IsolatedQueue<byte> receiveQueue)
         {
@@ -43,18 +51,37 @@ public class NetworkStreamSimulator
             m_receiveQueue = receiveQueue;
         }
 
+        #endregion
+
+        #region [ Properties ]
+
+        public override bool CanRead => true;
+
+        public override bool CanSeek => false;
+
+        public override bool CanWrite => true;
+
+        public override long Length => throw new NotSupportedException();
+
+        public override long Position
+        {
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
+        }
+
+        #endregion
+
+        #region [ Methods ]
+
         public override void Flush()
         {
-
         }
 
         public override int Read(byte[] buffer, int offset, int count)
         {
             int bytesRead = 0;
             while (bytesRead < count)
-            {
                 bytesRead += m_receiveQueue.Dequeue(buffer, offset + bytesRead, count - bytesRead);
-            }
             return bytesRead;
         }
 
@@ -86,32 +113,25 @@ public class NetworkStreamSimulator
             throw new NotSupportedException();
         }
 
-        public override bool CanRead => true;
-
-        public override bool CanSeek => false;
-
-        public override bool CanWrite => true;
-
-        public override long Length => throw new NotSupportedException();
-
-        public override long Position
-        {
-            get => throw new NotSupportedException();
-            set => throw new NotSupportedException();
-        }
+        #endregion
     }
-
-    private readonly IsolatedQueue<byte> m_queueA;
-    private readonly IsolatedQueue<byte> m_queueB;
 
     /// <summary>
     /// The client's stream.
     /// </summary>
     public readonly Stream ClientStream;
+
     /// <summary>
     /// The server's stream.
     /// </summary>
     public readonly Stream ServerStream;
+
+    private readonly IsolatedQueue<byte> m_queueA;
+    private readonly IsolatedQueue<byte> m_queueB;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new <see cref="NetworkStreamSimulator"/>.
@@ -125,5 +145,5 @@ public class NetworkStreamSimulator
         ServerStream = new InternalStreams(m_queueB, m_queueA);
     }
 
-
+    #endregion
 }

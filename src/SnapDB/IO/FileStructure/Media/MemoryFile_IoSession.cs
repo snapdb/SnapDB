@@ -34,13 +34,20 @@ namespace SnapDB.IO.FileStructure.Media;
 /// </summary>
 internal partial class MemoryPoolFile
 {
+    #region [ Members ]
+
     /// <summary>
     /// An I/O session for the <see cref="MemoryPoolFile"/>.
     /// </summary>
-    private class IoSession
-        : BinaryStreamIoSessionBase
+    private class IoSession : BinaryStreamIoSessionBase
     {
+        #region [ Members ]
+
         private readonly MemoryPoolFile m_file;
+
+        #endregion
+
+        #region [ Constructors ]
 
         /// <summary>
         /// Creates a new <see cref="IoSession"/>.
@@ -50,6 +57,10 @@ internal partial class MemoryPoolFile
         {
             m_file = file;
         }
+
+        #endregion
+
+        #region [ Methods ]
 
         /// <summary>
         /// Retrieves a data block based on the provided <see cref="BlockArguments"/>.
@@ -77,5 +88,9 @@ internal partial class MemoryPoolFile
         public override void Clear()
         {
         }
+
+        #endregion
     }
+
+    #endregion
 }

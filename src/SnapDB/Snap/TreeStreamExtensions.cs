@@ -31,6 +31,8 @@ namespace SnapDB.Snap;
 /// </summary>
 public static class TreeStreamExtensions
 {
+    #region [ Static ]
+
     /// <summary>
     /// Parses an entire stream to count the number of items. Notice, this will
     /// enumerate the stream, and the stream will have to be reset to be enumerated again.
@@ -39,9 +41,7 @@ public static class TreeStreamExtensions
     /// <typeparam name="TValue">The value type.</typeparam>
     /// <param name="stream">The stream to enumerate.</param>
     /// <returns>The number of items in the stream.</returns>
-    public static long Count<TKey, TValue>(this TreeStream<TKey, TValue> stream)
-        where TKey : class, new()
-        where TValue : class, new()
+    public static long Count<TKey, TValue>(this TreeStream<TKey, TValue> stream) where TKey : class, new() where TValue : class, new()
     {
         TKey key = new();
         TValue value = new();
@@ -51,4 +51,5 @@ public static class TreeStreamExtensions
         return cnt;
     }
 
+    #endregion
 }

@@ -31,6 +31,8 @@ namespace SnapDB;
 /// </summary>
 public static class DateTimeExtensions
 {
+    #region [ Static ]
+
     /// <summary>
     /// Rounds down a <see cref="DateTime"/> value to the nearest day.
     /// </summary>
@@ -95,4 +97,6 @@ public static class DateTimeExtensions
     {
         return new DateTime(value.Ticks - value.Ticks % TimeSpan.TicksPerMillisecond, value.Kind);
     }
+
+    #endregion
 }

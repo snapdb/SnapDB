@@ -35,55 +35,36 @@ public enum MemoryPoolCollectionMode
     /// This means no collection has to occur.
     /// </summary>
     None,
+
     /// <summary>
     /// This is the routine mode.
     /// </summary>
     Normal,
+
     /// <summary>
     /// This means the engine is using more memory than desired.
     /// </summary>
     Emergency,
+
     /// <summary>
-    /// This means any memory that can be released should be released. 
+    /// This means any memory that can be released should be released.
     /// If no memory is released after this pass, an out of memory exception will occur.
     /// </summary>
     Critical
 }
 
 /// <summary>
-/// Initializes a new instance of the <see cref="CollectionEventArgs"/> class.
+/// Represents a collection of event arguments.
 /// </summary>
-/// <param name="releasePage">The action to release a page.</param>
-/// <param name="collectionMode">The memory pool collection mode.</param>
-/// <param name="desiredPageReleaseCount">The desired number of pages to release during collection.</param>
-/// <remarks>
-/// This constructor initializes a new instance of the <see cref="CollectionEventArgs"/> class.
-/// It sets the desired page release count, the action to release a page, and the memory pool collection mode.
-/// </remarks>
 public class CollectionEventArgs : EventArgs
 {
+    #region [ Members ]
+
     private readonly Action<int> m_releasePage;
 
-    /// <summary>
-    /// When <see cref="CollectionMode"/> is <see cref="MemoryPoolCollectionMode.Emergency"/> or 
-    /// <see cref="MemoryPoolCollectionMode.Critical"/> this field contains the number of pages
-    /// that need to be released by all of the objects. This value will automatically decrement
-    /// every time a page has been released.
-    /// </summary>
-    public int DesiredPageReleaseCount
-    {
-        get;
-        private set;
-    }
+    #endregion
 
-    /// <summary>
-    /// The mode for the collection.
-    /// </summary>
-    public MemoryPoolCollectionMode CollectionMode
-    {
-        get;
-        private set;
-    }
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new <see cref="CollectionEventArgs"/>.
@@ -98,6 +79,27 @@ public class CollectionEventArgs : EventArgs
         CollectionMode = collectionMode;
     }
 
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// When <see cref="CollectionMode"/> is <see cref="MemoryPoolCollectionMode.Emergency"/> or
+    /// <see cref="MemoryPoolCollectionMode.Critical"/> this field contains the number of pages
+    /// that need to be released by all of the objects. This value will automatically decrement
+    /// every time a page has been released.
+    /// </summary>
+    public int DesiredPageReleaseCount { get; private set; }
+
+    /// <summary>
+    /// The mode for the collection.
+    /// </summary>
+    public MemoryPoolCollectionMode CollectionMode { get; private set; }
+
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Releases an unused page.
     /// </summary>
@@ -107,4 +109,6 @@ public class CollectionEventArgs : EventArgs
         m_releasePage(index);
         DesiredPageReleaseCount--;
     }
+
+    #endregion
 }

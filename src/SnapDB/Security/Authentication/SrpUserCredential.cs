@@ -24,27 +24,28 @@
 //
 //******************************************************************************************************
 
+using System.Text;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Math;
-using System.Text;
 
 namespace SnapDB.Security.Authentication;
-
 
 /// <summary>
 /// An individual server side user credential
 /// </summary>
 public class SrpUserCredential
 {
-    /// <summary>
-    /// Session Resume Key Name
-    /// </summary>
-    public readonly Guid ServerKeyName = Guid.NewGuid();
+    #region [ Members ]
 
     /// <summary>
-    /// Session Resume HMAC key
+    /// The number of SHA512 iterations using PBKDF2
     /// </summary>
-    public readonly byte[] ServerHmacKey = SaltGenerator.Create(32);
+    public readonly int Iterations;
+
+    /// <summary>
+    /// The salt used to compute the password bytes (x)
+    /// </summary>
+    public readonly byte[] Salt;
 
     /// <summary>
     /// Session Resume Encryption Key
@@ -52,31 +53,40 @@ public class SrpUserCredential
     public readonly byte[] ServerEncryptionkey = SaltGenerator.Create(32);
 
     /// <summary>
+    /// Session Resume HMAC key
+    /// </summary>
+    public readonly byte[] ServerHmacKey = SaltGenerator.Create(32);
+
+    /// <summary>
+    /// Session Resume Key Name
+    /// </summary>
+    public readonly Guid ServerKeyName = Guid.NewGuid();
+
+    /// <summary>
+    /// The bit strength of the SRP algorithm.
+    /// </summary>
+    public readonly SrpStrength SrpStrength;
+
+    /// <summary>
     /// The normalized name of the user
     /// </summary>
     public readonly string UserName;
 
     public readonly byte[] UsernameBytes;
-    /// <summary>
-    /// The salt used to compute the password bytes (x)
-    /// </summary>
-    public readonly byte[] Salt;
+
     /// <summary>
     /// The Srp server verification bytes. (Computed as g^x % N)
     /// </summary>
     public readonly byte[] Verification;
-    /// <summary>
-    /// The number of SHA512 iterations using PBKDF2
-    /// </summary>
-    public readonly int Iterations;
-    /// <summary>
-    /// The bit strength of the SRP algorithm.
-    /// </summary>
-    public readonly SrpStrength SrpStrength;
+
     /// <summary>
     /// <see cref="Verification"/> as a <see cref="BigInteger"/>.
     /// </summary>
     public readonly BigInteger VerificationInteger;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates user credentials
@@ -138,18 +148,17 @@ public class SrpUserCredential
         VerificationInteger = new BigInteger(1, Verification);
     }
 
+    #endregion
 
+    #region [ Methods ]
 
     public void Save()
     {
-
     }
 
     public void Load()
     {
-
     }
 
+    #endregion
 }
-
-

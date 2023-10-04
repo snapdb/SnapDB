@@ -31,11 +31,15 @@ namespace SnapDB.Snap;
 /// </summary>
 /// <typeparam name="TKey">The key associated with the point.</typeparam>
 /// <typeparam name="TValue">The value associated with the point.</typeparam>
-public abstract class TreeStream<TKey, TValue> : IDisposable
-    where TKey : class, new()
-    where TValue : class, new()
+public abstract class TreeStream<TKey, TValue> : IDisposable where TKey : class, new() where TValue : class, new()
 {
+    #region [ Members ]
+
     private bool m_disposed;
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Boolean indicating that the end of the stream has been read or class has been disposed.
@@ -43,19 +47,43 @@ public abstract class TreeStream<TKey, TValue> : IDisposable
     public bool Eos { get; private set; }
 
     /// <summary>
-    /// Gets if the stream is always in sequential order. Do not return true unless it is guaranteed that 
+    /// Gets if the stream is always in sequential order. Do not return true unless it is guaranteed that
     /// the data read from this stream is sequential.
     /// </summary>
     public virtual bool IsAlwaysSequential => false;
 
     /// <summary>
-    /// Gets if the stream will never return duplicate keys. Do not return true unless it is guaranteed that 
+    /// Gets if the stream will never return duplicate keys. Do not return true unless it is guaranteed that
     /// the data read from this stream will never contain duplicates.
     /// </summary>
     public virtual bool NeverContainsDuplicates => false;
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
-    /// Advances the stream to the next value. 
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// </summary>
+    /// <filterpriority>2</filterpriority>
+    public void Dispose()
+    {
+        if (!m_disposed)
+            try
+            {
+                Dispose(true);
+            }
+            finally
+            {
+                Eos = true;
+                m_disposed = true;
+            }
+
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Advances the stream to the next value.
     /// If before the beginning of the stream, advances to the first value
     /// </summary>
     /// <returns><c>true</c> if the advance was successful; otherwise, <c>false</c> if the end of the stream was reached.</returns>
@@ -66,6 +94,7 @@ public abstract class TreeStream<TKey, TValue> : IDisposable
             EndOfStreamReached();
             return false;
         }
+
         return true;
     }
 
@@ -92,34 +121,13 @@ public abstract class TreeStream<TKey, TValue> : IDisposable
     }
 
     /// <summary>
-    /// Advances the stream to the next value. 
+    /// Advances the stream to the next value.
     /// If before the beginning of the stream, advances to the first value
     /// </summary>
     /// <returns>
     /// <c>true</c> if the advance was successful; <c>false</c> if the end of the stream was reached.
     /// </returns>
     protected abstract bool ReadNext(TKey key, TValue value);
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-    /// </summary>
-    /// <filterpriority>2</filterpriority>
-    public void Dispose()
-    {
-        if (!m_disposed)
-        {
-            try
-            {
-                Dispose(true);
-            }
-            finally
-            {
-                Eos = true;
-                m_disposed = true;
-            }
-        }
-        GC.SuppressFinalize(this);
-    }
 
     /// <summary>
     /// Releases the unmanaged resources used by the <see cref="TreeStream{TKey,TValue}"/> object and optionally releases the managed resources.
@@ -129,4 +137,6 @@ public abstract class TreeStream<TKey, TValue> : IDisposable
     {
         Eos = true;
     }
+
+    #endregion
 }

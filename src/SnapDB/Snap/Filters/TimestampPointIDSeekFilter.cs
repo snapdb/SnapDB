@@ -25,8 +25,8 @@
 //******************************************************************************************************
 
 using System.Runtime.CompilerServices;
-using SnapDB.Snap.Types;
 using SnapDB.IO;
+using SnapDB.Snap.Types;
 
 namespace SnapDB.Snap.Filters;
 
@@ -35,36 +35,19 @@ namespace SnapDB.Snap.Filters;
 /// </summary>
 public static class TimestampPointIdSeekFilter
 {
-    /// <summary>
-    /// Creates a filter for the specified timestamp and point ID.
-    /// </summary>
-    /// <param name="timestamp">The specific timestamp to find.</param>
-    /// <param name="pointId">The specific point ID to find.</param>
-    /// <returns>Seek filter to find specific key.</returns>
-    public static SeekFilterBase<TKey> FindKey<TKey>(ulong timestamp, ulong pointId)
-        where TKey : TimestampPointIdBase<TKey>, new()
-    {
-        return new SeekToKey<TKey>(timestamp, pointId);
-    }
+    #region [ Members ]
 
-    /// <summary>
-    /// Loads a <see cref="SeekFilterBase{TKey}"/> from the provided <see cref="stream"/>.
-    /// </summary>
-    /// <param name="stream">The stream to load the filter from.</param>
-    /// <returns>Seek filter to find specific key.</returns>
-    [MethodImpl(MethodImplOptions.NoOptimization)]
-    private static SeekFilterBase<TKey> CreateFromStream<TKey>(BinaryStreamBase stream)
-        where TKey : TimestampPointIdBase<TKey>, new()
+    private class SeekToKey<TKey> : SeekFilterBase<TKey> where TKey : TimestampPointIdBase<TKey>, new()
     {
-        return new SeekToKey<TKey>(stream);
-    }
+        #region [ Members ]
 
-    private class SeekToKey<TKey>
-        : SeekFilterBase<TKey>
-        where TKey : TimestampPointIdBase<TKey>, new()
-    {
-        private readonly TKey m_keyToFind;
         private bool m_isEndReached;
+
+        private readonly TKey m_keyToFind;
+
+        #endregion
+
+        #region [ Constructors ]
 
         private SeekToKey()
         {
@@ -79,8 +62,7 @@ public static class TimestampPointIdSeekFilter
         /// Creates a filter by reading from the stream.
         /// </summary>
         /// <param name="stream">The stream to read from.</param>
-        public SeekToKey(BinaryStreamBase stream)
-            : this()
+        public SeekToKey(BinaryStreamBase stream) : this()
         {
             m_keyToFind.Timestamp = stream.ReadUInt64();
             m_keyToFind.PointId = stream.ReadUInt64();
@@ -93,14 +75,23 @@ public static class TimestampPointIdSeekFilter
         /// </summary>
         /// <param name="timestamp">The specific timestamp to find.</param>
         /// <param name="pointId">The specific point ID to find.</param>
-        public SeekToKey(ulong timestamp, ulong pointId)
-            : this()
+        public SeekToKey(ulong timestamp, ulong pointId) : this()
         {
             m_keyToFind.Timestamp = timestamp;
             m_keyToFind.PointId = pointId;
             m_keyToFind.CopyTo(StartOfRange);
             m_keyToFind.CopyTo(EndOfRange);
         }
+
+        #endregion
+
+        #region [ Properties ]
+
+        public override Guid FilterType => TimestampPointIdSeekFilterDefinition.FilterGuid;
+
+        #endregion
+
+        #region [ Methods ]
 
         /// <summary>
         /// Gets the next search window.
@@ -117,7 +108,7 @@ public static class TimestampPointIdSeekFilter
         }
 
         /// <summary>
-        /// Resets the iterative nature of the filter. 
+        /// Resets the iterative nature of the filter.
         /// </summary>
         public override void Reset()
         {
@@ -134,6 +125,34 @@ public static class TimestampPointIdSeekFilter
             stream.Write(m_keyToFind.PointId);
         }
 
-        public override Guid FilterType => TimestampPointIdSeekFilterDefinition.FilterGuid;
+        #endregion
     }
+
+    #endregion
+
+    #region [ Static ]
+
+    /// <summary>
+    /// Creates a filter for the specified timestamp and point ID.
+    /// </summary>
+    /// <param name="timestamp">The specific timestamp to find.</param>
+    /// <param name="pointId">The specific point ID to find.</param>
+    /// <returns>Seek filter to find specific key.</returns>
+    public static SeekFilterBase<TKey> FindKey<TKey>(ulong timestamp, ulong pointId) where TKey : TimestampPointIdBase<TKey>, new()
+    {
+        return new SeekToKey<TKey>(timestamp, pointId);
+    }
+
+    /// <summary>
+    /// Loads a <see cref="SeekFilterBase{TKey}"/> from the provided <see cref="stream"/>.
+    /// </summary>
+    /// <param name="stream">The stream to load the filter from.</param>
+    /// <returns>Seek filter to find specific key.</returns>
+    [MethodImpl(MethodImplOptions.NoOptimization)]
+    private static SeekFilterBase<TKey> CreateFromStream<TKey>(BinaryStreamBase stream) where TKey : TimestampPointIdBase<TKey>, new()
+    {
+        return new SeekToKey<TKey>(stream);
+    }
+
+    #endregion
 }

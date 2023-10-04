@@ -30,13 +30,29 @@ namespace SnapDB.Snap.Tree.Specialized;
 /// Contains basic data about a node in the SortedTree.
 /// </summary>
 /// <typeparam name="TKey">The key that the SortedTree contains.</typeparam>
-public unsafe class NodeHeader<TKey>
-    where TKey : SnapTypeBase<TKey>, new()
+public unsafe class NodeHeader<TKey> where TKey : SnapTypeBase<TKey>, new()
 {
+    #region [ Members ]
+
     /// <summary>
-    /// The offset of the version field within the node header.
+    /// The version of the node header.
     /// </summary>
-    protected const int OffsetOfVersion = 0;
+    public const byte Version = 0;
+
+    /// <summary>
+    /// The size, in bytes, of an index field.
+    /// </summary>
+    protected const int IndexSize = sizeof(uint);
+
+    /// <summary>
+    /// The offset of the left sibling node index field within the node header.
+    /// </summary>
+    protected const int OffsetOfLeftSibling = OffsetOfValidBytes + sizeof(ushort);
+
+    /// <summary>
+    /// The offset of the lower bounds field within the node header.
+    /// </summary>
+    protected const int OffsetOfLowerBounds = OffsetOfRightSibling + IndexSize;
 
     /// <summary>
     /// The offset of the node level field within the node header.
@@ -49,69 +65,24 @@ public unsafe class NodeHeader<TKey>
     protected const int OffsetOfRecordCount = OffsetOfNodeLevel + sizeof(byte);
 
     /// <summary>
-    /// The offset of the valid bytes field within the node header.
-    /// </summary>
-    protected const int OffsetOfValidBytes = OffsetOfRecordCount + sizeof(ushort);
-
-    /// <summary>
-    /// The offset of the left sibling node index field within the node header.
-    /// </summary>
-    protected const int OffsetOfLeftSibling = OffsetOfValidBytes + sizeof(ushort);
-
-    /// <summary>
     /// The offset of the right sibling node index field within the node header.
     /// </summary>
     protected const int OffsetOfRightSibling = OffsetOfLeftSibling + IndexSize;
 
     /// <summary>
-    /// The offset of the lower bounds field within the node header.
+    /// The offset of the valid bytes field within the node header.
     /// </summary>
-    protected const int OffsetOfLowerBounds = OffsetOfRightSibling + IndexSize;
+    protected const int OffsetOfValidBytes = OffsetOfRecordCount + sizeof(ushort);
 
     /// <summary>
-    /// The size, in bytes, of an index field.
+    /// The offset of the version field within the node header.
     /// </summary>
-    protected const int IndexSize = sizeof(uint);
+    protected const int OffsetOfVersion = 0;
 
     /// <summary>
-    /// The version of the node header.
+    /// The size, in bytes, of the node block.
     /// </summary>
-    public const byte Version = 0;
-
-    /// <summary>
-    /// The level of the node within the B-tree structure.
-    /// </summary>
-    public readonly byte Level;
-
-    /// <summary>
-    /// The number of records within the node.
-    /// </summary>
-    public ushort RecordCount;
-
-    /// <summary>
-    /// The number of valid bytes within the node.
-    /// </summary>
-    public ushort ValidBytes;
-
-    /// <summary>
-    /// The index of the left sibling node.
-    /// </summary>
-    public uint LeftSiblingNodeIndex;
-
-    /// <summary>
-    /// The index of the right sibling node.
-    /// </summary>
-    public uint RightSiblingNodeIndex;
-
-    /// <summary>
-    /// The lower key associated with the node.
-    /// </summary>
-    public TKey LowerKey;
-
-    /// <summary>
-    /// The upper key associated with the node.
-    /// </summary>
-    public TKey UpperKey;
+    public int BlockSize;
 
     /// <summary>
     /// The size, in bytes, of a key.
@@ -119,14 +90,48 @@ public unsafe class NodeHeader<TKey>
     public int KeySize;
 
     /// <summary>
+    /// The index of the left sibling node.
+    /// </summary>
+    public uint LeftSiblingNodeIndex;
+
+    /// <summary>
+    /// The level of the node within the B-tree structure.
+    /// </summary>
+    public readonly byte Level;
+
+    /// <summary>
+    /// The lower key associated with the node.
+    /// </summary>
+    public TKey LowerKey;
+
+    /// <summary>
     /// The index of the node.
     /// </summary>
     public uint NodeIndex;
 
     /// <summary>
-    /// The size, in bytes, of the node block.
+    /// The number of records within the node.
     /// </summary>
-    public int BlockSize;
+    public ushort RecordCount;
+
+    /// <summary>
+    /// The index of the right sibling node.
+    /// </summary>
+    public uint RightSiblingNodeIndex;
+
+    /// <summary>
+    /// The upper key associated with the node.
+    /// </summary>
+    public TKey UpperKey;
+
+    /// <summary>
+    /// The number of valid bytes within the node.
+    /// </summary>
+    public ushort ValidBytes;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// The constructor that is used for inheriting. Must call Initialize before using it.
@@ -141,6 +146,10 @@ public unsafe class NodeHeader<TKey>
         UpperKey = new TKey();
         KeySize = UpperKey.Size;
     }
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets the byte offset of the upper bounds key.
@@ -159,6 +168,10 @@ public unsafe class NodeHeader<TKey>
     /// <param name="blockSize">The size, in bytes, of the node block.</param>
     public ushort RemainingBytes => (ushort)(BlockSize - ValidBytes);
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Saves the node header data to a memory location pointed to by a byte pointer.
     /// </summary>
@@ -175,4 +188,5 @@ public unsafe class NodeHeader<TKey>
         UpperKey.Write(ptr + OffsetOfUpperBounds);
     }
 
+    #endregion
 }

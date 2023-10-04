@@ -27,26 +27,31 @@
 //
 //******************************************************************************************************
 
-using Gemstone.Diagnostics;
-using SnapDB.Security;
 using System.Net.Sockets;
 using System.Text;
+using Gemstone.Diagnostics;
+using SnapDB.Security;
 
 namespace SnapDB.Snap.Services.Net;
 
 /// <summary>
 /// Hosts a <see cref="SnapServer"/> on a network socket.
 /// </summary>
-public class SnapSocketListener
-    : DisposableLoggingClassBase
+public class SnapSocketListener : DisposableLoggingClassBase
 {
+    #region [ Members ]
+
+    private readonly SecureStreamServer<SocketUserPermissions> m_authenticator;
+    private readonly List<SnapNetworkServer> m_clients = new();
     private volatile bool m_isRunning;
     private readonly TcpListener m_listener;
     private SnapServer m_server;
-    private bool m_disposed;
-    private readonly List<SnapNetworkServer> m_clients = new();
     private readonly SnapSocketListenerSettings m_settings;
-    private readonly SecureStreamServer<SocketUserPermissions> m_authenticator;
+    private bool m_disposed;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a <see cref="SnapSocketListener"/>
@@ -54,8 +59,7 @@ public class SnapSocketListener
     /// <param name="settings"></param>
     /// <param name="server"></param>
     /// <param name="parent"></param>
-    public SnapSocketListener(SnapSocketListenerSettings settings, SnapServer server)
-        : base(MessageClass.Framework)
+    public SnapSocketListener(SnapSocketListenerSettings settings, SnapServer server) : base(MessageClass.Framework)
     {
         if (settings is null)
             throw new ArgumentNullException(nameof(settings));
@@ -67,24 +71,10 @@ public class SnapSocketListener
         m_authenticator = new SecureStreamServer<SocketUserPermissions>();
 
         if (settings.DefaultUserCanRead || settings.DefaultUserCanWrite || settings.DefaultUserIsAdmin)
-        {
-            m_authenticator.SetDefaultUser(true, new SocketUserPermissions
-            {
-                CanRead = settings.DefaultUserCanRead,
-                CanWrite = settings.DefaultUserCanWrite,
-                IsAdmin = settings.DefaultUserIsAdmin
-            });
-        }
+            m_authenticator.SetDefaultUser(true, new SocketUserPermissions { CanRead = settings.DefaultUserCanRead, CanWrite = settings.DefaultUserCanWrite, IsAdmin = settings.DefaultUserIsAdmin });
 
         foreach (string user in settings.Users)
-        {
-            m_authenticator.AddUserIntegratedSecurity(user, new SocketUserPermissions
-            {
-                CanRead = true,
-                CanWrite = true,
-                IsAdmin = true
-            });
-        }
+            m_authenticator.AddUserIntegratedSecurity(user, new SocketUserPermissions { CanRead = true, CanWrite = true, IsAdmin = true });
 
         m_isRunning = true;
 
@@ -96,6 +86,10 @@ public class SnapSocketListener
         new Thread(ProcessDataRequests) { IsBackground = true }.Start();
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Gets the status of the <see cref="SnapSocketListener"/>.
     /// </summary>
@@ -106,10 +100,40 @@ public class SnapSocketListener
         {
             status.AppendFormat("Active Client Count: {0}\r\n", m_clients.Count);
             foreach (SnapNetworkServer client in m_clients)
-            {
                 client.GetFullStatus(status);
-            }
         }
+    }
+
+    /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="SnapSocketListener"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (!m_disposed)
+            try
+            {
+                if (!disposing)
+                    return;
+
+                m_isRunning = false;
+
+                m_listener?.Stop();
+
+                m_server = null;
+
+                lock (m_clients)
+                {
+                    foreach (SnapNetworkServer client in m_clients)
+                        client.Dispose();
+                    m_clients.Clear();
+                }
+            }
+            finally
+            {
+                m_disposed = true; // Prevent duplicate dispose.
+                base.Dispose(disposing); // Call base class Dispose().
+            }
     }
 
     /// <summary>
@@ -177,40 +201,6 @@ public class SnapSocketListener
         }
     }
 
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="SnapSocketListener"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (!m_disposed)
-        {
-            try
-            {
-                if (!disposing)
-                    return;
-
-                m_isRunning = false;
-
-                m_listener?.Stop();
-
-                m_server = null;
-
-                lock (m_clients)
-                {
-                    foreach (SnapNetworkServer client in m_clients)
-                        client.Dispose();
-                    m_clients.Clear();
-                }
-            }
-            finally
-            {
-                m_disposed = true;          // Prevent duplicate dispose.
-                base.Dispose(disposing);    // Call base class Dispose().
-            }
-        }
-    }
-
     private void TryShutdownSocket(TcpClient client)
     {
         try
@@ -224,4 +214,6 @@ public class SnapSocketListener
             Log.Publish(MessageLevel.Debug, "SnapConnectionReset", null, null, ex);
         }
     }
+
+    #endregion
 }

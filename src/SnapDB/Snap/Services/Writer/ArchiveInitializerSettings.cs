@@ -24,25 +24,30 @@
 //
 //******************************************************************************************************
 
+using System.Data;
 using Gemstone.IO.StreamExtensions;
 using SnapDB.Immutables;
 using SnapDB.IO;
-using System.Data;
 
 namespace SnapDB.Snap.Services.Writer;
 
 /// <summary>
 /// Settings for <see cref="ArchiveInitializer{TKey,TValue}"/>.
 /// </summary>
-public class ArchiveInitializerSettings
-    : SettingsBase<ArchiveInitializerSettings>
+public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSettings>
 {
+    #region [ Members ]
+
+    private long m_desiredRemainingSpace;
     private ArchiveDirectoryMethod m_directoryMethod;
+    private EncodingDefinition m_encodingMethod;
+    private string m_fileExtension;
     private bool m_isMemoryArchive;
     private string m_prefix;
-    private string m_fileExtension;
-    private long m_desiredRemainingSpace;
-    private EncodingDefinition m_encodingMethod;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new <see cref="ArchiveInitializerSettings"/>.
@@ -52,21 +57,9 @@ public class ArchiveInitializerSettings
         Initialize();
     }
 
-    private void Initialize()
-    {
-        m_directoryMethod = ArchiveDirectoryMethod.TopDirectoryOnly;
-        m_isMemoryArchive = false;
-        m_prefix = string.Empty;
-        m_fileExtension = ".d2i";
-        m_desiredRemainingSpace = 5 * 1024 * 1024 * 1024L; //5GB
-        m_encodingMethod = EncodingDefinition.FixedSizeCombinedEncoding;
-        WritePath = new ImmutableList<string>((x) =>
-        {
-            PathHelpers.ValidatePathName(x);
-            return x;
-        });
-        Flags = new ImmutableList<Guid>();
-    }
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets the method that the directory structure will follow when writing a new file.
@@ -155,7 +148,7 @@ public class ArchiveInitializerSettings
     }
 
     /// <summary>
-    /// The desired number of bytes to leave on the disk after a rollover has completed. 
+    /// The desired number of bytes to leave on the disk after a rollover has completed.
     /// Otherwise, pick a different directory or throw an out of disk space exception.
     /// </summary>
     /// <remarks>
@@ -177,6 +170,10 @@ public class ArchiveInitializerSettings
                 m_desiredRemainingSpace = value;
         }
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Creates a <see cref="ArchiveInitializer{TKey,TValue}"/> that will reside in memory.
@@ -229,16 +226,12 @@ public class ArchiveInitializerSettings
         stream.Write(WritePath.Count);
 
         foreach (string path in WritePath)
-        {
             stream.Write(path);
-        }
 
         stream.Write(Flags.Count);
 
         foreach (Guid flag in Flags)
-        {
             stream.Write(flag);
-        }
     }
 
     public override void Load(Stream stream)
@@ -272,11 +265,11 @@ public class ArchiveInitializerSettings
                     cnt--;
                     Flags.Add(stream.ReadGuid());
                 }
+
                 break;
 
             default:
                 throw new VersionNotFoundException("Unknown Version Code: " + version);
-
         }
     }
 
@@ -293,4 +286,21 @@ public class ArchiveInitializerSettings
                 Directory.CreateDirectory(path);
     }
 
+    private void Initialize()
+    {
+        m_directoryMethod = ArchiveDirectoryMethod.TopDirectoryOnly;
+        m_isMemoryArchive = false;
+        m_prefix = string.Empty;
+        m_fileExtension = ".d2i";
+        m_desiredRemainingSpace = 5 * 1024 * 1024 * 1024L; //5GB
+        m_encodingMethod = EncodingDefinition.FixedSizeCombinedEncoding;
+        WritePath = new ImmutableList<string>(x =>
+        {
+            PathHelpers.ValidatePathName(x);
+            return x;
+        });
+        Flags = new ImmutableList<Guid>();
+    }
+
+    #endregion
 }

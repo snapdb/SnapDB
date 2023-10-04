@@ -26,8 +26,8 @@
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 using System.Data;
-using SnapDB.IO.Unmanaged;
 using Gemstone.Diagnostics;
+using SnapDB.IO.Unmanaged;
 
 namespace SnapDB.IO.FileStructure.Media;
 
@@ -36,20 +36,19 @@ namespace SnapDB.IO.FileStructure.Media;
 /// </summary>
 internal unsafe class DiskIoSession : IDisposable
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(DiskIoSession), MessageClass.Component);
-
     #region [ Members ]
 
-    private DiskIo m_diskIo;
     private readonly BlockArguments m_args;
-
-    private readonly bool m_isReadOnly;
     private readonly int m_blockSize;
-    private readonly ushort m_fileIdNumber;
-    private readonly uint m_snapshotSequenceNumber;
-    private readonly uint m_lastReadonlyBlock;
+
+    private DiskIo m_diskIo;
 
     private BinaryStreamIoSessionBase m_diskMediumIoSession;
+    private readonly ushort m_fileIdNumber;
+
+    private readonly bool m_isReadOnly;
+    private readonly uint m_lastReadonlyBlock;
+    private readonly uint m_snapshotSequenceNumber;
 
     #endregion
 
@@ -101,66 +100,65 @@ internal unsafe class DiskIoSession : IDisposable
     /// <summary>
     /// Returns <c>true</c> if this class is disposed.
     /// </summary>
-    public bool IsDisposed
-    {
-        get;
-        private set;
-    }
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Gets if the block in this I/O Session is valid.
     /// </summary>
-    public bool IsValid
-    {
-        get;
-        private set;
-    }
+    public bool IsValid { get; private set; }
 
     /// <summary>
     /// Gets the number of bytes valid in this block.
     /// </summary>
-    public int Length
-    {
-        get;
-        private set;
-    }
+    public int Length { get; private set; }
 
     /// <summary>
     /// Gets the indexed page of this block.
     /// </summary>
-    public uint BlockIndex
-    {
-        get;
-        private set;
-    }
+    public uint BlockIndex { get; private set; }
 
     /// <summary>
     /// Gets a pointer to the block.
     /// </summary>
-    public byte* Pointer
-    {
-        get;
-        private set;
-    }
+    public byte* Pointer { get; private set; }
 
-    public byte BlockType
-    {
-        get;
-        private set;
-    }
+    public byte BlockType { get; private set; }
 
-    public uint IndexValue
-    {
-        get;
-        private set;
-    }
+    public uint IndexValue { get; private set; }
 
     #endregion
 
     #region [ Methods ]
 
     /// <summary>
-    /// Navigates to a block that will be written to. 
+    /// Releases all the resources used by the <see cref="DiskIoSession"/> object.
+    /// </summary>
+    public void Dispose()
+    {
+        if (IsDisposed)
+            return;
+
+        try
+        {
+            if (m_diskMediumIoSession is not null)
+            {
+                m_diskMediumIoSession.Dispose();
+                m_diskMediumIoSession = null!;
+            }
+
+            m_diskIo = null!;
+        }
+
+        finally
+        {
+            GC.SuppressFinalize(this);
+            IsValid = false;
+            IsDisposed = true; // Prevent duplicate dispose.
+        }
+    }
+
+    /// <summary>
+    /// Navigates to a block that will be written to.
     /// This class does not check if overwriting an existing block. So be careful not to corrupt the file.
     /// </summary>
     /// <param name="blockIndex">The index value of this block.</param>
@@ -235,9 +233,9 @@ internal unsafe class DiskIoSession : IDisposable
 
         if (readState == IoReadState.Valid)
             return;
-        
+
         IsValid = false;
-        throw new Exception("Read Error: " + readState.ToString());
+        throw new Exception("Read Error: " + readState);
     }
 
     /// <summary>
@@ -270,9 +268,9 @@ internal unsafe class DiskIoSession : IDisposable
 
         if (readState == IoReadState.Valid)
             return;
-        
+
         IsValid = false;
-        throw new Exception("Read Error: " + readState.ToString());
+        throw new Exception("Read Error: " + readState);
     }
 
     /// <summary>
@@ -305,36 +303,9 @@ internal unsafe class DiskIoSession : IDisposable
 
         if (readState == IoReadState.Valid)
             return;
-        
+
         IsValid = false;
-        throw new Exception("Read Error: " + readState.ToString());
-    }
-
-    /// <summary>
-    /// Releases all the resources used by the <see cref="DiskIoSession"/> object.
-    /// </summary>
-    public void Dispose()
-    {
-        if (IsDisposed)
-            return;
-        
-        try
-        {
-            if (m_diskMediumIoSession is not null)
-            {
-                m_diskMediumIoSession.Dispose();
-                m_diskMediumIoSession = null!;
-            }
-
-            m_diskIo = null!;
-        }
-
-        finally
-        {
-            GC.SuppressFinalize(this);
-            IsValid = false;
-            IsDisposed = true; // Prevent duplicate dispose.
-        }
+        throw new Exception("Read Error: " + readState);
     }
 
     /// <summary>
@@ -353,10 +324,6 @@ internal unsafe class DiskIoSession : IDisposable
         IsValid = false;
         m_diskMediumIoSession.Clear();
     }
-
-    #endregion
-
-    #region [ Helper Methods ]
 
     /// <summary>
     /// Tries to read data from the following file.
@@ -411,7 +378,7 @@ internal unsafe class DiskIoSession : IDisposable
 
             if (*(ushort*)(data + 2) != m_fileIdNumber)
                 return IoReadState.FileIdNumberDidNotMatch;
-            
+
             return IoReadState.Valid;
         }
 
@@ -493,12 +460,14 @@ internal unsafe class DiskIoSession : IDisposable
         ptr[0] = 0;
         ptr[1] = 0;
         ptr[2] = 0;
-        ptr[3] = 0; 
+        ptr[3] = 0;
     }
 
     #endregion
 
     #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(DiskIoSession), MessageClass.Component);
 
     internal static long ReadCount;
     internal static long WriteCount;

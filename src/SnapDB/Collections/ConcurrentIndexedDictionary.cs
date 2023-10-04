@@ -38,9 +38,16 @@ namespace SnapDB.Collections;
 /// </remarks>
 public class ConcurrentIndexedDictionary<TKey, TValue> where TKey : notnull
 {
+    #region [ Members ]
+
     private TValue[] m_items = new TValue[4];
+
     private readonly Dictionary<TKey, int> m_lookup = new();
     private readonly object m_syncRoot = new();
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets the number of items in the dictionary.
@@ -68,6 +75,10 @@ public class ConcurrentIndexedDictionary<TKey, TValue> where TKey : notnull
         }
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
     /// Gets the value associated with the specified key in the dictionary.
     /// </summary>
@@ -83,7 +94,9 @@ public class ConcurrentIndexedDictionary<TKey, TValue> where TKey : notnull
         int index;
 
         lock (m_syncRoot)
+        {
             index = m_lookup[key];
+        }
 
         return this[index];
     }
@@ -122,27 +135,6 @@ public class ConcurrentIndexedDictionary<TKey, TValue> where TKey : notnull
         }
     }
 
-    private int InternalAdd(TKey key, TValue value)
-    {
-        m_lookup.Add(key, Count);
-
-        // As long as the count of elements in the dictionary equals the capacity of the internal items array,
-        // then when the capacity is reached a new internal items array with double the capacity will be created.
-        // Existing elements will be copied to the new array and the reference will be updated to point to the new array.
-        if (Count == m_items.Length)
-        { 
-            TValue[] newItems = new TValue[m_items.Length * 2];
-
-            m_items.CopyTo(newItems, 0);
-            m_items = newItems;
-        }
-
-        m_items[Count] = value;
-        Count++;
-
-        return Count - 1;
-    }
-
     /// <summary>
     /// Gets the value associated with the specified <paramref name="key"/> from the dictionary, or adds it if not found.
     /// </summary>
@@ -155,7 +147,7 @@ public class ConcurrentIndexedDictionary<TKey, TValue> where TKey : notnull
         {
             if (m_lookup.TryGetValue(key, out int index))
                 return this[index];
-            
+
             TValue value = createFunction();
             InternalAdd(key, value);
 
@@ -163,8 +155,35 @@ public class ConcurrentIndexedDictionary<TKey, TValue> where TKey : notnull
         }
     }
 
+    private int InternalAdd(TKey key, TValue value)
+    {
+        m_lookup.Add(key, Count);
+
+        // As long as the count of elements in the dictionary equals the capacity of the internal items array,
+        // then when the capacity is reached a new internal items array with double the capacity will be created.
+        // Existing elements will be copied to the new array and the reference will be updated to point to the new array.
+        if (Count == m_items.Length)
+        {
+            TValue[] newItems = new TValue[m_items.Length * 2];
+
+            m_items.CopyTo(newItems, 0);
+            m_items = newItems;
+        }
+
+        m_items[Count] = value;
+        Count++;
+
+        return Count - 1;
+    }
+
+    #endregion
+
+    #region [ Static ]
+
     private static void ThrowIndexException()
     {
         throw new IndexOutOfRangeException("specified index is outside the range of valid indexes");
     }
+
+    #endregion
 }

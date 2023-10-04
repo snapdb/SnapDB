@@ -33,18 +33,21 @@ namespace SnapDB.Snap.Services.Writer;
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-public class WriteProcessor<TKey, TValue>
-    : DisposableLoggingClassBase
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class WriteProcessor<TKey, TValue> : DisposableLoggingClassBase where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
-    private readonly bool m_isMemoryOnly;
-    private bool m_disposed;
-    private readonly PrebufferWriter<TKey, TValue> m_prebuffer;
+    #region [ Members ]
+
     private readonly FirstStageWriter<TKey, TValue> m_firstStageWriter;
-    private readonly TransactionTracker<TKey, TValue> m_transactionTracker;
-    private readonly List<CombineFiles<TKey, TValue>> m_stagingRollovers;
+    private readonly bool m_isMemoryOnly;
+    private readonly PrebufferWriter<TKey, TValue> m_prebuffer;
     private readonly WriteProcessorSettings m_settings;
+    private readonly List<CombineFiles<TKey, TValue>> m_stagingRollovers;
+    private readonly TransactionTracker<TKey, TValue> m_transactionTracker;
+    private bool m_disposed;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a <see cref="WriteProcessor{TKey,TValue}"/>.
@@ -52,8 +55,7 @@ public class WriteProcessor<TKey, TValue>
     /// <param name="list">the master list of archive files</param>
     /// <param name="settings">the settings</param>
     /// <param name="rolloverLog">the rollover log value</param>
-    public WriteProcessor(ArchiveList<TKey, TValue> list, WriteProcessorSettings settings, RolloverLog rolloverLog)
-        : base(MessageClass.Framework)
+    public WriteProcessor(ArchiveList<TKey, TValue> list, WriteProcessorSettings settings, RolloverLog rolloverLog) : base(MessageClass.Framework)
     {
         m_settings = settings.CloneReadonly();
         m_settings.Validate();
@@ -64,10 +66,12 @@ public class WriteProcessor<TKey, TValue>
         m_prebuffer = new PrebufferWriter<TKey, TValue>(settings.PrebufferWriter, m_firstStageWriter.AppendData);
         m_transactionTracker = new TransactionTracker<TKey, TValue>(m_prebuffer, m_firstStageWriter);
         foreach (CombineFilesSettings rollover in settings.StagingRollovers)
-        {
             m_stagingRollovers.Add(new CombineFiles<TKey, TValue>(rollover, list, rolloverLog));
-        }
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Writes the provided key/value to the engine.
@@ -112,13 +116,9 @@ public class WriteProcessor<TKey, TValue>
     public void HardCommit(long transactionId)
     {
         if (m_isMemoryOnly)
-        {
             SoftCommit(transactionId);
-        }
         else
-        {
             m_transactionTracker.WaitForHardCommit(transactionId);
-        }
     }
 
     /// <summary>
@@ -128,11 +128,9 @@ public class WriteProcessor<TKey, TValue>
     protected override void Dispose(bool disposing)
     {
         if (!m_disposed)
-        {
             try
             {
                 // This will be done regardless of whether the object is finalized or disposed.
-
                 if (disposing)
                 {
                     // This will be done only when the object is disposed by calling Dispose().
@@ -143,10 +141,10 @@ public class WriteProcessor<TKey, TValue>
             }
             finally
             {
-                m_disposed = true;          // Prevent duplicate dispose.
-                base.Dispose(disposing);    // Call base class Dispose().
+                m_disposed = true; // Prevent duplicate dispose.
+                base.Dispose(disposing); // Call base class Dispose().
             }
-        }
     }
 
+    #endregion
 }

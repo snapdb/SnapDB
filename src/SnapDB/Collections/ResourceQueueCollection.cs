@@ -31,13 +31,18 @@ namespace SnapDB.Collections;
 /// </summary>
 /// <typeparam name="TKey">An IComparable type key that is used to distinguish different resource queues.</typeparam>
 /// <typeparam name="TResource">The type of the resource queue.</typeparam>
-public class ResourceQueueCollection<TKey, TResource>
-    where TResource : class where TKey : notnull
+public class ResourceQueueCollection<TKey, TResource> where TResource : class where TKey : notnull
 {
-    private readonly SortedList<TKey, ResourceQueue<TResource>?> m_list;
-    private readonly Func<TKey, Func<TResource>> m_instanceObject;
-    private readonly Func<TKey, int> m_maximumCount;
+    #region [ Members ]
+
     private readonly Func<TKey, int> m_initialCount;
+    private readonly Func<TKey, Func<TResource>> m_instanceObject;
+    private readonly SortedList<TKey, ResourceQueue<TResource>?> m_list;
+    private readonly Func<TKey, int> m_maximumCount;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ResourceQueueCollection{TKey, TResource}"/> class
@@ -45,9 +50,8 @@ public class ResourceQueueCollection<TKey, TResource>
     /// </summary>
     /// <param name="instance">A function to create instances of the resource queues.</param>
     /// <param name="initialCount">The initial number of resources in each queue.</param>
-    /// <param name="maximumCount">The maximum number of resources in each queue.</param>    
-    public ResourceQueueCollection(Func<TResource> instance, int initialCount, int maximumCount)
-        : this(_ => instance, _ => initialCount, _ => maximumCount)
+    /// <param name="maximumCount">The maximum number of resources in each queue.</param>
+    public ResourceQueueCollection(Func<TResource> instance, int initialCount, int maximumCount) : this(_ => instance, _ => initialCount, _ => maximumCount)
     {
     }
 
@@ -58,8 +62,7 @@ public class ResourceQueueCollection<TKey, TResource>
     /// <param name="instance">A function that returns the instance creation function for each key.</param>
     /// <param name="initialCount">The initial number of resources in each queue.</param>
     /// <param name="maximumCount">The maximum number of resources in each queue.</param>
-    public ResourceQueueCollection(Func<TKey, TResource> instance, int initialCount, int maximumCount)
-        : this(key => () => instance(key), _ => initialCount, _ => maximumCount)
+    public ResourceQueueCollection(Func<TKey, TResource> instance, int initialCount, int maximumCount) : this(key => () => instance(key), _ => initialCount, _ => maximumCount)
     {
     }
 
@@ -70,8 +73,7 @@ public class ResourceQueueCollection<TKey, TResource>
     /// <param name="instance">A function that returns the instance creation function for each key.</param>
     /// <param name="initialCount">The initial number of resources in each queue.</param>
     /// <param name="maximumCount">The maximum number of resources in each queue.</param>
-    public ResourceQueueCollection(Func<TKey, Func<TResource>> instance, int initialCount, int maximumCount)
-        : this(instance, _ => initialCount, _ => maximumCount)
+    public ResourceQueueCollection(Func<TKey, Func<TResource>> instance, int initialCount, int maximumCount) : this(instance, _ => initialCount, _ => maximumCount)
     {
     }
 
@@ -90,11 +92,19 @@ public class ResourceQueueCollection<TKey, TResource>
         m_list = new SortedList<TKey, ResourceQueue<TResource>?>();
     }
 
+    #endregion
+
+    #region [ Properties ]
+
     /// <summary>
     /// Gets the resource queue for a key of <c>this</c>.
     /// </summary>
     /// <param name="key">The key identifying the resource queue to pull from.</param>
     public ResourceQueue<TResource> this[TKey key] => GetResourceQueue(key);
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Gets a resource queue associated with the specified key or creates a new one if it doesn't exist.
@@ -127,4 +137,6 @@ public class ResourceQueueCollection<TKey, TResource>
 
         return resourceQueue ?? throw new NullReferenceException("Null resource is unexpected");
     }
+
+    #endregion
 }

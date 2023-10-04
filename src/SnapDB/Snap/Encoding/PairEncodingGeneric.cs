@@ -25,7 +25,6 @@
 //******************************************************************************************************
 
 using SnapDB.IO;
-using SnapDB.Snap;
 
 namespace SnapDB.Snap.Encoding;
 
@@ -34,14 +33,17 @@ namespace SnapDB.Snap.Encoding;
 /// </summary>
 /// <typeparam name="TKey">The generic type of the keys.</typeparam>
 /// <typeparam name="TValue">The generic type of the values.</typeparam>
-/// <seealso cref="PairEncodingBase{TKey, TValue}" />
-internal class PairEncodingGeneric<TKey, TValue>
-    : PairEncodingBase<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+/// <seealso cref="PairEncodingBase{TKey, TValue}"/>
+internal class PairEncodingGeneric<TKey, TValue> : PairEncodingBase<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Members ]
+
     private readonly IndividualEncodingBase<TKey> m_keyEncoding;
     private readonly IndividualEncodingBase<TValue> m_valueEncoding;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PairEncodingGeneric{TKey, TValue}"/> class with the specified encoding method.
@@ -53,6 +55,10 @@ internal class PairEncodingGeneric<TKey, TValue>
         m_keyEncoding = Library.Encodings.GetEncodingMethod<TKey>(encodingMethod.KeyEncodingMethod);
         m_valueEncoding = Library.Encodings.GetEncodingMethod<TValue>(encodingMethod.ValueEncodingMethod);
     }
+
+    #endregion
+
+    #region [ Properties ]
 
     public override EncodingDefinition EncodingMethod { get; }
 
@@ -79,7 +85,7 @@ internal class PairEncodingGeneric<TKey, TValue>
     public override int MaxCompressionSize => m_keyEncoding.MaxCompressionSize + m_valueEncoding.MaxCompressionSize;
 
     /// <summary>
-    /// Gets if the stream supports a symbol that 
+    /// Gets if the stream supports a symbol that
     /// represents that the end of the stream has been encountered.
     /// </summary>
     /// <remarks>
@@ -88,7 +94,6 @@ internal class PairEncodingGeneric<TKey, TValue>
     /// word is 0xFF, the encoding has specifically
     /// designated this as the end of the stream. Therefore, calls to
     /// Decompress will result in an end of stream exception.
-    /// 
     /// Failing to reserve a code as the end of stream will mean that
     /// streaming points will include its own symbol to represent the end of the
     /// stream, taking 1 extra byte per point encoded.
@@ -100,6 +105,10 @@ internal class PairEncodingGeneric<TKey, TValue>
     /// May throw NotSupportedException if <see cref="PairEncodingBase{TKey,TValue}.ContainsEndOfStreamSymbol"/> is <c>false</c>.
     /// </summary>
     public override byte EndOfStreamSymbol => m_keyEncoding.EndOfStreamSymbol;
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Encodes key and value and writes them to a binary stream using the specified encoding methods.
@@ -177,4 +186,6 @@ internal class PairEncodingGeneric<TKey, TValue>
     {
         return new PairEncodingGeneric<TKey, TValue>(EncodingMethod);
     }
+
+    #endregion
 }

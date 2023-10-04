@@ -32,7 +32,13 @@ namespace SnapDB.Snap.Services.Writer;
 /// </summary>
 public class RolloverLog
 {
+    #region [ Members ]
+
     private readonly RolloverLogSettings m_settings;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new <see cref="RolloverLog"/>
@@ -45,7 +51,6 @@ public class RolloverLog
         m_settings.Validate();
 
         if (settings.IsFileBacked)
-        {
             foreach (string logFile in Directory.GetFiles(settings.LogPath, settings.SearchPattern))
             {
                 RolloverLogFile log = new(logFile);
@@ -54,10 +59,12 @@ public class RolloverLog
 
                 else
                     log.Delete();
-
             }
-        }
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Creates a rollover log file
@@ -71,4 +78,5 @@ public class RolloverLog
         return new RolloverLogFile(fileName, sourceFiles, destinationFile);
     }
 
+    #endregion
 }

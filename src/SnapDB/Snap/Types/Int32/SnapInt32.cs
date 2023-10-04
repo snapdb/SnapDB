@@ -31,20 +31,24 @@ namespace SnapDB.Snap.Types;
 /// <summary>
 /// Represents a 32-bit integer value that can be serialized.
 /// </summary>
-public class SnapInt32
-    : SnapTypeBase<SnapInt32>
+public class SnapInt32 : SnapTypeBase<SnapInt32>
 {
+    #region [ Members ]
+
     /// <summary>
     /// Gets or sets the integer value.
     /// </summary>
     public int Value;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SnapInt32"/> class.
     /// </summary>
     public SnapInt32()
     {
-
     }
 
     /// <summary>
@@ -56,11 +60,19 @@ public class SnapInt32
         Value = value;
     }
 
+    #endregion
+
+    #region [ Properties ]
+
     public override Guid GenericTypeGuid =>
         // {9DCCEEBA-D191-49CC-AF03-118C0D7D221A}
         new(0x9dcceeba, 0xd191, 0x49cc, 0xaf, 0x03, 0x11, 0x8c, 0x0d, 0x7d, 0x22, 0x1a);
 
     public override int Size => 4;
+
+    #endregion
+
+    #region [ Methods ]
 
     public override void CopyTo(SnapInt32 destination)
     {
@@ -102,8 +114,6 @@ public class SnapInt32
         stream.Write(Value);
     }
 
-    #region [ Optional Overrides ]
-
     // Read(byte*)
     // Write(byte*)
     // IsLessThan(T)
@@ -116,28 +126,32 @@ public class SnapInt32
     {
         Value = *(int*)stream;
     }
+
     public override unsafe void Write(byte* stream)
     {
         *(int*)stream = Value;
     }
+
     public override bool IsLessThan(SnapInt32 right)
     {
         return Value < right.Value;
     }
+
     public override bool IsEqualTo(SnapInt32 right)
     {
         return Value == right.Value;
-
     }
+
     public override bool IsGreaterThan(SnapInt32 right)
     {
         return Value > right.Value;
-
     }
+
     public override bool IsGreaterThanOrEqualTo(SnapInt32 right)
     {
         return Value >= right.Value;
     }
+
     public override bool IsBetween(SnapInt32 lowerBounds, SnapInt32 upperBounds)
     {
         return lowerBounds.Value <= Value && Value < upperBounds.Value;

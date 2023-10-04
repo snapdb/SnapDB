@@ -24,31 +24,36 @@
 //
 //******************************************************************************************************
 
+using System.Data;
 using Gemstone.IO.StreamExtensions;
 using SnapDB.IO;
-using System.Data;
 
 namespace SnapDB.Snap.Services.Writer;
 
 /// <summary>
 /// The settings for a <see cref="RolloverLogFile"/>.
 /// </summary>
-public class RolloverLogSettings
-    : SettingsBase<RolloverLogSettings>
+public class RolloverLogSettings : SettingsBase<RolloverLogSettings>
 {
-    private string m_logPath = string.Empty;
-    private string m_logFilePrefix = "Rollover";
+    #region [ Members ]
+
     private string m_logFileExtension = ".RolloverLog";
+    private string m_logFilePrefix = "Rollover";
+    private string m_logPath = string.Empty;
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
-    /// Gets if this archive log will be file backed. 
+    /// Gets if this archive log will be file backed.
     /// This is true as long as <see cref="LogPath"/> is assigned
     /// a value.
     /// </summary>
     public bool IsFileBacked => m_logPath != string.Empty;
 
     /// <summary>
-    /// The path to store all log files. Can be an empty string to 
+    /// The path to store all log files. Can be an empty string to
     /// not enable file based logging.
     /// </summary>
     public string LogPath
@@ -62,6 +67,7 @@ public class RolloverLogSettings
                 m_logPath = string.Empty;
                 return;
             }
+
             PathHelpers.ValidatePathName(value);
             m_logPath = value;
         }
@@ -81,6 +87,7 @@ public class RolloverLogSettings
                 m_logFilePrefix = string.Empty;
                 return;
             }
+
             PathHelpers.ValidatePathName(value);
             m_logFilePrefix = value;
         }
@@ -107,27 +114,14 @@ public class RolloverLogSettings
         get
         {
             if (LogFilePrefix == string.Empty)
-            {
                 return "*" + LogFileExtension;
-            }
             return LogFilePrefix + " *" + LogFileExtension;
         }
     }
 
-    /// <summary>
-    /// Generates a new file name.
-    /// </summary>
-    /// <returns></returns>
-    internal string GenerateNewFileName()
-    {
-        if (!IsFileBacked)
-            throw new Exception("Cannot generate a file name when the log is not a file backed log");
-        if (LogFilePrefix == string.Empty)
-        {
-            return Path.Combine(LogPath, Guid.NewGuid().ToString() + LogFileExtension);
-        }
-        return Path.Combine(LogPath, LogFilePrefix + " " + Guid.NewGuid().ToString() + LogFileExtension);
-    }
+    #endregion
+
+    #region [ Methods ]
 
     public override void Save(Stream stream)
     {
@@ -160,4 +154,18 @@ public class RolloverLogSettings
         //Nothing to validate.
     }
 
+    /// <summary>
+    /// Generates a new file name.
+    /// </summary>
+    /// <returns></returns>
+    internal string GenerateNewFileName()
+    {
+        if (!IsFileBacked)
+            throw new Exception("Cannot generate a file name when the log is not a file backed log");
+        if (LogFilePrefix == string.Empty)
+            return Path.Combine(LogPath, Guid.NewGuid() + LogFileExtension);
+        return Path.Combine(LogPath, LogFilePrefix + " " + Guid.NewGuid() + LogFileExtension);
+    }
+
+    #endregion
 }

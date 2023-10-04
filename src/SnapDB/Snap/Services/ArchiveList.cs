@@ -24,27 +24,29 @@
 //
 //******************************************************************************************************
 
-using Gemstone.Diagnostics;
 using System.Text;
+using Gemstone.Diagnostics;
 
 namespace SnapDB.Snap.Services;
 
 /// <summary>
-/// Manages the complete list of archive resources and the 
+/// Manages the complete list of archive resources and the
 /// associated reading and writing that goes along with it.
 /// </summary>
-public abstract class ArchiveList
-    : DisposableLoggingClassBase
+public abstract class ArchiveList : DisposableLoggingClassBase
 {
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a <see cref="ArchiveList"/>
     /// </summary>
-    protected ArchiveList()
-        : base(MessageClass.Framework)
+    protected ArchiveList() : base(MessageClass.Framework)
     {
-
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Attaches the supplied paths or files.
@@ -58,18 +60,6 @@ public abstract class ArchiveList
     /// </summary>
     /// <param name="archiveFiles"></param>
     public abstract void LoadFiles(IEnumerable<string> archiveFiles);
-
-    #region [ Resource Locks ]
-
-    ///// <summary>
-    ///// Creates an object that can be used to get updated snapshots from this <see cref="ArchiveList{TKey,TValue}"/>.
-    ///// Client must call <see cref="IDisposable.Dispose"/> method when finished with these resources as they will not 
-    ///// automatically be reclaimed by the garbage collector. Class will not be initiallized until calling <see cref="ArchiveListSnapshot{TKey,TValue}.UpdateSnapshot"/>.
-    ///// </summary>
-    ///// <returns></returns>
-    //public abstract ArchiveListSnapshot<TKey, TValue> CreateNewClientResources();
-
-    #endregion
 
     /// <summary>
     /// Appends the status of the files in the ArchiveList to the provided <see cref="StringBuilder"/>.
@@ -99,6 +89,16 @@ public abstract class ArchiveList
     /// </summary>
     /// <returns></returns>
     protected abstract ArchiveListEditor InternalAcquireEditLock();
+
+    #endregion
+
+    ///// <summary>
+    ///// Creates an object that can be used to get updated snapshots from this <see cref="ArchiveList{TKey,TValue}"/>.
+    ///// Client must call <see cref="IDisposable.Dispose"/> method when finished with these resources as they will not 
+    ///// automatically be reclaimed by the garbage collector. Class will not be initiallized until calling <see cref="ArchiveListSnapshot{TKey,TValue}.UpdateSnapshot"/>.
+    ///// </summary>
+    ///// <returns></returns>
+    //public abstract ArchiveListSnapshot<TKey, TValue> CreateNewClientResources();
 
     ///// <summary>
     ///// Determines if the provided file is currently in use

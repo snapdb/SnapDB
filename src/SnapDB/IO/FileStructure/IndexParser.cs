@@ -32,42 +32,24 @@ namespace SnapDB.IO.FileStructure;
 /// This class provides passthrough properties for the <see cref="IndexMapper"/> class as well follows the directions
 /// of the Index Mapper to find the data cluster that contains the point in question.
 /// </summary>
-internal unsafe class IndexParser
-    : IndexMapper
+internal unsafe class IndexParser : IndexMapper
 {
     #region [ Members ]
 
     /// <summary>
-    /// The file that is being read by this parser.
+    /// The address of the first block of the data cluster.
     /// </summary>
-    private readonly SubFileHeader? m_subFile;
-
-    private readonly SubFileDiskIoSessionPool m_ioSessions;
-
-    #endregion
-
-    #region [ Constructors ]
-
-    /// <summary>
-    /// Creates a new instance of this class.
-    /// </summary>
-    /// <param name="ioSessions">IoSessions to use to read from this disk</param>
-    public IndexParser(SubFileDiskIoSessionPool ioSessions)
-        : base(ioSessions.Header.BlockSize)
-    {
-        m_subFile = ioSessions.File;
-        m_ioSessions = ioSessions;
-        m_oldFirstOffset = -1;
-    }
-
-    #endregion
-
-    #region [ Properties ]
+    protected uint DataClusterAddress;
 
     /// <summary>
     /// The address of the first indirect block.
     /// </summary>
     protected uint FirstIndirectBlockAddress;
+
+    /// <summary>
+    /// The address of the fourth indirect block.
+    /// </summary>
+    protected uint FourthIndirectBlockAddress;
 
     /// <summary>
     /// The address of the second indirect block.
@@ -79,35 +61,37 @@ internal unsafe class IndexParser
     /// </summary>
     protected uint ThirdIndirectBlockAddress;
 
-    /// <summary>
-    /// The address of the fourth indirect block.
-    /// </summary>
-    protected uint FourthIndirectBlockAddress;
+    private readonly SubFileDiskIoSessionPool m_ioSessions;
 
-    /// <summary>
-    /// The address of the first block of the data cluster.
-    /// </summary>
-    protected uint DataClusterAddress;
-
-    /// <summary>
-    /// The address of the first indirect block.
-    /// </summary>
+    // The address of the first indirect block.
     private int m_oldFirstOffset;
 
-    /// <summary>
-    /// The address of the second indirect block.
-    /// </summary>
+    // The address of the fourth indirect block.
+    private int m_oldFourthOffset;
+
+    // The address of the second indirect block.
     private int m_oldSecondOffset;
 
-    /// <summary>
-    /// The address of the third indirect block.
-    /// </summary>
+    // The address of the third indirect block.
     private int m_oldThirdOffset;
 
+    // The file that is being read by this parser.
+    private readonly SubFileHeader? m_subFile;
+
+    #endregion
+
+    #region [ Constructors ]
+
     /// <summary>
-    /// The address of the fourth indirect block.
+    /// Creates a new instance of this class.
     /// </summary>
-    private int m_oldFourthOffset;
+    /// <param name="ioSessions">IoSessions to use to read from this disk</param>
+    public IndexParser(SubFileDiskIoSessionPool ioSessions) : base(ioSessions.Header.BlockSize)
+    {
+        m_subFile = ioSessions.File;
+        m_ioSessions = ioSessions;
+        m_oldFirstOffset = -1;
+    }
 
     #endregion
 
@@ -122,6 +106,7 @@ internal unsafe class IndexParser
     {
         MapPosition(positionIndex);
         UpdateBlockInformation();
+
         return DataClusterAddress;
     }
 
@@ -134,6 +119,7 @@ internal unsafe class IndexParser
         MapPosition(positionIndex);
         UpdateBlockInformation();
     }
+
     /// <summary>
     /// Resets the index cache with the information from the supplied <see cref="mostRecentParser"/>.
     /// </summary>
@@ -145,6 +131,7 @@ internal unsafe class IndexParser
         ThirdIndirectBlockAddress = mostRecentParser.ThirdIndirectBlockAddress;
         FourthIndirectBlockAddress = mostRecentParser.FourthIndirectBlockAddress;
         DataClusterAddress = mostRecentParser.DataClusterAddress;
+
         MapPosition(mostRecentParser.BaseVirtualAddressIndexValue);
         m_oldFirstOffset = -1;
     }
@@ -155,6 +142,7 @@ internal unsafe class IndexParser
     private void UpdateBlockInformation()
     {
         int lowestChange;
+
         if (m_oldFirstOffset != FirstIndirectOffset)
             lowestChange = 1;
         else if (m_oldSecondOffset != SecondIndirectOffset)
@@ -164,10 +152,7 @@ internal unsafe class IndexParser
         else if (m_oldFourthOffset != FourthIndirectOffset)
             lowestChange = 4;
         else
-        {
-            // DataClusterAddress = m_subFile.DirectBlock;
-            return;
-        }
+            return; // DataClusterAddress = m_subFile.DirectBlock;
 
         m_oldFirstOffset = FirstIndirectOffset;
         m_oldSecondOffset = SecondIndirectOffset;
@@ -176,45 +161,55 @@ internal unsafe class IndexParser
 
         if (FirstIndirectOffset != 0) // Quadruple Indirect
         {
-            FirstIndirectBlockAddress = m_subFile.QuadrupleIndirectBlock;
+            FirstIndirectBlockAddress = m_subFile!.QuadrupleIndirectBlock;
+
             if (lowestChange <= 1)
                 SecondIndirectBlockAddress = GetBlockIndexValue(FirstIndirectBlockAddress, FirstIndirectOffset, BlockType.IndexIndirect1, FirstIndirectBaseIndex);
+
             if (lowestChange <= 2)
                 ThirdIndirectBlockAddress = GetBlockIndexValue(SecondIndirectBlockAddress, SecondIndirectOffset, BlockType.IndexIndirect2, SecondIndirectBaseIndex);
+
             if (lowestChange <= 3)
                 FourthIndirectBlockAddress = GetBlockIndexValue(ThirdIndirectBlockAddress, ThirdIndirectOffset, BlockType.IndexIndirect3, ThirdIndirectBaseIndex);
-            if (lowestChange <= 4)
-                DataClusterAddress = GetBlockIndexValue(FourthIndirectBlockAddress, FourthIndirectOffset, BlockType.IndexIndirect4, FourthIndirectBaseIndex);
+
+            //if (lowestChange <= 4)
+            DataClusterAddress = GetBlockIndexValue(FourthIndirectBlockAddress, FourthIndirectOffset, BlockType.IndexIndirect4, FourthIndirectBaseIndex);
         }
         else if (SecondIndirectOffset != 0) // Triple Indirect
         {
             FirstIndirectBlockAddress = 0;
-            SecondIndirectBlockAddress = m_subFile.TripleIndirectBlock;
+            SecondIndirectBlockAddress = m_subFile!.TripleIndirectBlock;
+
             if (lowestChange <= 2)
                 ThirdIndirectBlockAddress = GetBlockIndexValue(SecondIndirectBlockAddress, SecondIndirectOffset, BlockType.IndexIndirect2, SecondIndirectBaseIndex);
+
             if (lowestChange <= 3)
                 FourthIndirectBlockAddress = GetBlockIndexValue(ThirdIndirectBlockAddress, ThirdIndirectOffset, BlockType.IndexIndirect3, ThirdIndirectBaseIndex);
-            if (lowestChange <= 4)
-                DataClusterAddress = GetBlockIndexValue(FourthIndirectBlockAddress, FourthIndirectOffset, BlockType.IndexIndirect4, FourthIndirectBaseIndex);
+
+            //if (lowestChange <= 4)
+            DataClusterAddress = GetBlockIndexValue(FourthIndirectBlockAddress, FourthIndirectOffset, BlockType.IndexIndirect4, FourthIndirectBaseIndex);
         }
         else if (ThirdIndirectOffset != 0) // Double Indirect
         {
             FirstIndirectBlockAddress = 0;
             SecondIndirectBlockAddress = 0;
-            ThirdIndirectBlockAddress = m_subFile.DoubleIndirectBlock;
+            ThirdIndirectBlockAddress = m_subFile!.DoubleIndirectBlock;
+
             if (lowestChange <= 3)
                 FourthIndirectBlockAddress = GetBlockIndexValue(ThirdIndirectBlockAddress, ThirdIndirectOffset, BlockType.IndexIndirect3, ThirdIndirectBaseIndex);
-            if (lowestChange <= 4)
-                DataClusterAddress = GetBlockIndexValue(FourthIndirectBlockAddress, FourthIndirectOffset, BlockType.IndexIndirect4, FourthIndirectBaseIndex);
+
+            //if (lowestChange <= 4)
+            DataClusterAddress = GetBlockIndexValue(FourthIndirectBlockAddress, FourthIndirectOffset, BlockType.IndexIndirect4, FourthIndirectBaseIndex);
         }
         else if (FourthIndirectOffset != 0) // Single Indirect
         {
             FirstIndirectBlockAddress = 0;
             SecondIndirectBlockAddress = 0;
             ThirdIndirectBlockAddress = 0;
-            FourthIndirectBlockAddress = m_subFile.SingleIndirectBlock;
-            if (lowestChange <= 4)
-                DataClusterAddress = GetBlockIndexValue(FourthIndirectBlockAddress, FourthIndirectOffset, BlockType.IndexIndirect4, FourthIndirectBaseIndex);
+            FourthIndirectBlockAddress = m_subFile!.SingleIndirectBlock;
+
+            //if (lowestChange <= 4)
+            DataClusterAddress = GetBlockIndexValue(FourthIndirectBlockAddress, FourthIndirectOffset, BlockType.IndexIndirect4, FourthIndirectBaseIndex);
         }
         else // Immediate
         {
@@ -222,7 +217,7 @@ internal unsafe class IndexParser
             SecondIndirectBlockAddress = 0;
             ThirdIndirectBlockAddress = 0;
             FourthIndirectBlockAddress = 0;
-            DataClusterAddress = m_subFile.DirectBlock;
+            DataClusterAddress = m_subFile!.DirectBlock;
         }
     }
 
@@ -238,6 +233,7 @@ internal unsafe class IndexParser
     private uint GetBlockIndexValue(uint blockIndex, int offset, BlockType blockType, uint blockBaseIndex)
     {
         DiskIoSession buffer = m_ioSessions.SourceIndex;
+
         if (blockIndex == 0)
             return 0;
 
@@ -247,5 +243,6 @@ internal unsafe class IndexParser
 
         return *(uint*)(buffer.Pointer + (offset << 2));
     }
+
     #endregion
 }

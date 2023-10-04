@@ -29,16 +29,13 @@ using System.Reflection;
 namespace SnapDB.Immutables;
 
 /// <summary>
-/// Represents an object that can be configured as read only and thus made immutable.  
+/// Represents an object that can be configured as read only and thus made immutable.
 /// This class will automatically clone any field that implements <see cref="IImmutableObject"/>
 /// </summary>
 /// <typeparam name="T">Object type.</typeparam>
-public abstract class ImmutableObjectAutoBase<T>
-    : ImmutableObjectBase<T>
-    where T : ImmutableObjectAutoBase<T>
+public abstract class ImmutableObjectAutoBase<T> : ImmutableObjectBase<T> where T : ImmutableObjectAutoBase<T>
 {
-    // ReSharper disable once StaticFieldInGenericType
-    private static readonly List<FieldInfo> s_readonlyFields;
+    #region [ Constructors ]
 
     static ImmutableObjectAutoBase()
     {
@@ -46,14 +43,16 @@ public abstract class ImmutableObjectAutoBase<T>
         Type newType = typeof(IImmutableObject);
 
         foreach (FieldInfo field in typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-        {
             if (newType.IsAssignableFrom(field.FieldType))
                 s_readonlyFields.Add(field);
-        }
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
-    /// Requests that member fields be set to "read-only". 
+    /// Requests that member fields be set to "read-only".
     /// </summary>
     protected override void SetMembersAsReadOnly()
     {
@@ -75,4 +74,13 @@ public abstract class ImmutableObjectAutoBase<T>
             field.SetValue(this, value.CloneEditable());
         }
     }
+
+    #endregion
+
+    #region [ Static ]
+
+    // ReSharper disable once StaticFieldInGenericType
+    private static readonly List<FieldInfo> s_readonlyFields;
+
+    #endregion
 }

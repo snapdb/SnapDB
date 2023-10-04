@@ -26,33 +26,51 @@
 
 using SnapDB.IO.Unmanaged;
 using SnapDB.Snap.Encoding;
-using System;
 
 namespace SnapDB.Snap.Tree;
 
 /// <summary>
-/// A node for a <see cref="SortedTree"/> that is encoded in a fixed width. 
+/// A node for a <see cref="SortedTree"/> that is encoded in a fixed width.
 /// This allows binary searches and faster writing.
 /// </summary>
 /// <typeparam name="TKey">The type of keys stored in the nodes.</typeparam>
 /// <typeparam name="TValue">The type of values stored in the nodes.</typeparam>
-public unsafe class FixedSizeNode<TKey, TValue>
-    : SortedTreeNodeBase<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public unsafe class FixedSizeNode<TKey, TValue> : SortedTreeNodeBase<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
-    private int m_maxRecordsPerNode;
+    #region [ Members ]
+
     private readonly PairEncodingBase<TKey, TValue> m_encoding;
+    private int m_maxRecordsPerNode;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new class.
     /// </summary>
     /// <param name="level">The level of this node.</param>
-    public FixedSizeNode(byte level)
-        : base(level)
+    public FixedSizeNode(byte level) : base(level)
     {
         m_encoding = Library.Encodings.GetEncodingMethod<TKey, TValue>(EncodingDefinition.FixedSizeCombinedEncoding);
     }
+
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// Gets the maximum overhead (additional space used) when combining nodes.
+    /// </summary>
+    /// <remarks>
+    /// This property specifies the maximum additional space that can be used when nodes are combined during tree operations.
+    /// The value is typically 0, indicating that combining nodes doesn't introduce any additional overhead.
+    /// </remarks>
+    protected override int MaxOverheadWithCombineNodes => 0;
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Creates a new instance of the same node type as a clone with the specified <paramref name="level"/>.
@@ -87,15 +105,6 @@ public unsafe class FixedSizeNode<TKey, TValue>
         if (m_maxRecordsPerNode < 4)
             throw new Exception("Tree must have at least 4 records per node. Increase the block size or decrease the size of the records.");
     }
-
-    /// <summary>
-    /// Gets the maximum overhead (additional space used) when combining nodes.
-    /// </summary>
-    /// <remarks>
-    /// This property specifies the maximum additional space that can be used when nodes are combined during tree operations.
-    /// The value is typically 0, indicating that combining nodes doesn't introduce any additional overhead.
-    /// </remarks>
-    protected override int MaxOverheadWithCombineNodes => 0;
 
     /// <summary>
     /// Reads the value at the specified index in the node.
@@ -255,31 +264,29 @@ public unsafe class FixedSizeNode<TKey, TValue>
             // End Inlined
             goto TryAgain;
         }
-        else
+
+        // Key2,Value2 are the current record
+        if (RemainingBytes - additionalValidBytes < KeyValueSize)
         {
-            // Key2,Value2 are the current record
-            if (RemainingBytes - additionalValidBytes < KeyValueSize)
-            {
-                isFull = true;
-                IncrementRecordCounts(recordsAdded, additionalValidBytes);
+            isFull = true;
+            IncrementRecordCounts(recordsAdded, additionalValidBytes);
 
-                return;
-            }
-
-            stream.Key2.Write(writePointer + offset);
-            stream.Value2.Write(writePointer + offset + KeySize);
-            additionalValidBytes += KeyValueSize;
-            recordsAdded++;
-            offset += KeyValueSize;
-
-            // Inlined stream.Next()
-            stream.IsValid = stream.Stream.Read(stream.Key1, stream.Value1);
-            stream.IsStillSequential = stream.Key2.IsLessThan(stream.Key1);
-            stream.IsKvp1 = true;
-            // End Inlined
-
-            goto TryAgain;
+            return;
         }
+
+        stream.Key2.Write(writePointer + offset);
+        stream.Value2.Write(writePointer + offset + KeySize);
+        additionalValidBytes += KeyValueSize;
+        recordsAdded++;
+        offset += KeyValueSize;
+
+        // Inlined stream.Next()
+        stream.IsValid = stream.Stream.Read(stream.Key1, stream.Value1);
+        stream.IsStillSequential = stream.Key2.IsLessThan(stream.Key1);
+        stream.IsKvp1 = true;
+        // End Inlined
+
+        goto TryAgain;
     }
 
     /// <summary>
@@ -325,9 +332,7 @@ public unsafe class FixedSizeNode<TKey, TValue>
         Stream.Copy(sourceStartingAddress, targetStartingAddress, recordsInTheSecondNode * KeyValueSize);
 
         // Create the header of the second node.
-        CreateNewNode(newNodeIndex, (ushort)recordsInTheSecondNode,
-                      (ushort)(HeaderSize + recordsInTheSecondNode * KeyValueSize),
-                      NodeIndex, RightSiblingNodeIndex, dividingKey, UpperKey);
+        CreateNewNode(newNodeIndex, (ushort)recordsInTheSecondNode, (ushort)(HeaderSize + recordsInTheSecondNode * KeyValueSize), NodeIndex, RightSiblingNodeIndex, dividingKey, UpperKey);
 
         // update the node that was the old right sibling
         if (RightSiblingNodeIndex != uint.MaxValue)
@@ -399,4 +404,6 @@ public unsafe class FixedSizeNode<TKey, TValue>
         right.RecordCount += (ushort)recordsToTransfer;
         right.ValidBytes += (ushort)(recordsToTransfer * KeyValueSize);
     }
+
+    #endregion
 }

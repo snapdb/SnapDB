@@ -37,10 +37,10 @@ namespace SnapDB.Snap.Storage;
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-public static class SortedTreeFileSimpleWriter<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public static class SortedTreeFileSimpleWriter<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Static ]
+
     /// <summary>
     /// Creates a new arhive file with the supplied data.
     /// </summary>
@@ -60,6 +60,7 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue>
         {
             SequentialSortedTreeWriter<TKey, TValue>.Create(bs, blockSize - 32, treeNodeType, treeStream);
         }
+
         writer.Commit();
     }
 
@@ -78,16 +79,12 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue>
             while (treeStream.Read(key, value))
             {
                 if (queue.IsFull)
-                {
                     pendingFiles.Add(CreateMemoryFile(treeNodeType, queue));
-                }
                 queue.TryEnqueue(key, value);
             }
 
             if (queue.Count > 0)
-            {
                 pendingFiles.Add(CreateMemoryFile(treeNodeType, queue));
-            }
 
             using UnionTreeStream<TKey, TValue> reader = new(pendingFiles.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), false);
             Create(pendingFileName, completeFileName, blockSize, archiveIdCallback, treeNodeType, reader, flags);
@@ -102,7 +99,7 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue>
     {
         buffer.IsReadingMode = true;
 
-        SortedTreeFile file = SortedTreeFile.CreateInMemory(4096);
+        SortedTreeFile file = SortedTreeFile.CreateInMemory();
         SortedTreeTable<TKey, TValue> table = file.OpenOrCreateTable<TKey, TValue>(treeNodeType);
         using (SortedTreeTableEditor<TKey, TValue> edit = table.BeginEdit())
         {
@@ -127,5 +124,5 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue>
         return SubFileName.Create(SortedTreeFile.PrimaryArchiveType, keyType, valueType);
     }
 
-
+    #endregion
 }

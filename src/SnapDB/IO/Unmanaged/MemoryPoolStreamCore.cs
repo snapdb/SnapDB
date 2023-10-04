@@ -31,23 +31,26 @@ namespace SnapDB.IO.Unmanaged;
 /// </summary>
 public class MemoryPoolStreamCore : IDisposable
 {
+    #region [ Members ]
+
     /// <summary>
     /// This class was created to allow settings update to be atomic.
     /// </summary>
     private class Settings
     {
-        private const int Mask = 1023;
-        private const int ElementsPerRow = 1024;
-        private const int ShiftBits = 10;
+        #region [ Members ]
 
-        public int PageCount
-        {
-            get;
-            private set;
-        }
+        private const int ElementsPerRow = 1024;
+
+        private const int Mask = 1023;
+        private const int ShiftBits = 10;
 
         private int[][] m_pageIndex;
         private nint[][] m_pagePointer;
+
+        #endregion
+
+        #region [ Constructors ]
 
         public Settings()
         {
@@ -56,17 +59,67 @@ public class MemoryPoolStreamCore : IDisposable
             PageCount = 0;
         }
 
+        #endregion
+
+        #region [ Properties ]
+
+        public int PageCount { get; private set; }
+
+        public bool AddingRequiresClone => m_pagePointer.Length * ElementsPerRow == PageCount;
+
+        #endregion
+
+        #region [ Methods ]
+
         public nint GetPointer(int page)
         {
             return m_pagePointer[page >> ShiftBits][page & Mask];
+        }
+
+        /// <summary>
+        /// Adds a new page to the collection of pages.
+        /// </summary>
+        /// <param name="pagePointer">A pointer to the new page to be added.</param>
+        /// <param name="pageIndex">The index of the new page.</param>
+        public void AddNewPage(nint pagePointer, int pageIndex)
+        {
+            // Ensure that there is enough capacity to add a new page.
+            EnsureCapacity();
+
+            // Calculate the index for the new page.
+            int index = PageCount;
+            int bigIndex = index >> ShiftBits; // Calculate the outer array index.
+            int smallIndex = index & Mask; // Calculate the inner array index.
+
+            // Assign the page index and page pointer to their respective arrays.
+            m_pageIndex[bigIndex][smallIndex] = pageIndex;
+            m_pagePointer[bigIndex][smallIndex] = pagePointer;
+
+            // Ensure memory visibility: Incrementing the page count must occur after the data is correct.
+            Thread.MemoryBarrier();
+
+            // Increment the page count to reflect the addition of the new page.
+            PageCount++;
+        }
+
+        public Settings Clone()
+        {
+            return (Settings)MemberwiseClone();
+        }
+
+        /// <summary>
+        /// Returns all of the buffer pool page indexes used by this class.
+        /// </summary>
+        public IEnumerable<int> GetAllPageIndexes()
+        {
+            for (int x = 0; x < PageCount; x++)
+                yield return GetIndex(x);
         }
 
         private int GetIndex(int page)
         {
             return m_pageIndex[page >> ShiftBits][page & Mask];
         }
-
-        public bool AddingRequiresClone => m_pagePointer.Length * ElementsPerRow == PageCount;
 
         private void EnsureCapacity()
         {
@@ -88,59 +141,14 @@ public class MemoryPoolStreamCore : IDisposable
             }
         }
 
-        /// <summary>
-        /// Adds a new page to the collection of pages.
-        /// </summary>
-        /// <param name="pagePointer">A pointer to the new page to be added.</param>
-        /// <param name="pageIndex">The index of the new page.</param>
-        public void AddNewPage(nint pagePointer, int pageIndex)
-        {
-            // Ensure that there is enough capacity to add a new page.
-            EnsureCapacity();
-
-            // Calculate the index for the new page.
-            int index = PageCount;
-            int bigIndex = index >> ShiftBits; // Calculate the outer array index.
-            int smallIndex = index & Mask; // Calculate the inner array index.
-
-            // Assign the page index and page pointer to their respective arrays.
-            m_pageIndex[bigIndex][smallIndex] = pageIndex; 
-            m_pagePointer[bigIndex][smallIndex] = pagePointer; 
-
-            // Ensure memory visibility: Incrementing the page count must occur after the data is correct.
-            Thread.MemoryBarrier();
-
-            // Increment the page count to reflect the addition of the new page.
-            PageCount++;
-        }
-
-        public Settings Clone()
-        {
-            return (Settings)MemberwiseClone();
-        }
-
-        /// <summary>
-        /// Returns all of the buffer pool page indexes used by this class.
-        /// </summary>
-        public IEnumerable<int> GetAllPageIndexes()
-        {
-            for (int x = 0; x < PageCount; x++)
-            {
-                yield return GetIndex(x);
-            }
-        }
+        #endregion
     }
 
-    #region [ Members ]
-
-    private readonly object m_syncRoot;
-
-    private volatile Settings m_settings;
-
     /// <summary>
-    /// The buffer pool to utilize.
+    /// The first position of this stream. This may be different from <see cref="m_firstValidPosition"/>
+    /// due to alignment requirements.
     /// </summary>
-    private MemoryPool m_pool;
+    private long m_firstAddressablePosition;
 
     /// <summary>
     /// The first position that can be accessed by users of this stream.
@@ -150,20 +158,23 @@ public class MemoryPoolStreamCore : IDisposable
     private readonly long m_invertMask;
 
     /// <summary>
-    /// The first position of this stream. This may be different from <see cref="m_firstValidPosition"/> 
-    /// due to alignment requirements.
+    /// The size of each page.
     /// </summary>
-    private long m_firstAddressablePosition;
+    private readonly int m_pageSize;
+
+    /// <summary>
+    /// The buffer pool to utilize.
+    /// </summary>
+    private MemoryPool m_pool;
+
+    private volatile Settings m_settings;
 
     /// <summary>
     /// The number of bits in the page size.
     /// </summary>
     private readonly int m_shiftLength;
 
-    /// <summary>
-    /// The size of each page.
-    /// </summary>
-    private readonly int m_pageSize;
+    private readonly object m_syncRoot;
 
     /// <summary>
     /// Releases all the resources used by the <see cref="MemoryFile"/> object.
@@ -177,8 +188,7 @@ public class MemoryPoolStreamCore : IDisposable
     /// <summary>
     /// Creates a new <see cref="MemoryPoolStreamCore"/> using the default <see cref="MemoryPool"/>.
     /// </summary>
-    public MemoryPoolStreamCore()
-        : this(Globals.MemoryPool)
+    public MemoryPoolStreamCore() : this(Globals.MemoryPool)
     {
     }
 
@@ -220,6 +230,66 @@ public class MemoryPoolStreamCore : IDisposable
     #endregion
 
     #region [ Methods ]
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// </summary>
+    /// <filterpriority>2</filterpriority>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    // TODO: Consider removing these methods
+    /// <summary>
+    /// Reads from the underlying stream the requested set of data.
+    /// This function is more user friendly than calling GetBlock().
+    /// </summary>
+    /// <param name="position">The starting position of the read.</param>
+    /// <param name="pointer">Ann output pointer to <see cref="position"/>.</param>
+    /// <param name="validLength">The number of bytes that are valid after this position.</param>
+    public void ReadBlock(long position, out nint pointer, out int validLength)
+    {
+        if (m_disposed)
+            throw new ObjectDisposedException("MemoryStream");
+
+        if (position < m_firstValidPosition)
+            throw new ArgumentOutOfRangeException(nameof(position), "position is before the beginning of the stream");
+
+        validLength = m_pageSize;
+        long firstPosition = ((position - m_firstAddressablePosition) & m_invertMask) + m_firstAddressablePosition;
+        pointer = GetPage(position - m_firstAddressablePosition);
+
+        if (firstPosition < m_firstValidPosition)
+        {
+            pointer += (int)(m_firstValidPosition - firstPosition);
+            validLength -= (int)(m_firstValidPosition - firstPosition);
+            firstPosition = m_firstValidPosition;
+        }
+
+        int seekDistance = (int)(position - firstPosition);
+        validLength -= seekDistance;
+        pointer += seekDistance;
+    }
+
+    public void CopyTo(long position, nint dest, int length)
+    {
+    TryAgain:
+
+        ReadBlock(position, out nint src, out int validLength);
+        if (validLength < length)
+        {
+            Memory.Copy(src, dest, validLength);
+            length -= validLength;
+            dest += validLength;
+            position += validLength;
+
+            goto TryAgain;
+        }
+
+        Memory.Copy(src, dest, length);
+    }
 
     /// <summary>
     /// Configure the natural alignment of the data.
@@ -280,23 +350,12 @@ public class MemoryPoolStreamCore : IDisposable
     }
 
     /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-    /// </summary>
-    /// <filterpriority>2</filterpriority>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
     /// Releases the unmanaged resources used by the <see cref="MemoryFile"/> object and optionally releases the managed resources.
     /// </summary>
     /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     private void Dispose(bool disposing)
     {
         if (!m_disposed)
-        {
             try
             {
                 if (!m_pool.IsDisposed)
@@ -308,15 +367,10 @@ public class MemoryPoolStreamCore : IDisposable
                 m_settings = null;
                 m_disposed = true;
             }
-        }
     }
 
-    #endregion
-
-    #region [ Helper Methods ]
-
     /// <summary>
-    /// Returns the page that corresponds to the absolute position.  
+    /// Returns the page that corresponds to the absolute position.
     /// This function will also autogrow the stream.
     /// </summary>
     /// <param name="position">The position to use to calculate the page to retrieve</param>
@@ -369,53 +423,4 @@ public class MemoryPoolStreamCore : IDisposable
     }
 
     #endregion
-
-    // TODO: Consider removing these methods
-    /// <summary>
-    /// Reads from the underlying stream the requested set of data. 
-    /// This function is more user friendly than calling GetBlock().
-    /// </summary>
-    /// <param name="position">The starting position of the read.</param>
-    /// <param name="pointer">Ann output pointer to <see cref="position"/>.</param>
-    /// <param name="validLength">The number of bytes that are valid after this position.</param>
-    public void ReadBlock(long position, out nint pointer, out int validLength)
-    {
-        if (m_disposed)
-            throw new ObjectDisposedException("MemoryStream");
-
-        if (position < m_firstValidPosition)
-            throw new ArgumentOutOfRangeException(nameof(position), "position is before the beginning of the stream");
-
-        validLength = m_pageSize;
-        var firstPosition = ((position - m_firstAddressablePosition) & m_invertMask) + m_firstAddressablePosition;
-        pointer = GetPage(position - m_firstAddressablePosition);
-
-        if (firstPosition < m_firstValidPosition)
-        {
-            pointer += (int)(m_firstValidPosition - firstPosition);
-            validLength -= (int)(m_firstValidPosition - firstPosition);
-            firstPosition = m_firstValidPosition;
-        }
-
-        int seekDistance = (int)(position - firstPosition);
-        validLength -= seekDistance;
-        pointer += seekDistance;
-    }
-
-    public void CopyTo(long position, nint dest, int length)
-    {
-    TryAgain:
-
-        ReadBlock(position, out nint src, out int validLength);
-        if (validLength < length)
-        {
-            Memory.Copy(src, dest, validLength);
-            length -= validLength;
-            dest += validLength;
-            position += validLength;
-
-            goto TryAgain;
-        }
-        Memory.Copy(src, dest, length);
-    }
 }

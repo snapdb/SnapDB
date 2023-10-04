@@ -27,6 +27,7 @@
 //
 //******************************************************************************************************
 
+using System.Security.Cryptography;
 using Gemstone.ArrayExtensions;
 using Gemstone.IO.StreamExtensions;
 using Org.BouncyCastle.Crypto;
@@ -34,7 +35,6 @@ using Org.BouncyCastle.Crypto.Agreement.Srp;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Math;
 using SnapDB.IO.Unmanaged;
-using System.Security.Cryptography;
 
 namespace SnapDB.Security.Authentication;
 
@@ -43,14 +43,21 @@ namespace SnapDB.Security.Authentication;
 /// </summary>
 public class SrpServerSession
 {
+    #region [ Members ]
+
+    private const HashMethod PasswordHashMethod = HashMethod.Sha512;
+    private const HashMethod SrpHashMethod = HashMethod.Sha512;
+
     /// <summary>
     /// The session secret that is used to generate keys.
     /// </summary>
     public byte[] SessionSecret;
 
-    private const HashMethod PasswordHashMethod = HashMethod.Sha512;
-    private const HashMethod SrpHashMethod = HashMethod.Sha512;
     private readonly SrpUserCredential m_user;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new <see cref="SrpServerSession"/> that will authenticate a stream.
@@ -60,6 +67,10 @@ public class SrpServerSession
     {
         m_user = user;
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Attempts to authenticate the provided stream.
@@ -150,6 +161,7 @@ public class SrpServerSession
             stream.Flush();
             return true;
         }
+
         stream.Write(false);
         stream.Flush();
 
@@ -212,12 +224,18 @@ public class SrpServerSession
                 stream.Flush();
                 return true;
             }
+
             stream.Write(false);
             return false;
         }
+
         stream.Write(false);
         return StandardAuthentication(hash, stream, additionalChallenge);
     }
+
+    #endregion
+
+    #region [ Static ]
 
     private static unsafe byte[] CreateSessionData(byte[] sessionSecret, SrpUserCredential user)
     {
@@ -229,9 +247,7 @@ public class SrpServerSession
 
         //fill the remainder of the block with random bits
         if (len != blockLen)
-        {
             SaltGenerator.Create(blockLen - len).CopyTo(dataToEncrypt, len);
-        }
 
         byte[] ticket = new byte[1 + 16 + 8 + 16 + 2 + blockLen + 32];
 
@@ -331,4 +347,6 @@ public class SrpServerSession
             return true;
         }
     }
+
+    #endregion
 }

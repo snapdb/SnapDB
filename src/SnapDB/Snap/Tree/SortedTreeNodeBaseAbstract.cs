@@ -28,12 +28,15 @@ namespace SnapDB.Snap.Tree;
 
 public partial class SortedTreeNodeBase<TKey, TValue>
 {
-    protected abstract void InitializeType();
+    #region [ Properties ]
 
-    protected abstract int MaxOverheadWithCombineNodes
-    {
-        get;
-    }
+    protected abstract int MaxOverheadWithCombineNodes { get; }
+
+    #endregion
+
+    #region [ Methods ]
+
+    protected abstract void InitializeType();
 
     protected abstract void Read(int index, TValue value);
 
@@ -42,7 +45,7 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     protected abstract bool RemoveUnlessOverflow(int index);
 
     /// <summary>
-    /// Inserts the provided key into the current node. 
+    /// Inserts the provided key into the current node.
     /// Note: A duplicate key has already been detected and will never be passed to this function.
     /// </summary>
     /// <param name="index"></param>
@@ -53,11 +56,13 @@ public partial class SortedTreeNodeBase<TKey, TValue>
 
     /// <summary>
     /// Requests that the current stream is inserted into the tree. Sequentail insertion can only occur while the stream
-    /// is in order and is entirely past the end of the tree. 
+    /// is in order and is entirely past the end of the tree.
     /// </summary>
     /// <param name="stream">the stream data to insert</param>
-    /// <param name="isFull">if returning from this function while the node is not yet full, this means the stream 
-    /// can no longer be inserted sequentially and we must break out to the root and insert one at a time.</param>
+    /// <param name="isFull">
+    /// if returning from this function while the node is not yet full, this means the stream
+    /// can no longer be inserted sequentially and we must break out to the root and insert one at a time.
+    /// </param>
     protected abstract void AppendSequentialStream(InsertStreamHelper<TKey, TValue> stream, out bool isFull);
 
     protected abstract int GetIndexOf(TKey key);
@@ -67,4 +72,6 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     protected abstract void TransferRecordsFromRightToLeft(Node<TKey> left, Node<TKey> right, int bytesToTransfer);
 
     protected abstract void TransferRecordsFromLeftToRight(Node<TKey> left, Node<TKey> right, int bytesToTransfer);
+
+    #endregion
 }

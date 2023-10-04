@@ -29,15 +29,14 @@
 
 using System.Net.Security;
 using System.Security.Authentication;
-using SnapDB.Security.Authentication;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Gemstone.Diagnostics;
 using Gemstone.GuidExtensions;
 using Gemstone.IO.StreamExtensions;
-using Gemstone.Security.Cryptography;
-using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Digests;
+using SnapDB.Security.Authentication;
 #if !SQLCLR
 using SnapDB.IO.Unmanaged;
 #endif
@@ -50,65 +49,81 @@ namespace SnapDB.Security;
 /// </summary>
 internal static class SecureStreamServerCertificate
 {
+    #region [ Constructors ]
+
+    static SecureStreamServerCertificate()
+    {
+    #if !SQLCLR
+        TempCertificate = GenerateCertificate.CreateSelfSignedCertificate("CN=Local", 256, 1024);
+    #endif
+    }
+
+    #endregion
+
+    #region [ Static ]
+
     /// <summary>
     /// A RSA-1024 SHA-256 certificate. It takes about 250ms to generate this certificate.
     /// </summary>
     internal static X509Certificate2 TempCertificate;
 
-    static SecureStreamServerCertificate()
-    {
-#if !SQLCLR
-        TempCertificate = GenerateCertificate.CreateSelfSignedCertificate("CN=Local", 256, 1024);
-#endif
-    }
+    #endregion
 }
 
 /// <summary>
 /// A server host that manages a secure stream connection.
 /// This class is thread safe and can negotiate streams simultaneous.
 /// </summary>
-public class SecureStreamServer<T>
-    : DisposableLoggingClassBase
-    where T : IUserToken, new()
+public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserToken, new()
 {
+    #region [ Members ]
 
     private class State
     {
-        public Guid ServerKeyName;
-        public byte[] ServerHmacKey;
-        public byte[] ServerEncryptionkey;
+        #region [ Members ]
+
         public bool ContainsDefaultCredentials;
         public Guid DefaultUserToken;
+        public byte[] ServerEncryptionkey;
+        public byte[] ServerHmacKey;
+        public Guid ServerKeyName;
+
+        #endregion
+
+        #region [ Methods ]
 
         public State Clone()
         {
             return (State)MemberwiseClone();
         }
+
+        #endregion
     }
 
     /// <summary>
     /// Tickets expire every 10 minutes.
     /// </summary>
     private const int TicketExpireTimeMinutes = 10;
-    private readonly Dictionary<Guid, T> m_userTokens;
+
     //private SrpServer m_srp;
     //private ScramServer m_scram;
     //private CertificateServer m_cert;
     private readonly IntegratedSecurityServer m_integrated;
     private State m_state;
     private readonly object m_syncRoot;
+    private readonly Dictionary<Guid, T> m_userTokens;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new <see cref="SecureStreamServer{T}"/>.
     /// </summary>
-    public SecureStreamServer()
-        : base(MessageClass.Component)
+    public SecureStreamServer() : base(MessageClass.Component)
     {
         m_syncRoot = new object();
-        m_state = new State
-        {
-            ContainsDefaultCredentials = false
-        };
+        m_state = new State { ContainsDefaultCredentials = false };
         InvalidateAllTickets();
         m_userTokens = new Dictionary<Guid, T>();
         //m_srp = new SrpServer();
@@ -116,6 +131,10 @@ public class SecureStreamServer<T>
         //m_cert = new CertificateServer();
         m_integrated = new IntegratedSecurityServer();
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// This will change the encryption keys used to create resume tickets, thus
@@ -152,7 +171,7 @@ public class SecureStreamServer<T>
     }
 
     /// <summary>
-    /// Adds the specified user 
+    /// Adds the specified user
     /// </summary>
     /// <param name="username">the username to add</param>
     /// <param name="userToken">The token data associated with this user</param>
@@ -164,23 +183,6 @@ public class SecureStreamServer<T>
             m_userTokens.Add(id, userToken);
             m_integrated.Users.AddUser(username, id);
         }
-    }
-
-    private bool TryConnectSsl(Stream stream, out SslStream ssl)
-    {
-        ssl = new SslStream(stream, false, UserCertificateValidationCallback, UserCertificateSelectionCallback, EncryptionPolicy.RequireEncryption);
-        try
-        {
-            ssl.AuthenticateAsServer(SecureStreamServerCertificate.TempCertificate, true, SslProtocols.Tls12, false);
-        }
-        catch (Exception ex)
-        {
-            Log.Publish(MessageLevel.Info, "Authentication Failed", null, null, ex);
-            ssl.Dispose();
-            ssl = null;
-            return false;
-        }
-        return true;
     }
 
     /// <summary>
@@ -228,6 +230,7 @@ public class SecureStreamServer<T>
                         ssl?.Dispose();
                         return false;
                     }
+
                     stream2.Write(true);
                     userToken = state.DefaultUserToken;
                     break;
@@ -240,6 +243,7 @@ public class SecureStreamServer<T>
                         ssl?.Dispose();
                         return false;
                     }
+
                     break;
                 //case AuthenticationMode.Scram: //Scram
                 //    m_scram.AuthenticateAsServer(ssl, certSignatures);
@@ -254,13 +258,14 @@ public class SecureStreamServer<T>
                         {
                             m_userTokens.TryGetValue(userToken, out token);
                         }
+
                         secureStream = stream2;
                         return true;
                     }
+
                     goto TryAgain;
                 default:
-                    Log.Publish(MessageLevel.Info, "Invalid Authentication Method",
-                        authenticationMode.ToString());
+                    Log.Publish(MessageLevel.Info, "Invalid Authentication Method", authenticationMode.ToString());
                     return false;
             }
 
@@ -281,6 +286,7 @@ public class SecureStreamServer<T>
             {
                 m_userTokens.TryGetValue(userToken, out token);
             }
+
             secureStream = stream2;
             return true;
         }
@@ -290,6 +296,24 @@ public class SecureStreamServer<T>
             ssl?.Dispose();
             return false;
         }
+    }
+
+    private bool TryConnectSsl(Stream stream, out SslStream ssl)
+    {
+        ssl = new SslStream(stream, false, UserCertificateValidationCallback, UserCertificateSelectionCallback, EncryptionPolicy.RequireEncryption);
+        try
+        {
+            ssl.AuthenticateAsServer(SecureStreamServerCertificate.TempCertificate, true, SslProtocols.Tls12, false);
+        }
+        catch (Exception ex)
+        {
+            Log.Publish(MessageLevel.Info, "Authentication Failed", null, null, ex);
+            ssl.Dispose();
+            ssl = null;
+            return false;
+        }
+
+        return true;
     }
 
     private X509Certificate UserCertificateSelectionCallback(object sender, string targetHost, X509CertificateCollection localCertificates, X509Certificate remoteCertificate, string[] acceptableIssuers)
@@ -304,10 +328,10 @@ public class SecureStreamServer<T>
 
     private bool TryResumeSession(Stream stream, byte[] certSignatures, out Guid userToken)
     {
-#if SQLCLR
+    #if SQLCLR
         userToken = Guid.Empty;
         return false;
-#else
+    #else
         //Resume Session:
         // C => S
         // byte    ResumeSession
@@ -353,25 +377,24 @@ public class SecureStreamServer<T>
                 stream.Flush();
 
                 if (stream.ReadBoolean())
-                {
                     return true;
-                }
                 return false;
             }
         }
+
         stream.Write(false);
         userToken = default;
         return false;
-#endif
+    #endif
     }
 
     private unsafe bool TryLoadTicket(byte[] ticket, out byte[] sessionSecret, out Guid userToken)
     {
-#if SQLCLR
+    #if SQLCLR
         sessionSecret = null;
         userToken = Guid.Empty;
         return false;
-#else
+    #else
         State state = m_state;
         const int encryptedLength = 32 + 16;
         const int ticketSize = 1 + 16 + 8 + 16 + encryptedLength + 32;
@@ -408,9 +431,7 @@ public class SecureStreamServer<T>
             {
                 //Issue time is before current time.
                 if (currentTime - issueTime > TimeSpan.TicksPerMinute * TicketExpireTimeMinutes)
-                {
                     return false;
-                }
             }
             else
             {
@@ -418,9 +439,7 @@ public class SecureStreamServer<T>
                 //This could be due to a clock sync on the server after the ticket was issued. 
                 //Allow up to 1 minute of clock skew
                 if (issueTime - currentTime > TimeSpan.TicksPerMinute)
-                {
                     return false;
-                }
             }
 
             byte[] initializationVector = stream.ReadBytes(16);
@@ -448,15 +467,15 @@ public class SecureStreamServer<T>
 
             return true;
         }
-#endif
+    #endif
     }
 
     private unsafe void CreateResumeTicket(Guid userToken, out byte[] ticket, out byte[] sessionSecret)
     {
-#if SQLCLR
+    #if SQLCLR
         ticket = null;
         sessionSecret = null;
-#else
+    #else
         State state = m_state;
 
         //Ticket Structure:
@@ -497,6 +516,8 @@ public class SecureStreamServer<T>
             stream.Write(Hmac<Sha256Digest>.Compute(state.ServerHmacKey, ticket, 0, ticket.Length - 32));
         }
 
-#endif
+    #endif
     }
+
+    #endregion
 }

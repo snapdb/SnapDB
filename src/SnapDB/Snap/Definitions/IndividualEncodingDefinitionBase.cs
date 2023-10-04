@@ -23,6 +23,7 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
+
 using SnapDB.Snap.Encoding;
 
 namespace SnapDB.Snap.Definitions;
@@ -32,6 +33,8 @@ namespace SnapDB.Snap.Definitions;
 /// </summary>
 public abstract class IndividualEncodingDefinitionBase
 {
+    #region [ Properties ]
+
     /// <summary>
     /// The type supported by the encoded method. Can be <c>null</c> if the encoding is not type specific.
     /// </summary>
@@ -42,13 +45,18 @@ public abstract class IndividualEncodingDefinitionBase
     /// </summary>
     public abstract Guid Method { get; }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
-    /// Constructs a new class based on this encoding method. 
+    /// Constructs a new class based on this encoding method.
     /// </summary>
     /// <typeparam name="T">The type of this base class.</typeparam>
     /// <returns>
     /// The encoding method.
     /// </returns>
-    public abstract IndividualEncodingBase<T> Create<T>()
-        where T : SnapTypeBase<T>, new();
+    public abstract IndividualEncodingBase<T> Create<T>() where T : SnapTypeBase<T>, new();
+
+    #endregion
 }

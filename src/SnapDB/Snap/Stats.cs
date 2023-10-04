@@ -28,11 +28,14 @@ namespace SnapDB.Snap;
 
 public static class Stats
 {
+    #region [ Static ]
+
     /// <summary>
     /// Checks how many times the checksum was computed. This is used to see IO amplification.
     /// It is currently a debug term that will soon disappear.
     /// </summary>
     public static long ChecksumCount;
+
     public static long LookupKeys;
     public static long PointsReturned;
     public static long PointsScanned;
@@ -47,4 +50,6 @@ public static class Stats
         QueriesExecuted = 0;
         SeeksRequested = 0;
     }
+
+    #endregion
 }

@@ -29,18 +29,17 @@ using SnapDB.IO.FileStructure;
 namespace SnapDB.Snap.Storage;
 
 /// <summary>
-/// Aquires a read transaction on the current archive partition. This will allow all user created
+/// Acquires a read transaction on the current archive partition. This will allow all user created
 /// transactions to have snapshot isolation of the entire data set.
 /// </summary>
-public class SortedTreeTableSnapshotInfo<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class SortedTreeTableSnapshotInfo<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
 
-    private readonly TransactionalFileStructure m_fileStructure;
     private readonly ReadSnapshot m_currentTransaction;
     private readonly SubFileName m_fileName;
+
+    private readonly TransactionalFileStructure m_fileStructure;
 
     #endregion
 

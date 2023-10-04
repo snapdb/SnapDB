@@ -26,24 +26,21 @@
 
 namespace SnapDB.IO.Unmanaged;
 
-public unsafe class BinaryStream
-    : BinaryStreamPointerBase
+public unsafe class BinaryStream : BinaryStreamPointerBase
 {
     #region [ Members ]
 
     private readonly BlockArguments m_args;
 
-    /// <summary>
-    /// Determines if this class owns the underlying stream, thus when Dispose() is called
-    /// the dispose of the underlying stream will also be called.
-    /// </summary>
+    // Determines if this class owns the underlying stream, thus when Dispose() is called
+    // the dispose of the underlying stream will also be called.
     private readonly bool m_leaveOpen;
-
-    private bool m_disposed;
 
     private BinaryStreamIoSessionBase m_mainIoSession;
 
-    private BinaryStreamIoSessionBase m_secondaryIoSession;
+    private BinaryStreamIoSessionBase m_secondaryIoSession = default!;
+
+    private bool m_disposed;
 
     #endregion
 
@@ -52,8 +49,7 @@ public unsafe class BinaryStream
     /// <summary>
     /// Creates a <see cref="BinaryStream"/> that is in memory only.
     /// </summary>
-    public BinaryStream()
-        : this(new MemoryPoolStream(), false)
+    public BinaryStream() : this(new MemoryPoolStream(), false)
     {
         if (!BitConverter.IsLittleEndian)
             throw new Exception("Only designed to run on a little endian processor.");
@@ -62,8 +58,7 @@ public unsafe class BinaryStream
     /// <summary>
     /// Creates a <see cref="BinaryStream"/> that is in memory only.
     /// </summary>
-    public BinaryStream(MemoryPool pool)
-        : this(new MemoryPoolStream(pool), false)
+    public BinaryStream(MemoryPool pool) : this(new MemoryPoolStream(pool), false)
     {
         if (!BitConverter.IsLittleEndian)
             throw new Exception("Only designed to run on a little endian processor.");
@@ -73,19 +68,10 @@ public unsafe class BinaryStream
     /// Creates a <see cref="BinaryStream"/> that is in memory only.
     /// </summary>
     /// <param name="allocatesOwnMemory"><c>true</c> to allocate its own memory rather than using the <see cref="MemoryPool"/>.</param>
-    public BinaryStream(bool allocatesOwnMemory)
-        : this(CreatePool(allocatesOwnMemory), false)
+    public BinaryStream(bool allocatesOwnMemory) : this(CreatePool(allocatesOwnMemory), false)
     {
         if (!BitConverter.IsLittleEndian)
             throw new Exception("Only designed to run on a little endian processor.");
-    }
-
-    private static ISupportsBinaryStream CreatePool(bool allocatesOwnMemory)
-    {
-        if (allocatesOwnMemory)
-            return new UnmanagedMemoryStream();
-
-        return new MemoryPoolStream();
     }
 
     /// <summary>
@@ -122,7 +108,7 @@ public unsafe class BinaryStream
 
     #region [ Properties ]
 
-    public ISupportsBinaryStream BaseStream { get; private set; }
+    public ISupportsBinaryStream? BaseStream { get; private set; }
 
     #endregion
 
@@ -141,7 +127,6 @@ public unsafe class BinaryStream
         LastWrite = null;
 
         m_mainIoSession?.Clear();
-
         m_secondaryIoSession?.Clear();
     }
 
@@ -152,7 +137,7 @@ public unsafe class BinaryStream
     public override void UpdateLocalBuffer(bool isWriting)
     {
         //If the block block is already looked up, skip this step.
-        if (isWriting && LastWrite - Current > 0 || !isWriting && LastRead - Current > 0)
+        if ((isWriting && LastWrite - Current > 0) || (!isWriting && LastRead - Current > 0))
             return;
 
         long position = FirstPosition + (Current - First);
@@ -165,11 +150,7 @@ public unsafe class BinaryStream
         LastRead = First + m_args.Length;
         Current = First + (position - FirstPosition);
         LastPosition = FirstPosition + m_args.Length;
-
-        if (m_args.SupportsWriting)
-            LastWrite = LastRead;
-        else
-            LastWrite = First;
+        LastWrite = m_args.SupportsWriting ? LastRead : First;
     }
 
     /// <summary>
@@ -180,7 +161,6 @@ public unsafe class BinaryStream
     {
         // If the object has not been disposed yet
         if (!m_disposed)
-        {
             // This will be done regardless of whether the object is finalized or disposed.
             try
             {
@@ -195,7 +175,6 @@ public unsafe class BinaryStream
                     BaseStream.Dispose();
             }
             finally
-
             {
                 // Reset various fields and properties to release references.
                 FirstPosition = 0;
@@ -204,16 +183,26 @@ public unsafe class BinaryStream
                 First = null;
                 LastRead = null;
                 LastWrite = null;
-                m_mainIoSession = null;
-                m_secondaryIoSession = null;
+                m_mainIoSession = null!;
+                m_secondaryIoSession = null!;
                 BaseStream = null;
                 m_disposed = true;
             }
-        }
+
         base.Dispose(disposing);
     }
 
+    #endregion
 
+    #region [ Static ]
+
+    private static ISupportsBinaryStream CreatePool(bool allocatesOwnMemory)
+    {
+        if (allocatesOwnMemory)
+            return new UnmanagedMemoryStream();
+
+        return new MemoryPoolStream();
+    }
 
     #endregion
 }

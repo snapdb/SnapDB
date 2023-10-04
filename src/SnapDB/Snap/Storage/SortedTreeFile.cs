@@ -27,18 +27,273 @@
 using SnapDB.IO.FileStructure;
 using SnapDB.IO.Unmanaged;
 using SnapDB.Snap.Tree;
-using System.Collections;
 
 namespace SnapDB.Snap.Storage;
 
 /// <summary>
-/// Represents a individual self-contained archive file. 
+/// Represents a individual self-contained archive file.
 /// </summary>
 /// <remarks>
 /// </remarks>
-public class SortedTreeFile
-    : IDisposable
+public class SortedTreeFile : IDisposable
 {
+    #region [ Members ]
+
+    private TransactionalFileStructure m_fileStructure;
+
+    private readonly SortedList<SubFileName, IDisposable> m_openedFiles;
+
+    #endregion
+
+    #region [ Constructors ]
+
+    private SortedTreeFile()
+    {
+        m_openedFiles = new SortedList<SubFileName, IDisposable>();
+    }
+
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// Determines if the archive file has been disposed.
+    /// </summary>
+    public bool IsDisposed { get; private set; }
+
+    /// <summary>
+    /// Returns the name of the file.  Returns <see cref="String.Empty"/> if this is a memory archive.
+    /// This is the name of the entire path.
+    /// </summary>
+    public string FilePath { get; private set; }
+
+    /// <summary>
+    /// Gets if the file is a memory file.
+    /// </summary>
+    public bool IsMemoryFile => FilePath == string.Empty;
+
+    /// <summary>
+    /// Gets the name of the file, but only the file, not the entire path.
+    /// </summary>
+    public string FileName
+    {
+        get
+        {
+            if (FilePath == string.Empty)
+                return string.Empty;
+            return Path.GetFileName(FilePath);
+        }
+    }
+
+    /// <summary>
+    /// Gets the last committed read snapshot on the file system.
+    /// </summary>
+    /// <returns></returns>
+    public ReadSnapshot Snapshot => m_fileStructure.Snapshot;
+
+    /// <summary>
+    /// Gets the size of the file.
+    /// </summary>
+    public long ArchiveSize => m_fileStructure.ArchiveSize;
+
+    #endregion
+
+    #region [ Methods ]
+
+    /// <summary>
+    /// Closes the archive file. If there is a current transaction,
+    /// that transaction is immediately rolled back and disposed.
+    /// </summary>
+    public void Dispose()
+    {
+        if (!IsDisposed)
+        {
+            foreach (IDisposable d in m_openedFiles.Values)
+                d.Dispose();
+            m_openedFiles.Clear();
+            m_fileStructure.Dispose();
+            IsDisposed = true;
+        }
+    }
+
+    /// <summary>
+    /// Changes the extension of the current file.
+    /// </summary>
+    /// <param name="extension">the new extension</param>
+    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="isSharingEnabled">If the file should share read privileges.</param>
+    public void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled)
+    {
+        m_fileStructure.ChangeExtension(extension, isReadOnly, isSharingEnabled);
+        FilePath = m_fileStructure.FileName;
+    }
+
+    /// <summary>
+    /// Reopens the file with different permissions.
+    /// </summary>
+    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
+    /// <param name="isSharingEnabled">If the file should share read privileges.</param>
+    public void ChangeShareMode(bool isReadOnly, bool isSharingEnabled)
+    {
+        m_fileStructure.ChangeShareMode(isReadOnly, isSharingEnabled);
+    }
+
+    /// <summary>
+    /// Opens the default table for this TKey and TValue.
+    /// </summary>
+    /// <typeparam name="TKey">The key</typeparam>
+    /// <typeparam name="TValue">The value</typeparam>
+    /// <remarks>
+    /// Every Key and Value have their uniquely mapped file, therefore a different file is opened if TKey and TValue are different.
+    /// </remarks>
+    /// <returns>null if table does not exist</returns>
+    public SortedTreeTable<TKey, TValue> OpenTable<TKey, TValue>() where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    {
+        return OpenTable<TKey, TValue>(GetFileName<TKey, TValue>());
+    }
+
+    /// <summary>
+    /// Opens the default table for this TKey and TValue.
+    /// </summary>
+    /// <typeparam name="TKey">The key</typeparam>
+    /// <typeparam name="TValue">The value</typeparam>
+    /// <param name="tableName">the name of an internal table</param>
+    /// <remarks>
+    /// Every Key and Value have their uniquely mapped file, therefore a different file is opened if TKey and TValue are different.
+    /// </remarks>
+    /// <returns>null if table does not exist</returns>
+    public SortedTreeTable<TKey, TValue> OpenTable<TKey, TValue>(string tableName) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    {
+        return OpenTable<TKey, TValue>(GetFileName<TKey, TValue>(tableName));
+    }
+
+    /// <summary>
+    /// Opens the default table for this TKey and TValue. If it does not exists,
+    /// it will be created with the provided compression method.
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="storageMethod">The method of compression to utilize in this table.</param>
+    /// <param name="maxSortedTreeBlockSize">the maximum desired block size for a SortedTree. Must be at least 1024.</param>
+    /// <param name="tableName">the name of an internal table</param>
+    /// <returns></returns>
+    public SortedTreeTable<TKey, TValue> OpenOrCreateTable<TKey, TValue>(EncodingDefinition storageMethod, string tableName, int maxSortedTreeBlockSize = 4096) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    {
+        if (storageMethod is null)
+            throw new ArgumentNullException(nameof(storageMethod));
+
+        SubFileName fileName = GetFileName<TKey, TValue>(tableName);
+        return OpenOrCreateTable<TKey, TValue>(storageMethod, fileName, maxSortedTreeBlockSize);
+    }
+
+    /// <summary>
+    /// Opens the default table for this TKey and TValue. If it does not exists,
+    /// it will be created with the provided compression method.
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="storageMethod">The method of compression to utilize in this table.</param>
+    /// <param name="maxSortedTreeBlockSize">the maximum desired block size for a SortedTree. Must be at least 1024.</param>
+    /// <returns></returns>
+    public SortedTreeTable<TKey, TValue> OpenOrCreateTable<TKey, TValue>(EncodingDefinition storageMethod, int maxSortedTreeBlockSize = 4096) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    {
+        if (storageMethod is null)
+            throw new ArgumentNullException(nameof(storageMethod));
+
+        SubFileName fileName = GetFileName<TKey, TValue>();
+        return OpenOrCreateTable<TKey, TValue>(storageMethod, fileName, maxSortedTreeBlockSize);
+    }
+
+    /// <summary>
+    /// Closes and deletes the Archive File. Also calls dispose.
+    /// If this is a memory archive, it will release the memory space to the buffer pool.
+    /// </summary>
+    public void Delete()
+    {
+        Dispose();
+        if (FilePath != string.Empty)
+            File.Delete(FilePath);
+    }
+
+    /// <summary>
+    /// Opens the table for the provided file name.
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="fileName">the filename to open</param>
+    /// <returns>null if table does not exist</returns>
+    private SortedTreeTable<TKey, TValue> OpenTable<TKey, TValue>(SubFileName fileName) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    {
+        if (!m_openedFiles.ContainsKey(fileName))
+        {
+            if (!m_fileStructure.Snapshot.Header.ContainsSubFile(fileName))
+                return null;
+            m_openedFiles.Add(fileName, new SortedTreeTable<TKey, TValue>(m_fileStructure, fileName, this));
+        }
+
+        return (SortedTreeTable<TKey, TValue>)m_openedFiles[fileName];
+    }
+
+    private SortedTreeTable<TKey, TValue> OpenOrCreateTable<TKey, TValue>(EncodingDefinition storageMethod, SubFileName fileName, int maxSortedTreeBlockSize) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    {
+        if (!m_openedFiles.ContainsKey(fileName))
+        {
+            if (!m_fileStructure.Snapshot.Header.ContainsSubFile(fileName))
+                CreateArchiveFile<TKey, TValue>(fileName, storageMethod, maxSortedTreeBlockSize);
+            m_openedFiles.Add(fileName, new SortedTreeTable<TKey, TValue>(m_fileStructure, fileName, this));
+        }
+
+        return (SortedTreeTable<TKey, TValue>)m_openedFiles[fileName];
+    }
+
+    /// <summary>
+    /// Helper method. Creates the <see cref="SubFileName"/> for the default table.
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <returns></returns>
+    private SubFileName GetFileName<TKey, TValue>() where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    {
+        Guid keyType = new TKey().GenericTypeGuid;
+        Guid valueType = new TValue().GenericTypeGuid;
+        return SubFileName.Create(PrimaryArchiveType, keyType, valueType);
+    }
+
+    private SubFileName GetFileName<TKey, TValue>(string fileName) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    {
+        Guid keyType = new TKey().GenericTypeGuid;
+        Guid valueType = new TValue().GenericTypeGuid;
+        return SubFileName.Create(fileName, keyType, valueType);
+    }
+
+    private void CreateArchiveFile<TKey, TValue>(SubFileName fileName, EncodingDefinition storageMethod, int maxSortedTreeBlockSize) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    {
+        if (maxSortedTreeBlockSize < 1024)
+            throw new ArgumentOutOfRangeException(nameof(maxSortedTreeBlockSize), "Must be greater than 1024");
+        if (storageMethod is null)
+            throw new ArgumentNullException(nameof(storageMethod));
+
+        using TransactionalEdit trans = m_fileStructure.BeginEdit();
+        using (SubFileStream fs = trans.CreateFile(fileName))
+        using (BinaryStream bs = new(fs))
+        {
+            int blockSize = m_fileStructure.Snapshot.Header.DataBlockSize;
+
+            while (blockSize > maxSortedTreeBlockSize)
+                blockSize >>= 2;
+
+            SortedTree<TKey, TValue> tree = SortedTree<TKey, TValue>.Create(bs, blockSize, storageMethod);
+            tree.Flush();
+        }
+
+        trans.ArchiveType = FileType;
+        trans.CommitAndDispose();
+    }
+
+    #endregion
+
+    #region [ Static ]
+
     // {63AB3FEA-14CD-4ECA-939B-0DD23742E170}
     /// <summary>
     /// The main type of the archive file.
@@ -50,20 +305,6 @@ public class SortedTreeFile
     /// The guid where the primary archive component exists
     /// </summary>
     internal static readonly Guid PrimaryArchiveType = new(0xe0fca590, 0xf46e, 0x4060, 0x87, 0x64, 0xdf, 0xdc, 0xfc, 0x74, 0xd7, 0x28);
-
-    #region [ Members ]
-
-    private TransactionalFileStructure m_fileStructure;
-    private readonly SortedList<SubFileName, IDisposable> m_openedFiles;
-
-    #endregion
-
-    #region [ Constructors ]
-
-    private SortedTreeFile()
-    {
-        m_openedFiles = new SortedList<SubFileName, IDisposable>();
-    }
 
     /// <summary>
     /// Creates a new in memory archive file.
@@ -111,267 +352,4 @@ public class SortedTreeFile
     }
 
     #endregion
-
-    #region [ Properties ]
-
-    /// <summary>
-    /// Determines if the archive file has been disposed. 
-    /// </summary>
-    public bool IsDisposed { get; private set; }
-
-    /// <summary>
-    /// Returns the name of the file.  Returns <see cref="String.Empty"/> if this is a memory archive.
-    /// This is the name of the entire path.
-    /// </summary>
-    public string FilePath { get; private set; }
-
-    /// <summary>
-    /// Gets if the file is a memory file.
-    /// </summary>
-    public bool IsMemoryFile => FilePath == string.Empty;
-
-    /// <summary>
-    /// Gets the name of the file, but only the file, not the entire path.
-    /// </summary>
-    public string FileName
-    {
-        get
-        {
-            if (FilePath == string.Empty)
-                return string.Empty;
-            return Path.GetFileName(FilePath);
-        }
-    }
-
-    /// <summary>
-    /// Gets the last committed read snapshot on the file system.
-    /// </summary>
-    /// <returns></returns>
-    public ReadSnapshot Snapshot => m_fileStructure.Snapshot;
-
-    /// <summary>
-    /// Gets the size of the file.
-    /// </summary>
-    public long ArchiveSize => m_fileStructure.ArchiveSize;
-
-    #endregion
-
-    #region [ Methods ]
-
-
-    /// <summary>
-    /// Changes the extension of the current file.
-    /// </summary>
-    /// <param name="extension">the new extension</param>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
-    /// <param name="isSharingEnabled">If the file should share read privileges.</param>
-    public void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled)
-    {
-        m_fileStructure.ChangeExtension(extension, isReadOnly, isSharingEnabled);
-        FilePath = m_fileStructure.FileName;
-    }
-
-    /// <summary>
-    /// Reopens the file with different permissions.
-    /// </summary>
-    /// <param name="isReadOnly">If the file should be reopened as readonly</param>
-    /// <param name="isSharingEnabled">If the file should share read privileges.</param>
-    public void ChangeShareMode(bool isReadOnly, bool isSharingEnabled)
-    {
-        m_fileStructure.ChangeShareMode(isReadOnly, isSharingEnabled);
-    }
-
-    /// <summary>
-    /// Opens the default table for this TKey and TValue. 
-    /// </summary>
-    /// <typeparam name="TKey">The key</typeparam>
-    /// <typeparam name="TValue">The value</typeparam>
-    /// <remarks>
-    /// Every Key and Value have their uniquely mapped file, therefore a different file is opened if TKey and TValue are different.
-    /// </remarks>
-    /// <returns>null if table does not exist</returns>
-    public SortedTreeTable<TKey, TValue> OpenTable<TKey, TValue>()
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
-    {
-        return OpenTable<TKey, TValue>(GetFileName<TKey, TValue>());
-    }
-
-    /// <summary>
-    /// Opens the default table for this TKey and TValue. 
-    /// </summary>
-    /// <typeparam name="TKey">The key</typeparam>
-    /// <typeparam name="TValue">The value</typeparam>
-    /// <param name="tableName">the name of an internal table</param>
-    /// <remarks>
-    /// Every Key and Value have their uniquely mapped file, therefore a different file is opened if TKey and TValue are different.
-    /// </remarks>
-    /// <returns>null if table does not exist</returns>
-    public SortedTreeTable<TKey, TValue> OpenTable<TKey, TValue>(string tableName)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
-    {
-        return OpenTable<TKey, TValue>(GetFileName<TKey, TValue>(tableName));
-    }
-
-    /// <summary>
-    /// Opens the table for the provided file name.
-    /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <param name="fileName">the filename to open</param>
-    /// <returns>null if table does not exist</returns>
-    private SortedTreeTable<TKey, TValue> OpenTable<TKey, TValue>(SubFileName fileName)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
-    {
-        if (!m_openedFiles.ContainsKey(fileName))
-        {
-            if (!m_fileStructure.Snapshot.Header.ContainsSubFile(fileName))
-                return null;
-            m_openedFiles.Add(fileName, new SortedTreeTable<TKey, TValue>(m_fileStructure, fileName, this));
-        }
-        return (SortedTreeTable<TKey, TValue>)m_openedFiles[fileName];
-    }
-
-    /// <summary>
-    /// Opens the default table for this TKey and TValue. If it does not exists, 
-    /// it will be created with the provided compression method.
-    /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <param name="storageMethod">The method of compression to utilize in this table.</param>
-    /// <param name="maxSortedTreeBlockSize">the maximum desired block size for a SortedTree. Must be at least 1024.</param>
-    /// <param name="tableName">the name of an internal table</param>
-    /// <returns></returns>
-    public SortedTreeTable<TKey, TValue> OpenOrCreateTable<TKey, TValue>(EncodingDefinition storageMethod, string tableName, int maxSortedTreeBlockSize = 4096)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
-    {
-        if (storageMethod is null)
-            throw new ArgumentNullException(nameof(storageMethod));
-
-        SubFileName fileName = GetFileName<TKey, TValue>(tableName);
-        return OpenOrCreateTable<TKey, TValue>(storageMethod, fileName, maxSortedTreeBlockSize);
-    }
-
-    /// <summary>
-    /// Opens the default table for this TKey and TValue. If it does not exists, 
-    /// it will be created with the provided compression method.
-    /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <param name="storageMethod">The method of compression to utilize in this table.</param>
-    /// <param name="maxSortedTreeBlockSize">the maximum desired block size for a SortedTree. Must be at least 1024.</param>
-    /// <returns></returns>
-    public SortedTreeTable<TKey, TValue> OpenOrCreateTable<TKey, TValue>(EncodingDefinition storageMethod, int maxSortedTreeBlockSize = 4096)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
-    {
-        if (storageMethod is null)
-            throw new ArgumentNullException(nameof(storageMethod));
-
-        SubFileName fileName = GetFileName<TKey, TValue>();
-        return OpenOrCreateTable<TKey, TValue>(storageMethod, fileName, maxSortedTreeBlockSize);
-    }
-
-    private SortedTreeTable<TKey, TValue> OpenOrCreateTable<TKey, TValue>(EncodingDefinition storageMethod, SubFileName fileName, int maxSortedTreeBlockSize)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
-    {
-        if (!m_openedFiles.ContainsKey(fileName))
-        {
-            if (!m_fileStructure.Snapshot.Header.ContainsSubFile(fileName))
-                CreateArchiveFile<TKey, TValue>(fileName, storageMethod, maxSortedTreeBlockSize);
-            m_openedFiles.Add(fileName, new SortedTreeTable<TKey, TValue>(m_fileStructure, fileName, this));
-        }
-        return (SortedTreeTable<TKey, TValue>)m_openedFiles[fileName];
-    }
-
-    /// <summary>
-    /// Helper method. Creates the <see cref="SubFileName"/> for the default table.
-    /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <returns></returns>
-    private SubFileName GetFileName<TKey, TValue>()
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
-    {
-        Guid keyType = new TKey().GenericTypeGuid;
-        Guid valueType = new TValue().GenericTypeGuid;
-        return SubFileName.Create(PrimaryArchiveType, keyType, valueType);
-    }
-
-    private SubFileName GetFileName<TKey, TValue>(string fileName)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
-    {
-        Guid keyType = new TKey().GenericTypeGuid;
-        Guid valueType = new TValue().GenericTypeGuid;
-        return SubFileName.Create(fileName, keyType, valueType);
-    }
-
-    private void CreateArchiveFile<TKey, TValue>(SubFileName fileName, EncodingDefinition storageMethod, int maxSortedTreeBlockSize)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
-    {
-        if (maxSortedTreeBlockSize < 1024)
-            throw new ArgumentOutOfRangeException(nameof(maxSortedTreeBlockSize), "Must be greater than 1024");
-        if (storageMethod is null)
-            throw new ArgumentNullException(nameof(storageMethod));
-
-        using TransactionalEdit trans = m_fileStructure.BeginEdit();
-        using (SubFileStream fs = trans.CreateFile(fileName))
-        using (BinaryStream bs = new(fs))
-        {
-            int blockSize = m_fileStructure.Snapshot.Header.DataBlockSize;
-
-            while (blockSize > maxSortedTreeBlockSize)
-            {
-                blockSize >>= 2;
-            }
-
-            SortedTree<TKey, TValue> tree = SortedTree<TKey, TValue>.Create(bs, blockSize, storageMethod);
-            tree.Flush();
-        }
-        trans.ArchiveType = FileType;
-        trans.CommitAndDispose();
-    }
-
-
-    /// <summary>
-    /// Closes the archive file. If there is a current transaction, 
-    /// that transaction is immediately rolled back and disposed.
-    /// </summary>
-    public void Dispose()
-    {
-        if (!IsDisposed)
-        {
-            foreach (IDisposable d in m_openedFiles.Values)
-            {
-                d.Dispose();
-            }
-            m_openedFiles.Clear();
-            m_fileStructure.Dispose();
-            IsDisposed = true;
-        }
-    }
-
-    /// <summary>
-    /// Closes and deletes the Archive File. Also calls dispose.
-    /// If this is a memory archive, it will release the memory space to the buffer pool.
-    /// </summary>
-    public void Delete()
-    {
-        Dispose();
-        if (FilePath != string.Empty)
-        {
-            File.Delete(FilePath);
-        }
-    }
-
-    #endregion
-
-
 }

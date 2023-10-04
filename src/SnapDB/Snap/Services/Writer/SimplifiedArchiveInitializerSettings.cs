@@ -24,25 +24,30 @@
 //
 //******************************************************************************************************
 
+using System.Data;
 using Gemstone.IO.StreamExtensions;
 using SnapDB.Immutables;
 using SnapDB.IO;
-using System.Data;
 
 namespace SnapDB.Snap.Services.Writer;
 
 /// <summary>
 /// Settings for <see cref="SimplifiedArchiveInitializer{TKey,TValue}"/>.
 /// </summary>
-public class SimplifiedArchiveInitializerSettings
-    : SettingsBase<SimplifiedArchiveInitializerSettings>
+public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchiveInitializerSettings>
 {
-    private ArchiveDirectoryMethod m_directoryMethod;
-    private string m_prefix;
-    private string m_pendingExtension;
-    private string m_finalExtension;
+    #region [ Members ]
+
     private long m_desiredRemainingSpace;
+    private ArchiveDirectoryMethod m_directoryMethod;
     private EncodingDefinition m_encodingMethod;
+    private string m_finalExtension;
+    private string m_pendingExtension;
+    private string m_prefix;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new <see cref="ArchiveInitializerSettings"/>.
@@ -52,22 +57,9 @@ public class SimplifiedArchiveInitializerSettings
         Initialize();
     }
 
-    private void Initialize()
-    {
-        m_directoryMethod = ArchiveDirectoryMethod.TopDirectoryOnly;
-        m_prefix = string.Empty;
-        m_pendingExtension = ".~d2i";
-        m_finalExtension = ".d2i";
-        m_desiredRemainingSpace = 5 * 1024 * 1024 * 1024L; //5GB
-        m_encodingMethod = EncodingDefinition.FixedSizeCombinedEncoding;
-        WritePath = new ImmutableList<string>((x) =>
-        {
-            PathHelpers.ValidatePathName(x);
+    #endregion
 
-            return x;
-        });
-        Flags = new ImmutableList<Guid>();
-    }
+    #region [ Properties ]
 
     /// <summary>
     /// Gets the method that the directory structure will follow when writing a new file.
@@ -157,7 +149,7 @@ public class SimplifiedArchiveInitializerSettings
     }
 
     /// <summary>
-    /// The desired number of bytes to leave on the disk after a rollover has completed. 
+    /// The desired number of bytes to leave on the disk after a rollover has completed.
     /// Otherwise, pick a different directory or throw an out of disk space exception.
     /// </summary>
     /// <remarks>
@@ -180,6 +172,9 @@ public class SimplifiedArchiveInitializerSettings
         }
     }
 
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Creates a <see cref="ArchiveInitializer{TKey,TValue}"/> that will reside on the disk.
@@ -271,4 +266,22 @@ public class SimplifiedArchiveInitializerSettings
             throw new Exception("Missing write paths.");
     }
 
+    private void Initialize()
+    {
+        m_directoryMethod = ArchiveDirectoryMethod.TopDirectoryOnly;
+        m_prefix = string.Empty;
+        m_pendingExtension = ".~d2i";
+        m_finalExtension = ".d2i";
+        m_desiredRemainingSpace = 5 * 1024 * 1024 * 1024L; //5GB
+        m_encodingMethod = EncodingDefinition.FixedSizeCombinedEncoding;
+        WritePath = new ImmutableList<string>(x =>
+        {
+            PathHelpers.ValidatePathName(x);
+
+            return x;
+        });
+        Flags = new ImmutableList<Guid>();
+    }
+
+    #endregion
 }

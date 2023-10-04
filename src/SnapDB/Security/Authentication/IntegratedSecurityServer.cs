@@ -35,39 +35,48 @@ namespace SnapDB.Security.Authentication;
 
 /// <summary>
 /// Uses windows integrated security to authentication.
-/// This uses NTLM in non-domain environments 
+/// This uses NTLM in non-domain environments
 /// and Kerberos in domain environments.
 /// </summary>
-public class IntegratedSecurityServer
-    : DisposableLoggingClassBase
+public class IntegratedSecurityServer : DisposableLoggingClassBase
 {
+    #region [ Members ]
+
     /// <summary>
     /// The location for all of the supported identities
     /// </summary>
     public IntegratedSecurityUserCredentials Users;
 
+    #endregion
+
+    #region [ Constructors ]
+
     /// <summary>
     /// Creates a new <see cref="IntegratedSecurityServer"/>.
     /// </summary>
-    public IntegratedSecurityServer()
-        : base(MessageClass.Component)
+    public IntegratedSecurityServer() : base(MessageClass.Component)
     {
         Users = new IntegratedSecurityUserCredentials();
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Authenticates the client stream
     /// </summary>
     /// <param name="stream">The stream to autenticate</param>
     /// <param name="userToken">the user token associated with the identity match</param>
-    /// <param name="additionalChallenge">Additional data that much match between the client and server
-    /// for the connection to succeed.</param>
+    /// <param name="additionalChallenge">
+    /// Additional data that much match between the client and server
+    /// for the connection to succeed.
+    /// </param>
     /// <returns>true if successful authentication. False otherwise.</returns>
     public bool TryAuthenticateAsServer(Stream stream, out Guid userToken, byte[] additionalChallenge = null)
     {
         userToken = Guid.Empty;
-        if (additionalChallenge is null)
-            additionalChallenge = new byte[] { };
+        additionalChallenge ??= new byte[] { };
         if (additionalChallenge.Length > short.MaxValue)
             throw new ArgumentOutOfRangeException(nameof(additionalChallenge), "Must be less than 32767 bytes");
 
@@ -84,35 +93,27 @@ public class IntegratedSecurityServer
 
         negotiateStream.Write((short)additionalChallenge.Length);
         if (additionalChallenge.Length > 0)
-        {
             negotiateStream.Write(additionalChallenge);
-        }
         negotiateStream.Flush();
 
         int len = negotiateStream.ReadInt16();
         if (len < 0)
         {
-            Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "Challenge Length is invalid: " + len.ToString());
+            Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "Challenge Length is invalid: " + len);
             return false;
         }
 
         byte[] remoteChallenge;
         if (len == 0)
-        {
             remoteChallenge = Array.Empty<byte>();
-        }
         else
-        {
             remoteChallenge = negotiateStream.ReadBytes(len);
-        }
 
         if (remoteChallenge.SecureEquals(additionalChallenge))
         {
             if (Users.TryGetToken(negotiateStream.RemoteIdentity, out userToken))
-            {
                 return true;
-            }
-            Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "User did not exist in the database: " + negotiateStream.RemoteIdentity.ToString());
+            Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "User did not exist in the database: " + negotiateStream.RemoteIdentity);
             return false;
         }
 
@@ -146,4 +147,6 @@ public class IntegratedSecurityServer
                 throw new VersionNotFoundException("Unknown encoding method");
         }
     }
+
+    #endregion
 }

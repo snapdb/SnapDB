@@ -31,15 +31,7 @@ namespace SnapDB.IO.Unmanaged;
 /// </summary>
 public class BlockArguments
 {
-    /// <summary>
-    /// The block returned must contain this position.
-    /// </summary>
-    public long Position;
-
-    /// <summary>
-    /// Indicates if the stream plans to write to this block.
-    /// </summary>
-    public bool IsWriting;
+    #region [ Members ]
 
     /// <summary>
     /// The pointer for the first byte of the block.
@@ -52,13 +44,25 @@ public class BlockArguments
     public long FirstPosition;
 
     /// <summary>
+    /// Indicates if the stream plans to write to this block.
+    /// </summary>
+    public bool IsWriting;
+
+    /// <summary>
     /// The length of the block.
     /// </summary>
     public int Length;
 
     /// <summary>
-    /// Notifies the calling class if this block supports 
+    /// The block returned must contain this position.
+    /// </summary>
+    public long Position;
+
+    /// <summary>
+    /// Notifies the calling class if this block supports
     /// writing without requiring this function to be called again if <see cref="IsWriting"/> was set to <c>false</c>.
     /// </summary>
     public bool SupportsWriting;
+
+    #endregion
 }

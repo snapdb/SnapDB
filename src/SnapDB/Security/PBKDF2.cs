@@ -25,10 +25,10 @@
 //******************************************************************************************************
 
 using System.Security.Cryptography;
-using Gemstone.ArrayExtensions;
 using Gemstone;
-using Org.BouncyCastle.Crypto.Macs;
+using Gemstone.ArrayExtensions;
 using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Macs;
 using Org.BouncyCastle.Crypto.Parameters;
 
 namespace SnapDB.Security;
@@ -46,6 +46,7 @@ public enum HmacMethod
     Sha384,
     Sha512
 }
+
 /// <summary>
 /// Implements a generic PBKDF2 <see cref="DeriveBytes"/> that will work from a custom cryptographic transform.
 /// <see cref="Rfc2898DeriveBytes"/> only implements a SHA-1 underlying hash function.
@@ -54,27 +55,33 @@ public enum HmacMethod
 /// It is recommended to use one of the HMAC-SHA implementations unless you understand the implications
 /// of using something differently.
 /// </remarks>
-public class Pbkdf2
-    : DeriveBytes
+public class Pbkdf2 : DeriveBytes
 {
+    #region [ Members ]
+
+    /// <summary>
+    /// The block number, which starts at 1, and increases every time that a new block must be computed.
+    /// </summary>
+    private int m_blockNumber;
+
+    private HMac m_hash1;
+
+    private uint m_iterations;
+
+    /// <summary>
+    /// A temporary location to store the hashed bytes.
+    /// </summary>
+    private readonly Queue<byte> m_results = new();
     //See defintion in: http://tools.ietf.org/html/rfc2898
 
     /// <summary>
     /// Contains the salt, along with an extra 4 bytes at the end to place the block number
     /// </summary>
     private byte[] m_saltWithBlock;
-    /// <summary>
-    /// The block number, which starts at 1, and increases every time that a new block must be computed.
-    /// </summary>
-    private int m_blockNumber;
-    /// <summary>
-    /// A temporary location to store the hashed bytes.
-    /// </summary>
-    private readonly Queue<byte> m_results = new();
 
-    private HMac m_hash1;
+    #endregion
 
-    private uint m_iterations;
+    #region [ Constructors ]
 
     /// <summary>
     /// Implements a <see cref="Pbkdf2"/> algorthim with a user definded MAC method.
@@ -122,20 +129,9 @@ public class Pbkdf2
         }
     }
 
-    private void Initialize(HMac hash, byte[] passwordBytes, byte[] salt, int iterations)
-    {
-        if (hash is null)
-            throw new ArgumentNullException(nameof(hash));
-        if (salt is null)
-            throw new ArgumentNullException(nameof(salt));
+    #endregion
 
-        hash.Init(new KeyParameter(passwordBytes));
-        m_blockNumber = 1;
-        m_saltWithBlock = salt.Combine(BigEndian.GetBytes(m_blockNumber));
-        m_iterations = (uint)iterations;
-        m_results.Clear();
-        m_hash1 = hash;
-    }
+    #region [ Methods ]
 
     /// <summary>
     /// When overridden in a derived class, resets the state of the operation.
@@ -165,6 +161,7 @@ public class Pbkdf2
                 ComputeNextBlock();
             results[x] = m_results.Dequeue();
         }
+
         return results;
     }
 
@@ -176,10 +173,23 @@ public class Pbkdf2
     protected override void Dispose(bool disposing)
     {
         if (disposing)
-        {
             m_hash1 = null;
-        }
         base.Dispose(disposing);
+    }
+
+    private void Initialize(HMac hash, byte[] passwordBytes, byte[] salt, int iterations)
+    {
+        if (hash is null)
+            throw new ArgumentNullException(nameof(hash));
+        if (salt is null)
+            throw new ArgumentNullException(nameof(salt));
+
+        hash.Init(new KeyParameter(passwordBytes));
+        m_blockNumber = 1;
+        m_saltWithBlock = salt.Combine(BigEndian.GetBytes(m_blockNumber));
+        m_iterations = (uint)iterations;
+        m_results.Clear();
+        m_hash1 = hash;
     }
 
     /// <summary>
@@ -219,7 +229,9 @@ public class Pbkdf2
             m_results.Enqueue(b);
     }
 
+    #endregion
 
+    #region [ Static ]
 
     /// <summary>
     /// Implements a <see cref="Pbkdf2"/> algorthim with a user definded MAC method.
@@ -238,4 +250,5 @@ public class Pbkdf2
         return kdf.GetBytes(length);
     }
 
+    #endregion
 }

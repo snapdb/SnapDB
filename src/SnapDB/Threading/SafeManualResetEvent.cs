@@ -36,23 +36,26 @@ namespace SnapDB.Threading;
 /// can cause other waiting threads to throw <see cref="ObjectDisposedException"/>.
 /// This class makes disposing of the class thread safe as well.
 /// Note: Not properly disposing of this class can cause all threads waiting on this
-/// class to wait indefinitely. 
+/// class to wait indefinitely.
 /// </remarks>
-public sealed class SafeManualResetEvent
-    : IDisposable
+public sealed class SafeManualResetEvent : IDisposable
 {
-    /// <summary>
-    /// A place to report exception logs associated with this class.
-    /// </summary>
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(SafeManualResetEvent), MessageClass.Component);
-    private bool m_disposed;
+    #region [ Members ]
+
+    private ManualResetEvent m_resetEvent;
+
     private readonly object m_syncRoot;
 
     /// <summary>
     /// The number of threads waiting.
     /// </summary>
     private int m_waitingThreadCount;
-    private ManualResetEvent m_resetEvent;
+
+    private bool m_disposed;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new <see cref="SafeManualResetEvent"/>.
@@ -62,6 +65,54 @@ public sealed class SafeManualResetEvent
     {
         m_syncRoot = new object();
         m_resetEvent = new ManualResetEvent(signaledState);
+    }
+
+    #endregion
+
+    #region [ Methods ]
+
+    /// <summary>
+    /// Releases all the resources used by the <see cref="SafeManualResetEvent"/> object.
+    /// Also signals all waiting threads and ignores all calls to <see cref="Reset"/>.
+    /// </summary>
+    public void Dispose()
+    {
+        lock (m_syncRoot)
+        {
+            if (m_disposed)
+                return;
+            m_disposed = true;
+
+            // If there are threads waiting, signal them to resume
+            // however, do not dispose of the wait handle, 
+            // allow the last waiting thread to dispose of the reset event.
+            if (m_waitingThreadCount > 0)
+            {
+                try
+                {
+                    m_resetEvent.Set();
+                }
+                catch (Exception ex)
+                {
+                    s_log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to Dispose() threw an exception", null, ex);
+                }
+            }
+            else
+            {
+                // Since no one is waiting on the reset event, it is safe
+                // to dispose of the wait handle.
+                try
+                {
+                    m_resetEvent.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    s_log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to Dispose() threw an exception", null, ex);
+                }
+
+                m_resetEvent = null;
+            }
+        }
     }
 
     //Note: A finalizer will not properly release waiting threads
@@ -122,6 +173,7 @@ public sealed class SafeManualResetEvent
 
             m_waitingThreadCount++;
         }
+
         try
         {
             m_resetEvent.WaitOne();
@@ -148,54 +200,21 @@ public sealed class SafeManualResetEvent
                     {
                         s_log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to WaitOne() threw an exception", null, ex);
                     }
+
                     m_resetEvent = null;
                 }
             }
         }
     }
 
+    #endregion
+
+    #region [ Static ]
 
     /// <summary>
-    /// Releases all the resources used by the <see cref="SafeManualResetEvent"/> object.
-    /// Also signals all waiting threads and ignores all calls to <see cref="Reset"/>.
+    /// A place to report exception logs associated with this class.
     /// </summary>
-    public void Dispose()
-    {
-        lock (m_syncRoot)
-        {
-            if (m_disposed)
-                return;
-            m_disposed = true;
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(SafeManualResetEvent), MessageClass.Component);
 
-            // If there are threads waiting, signal them to resume
-            // however, do not dispose of the wait handle, 
-            // allow the last waiting thread to dispose of the reset event.
-            if (m_waitingThreadCount > 0)
-            {
-                try
-                {
-                    m_resetEvent.Set();
-                }
-                catch (Exception ex)
-                {
-                    s_log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to Dispose() threw an exception", null, ex);
-                }
-            }
-            else
-            {
-                // Since no one is waiting on the reset event, it is safe
-                // to dispose of the wait handle.
-                try
-                {
-                    m_resetEvent.Dispose();
-                }
-                catch (Exception ex)
-                {
-                    s_log.Publish(MessageLevel.NA, MessageFlags.BugReport, "Possible miscoordination of dispose method", "Call to Dispose() threw an exception", null, ex);
-                }
-                m_resetEvent = null;
-            }
-        }
-    }
-
+    #endregion
 }

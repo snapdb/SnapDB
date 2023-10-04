@@ -24,31 +24,36 @@
 //  
 //******************************************************************************************************
 
-using Gemstone.IO.StreamExtensions;
 using System.Data;
+using Gemstone.IO.StreamExtensions;
 
 namespace SnapDB.Snap.Services.Writer;
 
 /// <summary>
 /// A collection of settings for <see cref="CombineFiles{TKey,TValue}"/>.
 /// </summary>
-public class CombineFilesSettings
-    : SettingsBase<CombineFilesSettings>
+public class CombineFilesSettings : SettingsBase<CombineFilesSettings>
 {
-    private int m_executeTimer = 60000;
-    private string m_logPath = string.Empty;
+    #region [ Members ]
+
+    private SimplifiedArchiveInitializerSettings m_archiveSettings = new();
     private int m_combineOnFileCount = 100;
     private long m_combineOnFileSize = 1024 * 1024 * 1024;
+    private int m_executeTimer = 60000;
+    private string m_logPath = string.Empty;
     private Guid m_matchFlag = Guid.Empty;
-    private SimplifiedArchiveInitializerSettings m_archiveSettings = new();
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets the rate a which a rollover check is executed
     /// Time is in milliseconds.
     /// </summary>
     /// <remarks>
-    /// Default is every 60,000 milliseconds. 
-    /// Must be between 1 second and 10 minutes. 
+    /// Default is every 60,000 milliseconds.
+    /// Must be between 1 second and 10 minutes.
     /// Anything outside this range will substitute for the closest valid value.
     /// </remarks>
     public int ExecuteTimer
@@ -58,17 +63,11 @@ public class CombineFilesSettings
         {
             TestForEditable();
             if (value < 1000)
-            {
                 m_executeTimer = 1000;
-            }
             else if (value > 600000)
-            {
                 m_executeTimer = 600000;
-            }
             else
-            {
                 m_executeTimer = value;
-            }
         }
     }
 
@@ -85,19 +84,15 @@ public class CombineFilesSettings
         {
             TestForEditable();
             if (string.IsNullOrWhiteSpace(value))
-            {
                 m_logPath = string.Empty;
-            }
             else
-            {
                 m_logPath = value;
-            }
         }
     }
 
     /// <summary>
     /// The number of files with the specified <see cref="MatchFlag"/>
-    /// before they will be combined. 
+    /// before they will be combined.
     /// </summary>
     /// <remarks>
     /// Must be between 2 and 1000.
@@ -109,17 +104,11 @@ public class CombineFilesSettings
         {
             TestForEditable();
             if (value < 2)
-            {
                 m_combineOnFileCount = 2;
-            }
             else if (value > 1000)
-            {
                 m_combineOnFileCount = 1000;
-            }
             else
-            {
                 m_combineOnFileCount = value;
-            }
         }
     }
 
@@ -136,17 +125,11 @@ public class CombineFilesSettings
         {
             TestForEditable();
             if (value < 1 * 1024L * 1024L)
-            {
                 m_combineOnFileSize = 1 * 1024L * 1024L;
-            }
             else if (value > 100 * 1024L * 1024L * 1024L)
-            {
                 m_combineOnFileSize = 100 * 1024L * 1024L * 1024L;
-            }
             else
-            {
                 m_combineOnFileSize = value;
-            }
         }
     }
 
@@ -175,6 +158,10 @@ public class CombineFilesSettings
             m_archiveSettings = value ?? throw new ArgumentNullException(nameof(value));
         }
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     public override void Save(Stream stream)
     {
@@ -210,4 +197,6 @@ public class CombineFilesSettings
     {
         m_archiveSettings.Validate();
     }
+
+    #endregion
 }

@@ -36,20 +36,186 @@ namespace SnapDB.Snap.Services.Net;
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-public class StreamingClientDatabase<TKey, TValue>
-    : ClientDatabaseBase<TKey, TValue>
-
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class StreamingClientDatabase<TKey, TValue> : ClientDatabaseBase<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
-    private BulkWriting? m_writer;
+    #region [ Members ]
+
+    /// <summary>
+    /// Handles bulk writing to a streaming interface.
+    /// </summary>
+    public class BulkWriting : IDisposable
+    {
+        #region [ Members ]
+
+        private readonly StreamingClientDatabase<TKey, TValue> m_client;
+        private readonly StreamEncodingBase<TKey, TValue> m_encodingMode;
+        private readonly RemoteBinaryStream m_stream;
+        private bool m_disposed;
+
+        #endregion
+
+        #region [ Constructors ]
+
+        internal BulkWriting(StreamingClientDatabase<TKey, TValue> client)
+        {
+            if (client.m_writer is not null)
+                throw new Exception("Duplicate call to StartBulkWriting");
+
+            m_client = client;
+            m_client.m_writer = this;
+            m_stream = m_client.m_stream;
+            m_encodingMode = m_client.m_encodingMode;
+
+            m_stream.Write((byte)ServerCommand.Write);
+            m_encodingMode.ResetEncoder();
+        }
+
+        #endregion
+
+        #region [ Methods ]
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <filterpriority>2</filterpriority>
+        public void Dispose()
+        {
+            if (m_disposed)
+                return;
+
+            m_client.m_writer = null;
+            m_disposed = true;
+
+            m_encodingMode.WriteEndOfStream(m_stream);
+            m_stream.Flush();
+        }
+
+        /// <summary>
+        /// Writes to the encoded stream.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public void Write(TKey key, TValue value)
+        {
+            m_encodingMode.Encode(m_stream, key, value);
+        }
+
+        #endregion
+    }
+
+    private class PointReader : TreeStream<TKey, TValue>
+    {
+        #region [ Members ]
+
+        private bool m_completed;
+
+        private readonly StreamEncodingBase<TKey, TValue> m_encodingMethod;
+        private readonly Action m_onComplete;
+        private readonly RemoteBinaryStream m_stream;
+
+        #endregion
+
+        #region [ Constructors ]
+
+        public PointReader(StreamEncodingBase<TKey, TValue> encodingMethod, RemoteBinaryStream stream, Action onComplete)
+        {
+            m_onComplete = onComplete;
+            m_encodingMethod = encodingMethod;
+            m_stream = stream;
+            encodingMethod.ResetEncoder();
+        }
+
+        #endregion
+
+        #region [ Methods ]
+
+        /// <summary>
+        /// Cancels the read operation.
+        /// </summary>
+        public void Cancel()
+        {
+            // TODO: Actually cancel the stream.
+            TKey key = new();
+            TValue value = new();
+
+            if (m_completed)
+                return;
+
+            // Flush the rest of the data off of the receive queue.
+            while (m_encodingMethod.TryDecode(m_stream, key, value))
+            {
+                // CurrentKey.ReadCompressed(m_client.m_stream, CurrentKey);
+                // CurrentValue.ReadCompressed(m_client.m_stream, CurrentValue);
+            }
+
+            Complete();
+        }
+
+        /// <summary>
+        /// Advances the stream to the next value.
+        /// If before the beginning of the stream, advances to the first value
+        /// </summary>
+        /// <returns>True if the advance was successful. False if the end of the stream was reached.</returns>
+        protected override bool ReadNext(TKey key, TValue value)
+        {
+            if (!m_completed && m_encodingMethod.TryDecode(m_stream, key, value))
+                return true;
+
+            Complete();
+            return false;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                Cancel();
+
+            base.Dispose(disposing);
+        }
+
+        private void Complete()
+        {
+            if (!m_completed)
+            {
+                m_completed = true;
+                m_onComplete();
+                string exception;
+                ServerResponse command = (ServerResponse)m_stream.ReadUInt8();
+                switch (command)
+                {
+                    case ServerResponse.UnhandledException:
+                        exception = m_stream.ReadString();
+                        throw new Exception("Server UnhandledException: \n" + exception);
+                    case ServerResponse.ErrorWhileReading:
+                        exception = m_stream.ReadString();
+                        throw new Exception("Server Error While Reading: \n" + exception);
+
+                    case ServerResponse.CanceledRead:
+                        break;
+                    case ServerResponse.ReadComplete:
+                        break;
+                    default:
+                        throw new Exception("Unknown server response: " + command);
+                }
+            }
+        }
+
+        #endregion
+    }
+
+    private StreamEncodingBase<TKey, TValue> m_encodingMode = default!;
+
+    private readonly Action m_onDispose;
+    private PointReader? m_reader;
+    private readonly RemoteBinaryStream m_stream;
     private readonly TKey m_tmpKey;
     private readonly TValue m_tmpValue;
-    private PointReader? m_reader;
+    private BulkWriting? m_writer;
     private bool m_disposed;
-    private readonly RemoteBinaryStream m_stream;
-    private readonly Action m_onDispose;
-    private StreamEncodingBase<TKey, TValue> m_encodingMode = default!;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a streaming wrapper around a database.
@@ -65,6 +231,24 @@ public class StreamingClientDatabase<TKey, TValue>
         m_onDispose = onDispose;
         m_stream = stream;
     }
+
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// Gets if has been disposed.
+    /// </summary>
+    public override bool IsDisposed => m_disposed;
+
+    /// <summary>
+    /// Gets basic information about the current Database.
+    /// </summary>
+    public override DatabaseInfo Info { get; }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Defines the encoding method to use for the server.
@@ -89,7 +273,7 @@ public class StreamingClientDatabase<TKey, TValue>
             case ServerResponse.EncodingMethodAccepted:
                 break;
             default:
-                throw new Exception("Unknown server response: " + command.ToString());
+                throw new Exception("Unknown server response: " + command);
         }
     }
 
@@ -143,7 +327,7 @@ public class StreamingClientDatabase<TKey, TValue>
         m_stream.Flush();
 
         ServerResponse command = (ServerResponse)m_stream.ReadUInt8();
-        
+
         switch (command)
         {
             case ServerResponse.UnhandledException:
@@ -161,7 +345,7 @@ public class StreamingClientDatabase<TKey, TValue>
                 exception = m_stream.ReadString();
                 throw new Exception("Server Error While Reading: \n" + exception);
             default:
-                throw new Exception("Unknown server response: " + command.ToString());
+                throw new Exception("Unknown server response: " + command);
         }
 
         m_reader = new PointReader(m_encodingMode, m_stream, () => m_reader = null);
@@ -171,7 +355,7 @@ public class StreamingClientDatabase<TKey, TValue>
 
 
     /// <summary>
-    /// Writes the tree stream to the database. 
+    /// Writes the tree stream to the database.
     /// </summary>
     /// <param name="stream">all of the key/value pairs to add to the database.</param>
     public override void Write(TreeStream<TKey, TValue> stream)
@@ -182,9 +366,7 @@ public class StreamingClientDatabase<TKey, TValue>
         m_stream.Write((byte)ServerCommand.Write);
         m_encodingMode.ResetEncoder();
         while (stream.Read(m_tmpKey, m_tmpValue))
-        {
             m_encodingMode.Encode(m_stream, m_tmpKey, m_tmpValue);
-        }
         m_encodingMode.WriteEndOfStream(m_stream);
         m_stream.Flush();
     }
@@ -207,7 +389,7 @@ public class StreamingClientDatabase<TKey, TValue>
     }
 
     /// <summary>
-    /// Due to the blocking nature of streams, this helper class can substantially 
+    /// Due to the blocking nature of streams, this helper class can substantially
     /// improve the performance of writing streaming points to the historian.
     /// </summary>
     /// <returns></returns>
@@ -252,20 +434,10 @@ public class StreamingClientDatabase<TKey, TValue>
     }
 
     /// <summary>
-    /// Gets if has been disposed.
-    /// </summary>
-    public override bool IsDisposed => m_disposed;
-
-    /// <summary>
-    /// Gets basic information about the current Database.
-    /// </summary>
-    public override DatabaseInfo Info { get; }
-
-    /// <summary>
-    /// Forces a soft commit on the database. A soft commit 
+    /// Forces a soft commit on the database. A soft commit
     /// only commits data to memory. This allows other clients to read the data.
     /// While soft committed, this data could be lost during an unexpected shutdown.
-    /// Soft commits usually occur within microseconds. 
+    /// Soft commits usually occur within microseconds.
     /// </summary>
     public override void SoftCommit()
     {
@@ -275,7 +447,7 @@ public class StreamingClientDatabase<TKey, TValue>
     /// <summary>
     /// Forces a commit to the disk subsystem. Once this returns, the data will not
     /// be lost due to an application crash or unexpected shutdown.
-    /// Hard commits can take 100ms or longer depending on how much data has to be committed. 
+    /// Hard commits can take 100ms or longer depending on how much data has to be committed.
     /// This requires two consecutive hardware cache flushes.
     /// </summary>
     public override void HardCommit()
@@ -291,7 +463,7 @@ public class StreamingClientDatabase<TKey, TValue>
     {
         if (m_disposed)
             return;
-        
+
         m_disposed = true;
 
         m_reader?.Dispose();
@@ -301,7 +473,7 @@ public class StreamingClientDatabase<TKey, TValue>
         m_onDispose();
 
         ServerResponse command = (ServerResponse)m_stream.ReadUInt8();
-        
+
         switch (command)
         {
             case ServerResponse.UnhandledException:
@@ -310,152 +482,9 @@ public class StreamingClientDatabase<TKey, TValue>
             case ServerResponse.DatabaseDisconnected:
                 break;
             default:
-                throw new Exception("Unknown server response: " + command.ToString());
+                throw new Exception("Unknown server response: " + command);
         }
     }
 
-    /// <summary>
-    /// Handles bulk writing to a streaming interface.
-    /// </summary>
-    public class BulkWriting
-        : IDisposable
-    {
-        private bool m_disposed;
-        private readonly StreamingClientDatabase<TKey, TValue> m_client;
-        private readonly RemoteBinaryStream m_stream;
-        private readonly StreamEncodingBase<TKey, TValue> m_encodingMode;
-
-        internal BulkWriting(StreamingClientDatabase<TKey, TValue> client)
-        {
-            if (client.m_writer is not null)
-                throw new Exception("Duplicate call to StartBulkWriting");
-
-            m_client = client;
-            m_client.m_writer = this;
-            m_stream = m_client.m_stream;
-            m_encodingMode = m_client.m_encodingMode;
-
-            m_stream.Write((byte)ServerCommand.Write);
-            m_encodingMode.ResetEncoder();
-        }
-
-        /// <summary>
-        /// Writes to the encoded stream.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        public void Write(TKey key, TValue value)
-        {
-            m_encodingMode.Encode(m_stream, key, value);
-        }
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        /// <filterpriority>2</filterpriority>
-        public void Dispose()
-        {
-            if (m_disposed)
-                return;
-            
-            m_client.m_writer = null;
-            m_disposed = true;
-
-            m_encodingMode.WriteEndOfStream(m_stream);
-            m_stream.Flush();
-        }
-    }
-
-    private class PointReader
-        : TreeStream<TKey, TValue>
-    {
-        private bool m_completed;
-        private readonly Action m_onComplete;
-        private readonly StreamEncodingBase<TKey, TValue> m_encodingMethod;
-        private readonly RemoteBinaryStream m_stream;
-
-        public PointReader(StreamEncodingBase<TKey, TValue> encodingMethod, RemoteBinaryStream stream, Action onComplete)
-        {
-            m_onComplete = onComplete;
-            m_encodingMethod = encodingMethod;
-            m_stream = stream;
-            encodingMethod.ResetEncoder();
-        }
-
-        /// <summary>
-        /// Advances the stream to the next value. 
-        /// If before the beginning of the stream, advances to the first value
-        /// </summary>
-        /// <returns>True if the advance was successful. False if the end of the stream was reached.</returns>
-        protected override bool ReadNext(TKey key, TValue value)
-        {
-            if (!m_completed && m_encodingMethod.TryDecode(m_stream, key, value))
-            {
-                return true;
-            }
-            else
-            {
-                Complete();
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Cancels the read operation.
-        /// </summary>
-        public void Cancel()
-        {
-            // TODO: Actually cancel the stream.
-            TKey key = new();
-            TValue value = new();
-
-            if (m_completed)
-                return;
-            
-            // Flush the rest of the data off of the receive queue.
-            while (m_encodingMethod.TryDecode(m_stream, key, value))
-            {
-                // CurrentKey.ReadCompressed(m_client.m_stream, CurrentKey);
-                // CurrentValue.ReadCompressed(m_client.m_stream, CurrentValue);
-            }
-            
-            Complete();
-        }
-
-        private void Complete()
-        {
-            if (!m_completed)
-            {
-                m_completed = true;
-                m_onComplete();
-                string exception;
-                ServerResponse command = (ServerResponse)m_stream.ReadUInt8();
-                switch (command)
-                {
-                    case ServerResponse.UnhandledException:
-                        exception = m_stream.ReadString();
-                        throw new Exception("Server UnhandledException: \n" + exception);
-                    case ServerResponse.ErrorWhileReading:
-                        exception = m_stream.ReadString();
-                        throw new Exception("Server Error While Reading: \n" + exception);
-
-                    case ServerResponse.CanceledRead:
-                        break;
-                    case ServerResponse.ReadComplete:
-                        break;
-                    default:
-                        throw new Exception("Unknown server response: " + command.ToString());
-                }
-
-            }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-                Cancel();
-
-            base.Dispose(disposing);
-        }
-    }
+    #endregion
 }

@@ -24,8 +24,8 @@
 //
 //******************************************************************************************************
 
-using SnapDB.IO.FileStructure.Media;
 using Gemstone.Diagnostics;
+using SnapDB.IO.FileStructure.Media;
 
 namespace SnapDB.IO.FileStructure;
 
@@ -34,67 +34,21 @@ namespace SnapDB.IO.FileStructure;
 /// reading and writing to an archive disk. This class contains two I/O Sessions if the file
 /// supports modification to speed up the copy operation when doing shadow copies.
 /// </summary>
-internal class SubFileDiskIoSessionPool
-    : IDisposable
+internal class SubFileDiskIoSessionPool : IDisposable
 {
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(SubFileDiskIoSessionPool), MessageClass.Component);
+    #region [ Members ]
 
-    public DiskIoSession SourceData;
-    /// <summary>
-    /// <c>null</c> if in readonly mode
-    /// </summary>
-    public DiskIoSession DestinationData;
+    public DiskIoSession? DestinationData; // null if readonly
 
-    public DiskIoSession SourceIndex;
-    /// <summary>
-    /// <c>null</c> if in readonly mode.
-    /// </summary>
-    public DiskIoSession DestinationIndex;
+    public DiskIoSession? DestinationIndex; // null if readonly
 
-    /// <summary>
-    /// The file.
-    /// </summary>
-    public SubFileHeader? File
-    {
-        get;
-        private set;
-    }
+    public DiskIoSession? SourceData;
 
-    /// <summary>
-    /// The Header.
-    /// </summary>
-    public FileHeaderBlock Header
-    {
-        get;
-        private set;
-    }
+    public DiskIoSession? SourceIndex;
 
-    /// <summary>
-    /// Contains the last block that is considered as "read only". This is the same as the end of the committed space
-    /// in the transactional file system.
-    /// </summary>
-    public uint LastReadonlyBlock
-    {
-        get;
-        private set;
-    }
+    #endregion
 
-    /// <summary>
-    /// Gets if the file is "read only".
-    /// </summary>
-    public bool IsReadOnly
-    {
-        get;
-    }
-
-    /// <summary>
-    /// Gets if this class has been disposed.
-    /// </summary>
-    public bool IsDisposed
-    {
-        get;
-        private set;
-    }
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates this file with the following data.
@@ -112,11 +66,11 @@ internal class SubFileDiskIoSessionPool
         SourceData = diskIo.CreateDiskIoSession(header, file);
         SourceIndex = diskIo.CreateDiskIoSession(header, file);
 
-        if (!isReadOnly)
-        {
-            DestinationData = diskIo.CreateDiskIoSession(header, file);
-            DestinationIndex = diskIo.CreateDiskIoSession(header, file);
-        }
+        if (isReadOnly)
+            return;
+
+        DestinationData = diskIo.CreateDiskIoSession(header, file);
+        DestinationIndex = diskIo.CreateDiskIoSession(header, file);
     }
 
 #if DEBUG
@@ -126,44 +80,25 @@ internal class SubFileDiskIoSessionPool
     }
 #endif
 
-    /// <summary>
-    /// Swaps the source and destination index I/O Sessions.
-    /// </summary>
-    public void SwapIndex()
-    {
-        if (IsReadOnly)
-            throw new NotSupportedException("Not supported when in read only mode");
+    #endregion
 
-        DiskIoSession swap = SourceIndex;
-        SourceIndex = DestinationIndex;
-        DestinationIndex = swap;
-    }
+    #region [ Properties ]
 
-    /// <summary>
-    /// Swaps the source and destination Data I/O Sessions.
-    /// </summary>
-    public void SwapData()
-    {
-        if (IsReadOnly)
-            throw new NotSupportedException("Not supported when in read only mode");
-        DiskIoSession swap = SourceData;
-        SourceData = DestinationData;
-        DestinationData = swap;
-    }
+    public SubFileHeader? File { get; private set; }
 
-    /// <summary>
-    /// Releases all of the data associated with the I/O Sessions.
-    /// </summary>
-    public void Clear()
-    {
-        SourceData?.Clear();
+    public FileHeaderBlock Header { get; private set; }
 
-        DestinationData?.Clear();
+    // Contains the last block that is considered as "read only". This is the same as the end of the committed space
+    // in the transactional file system.
+    public uint LastReadonlyBlock { get; private set; }
 
-        SourceIndex?.Clear();
+    public bool IsReadOnly { get; }
 
-        DestinationIndex?.Clear();
-    }
+    public bool IsDisposed { get; private set; }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -198,4 +133,52 @@ internal class SubFileDiskIoSessionPool
             DestinationIndex = null;
         }
     }
+
+    /// <summary>
+    /// Swaps the source and destination index I/O Sessions.
+    /// </summary>
+    public void SwapIndex()
+    {
+        if (IsReadOnly)
+            throw new NotSupportedException("Not supported when in read only mode");
+
+        DiskIoSession swap = SourceIndex!;
+        SourceIndex = DestinationIndex!;
+        DestinationIndex = swap;
+    }
+
+    /// <summary>
+    /// Swaps the source and destination Data I/O Sessions.
+    /// </summary>
+    public void SwapData()
+    {
+        if (IsReadOnly)
+            throw new NotSupportedException("Not supported when in read only mode");
+
+        DiskIoSession swap = SourceData!;
+        SourceData = DestinationData!;
+        DestinationData = swap;
+    }
+
+    /// <summary>
+    /// Releases all of the data associated with the I/O Sessions.
+    /// </summary>
+    public void Clear()
+    {
+        SourceData?.Clear();
+
+        DestinationData?.Clear();
+
+        SourceIndex?.Clear();
+
+        DestinationIndex?.Clear();
+    }
+
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(SubFileDiskIoSessionPool), MessageClass.Component);
+
+    #endregion
 }

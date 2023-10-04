@@ -31,9 +31,9 @@ namespace SnapDB.Security;
 /// <summary>
 /// Creates a secure stream that connects via the default credential
 /// </summary>
-public class SecureStreamClientDefault
-    : SecureStreamClientBase
+public class SecureStreamClientDefault : SecureStreamClientBase
 {
+    #region [ Constructors ]
 
     /// <summary>
     /// Creates a new <see cref="SecureStreamClientIntegratedSecurity"/>
@@ -41,6 +41,10 @@ public class SecureStreamClientDefault
     public SecureStreamClientDefault()
     {
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Authenticates with the remote server.
@@ -53,4 +57,6 @@ public class SecureStreamClientDefault
         stream.WriteByte((byte)AuthenticationMode.None);
         return stream.ReadBoolean();
     }
+
+    #endregion
 }

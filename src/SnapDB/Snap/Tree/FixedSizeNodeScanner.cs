@@ -34,12 +34,15 @@ namespace SnapDB.Snap.Tree;
 /// </summary>
 /// <typeparam name="TKey">The type of keys in the node.</typeparam>
 /// <typeparam name="TValue">The type of values associated with keys in the node.</typeparam>
-public class FixedSizeNodeScanner<TKey, TValue>
-    : SortedTreeScannerBase<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class FixedSizeNodeScanner<TKey, TValue> : SortedTreeScannerBase<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Members ]
+
     private readonly int m_keyValueSize;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// creates a new class
@@ -48,11 +51,14 @@ public class FixedSizeNodeScanner<TKey, TValue>
     /// <param name="blockSize">The size of the block containing the fixed-size node.</param>
     /// <param name="stream">The binary stream pointer for navigating the tree structure.</param>
     /// <param name="lookupKey">A delegate function for looking up keys in the tree.</param>
-    public FixedSizeNodeScanner(byte level, int blockSize, BinaryStreamPointerBase stream, Func<TKey, byte, uint> lookupKey)
-        : base(level, blockSize, stream, lookupKey)
+    public FixedSizeNodeScanner(byte level, int blockSize, BinaryStreamPointerBase stream, Func<TKey, byte, uint> lookupKey) : base(level, blockSize, stream, lookupKey)
     {
         m_keyValueSize = KeySize + ValueSize;
     }
+
+    #endregion
+
+    #region [ Methods ]
 
     /// <summary>
     /// Reads the next key-value pair from the internal byte buffer and advances the read pointer.
@@ -177,4 +183,6 @@ public class FixedSizeNodeScanner<TKey, TValue>
 
         IndexOfNextKeyValue = offset;
     }
+
+    #endregion
 }

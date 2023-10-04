@@ -30,17 +30,65 @@ namespace SnapDB.Snap.Encoding;
 
 /// <summary>
 /// Contains all of the fundamental encoding methods. Types implementing <see cref="SnapTypeBase{T}"/>
-/// will automatically register when passed to one of the child methods. 
+/// will automatically register when passed to one of the child methods.
 /// </summary>
 public class EncodingLibrary
 {
-    private readonly IndividualEncodingDictionary m_individualEncoding;
+    #region [ Members ]
+
     private readonly PairEncodingDictionary m_doubleEncoding;
+    private readonly IndividualEncodingDictionary m_individualEncoding;
+
+    #endregion
+
+    #region [ Constructors ]
 
     internal EncodingLibrary()
     {
         m_individualEncoding = new IndividualEncodingDictionary();
         m_doubleEncoding = new PairEncodingDictionary();
+    }
+
+    #endregion
+
+    #region [ Methods ]
+
+    /// <summary>
+    /// Gets the single encoding method if it exists in the database.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="encodingMethod"></param>
+    /// <returns></returns>
+    public IndividualEncodingBase<T> GetEncodingMethod<T>(Guid encodingMethod) where T : SnapTypeBase<T>, new()
+    {
+        if (encodingMethod == EncodingDefinition.FixedSizeIndividualGuid)
+            return new IndividualEncodingFixedSize<T>();
+
+        if (m_individualEncoding.TryGetEncodingMethod<T>(encodingMethod, out IndividualEncodingDefinitionBase encoding))
+            return encoding.Create<T>();
+
+        throw new Exception("Type is not registered");
+    }
+
+    /// <summary>
+    /// Gets the Double encoding method
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="encodingMethod"></param>
+    /// <returns></returns>
+    public PairEncodingBase<TKey, TValue> GetEncodingMethod<TKey, TValue>(EncodingDefinition encodingMethod) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    {
+        if (encodingMethod.IsFixedSizeEncoding)
+            return new PairEncodingFixedSize<TKey, TValue>();
+
+        if (m_doubleEncoding.TryGetEncodingMethod<TKey, TValue>(encodingMethod, out PairEncodingDefinitionBase encoding))
+            return encoding.Create<TKey, TValue>();
+
+        if (encodingMethod.IsKeyValueEncoded)
+            throw new Exception("Type is not registered");
+
+        return new PairEncodingGeneric<TKey, TValue>(encodingMethod);
     }
 
     /// <summary>
@@ -61,44 +109,5 @@ public class EncodingLibrary
         m_doubleEncoding.Register(encoding);
     }
 
-    /// <summary>
-    /// Gets the single encoding method if it exists in the database.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="encodingMethod"></param>
-    /// <returns></returns>
-    public IndividualEncodingBase<T> GetEncodingMethod<T>(Guid encodingMethod)
-        where T : SnapTypeBase<T>, new()
-    {
-        if (encodingMethod == EncodingDefinition.FixedSizeIndividualGuid)
-            return new IndividualEncodingFixedSize<T>();
-
-        if (m_individualEncoding.TryGetEncodingMethod<T>(encodingMethod, out IndividualEncodingDefinitionBase encoding))
-            return encoding.Create<T>();
-
-        throw new Exception("Type is not registered");
-    }
-
-    /// <summary>
-    /// Gets the Double encoding method
-    /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <param name="encodingMethod"></param>
-    /// <returns></returns>
-    public PairEncodingBase<TKey, TValue> GetEncodingMethod<TKey, TValue>(EncodingDefinition encodingMethod)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
-    {
-        if (encodingMethod.IsFixedSizeEncoding)
-            return new PairEncodingFixedSize<TKey, TValue>();
-
-        if (m_doubleEncoding.TryGetEncodingMethod<TKey, TValue>(encodingMethod, out PairEncodingDefinitionBase encoding))
-            return encoding.Create<TKey, TValue>();
-
-        if (encodingMethod.IsKeyValueEncoded)
-            throw new Exception("Type is not registered");
-
-        return new PairEncodingGeneric<TKey, TValue>(encodingMethod);
-    }
+    #endregion
 }

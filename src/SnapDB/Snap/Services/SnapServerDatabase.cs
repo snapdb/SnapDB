@@ -24,42 +24,39 @@
 //
 //******************************************************************************************************
 
+using System.Text;
 using Gemstone.Diagnostics;
 using SnapDB.Snap.Filters;
 using SnapDB.Snap.Services.Reader;
 using SnapDB.Snap.Services.Writer;
 using SnapDB.Threading;
-using System.Text;
 
 namespace SnapDB.Snap.Services;
 
 /// <summary>
 /// Creates an engine for reading/writing data from a SortedTreeStore.
 /// </summary>
-public partial class SnapServerDatabase<TKey, TValue>
-     : SnapServerDatabaseBase
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public partial class SnapServerDatabase<TKey, TValue> : SnapServerDatabaseBase where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
+
+    private readonly ArchiveList<TKey, TValue> m_archiveList;
+    private readonly WriteProcessor<TKey, TValue> m_archiveWriter;
+    private readonly RolloverLog m_rolloverLog;
+    private readonly ServerDatabaseSettings m_settings;
+    private readonly List<EncodingDefinition> m_supportedStreamingMethods;
 
     // Fields
     //private readonly List<ArchiveListRemovalStatus<TKey, TValue>> m_pendingDispose;
     private readonly TKey m_tmpKey;
     private readonly TValue m_tmpValue;
-    private readonly WriteProcessor<TKey, TValue> m_archiveWriter;
-    private readonly ArchiveList<TKey, TValue> m_archiveList;
     private volatile bool m_disposed;
-    private readonly List<EncodingDefinition> m_supportedStreamingMethods;
-    private readonly ServerDatabaseSettings m_settings;
-    private readonly RolloverLog m_rolloverLog;
 
     #endregion
 
     #region [ Constructors ]
 
     /// <summary>
-    /// 
     /// </summary>
     /// <param name="settings"></param>
     public SnapServerDatabase(ServerDatabaseSettings settings)
@@ -86,15 +83,6 @@ public partial class SnapServerDatabase<TKey, TValue>
         }
     }
 
-    /// <summary>
-    /// Loads the provided files from all of the specified paths.
-    /// </summary>
-    /// <param name="paths">all of the paths of archive files to attach. These can either be a path, or an individual file name.</param>
-    private void AttachFilesOrPaths(IEnumerable<string> paths)
-    {
-        m_archiveList.AttachFileOrPath(paths);
-    }
-
     #endregion
 
     #region [ Properties ]
@@ -118,25 +106,13 @@ public partial class SnapServerDatabase<TKey, TValue>
         m_archiveList.GetFullStatus(status, maxFileListing);
     }
 
-    private List<ArchiveDetails> GetAllAttachedFiles()
+    /// <summary>
+    /// Creates a <see cref="ClientDatabase"/>
+    /// </summary>
+    /// <returns></returns>
+    public override ClientDatabaseBase CreateClientDatabase(SnapClient client, Action<ClientDatabaseBase> onDispose)
     {
-        return m_archiveList.GetAllAttachedFiles();
-    }
-
-    private void DetatchFiles(List<Guid> files)
-    {
-        using ArchiveListEditor<TKey, TValue> editor = m_archiveList.AcquireEditLock();
-
-        foreach (Guid file in files)
-            editor.TryRemoveAndDispose(file);
-    }
-
-    private void DeleteFiles(List<Guid> files)
-    {
-        using ArchiveListEditor<TKey, TValue> editor = m_archiveList.AcquireEditLock();
-
-        foreach (Guid file in files)
-            editor.TryRemoveAndDelete(file);
+        return new ClientDatabase(this, client, onDispose);
     }
 
     /// <summary>
@@ -162,16 +138,46 @@ public partial class SnapServerDatabase<TKey, TValue>
         }
         finally
         {
-            m_disposed = true;       // Prevent duplicate dispose.
+            m_disposed = true; // Prevent duplicate dispose.
             base.Dispose(disposing); // Call base class Dispose().
         }
     }
 
     /// <summary>
-    /// Forces a soft commit on the database. A soft commit 
+    /// Loads the provided files from all of the specified paths.
+    /// </summary>
+    /// <param name="paths">all of the paths of archive files to attach. These can either be a path, or an individual file name.</param>
+    private void AttachFilesOrPaths(IEnumerable<string> paths)
+    {
+        m_archiveList.AttachFileOrPath(paths);
+    }
+
+    private List<ArchiveDetails> GetAllAttachedFiles()
+    {
+        return m_archiveList.GetAllAttachedFiles();
+    }
+
+    private void DetatchFiles(List<Guid> files)
+    {
+        using ArchiveListEditor<TKey, TValue> editor = m_archiveList.AcquireEditLock();
+
+        foreach (Guid file in files)
+            editor.TryRemoveAndDispose(file);
+    }
+
+    private void DeleteFiles(List<Guid> files)
+    {
+        using ArchiveListEditor<TKey, TValue> editor = m_archiveList.AcquireEditLock();
+
+        foreach (Guid file in files)
+            editor.TryRemoveAndDelete(file);
+    }
+
+    /// <summary>
+    /// Forces a soft commit on the database. A soft commit
     /// only commits data to memory. This allows other clients to read the data.
     /// While soft committed, this data could be lost during an unexpected shutdown.
-    /// Soft commits usually occur within microseconds. 
+    /// Soft commits usually occur within microseconds.
     /// </summary>
     private void SoftCommit()
     {
@@ -181,7 +187,7 @@ public partial class SnapServerDatabase<TKey, TValue>
     /// <summary>
     /// Forces a commit to the disk subsystem. Once this returns, the data will not
     /// be lost due to an application crash or unexpected shutdown.
-    /// Hard commits can take 100ms or longer depending on how much data has to be committed. 
+    /// Hard commits can take 100ms or longer depending on how much data has to be committed.
     /// This requires two consecutive hardware cache flushes.
     /// </summary>
     private void HardCommit()
@@ -210,25 +216,13 @@ public partial class SnapServerDatabase<TKey, TValue>
             Write(key, value);
     }
 
-    private SequentialReaderStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions,
-        SeekFilterBase<TKey> keySeekFilter,
-        MatchFilterBase<TKey, TValue>? keyMatchFilter,
-        WorkerThreadSynchronization workerThreadSynchronization)
+    private SequentialReaderStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions, SeekFilterBase<TKey> keySeekFilter, MatchFilterBase<TKey, TValue>? keyMatchFilter, WorkerThreadSynchronization workerThreadSynchronization)
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);
 
         Stats.QueriesExecuted++;
         return new SequentialReaderStream<TKey, TValue>(m_archiveList, readerOptions, keySeekFilter, keyMatchFilter, workerThreadSynchronization);
-    }
-
-    /// <summary>
-    /// Creates a <see cref="ClientDatabase"/>
-    /// </summary>
-    /// <returns></returns>
-    public override ClientDatabaseBase CreateClientDatabase(SnapClient client, Action<ClientDatabaseBase> onDispose)
-    {
-        return new ClientDatabase(this, client, onDispose);
     }
 
     #endregion

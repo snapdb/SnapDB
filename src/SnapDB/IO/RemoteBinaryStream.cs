@@ -31,24 +31,29 @@ namespace SnapDB.IO;
 /// <summary>
 /// Represents a remote binary stream for reading and writing data over a network connection.
 /// </summary>
-public class RemoteBinaryStream
-    : BinaryStreamBase
+public class RemoteBinaryStream : BinaryStreamBase
 {
+    #region [ Members ]
+
     private const int BufferSize = 1420;
-    private int m_receivePosition;
-    private int m_receiveLength;
-    private int m_sendLength;
     private readonly byte[] m_receiveBuffer;
+    private int m_receiveLength;
+    private int m_receivePosition;
     private readonly byte[] m_sendBuffer;
+    private int m_sendLength;
 
     private readonly Stream m_stream;
+
+    #endregion
+
+    #region [ Constructors ]
 
     /// <summary>
     /// Initializes a new instance of the RemoteBinaryStream class with the specified stream for communication.
     /// </summary>
     /// <param name="stream">The underlying stream used for communication.</param>
     /// <param name="workerThreadSynchronization">
-    ///     An optional instance of WorkerThreadSynchronization for synchronization. If not provided, a new instance will be created.
+    /// An optional instance of WorkerThreadSynchronization for synchronization. If not provided, a new instance will be created.
     /// </param>
     /// <exception cref="Exception">Thrown if the processor is not little-endian (not supported).</exception>
     public RemoteBinaryStream(Stream stream, WorkerThreadSynchronization? workerThreadSynchronization = null)
@@ -56,8 +61,7 @@ public class RemoteBinaryStream
         if (!BitConverter.IsLittleEndian)
             throw new Exception("BigEndian processors are not supported");
 
-        if (workerThreadSynchronization is null)
-            workerThreadSynchronization = new WorkerThreadSynchronization();
+        workerThreadSynchronization ??= new WorkerThreadSynchronization();
 
         WorkerThreadSynchronization = workerThreadSynchronization;
         m_receiveBuffer = new byte[BufferSize];
@@ -67,6 +71,10 @@ public class RemoteBinaryStream
         m_receivePosition = 0;
         m_stream = stream;
     }
+
+    #endregion
+
+    #region [ Properties ]
 
     /// <summary>
     /// Gets the WorkerThreadSynchronization instance used for synchronization in this stream.
@@ -103,6 +111,20 @@ public class RemoteBinaryStream
     }
 
     /// <summary>
+    /// Gets a value indicating whether the stream supports reading.
+    /// </summary>
+    public override bool CanRead => true;
+
+    /// <summary>
+    /// Gets a value indicating whether the stream supports seeking (positioning).
+    /// </summary>
+    public override bool CanSeek => false;
+
+    #endregion
+
+    #region [ Methods ]
+
+    /// <summary>
     /// Flushes any buffered data in the send buffer to the underlying stream.
     /// </summary>
     public override void Flush()
@@ -111,6 +133,7 @@ public class RemoteBinaryStream
             return;
 
         WorkerThreadSynchronization.BeginSafeToCallbackRegion();
+
         try
         {
             m_stream.Write(m_sendBuffer, 0, m_sendLength);
@@ -120,6 +143,7 @@ public class RemoteBinaryStream
         {
             WorkerThreadSynchronization.EndSafeToCallbackRegion();
         }
+
         m_sendLength = 0;
     }
 
@@ -154,7 +178,8 @@ public class RemoteBinaryStream
             m_receivePosition += count;
             return count;
         }
-        int origionalCount = count;
+
+        int originalCount = count;
 
         // First, empty the receive buffer.
         if (receiveBufferLength > 0)
@@ -170,7 +195,7 @@ public class RemoteBinaryStream
         // and copy directly to the destination.
         if (count > 100)
         {
-            // Loop, since ReceiveFromSocket can return parial results.
+            // Loop, since ReceiveFromSocket can return partial results.
             while (count > 0)
             {
                 WorkerThreadSynchronization.BeginSafeToCallbackRegion();
@@ -183,7 +208,6 @@ public class RemoteBinaryStream
                     WorkerThreadSynchronization.EndSafeToCallbackRegion();
                 }
 
-
                 if (receiveBufferLength == 0)
                     throw new EndOfStreamException();
 
@@ -191,53 +215,39 @@ public class RemoteBinaryStream
                 count -= receiveBufferLength;
             }
 
-            return origionalCount;
+            return originalCount;
         }
 
-        else
+        // With fewer than 100 bytes requested, 
+        // first fill up the receive buffer, 
+        // then copy this to the destination.
+        int prebufferLength = m_receiveBuffer.Length;
+        m_receiveLength = 0;
+
+        while (m_receiveLength < count)
         {
-            // With fewer than 100 bytes requested, 
-            // first fill up the receive buffer, 
-            // then copy this to the destination.
-            int prebufferLength = m_receiveBuffer.Length;
-            m_receiveLength = 0;
-            while (m_receiveLength < count)
-            {
-                WorkerThreadSynchronization.BeginSafeToCallbackRegion();
-                try
-                {
-                    receiveBufferLength = m_stream.Read(m_receiveBuffer, m_receiveLength, prebufferLength);
-                }
-                finally
-                {
-                    WorkerThreadSynchronization.EndSafeToCallbackRegion();
-                }
-
-                if (receiveBufferLength == 0)
-                    throw new EndOfStreamException();
-
-                m_receiveLength += receiveBufferLength;
-                prebufferLength -= receiveBufferLength;
-            }
-            Array.Copy(m_receiveBuffer, 0, buffer, offset, count);
-            m_receivePosition = count;
-
-            return origionalCount;
-        }
-    }
-
-    /// <summary>
-    /// Disposes of the RemoteBinaryStream, releasing any resources associated with it.
-    /// </summary>
-    /// <param name="disposing">
-    ///     A flag indicating whether the method is called from the finalizer or directly by user code.
-    /// </param>
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
             WorkerThreadSynchronization.BeginSafeToCallbackRegion();
 
-        base.Dispose(disposing);
+            try
+            {
+                receiveBufferLength = m_stream.Read(m_receiveBuffer, m_receiveLength, prebufferLength);
+            }
+            finally
+            {
+                WorkerThreadSynchronization.EndSafeToCallbackRegion();
+            }
+
+            if (receiveBufferLength == 0)
+                throw new EndOfStreamException();
+
+            m_receiveLength += receiveBufferLength;
+            prebufferLength -= receiveBufferLength;
+        }
+
+        Array.Copy(m_receiveBuffer, 0, buffer, offset, count);
+        m_receivePosition = count;
+
+        return originalCount;
     }
 
     /// <summary>
@@ -261,18 +271,17 @@ public class RemoteBinaryStream
     /// Writes an 8-byte (64-bit) signed integer to the stream.
     /// </summary>
     /// <param name="value">The long value to write to the stream.</param>
-    public unsafe override void Write(long value)
+    public override unsafe void Write(long value)
     {
         if (m_sendLength <= BufferSize - 8)
-        {
-            fixed (byte* lp = m_sendBuffer)
+            fixed (byte* ptr = m_sendBuffer)
             {
-                *(long*)(lp + m_sendLength) = value;
+                *(long*)(ptr + m_sendLength) = value;
                 m_sendLength += 8;
 
                 return;
             }
-        }
+
         base.Write(value);
     }
 
@@ -280,18 +289,17 @@ public class RemoteBinaryStream
     /// Writes a 4-byte (32-bit) signed integer to the stream.
     /// </summary>
     /// <param name="value">The integer value to write to the stream.</param>
-    public unsafe override void Write(int value)
+    public override unsafe void Write(int value)
     {
         if (m_sendLength <= BufferSize - 4)
-        {
-            fixed (byte* lp = m_sendBuffer)
+            fixed (byte* ptr = m_sendBuffer)
             {
-                *(int*)(lp + m_sendLength) = value;
+                *(int*)(ptr + m_sendLength) = value;
                 m_sendLength += 4;
 
                 return;
             }
-        }
+
         base.Write(value);
     }
 
@@ -299,14 +307,13 @@ public class RemoteBinaryStream
     /// Writes a 7-bit encoded unsigned 64-bit integer (UInt64) to the stream.
     /// </summary>
     /// <param name="value">The 7-bit encoded unsigned 64-bit integer (UInt64) value to write to the stream.</param>
-    public unsafe override void Write7Bit(ulong value)
+    public override unsafe void Write7Bit(ulong value)
     {
-        const int size = 9;
         if (m_sendLength <= BufferSize - 9)
-        {
-            fixed (byte* lp = m_sendBuffer)
+            fixed (byte* ptr = m_sendBuffer)
             {
-                byte* stream = lp + m_sendLength;
+                byte* stream = ptr + m_sendLength;
+
                 if (value < 128)
                 {
                     stream[0] = (byte)value;
@@ -364,6 +371,7 @@ public class RemoteBinaryStream
 
                     return;
                 }
+
                 stream[5] = (byte)((value >> (7 + 7 + 7 + 7 + 7)) | 128);
 
                 if (value < 128L * 128 * 128 * 128 * 128 * 128 * 128)
@@ -384,14 +392,13 @@ public class RemoteBinaryStream
                     return;
                 }
 
-                stream[7] = (byte)(value >> (7 + 7 + 7 + 7 + 7 + 7 + 7) | 128);
+                stream[7] = (byte)((value >> (7 + 7 + 7 + 7 + 7 + 7 + 7)) | 128);
                 stream[8] = (byte)(value >> (7 + 7 + 7 + 7 + 7 + 7 + 7 + 7));
                 m_sendLength += 9;
 
                 return;
             }
 
-        }
         base.Write7Bit(value);
     }
 
@@ -401,32 +408,30 @@ public class RemoteBinaryStream
     /// <returns>The unsigned byte (UInt8) read from the stream.</returns>
     public override byte ReadUInt8()
     {
-        if (m_receivePosition < m_receiveLength)
-        {
-            byte value = m_receiveBuffer[m_receivePosition];
-            m_receivePosition++;
+        if (m_receivePosition >= m_receiveLength)
+            return base.ReadUInt8();
 
-            return value;
-        }
-        return base.ReadUInt8();
+        byte value = m_receiveBuffer[m_receivePosition];
+        m_receivePosition++;
+
+        return value;
     }
 
     /// <summary>
     /// Reads a 4-byte (32-bit) signed integer from the stream.
     /// </summary>
     /// <returns>The 4-byte (32-bit) signed integer read from the stream.</returns>
-    public unsafe override int ReadInt32()
+    public override unsafe int ReadInt32()
     {
         if (m_receivePosition <= m_receiveLength - 4)
-        {
-            fixed (byte* lp = m_receiveBuffer)
+            fixed (byte* ptr = m_receiveBuffer)
             {
-                int value = *(int*)(lp + m_receivePosition);
+                int value = *(int*)(ptr + m_receivePosition);
                 m_receivePosition += 4;
 
                 return value;
             }
-        }
+
         return base.ReadInt32();
     }
 
@@ -434,18 +439,16 @@ public class RemoteBinaryStream
     /// Reads an 8-byte (64-bit) signed integer from the stream.
     /// </summary>
     /// <returns>The 8-byte (64-bit) signed integer read from the stream.</returns>
-    public unsafe override long ReadInt64()
+    public override unsafe long ReadInt64()
     {
         if (m_receivePosition <= m_receiveLength - 8)
-        {
-            fixed (byte* lp = m_receiveBuffer)
+            fixed (byte* ptr = m_receiveBuffer)
             {
-                long value = *(long*)(lp + m_receivePosition);
+                long value = *(long*)(ptr + m_receivePosition);
                 m_receivePosition += 8;
 
                 return value;
             }
-        }
 
         return base.ReadInt64();
     }
@@ -454,13 +457,12 @@ public class RemoteBinaryStream
     /// Reads a 7-bit encoded unsigned 64-bit integer (UInt64) from the stream.
     /// </summary>
     /// <returns>The 7-bit encoded unsigned 64-bit integer (UInt64) read from the stream.</returns>
-    public unsafe override ulong Read7BitUInt64()
+    public override unsafe ulong Read7BitUInt64()
     {
         if (m_receivePosition <= m_receiveLength - 9)
-        {
-            fixed (byte* lp = m_receiveBuffer)
+            fixed (byte* ptr = m_receiveBuffer)
             {
-                byte* stream = lp + m_receivePosition;
+                byte* stream = ptr + m_receivePosition;
                 ulong value11 = stream[0];
 
                 if (value11 < 128)
@@ -514,6 +516,7 @@ public class RemoteBinaryStream
 
                     return value11 ^ 0x810204080L;
                 }
+
                 value11 ^= (ulong)stream[6] << (7 + 7 + 7 + 7 + 7 + 7);
 
                 if (value11 < 128L * 128 * 128 * 128 * 128 * 128 * 128)
@@ -537,7 +540,6 @@ public class RemoteBinaryStream
 
                 return value11 ^ 0x102040810204080L;
             }
-        }
 
         return base.Read7BitUInt64();
     }
@@ -557,6 +559,7 @@ public class RemoteBinaryStream
         {
             Flush();
             WorkerThreadSynchronization.BeginSafeToCallbackRegion();
+
             try
             {
                 m_stream.Write(buffer, offset, count);
@@ -566,7 +569,6 @@ public class RemoteBinaryStream
                 WorkerThreadSynchronization.EndSafeToCallbackRegion();
             }
         }
-
         else
         {
             Array.Copy(buffer, offset, m_sendBuffer, m_sendLength, count);
@@ -575,12 +577,18 @@ public class RemoteBinaryStream
     }
 
     /// <summary>
-    /// Gets a value indicating whether the stream supports reading.
+    /// Disposes of the RemoteBinaryStream, releasing any resources associated with it.
     /// </summary>
-    public override bool CanRead => true;
+    /// <param name="disposing">
+    /// A flag indicating whether the method is called from the finalizer or directly by user code.
+    /// </param>
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+            WorkerThreadSynchronization.BeginSafeToCallbackRegion();
 
-    /// <summary>
-    /// Gets a value indicating whether the stream supports seeking (positioning).
-    /// </summary>
-    public override bool CanSeek => false;
+        base.Dispose(disposing);
+    }
+
+    #endregion
 }
