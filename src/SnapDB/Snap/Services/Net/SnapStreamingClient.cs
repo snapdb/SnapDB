@@ -80,8 +80,13 @@ public class SnapStreamingClient : SnapClient
     /// <summary>
     /// Gets the database that matches <paramref name="databaseName"/>.
     /// </summary>
-    /// <param name="databaseName">The case insensitive name of the database.</param>
-    /// <returns></returns>
+    /// <param name="databaseName">The name of the database to retrieve.</param>
+    /// <returns>A client database instance for the specified database name.</returns>
+    /// <remarks>
+    /// This method retrieves a client database instance associated with the specified <paramref name="databaseName"/>.
+    /// The method uses reflection to invoke the appropriate generic method to create the database instance based on the
+    /// specified key and value types associated with the database.
+    /// </remarks>
     public override ClientDatabaseBase GetDatabase(string databaseName)
     {
         DatabaseInfo info = m_databaseInfos[databaseName.ToUpper()];
@@ -108,7 +113,11 @@ public class SnapStreamingClient : SnapClient
     /// <summary>
     /// Gets basic information for every database connected to the server.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A list of <see cref="DatabaseInfo"/> objects representing available databases.</returns>
+    /// <remarks>
+    /// This method retrieves a list of database information objects for all available databases.
+    /// The database information objects contain details about each database, such as its name, key type, and value type.
+    /// </remarks>
     public override List<DatabaseInfo> GetDatabaseInfo()
     {
         return m_databaseInfos.Values.ToList();
@@ -118,7 +127,13 @@ public class SnapStreamingClient : SnapClient
     /// Determines if <paramref name="databaseName"/> is contained in the database.
     /// </summary>
     /// <param name="databaseName">Name of database instance to access.</param>
-    /// <returns></returns>
+    /// <returns>
+    /// <c>true</c> if a database with the specified name exists; otherwise, <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    /// This method checks whether a database with the specified name exists in the client.
+    /// It performs a case-insensitive comparison of the database name.
+    /// </remarks>
     public override bool Contains(string databaseName)
     {
         return m_databaseInfos.ContainsKey(databaseName.ToUpper());

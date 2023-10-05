@@ -303,10 +303,18 @@ public partial class SnapServer : DisposableLoggingClassBase
     }
 
     /// <summary>
-    /// Gets the database that matches <see cref="databaseName"/>
+    /// Gets the database that matches <paramref name="databaseName"/>
     /// </summary>
-    /// <param name="databaseName">the case insensitive name of the database</param>
-    /// <returns></returns>
+    /// <param name="databaseName">The name of the database to retrieve.</param>
+    /// <returns>
+    /// A <see cref="SnapServerDatabaseBase"/> instance representing the database with the specified name,
+    /// or <c>null</c> if no database with that name exists.
+    /// </returns>
+    /// <remarks>
+    /// The <see cref="GetDatabase"/> method allows you to retrieve a SnapServer database by providing its name as a parameter.
+    /// It returns a <see cref="SnapServerDatabaseBase"/> instance that represents the database with the specified name.
+    /// If no database with that name exists, it returns <c>null</c>.
+    /// </remarks>
     private SnapServerDatabaseBase GetDatabase(string databaseName)
     {
         lock (m_syncRoot)
@@ -316,10 +324,18 @@ public partial class SnapServer : DisposableLoggingClassBase
     }
 
     /// <summary>
-    /// Determines if <see cref="databaseName"/> is contained in the database.
+    /// Determines if <paramref name="databaseName"/> is contained in the database.
     /// </summary>
     /// <param name="databaseName">Name of database instance to access.</param>
-    /// <returns></returns>
+    /// <returns>
+    /// A <see cref="SnapServerDatabaseBase"/> instance representing the database with the specified name,
+    /// or <c>null</c> if no database with that name exists.
+    /// </returns>
+    /// <remarks>
+    /// The <see cref="GetDatabase"/> method allows you to retrieve a SnapServer database by providing its name as a parameter.
+    /// It returns a <see cref="SnapServerDatabaseBase"/> instance that represents the database with the specified name.
+    /// If no database with that name exists, it returns <c>null</c>.
+    /// </remarks>
     private bool Contains(string databaseName)
     {
         lock (m_syncRoot)
@@ -331,7 +347,13 @@ public partial class SnapServer : DisposableLoggingClassBase
     /// <summary>
     /// Gets basic information for every database connected to the server.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A list of <see cref="DatabaseInfo"/> objects representing information about each SnapServer database.
+    /// </returns>
+    /// <remarks>
+    /// The <see cref="GetDatabaseInfo"/> method allows you to retrieve a list of database information for all SnapServer databases.
+    /// It returns a list of <see cref="DatabaseInfo"/> objects, each containing details about a specific database.
+    /// </remarks>
     private List<DatabaseInfo> GetDatabaseInfo()
     {
         lock (m_syncRoot)

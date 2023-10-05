@@ -200,17 +200,27 @@ internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey :
     /// <summary>
     /// Compares two Archive Streams together for proper sorting.
     /// </summary>
-    /// <param name="item1"></param>
-    /// <param name="item2"></param>
-    /// <returns></returns>
+    /// <returns>
+    /// A value indicating the relative order of the streams based on their cache keys:
+    ///   - Less than 0 if <paramref name="item1"/> is less than <paramref name="item2"/>.
+    ///   - Greater than 0 if <paramref name="item1"/> is greater than <paramref name="item2"/>.
+    ///   - 0 if <paramref name="item1"/> and <paramref name="item2"/> are equal or their caches are invalid.
+    /// </returns>
+    /// <remarks>
+    /// The <see cref="CompareStreams"/> method is used to compare two <see cref="BufferedArchiveStream{TKey,TValue}"/>
+    /// instances based on their cache keys. If both streams have invalid caches, they are considered equal.
+    /// </remarks>
     private int CompareStreams(BufferedArchiveStream<TKey, TValue> item1, BufferedArchiveStream<TKey, TValue> item2)
     {
         if (!item1.CacheIsValid && !item2.CacheIsValid)
             return 0;
+
         if (!item1.CacheIsValid)
             return 1;
+
         if (!item2.CacheIsValid)
             return -1;
+
         return item1.CacheKey.CompareTo(item2.CacheKey); // item1.CurrentKey.CompareTo(item2.CurrentKey);
     }
 

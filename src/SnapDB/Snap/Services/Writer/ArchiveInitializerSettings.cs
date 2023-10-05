@@ -178,9 +178,15 @@ public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSetting
     /// <summary>
     /// Creates a <see cref="ArchiveInitializer{TKey,TValue}"/> that will reside in memory.
     /// </summary>
-    /// <param name="encodingMethod">the encoding method to use for the archive file.</param>
-    /// <param name="flags">Flags to include in the archive that is created.</param>
-    /// <returns></returns>
+    /// <param name="encodingMethod">The encoding method to use for data storage.</param>
+    /// <param name="flags">Additional flags to apply to the archive configuration.</param>
+    /// <remarks>
+    /// The <see cref="ConfigureInMemory"/> method allows configuring the archive to use an in-memory storage format.
+    /// This method sets the <see cref="IsMemoryArchive"/> property to <c>true</c>, specifies the encoding method for
+    /// data storage, and allows adding additional flags to the archive configuration. Once configured as an in-memory
+    /// archive, data is stored in RAM instead of on disk, which can improve read/write performance at the cost of
+    /// data persistence.
+    /// </remarks>
     public void ConfigureInMemory(EncodingDefinition encodingMethod, params Guid[] flags)
     {
         TestForEditable();

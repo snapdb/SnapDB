@@ -87,8 +87,18 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     /// Creates a new <see cref="SortedTreeTable{TKey,TValue}"/> based on the settings passed to this class.
     /// Once created, it is up to he caller to make sure that this class is properly disposed of.
     /// </summary>
-    /// <param name="estimatedSize">The estimated size of the file. -1 to ignore this feature and write to the first available directory.</param>
-    /// <returns></returns>
+    /// <param name="estimatedSize">
+    /// An optional estimated size (in bytes) for the archive file. Use a negative value to indicate no specific estimation.
+    /// </param>
+    /// <returns>
+    /// A new instance of <see cref="SortedTreeTable{TKey, TValue}"/> for archiving data.
+    /// </returns>
+    /// <remarks>
+    /// This creates a new <see cref="SortedTreeTable{TKey, TValue}"/> instance
+    /// for archiving data. It can create the table in-memory or in a file, depending on the <see cref="ServerSettings"/>
+    /// configuration. If the estimatedSize is specified (non-negative), the method attempts to create the table in a file
+    /// with enough space to accommodate the estimated data size.
+    /// </remarks>
     public SortedTreeTable<TKey, TValue> CreateArchiveFile(long estimatedSize = -1)
     {
         using (m_lock.EnterReadLock())
@@ -111,10 +121,12 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     /// Creates a new <see cref="SortedTreeTable{TKey,TValue}"/> based on the settings passed to this class.
     /// Once created, it is up to he caller to make sure that this class is properly disposed of.
     /// </summary>
-    /// <param name="startKey">the first key in the archive file</param>
-    /// <param name="endKey">the last key in the archive file</param>
-    /// <param name="estimatedSize">The estimated size of the file. -1 to ignore this feature and write to the first available directory.</param>
-    /// <returns></returns>
+    /// <param name="estimatedSize">
+    /// An optional estimated size (in bytes) for the archive file. Use a negative value to indicate no specific estimation.
+    /// </param>
+    /// <returns>
+    /// A new instance of <see cref="SortedTreeTable{TKey, TValue}"/> for archiving data within the specified key range.
+    /// </returns>
     public SortedTreeTable<TKey, TValue> CreateArchiveFile(TKey startKey, TKey endKey, long estimatedSize = -1)
     {
         using (m_lock.EnterReadLock())
@@ -136,7 +148,15 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     /// <summary>
     /// Creates a new random file in one of the provided folders in a round robin fashion.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="path">The base path where the archive file will be created.</param>
+    /// <returns>
+    /// A unique archive file name based on the specified path, server settings, and current timestamp.
+    /// </returns>
+    /// <remarks>
+    /// This method generates a unique archive file name by combining the provided base
+    /// path, server settings prefix, a new GUID, and the current timestamp. This ensures that the created archive file
+    /// has a distinct and recognizable name.
+    /// </remarks>
     private string CreateArchiveName(string path)
     {
         path = GetPath(path, DateTime.Now);
@@ -146,7 +166,6 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     /// <summary>
     /// Creates a new random file in one of the provided folders in a round robin fashion.
     /// </summary>
-    /// <returns></returns>
     private string CreateArchiveName(string path, TKey startKey, TKey endKey)
     {
         if (startKey is not IHasTimestampField startTime || endKey is not IHasTimestampField endTime)

@@ -392,7 +392,12 @@ public class StreamingClientDatabase<TKey, TValue> : ClientDatabaseBase<TKey, TV
     /// Due to the blocking nature of streams, this helper class can substantially
     /// improve the performance of writing streaming points to the historian.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A <see cref="BulkWriting"/> instance that provides methods for performing bulk write operations.</returns>
+    /// <remarks>
+    /// The <see cref="StartBulkWriting"/> method initializes a bulk writing operation, which allows you
+    /// to efficiently write multiple items to the client database without the overhead of individual write
+    /// operations. You can use the returned <see cref="BulkWriting"/> instance to perform bulk write operations.
+    /// </remarks>
     public BulkWriting StartBulkWriting()
     {
         return new BulkWriting(this);

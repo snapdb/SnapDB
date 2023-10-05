@@ -61,7 +61,16 @@ public abstract class SnapServerDatabaseBase : DisposableLoggingClassBase
     /// <summary>
     /// Creates a <see cref="SnapServerDatabase{TKey,TValue}.ClientDatabase"/>
     /// </summary>
-    /// <returns></returns>
+    /// <param name="client">The SnapClient associated with the new client-specific database.</param>
+    /// <param name="onDispose">An action to be executed when the client-specific database is disposed.</param>
+    /// <returns>
+    /// A new instance of the client-specific database derived from <see cref="ClientDatabaseBase"/>.
+    /// </returns>
+    /// <remarks>
+    /// The <see cref="CreateClientDatabase"/> method is used to create a new instance of a client-specific database
+    /// associated with this SnapServerDatabase. It takes a SnapClient as a parameter to associate the new database with
+    /// a specific client. Additionally, an optional action can be provided to be executed when the client-specific database is disposed.
+    /// </remarks>
     public abstract ClientDatabaseBase CreateClientDatabase(SnapClient client, Action<ClientDatabaseBase> onDispose);
 
     /// <summary>
@@ -87,9 +96,15 @@ public abstract class SnapServerDatabaseBase : DisposableLoggingClassBase
     /// <summary>
     /// Creates a new server database from the provided config.
     /// </summary>
-    /// <param name="databaseConfig"></param>
-    /// <param name="parent">the parent LogSource</param>
-    /// <returns></returns>
+    /// <param name="databaseConfig">The configuration settings for the database.</param>
+    /// <returns>
+    /// A new instance of SnapServerDatabaseBase derived from <see cref="SnapServerDatabaseBase"/>.
+    /// </returns>
+    /// <remarks>
+    /// The <see cref="CreateDatabase"/> method is used to create a new instance of a SnapServerDatabaseBase
+    /// with the specified configuration settings. It accepts a <see cref="ServerDatabaseSettings"/> object
+    /// containing configuration parameters such as key and value types, and returns a new instance of the database.
+    /// </remarks>
     public static SnapServerDatabaseBase CreateDatabase(ServerDatabaseSettings databaseConfig)
     {
         Type keyType = Library.GetSortedTreeType(databaseConfig.KeyType);

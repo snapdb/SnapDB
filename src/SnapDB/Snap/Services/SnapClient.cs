@@ -45,10 +45,17 @@ public abstract class SnapClient : DisposableLoggingClassBase
     #region [ Methods ]
 
     /// <summary>
-    /// Gets the database that matches <see cref="databaseName"/>
+    /// Gets the database that matches <paramref name="databaseName"/>.
     /// </summary>
-    /// <param name="databaseName">the case insensitive name of the databse</param>
-    /// <returns></returns>
+    /// <param name="databaseName">The case insensitive name of the database to retrieve.</param>
+    /// <returns>
+    /// A <see cref="ClientDatabaseBase"/> instance representing the requested client database.
+    /// </returns>
+    /// <remarks>
+    /// The <see cref="GetDatabase"/> method retrieves a client database with the specified <paramref name="databaseName"/>.
+    /// If a database with the specified name does not exist, this method may return null or throw an exception.
+    /// </remarks>
+    /// <seealso cref="ClientDatabaseBase"/>
     public abstract ClientDatabaseBase GetDatabase(string databaseName);
 
     /// <summary>
@@ -61,14 +68,30 @@ public abstract class SnapClient : DisposableLoggingClassBase
     /// <summary>
     /// Gets basic information for every database connected to the server.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A list of <see cref="DatabaseInfo"/> objects containing information about available databases.
+    /// </returns>
+    /// <remarks>
+    /// The <see cref="GetDatabaseInfo"/> method provides a list of <see cref="DatabaseInfo"/> objects
+    /// that contain information about the available databases in the system.
+    /// Each <see cref="DatabaseInfo"/> object typically includes details such as database name, key type,
+    /// value type, and other relevant metadata.
+    /// </remarks>
+    /// <seealso cref="DatabaseInfo"/>
     public abstract List<DatabaseInfo> GetDatabaseInfo();
 
     /// <summary>
-    /// Determines if <see cref="databaseName"/> is contained in the database.
+    /// Determines if <paramref name="databaseName"/> is contained in the database.
     /// </summary>
-    /// <param name="databaseName">Name of database instance to access.</param>
-    /// <returns></returns>
+    /// <param name="databaseName">The name of the database to check for existence.</param>
+    /// <returns>
+    /// <c>true</c> if a database with the specified name exists; otherwise, <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    /// The <see cref="Contains"/> method allows you to check whether a database with the specified
+    /// <paramref name="databaseName"/> exists within the system. It returns <c>true</c> if a database
+    /// with the provided name is found; otherwise, it returns <c>false</c>.
+    /// </remarks>
     public abstract bool Contains(string databaseName);
 
     #endregion
@@ -78,8 +101,15 @@ public abstract class SnapClient : DisposableLoggingClassBase
     /// <summary>
     /// Connects to a local <see cref="SnapServer"/>.
     /// </summary>
-    /// <param name="host"></param>
-    /// <returns></returns>
+    /// <param name="host">The SnapServer host to connect to.</param>
+    /// <returns>
+    /// A <see cref="SnapClient"/> instance representing the connection to the specified SnapServer host.
+    /// </returns>
+    /// <remarks>
+    /// The Connect method allows you to establish a connection to a SnapServer host.
+    /// You should provide the <paramref name="host"/> as a parameter, and it returns a <see cref="SnapClient"/>
+    /// instance that you can use to interact with the server.
+    /// </remarks>
     public static SnapClient Connect(SnapServer host)
     {
         return new SnapServer.Client(host);
