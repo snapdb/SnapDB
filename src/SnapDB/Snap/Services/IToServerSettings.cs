@@ -36,7 +36,11 @@ public interface IToServerSettings
     /// <summary>
     /// Creates a <see cref="ServerSettings"/> configuration that can be used for <see cref="SnapServer"/>
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A <see cref="ServerSettings"/> object that can be used for configuring a <see cref="SnapServer"/>.</returns>
+    /// <remarks>
+    /// This method is used to convert the current configuration settings into a <see cref="ServerSettings"/> object
+    /// that can be applied when configuring a <see cref="SnapServer"/>.
+    /// </remarks>
     ServerSettings ToServerSettings();
 
     #endregion

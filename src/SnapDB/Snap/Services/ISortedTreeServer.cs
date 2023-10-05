@@ -27,7 +27,7 @@
 namespace SnapDB.Snap.Services;
 
 /// <summary>
-/// An interface that describes a SortedTreeServer.
+/// Represents a sorted tree server interface that provides methods for interacting with the server.
 /// </summary>
 public interface ISortedTreeServer : IDisposable
 {
@@ -36,7 +36,11 @@ public interface ISortedTreeServer : IDisposable
     /// <summary>
     /// Creates a client connection to the server.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A <see cref="SnapClient"/> representing the client connection to the server.</returns>
+    /// <remarks>
+    /// This method is used to create a client connection to the server. The returned <see cref="SnapClient"/>
+    /// can be used to communicate with the server and perform various operations.
+    /// </remarks>
     SnapClient CreateClientHost();
 
     #endregion

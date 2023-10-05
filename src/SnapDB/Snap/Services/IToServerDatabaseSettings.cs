@@ -34,9 +34,13 @@ public interface IToServerDatabaseSettings
     #region [ Methods ]
 
     /// <summary>
-    /// Creates a <see cref="ServerDatabaseSettings"/> configuration that can be used for <see cref="SnapServerDatabase{TKey,TValue}"/>
+    /// Converts the current configuration into a <see cref="ServerDatabaseSettings"/> object.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A <see cref="ServerDatabaseSettings"/> object that can be used for configuring a <see cref="SnapServerDatabase{TKey,TValue}"/>.</returns>
+    /// <remarks>
+    /// This method is used to convert the current configuration settings into a <see cref="ServerDatabaseSettings"/> object
+    /// that can be applied when configuring a <see cref="SnapServerDatabase{TKey,TValue}"/>.
+    /// </remarks>
     ServerDatabaseSettings ToServerDatabaseSettings();
 
     #endregion

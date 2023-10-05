@@ -92,14 +92,20 @@ public class ArchiveTableSummary<TKey, TValue> where TKey : SnapTypeBase<TKey>, 
     /// <summary>
     /// Determines if this table might contain data for the keys provided.
     /// </summary>
-    /// <param name="startKey">the first key searching for</param>
-    /// <param name="stopKey">the last key searching for</param>
-    /// <returns></returns>
+    /// <param name="startKey">The start key of the range to check.</param>
+    /// <param name="stopKey">The stop key of the range to check.</param>
+    /// <returns>
+    /// <c>true</c> if the specified key range is contained within the archive list; otherwise, <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    /// This method checks if the specified key range, defined by <paramref name="startKey"/> and <paramref name="stopKey"/>,
+    /// is contained within the archive list. If the archive file is empty, it will always be searched.
+    /// </remarks>
     public bool Contains(TKey startKey, TKey stopKey)
     {
-        //If the archive file is empty, it will always be searched.  
-        //Since this will likely never happen and has little performance 
-        //implications, I have decided not to include logic that would exclude this case.
+        // If the archive file is empty, it will always be searched.  
+        // Since this will likely never happen and has little performance 
+        // implications, I have decided not to include logic that would exclude this case.
         return !(startKey.IsGreaterThan(LastKey) || stopKey.IsLessThan(FirstKey));
     }
 
