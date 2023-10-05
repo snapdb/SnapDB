@@ -55,15 +55,15 @@ public abstract class ArchiveListEditor : IDisposable
     /// Renews the snapshot of the archive file. This will acquire the latest
     /// read transaction so all new snapshots will use this later version.
     /// </summary>
-    /// <param name="archiveId">the ID of the archive snapshot to renew</param>
-    /// <returns></returns>
+    /// <param name="archiveId">The unique identifier of the archive snapshot to renew.</param>
+
     public abstract void RenewArchiveSnapshot(Guid archiveId);
 
     /// <summary>
     /// Returns true if the archive list contains the provided file.
     /// </summary>
-    /// <param name="archiveId">the file</param>
-    /// <returns></returns>
+    /// <param name="archiveId">The unique identifier of the archive to check for.</param>
+    /// <returns><c>true</c> if the archive list contains the specified archive; otherwise, <c>false</c>.</returns>
     public abstract bool Contains(Guid archiveId);
 
     /// <summary>

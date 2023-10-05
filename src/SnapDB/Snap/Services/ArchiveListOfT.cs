@@ -110,8 +110,11 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     /// <summary>
     /// Attaches the supplied paths or files.
     /// </summary>
-    /// <param name="paths">the path to file names or directories to enumerate.</param>
-    /// <returns></returns>
+    /// <param name="paths">An enumerable collection of file paths or directories to attach.</param>
+    /// <remarks>
+    /// This method will attach files from the specified paths and subdirectories, including files matching specified extensions.
+    /// If a specified path is a directory, it will be recursively searched for files with extensions defined in the settings.
+    /// </remarks>
     public override void AttachFileOrPath(IEnumerable<string> paths)
     {
         List<string> attachedFiles = new();
@@ -126,6 +129,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
 
                 if (File.Exists(path))
                     attachedFiles.Add(path);
+
                 else if (Directory.Exists(path))
                     foreach (string extension in m_settings.ImportExtensions)
                         attachedFiles.AddRange(FilePath.GetFiles(path, "*" + extension, SearchOption.AllDirectories, ExceptionHandler));
@@ -253,7 +257,13 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     /// WARNING: Make changes quickly and dispose the returned class.  All calls to this class are blocked while
     /// editing this class.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// An <see cref="ArchiveListEditor{TKey, TValue}"/> instance that allows editing the archive list.
+    /// </returns>
+    /// <remarks>
+    /// Use this method to obtain a lock for making changes to the archive list. Ensure to properly dispose of the editor
+    /// when done with the modifications to release the lock.
+    /// </remarks>
     public new ArchiveListEditor<TKey, TValue> AcquireEditLock()
     {
         return new Editor(this);
@@ -263,8 +273,13 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     /// Determines if the provided file is currently in use
     /// by any resource.
     /// </summary>
-    /// <param name="sortedTree"> file to search for.</param>
-    /// <returns></returns>
+    /// <param name="sortedTree">The <see cref="SortedTreeTable{TKey, TValue}"/> to search for.</param>
+    /// <returns>
+    /// <c>true</c> if the specified <paramref name="sortedTree"/> is being used by this object; otherwise, <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    /// This method checks if the provided <paramref name="sortedTree"/> is currently in use by this object.
+    /// </remarks>
     public bool IsFileBeingUsed(SortedTreeTable<TKey, TValue> sortedTree)
     {
         lock (m_syncRoot)
@@ -278,7 +293,15 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     /// Client must call <see cref="IDisposable.Dispose"/> method when finished with these resources as they will not
     /// automatically be reclaimed by the garbage collector. Class will not be initiallized until calling <see cref="ArchiveListSnapshot{TKey,TValue}.UpdateSnapshot"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A new <see cref="ArchiveListSnapshot{TKey, TValue}"/> instance for client resources.
+    /// </returns>
+    /// <exception cref="Exception">
+    /// Thrown if the object is disposing.
+    /// </exception>
+    /// <remarks>
+    /// This method creates a new <see cref="ArchiveListSnapshot{TKey, TValue}"/> instance for managing client resources.
+    /// </remarks>
     public ArchiveListSnapshot<TKey, TValue> CreateNewClientResources()
     {
         ArchiveListSnapshot<TKey, TValue> resources;
@@ -298,7 +321,12 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     /// <summary>
     /// Necessary to provide shadow method of archive list.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// An <see cref="ArchiveListEditor{TKey, TValue}"/> instance for making edits to the list.
+    /// </returns>
+    /// <remarks>
+    /// This method is used to acquire an edit lock for the <see cref="ArchiveList{TKey, TValue}"/>.
+    /// </remarks>
     protected override ArchiveListEditor InternalAcquireEditLock()
     {
         return AcquireEditLock();
@@ -379,8 +407,14 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     /// Gets if the specified file is being.
     /// MUST be called from a synchronized context.
     /// </summary>
-    /// <param name="sortedTree"></param>
-    /// <returns></returns>
+    /// <param name="sortedTree">The <see cref="SortedTreeTable{TKey, TValue}"/> to check.</param>
+    /// <returns>
+    /// <c>true</c> if the <paramref name="sortedTree"/> is being used in any active snapshots; otherwise, <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    /// This method checks if the specified <paramref name="sortedTree"/> is being used in any of the active snapshots
+    /// managed by the <see cref="ArchiveList{TKey, TValue}"/>.
+    /// </remarks>
     private bool InternalIsFileBeingUsed(SortedTreeTable<TKey, TValue> sortedTree)
     {
         return m_allSnapshots.Select(snapshot => snapshot.Tables).Where(tables => tables is not null).Any(tables => tables.Any(summary => summary is not null && summary.SortedTreeTable == sortedTree));

@@ -110,12 +110,11 @@ public class SrpUserCredential
     /// <summary>
     /// Creates a user credential from the provided data.
     /// </summary>
-    /// <param name="username"></param>
-    /// <param name="password"></param>
-    /// <param name="strength"></param>
-    /// <param name="saltSize"></param>
-    /// <param name="iterations"></param>
-    /// <returns></returns>
+    /// <param name="username">The username for the user credential.</param>
+    /// <param name="password">The password for the user credential.</param>
+    /// <param name="strength">The strength of the SRP protocol (default is <see cref="SrpStrength.Bits1024"/>).</param>
+    /// <param name="saltSize">The size of the salt in bytes (default is 32 bytes).</param>
+    /// <param name="iterations">The number of iterations for password hashing (default is 4000).</param>
     public SrpUserCredential(string username, string password, SrpStrength strength = SrpStrength.Bits1024, int saltSize = 32, int iterations = 4000)
     {
         username = username.Normalize(NormalizationForm.FormKC);

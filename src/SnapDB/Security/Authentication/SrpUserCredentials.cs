@@ -47,8 +47,10 @@ public class SrpUserCredentials
     /// <summary>
     /// Looks up the username from the database.
     /// </summary>
-    /// <param name="username"></param>
-    /// <returns></returns>
+    /// <param name="username">The username to look up.</param>
+    /// <returns>
+    /// The <see cref="SrpUserCredential"/> object associated with the specified username, or <c>null</c> if not found.
+    /// </returns>
     public SrpUserCredential Lookup(string username)
     {
         lock (m_users)

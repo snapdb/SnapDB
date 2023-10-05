@@ -24,7 +24,6 @@
 //
 //******************************************************************************************************
 
-using GSF.IO.Unmanaged.Test;
 using NUnit.Framework;
 using System;
 using System.Diagnostics;

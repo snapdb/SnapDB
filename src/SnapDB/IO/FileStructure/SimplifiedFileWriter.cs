@@ -110,10 +110,9 @@ public class SimplifiedFileWriter : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    /// <summary>
-    /// Creates and Opens a new file on the current file system.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="fileName">The name of the file to create.</param>
+    /// <returns>The <see cref="ISupportsBinaryStream"/> representing the newly created file.</returns>
     public ISupportsBinaryStream CreateFile(SubFileName fileName)
     {
         if (m_disposed)

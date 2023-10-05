@@ -56,9 +56,12 @@ public class EncodingLibrary
     /// <summary>
     /// Gets the single encoding method if it exists in the database.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="encodingMethod"></param>
-    /// <returns></returns>
+    /// <typeparam name="T">The type parameter specifying the data type.</typeparam>
+    /// <param name="encodingMethod">The encoding method identifier.</param>
+    /// <returns>
+    /// An instance of the <see cref="IndividualEncodingBase{T}"/> representing the encoding method.
+    /// </returns>
+    /// <exception cref="Exception">Thrown if the type is not registered.</exception>
     public IndividualEncodingBase<T> GetEncodingMethod<T>(Guid encodingMethod) where T : SnapTypeBase<T>, new()
     {
         if (encodingMethod == EncodingDefinition.FixedSizeIndividualGuid)
@@ -73,10 +76,13 @@ public class EncodingLibrary
     /// <summary>
     /// Gets the Double encoding method
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <param name="encodingMethod"></param>
-    /// <returns></returns>
+    /// <typeparam name="TKey">The type parameter specifying the key data type.</typeparam>
+    /// <typeparam name="TValue">The type parameter specifying the value data type.</typeparam>
+    /// <param name="encodingMethod">The encoding method identifier.</param>
+    /// <returns>
+    /// An instance of the <see cref="PairEncodingBase{TKey, TValue}"/> representing the encoding method.
+    /// </returns>
+    /// <exception cref="Exception">Thrown if the type is not registered.</exception>
     public PairEncodingBase<TKey, TValue> GetEncodingMethod<TKey, TValue>(EncodingDefinition encodingMethod) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         if (encodingMethod.IsFixedSizeEncoding)

@@ -167,13 +167,16 @@ public class ArchiveListLogSettings : SettingsBase<ArchiveListLogSettings>
     /// <summary>
     /// Generates a new file name.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A new unique file name for the log.</returns>
+    /// <exception cref="Exception">Thrown if the log is not file-backed.</exception>
     internal string GenerateNewFileName()
     {
         if (!IsFileBacked)
             throw new Exception("Cannot generate a file name when the log is not a file backed log");
+        
         if (LogFilePrefix == string.Empty)
             return Path.Combine(LogPath, Guid.NewGuid() + LogFileExtension);
+        
         return Path.Combine(LogPath, LogFilePrefix + " " + Guid.NewGuid() + LogFileExtension);
     }
 

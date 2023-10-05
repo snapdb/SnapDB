@@ -54,9 +54,11 @@ public static class GenerateCertificate
     /// <summary>
     /// Opens a certificate, loading the private key of the PFX file.
     /// </summary>
-    /// <param name="fileName"></param>
-    /// <param name="password"></param>
-    /// <returns></returns>
+    /// <param name="fileName">The path to the X.509 certificate file.</param>
+    /// <param name="password">The password to decrypt the private key (if encrypted).</param>
+    /// <returns>
+    /// An <see cref="X509Certificate2"/> object representing the certificate loaded from the file.
+    /// </returns>
     public static X509Certificate2 OpenCertificate(string fileName, string password)
     {
         return new X509Certificate2(fileName, password, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
@@ -140,7 +142,9 @@ public static class GenerateCertificate
     /// <param name="subjectDirName">A valid DirName formated string. Example: CN=ServerName</param>
     /// <param name="signatureBits">Bitstrength of signature algorithm. Supported Lengths are 160,256, and 384 </param>
     /// <param name="keyStrength">RSA key strength. Typically a multiple of 1024.</param>
-    /// <returns></returns>
+    /// <returns>
+    /// An <see cref="X509Certificate2"/> object representing the self-signed certificate.
+    /// </returns>
     public static X509Certificate2 CreateSelfSignedCertificate(string subjectDirName, int signatureBits, int keyStrength)
     {
         switch (signatureBits)

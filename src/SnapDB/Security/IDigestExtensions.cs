@@ -38,12 +38,14 @@ public static class DigestExtensions
     /// <summary>
     /// Computes the hash of the supplied words.
     /// </summary>
-    /// <param name="hash"></param>
-    /// <param name="word1"></param>
-    /// <param name="word2"></param>
-    /// <param name="word3"></param>
-    /// <param name="word4"></param>
-    /// <returns></returns>
+    /// <param name="hash">The hash algorithm to use for computing the hash.</param>
+    /// <param name="word1">The first byte array to include in the hash computation.</param>
+    /// <param name="word2">The second byte array to include in the hash computation.</param>
+    /// <param name="word3">The third byte array to include in the hash computation.</param>
+    /// <param name="word4">The fourth byte array to include in the hash computation.</param>
+    /// <returns>
+    /// A byte array containing the computed hash.
+    /// </returns>
     public static byte[] ComputeHash(this IDigest hash, byte[] word1, byte[] word2, byte[] word3, byte[] word4)
     {
         hash.BlockUpdate(word1, 0, word1.Length);
@@ -52,17 +54,20 @@ public static class DigestExtensions
         hash.BlockUpdate(word4, 0, word4.Length);
         byte[] rv = new byte[hash.GetDigestSize()];
         hash.DoFinal(rv, 0);
+
         return rv;
     }
 
     /// <summary>
     /// Computes the hash of the supplied words.
     /// </summary>
-    /// <param name="hash"></param>
-    /// <param name="word1"></param>
-    /// <param name="word2"></param>
-    /// <param name="word3"></param>
-    /// <returns></returns>
+    /// <param name="hash">The hash algorithm to use for computing the hash.</param>
+    /// <param name="word1">The first byte array to include in the hash computation.</param>
+    /// <param name="word2">The second byte array to include in the hash computation.</param>
+    /// <param name="word3">The third byte array to include in the hash computation.</param>
+    /// <returns>
+    /// A byte array containing the computed hash.
+    /// </returns>
     public static byte[] ComputeHash(this IDigest hash, byte[] word1, byte[] word2, byte[] word3)
     {
         hash.BlockUpdate(word1, 0, word1.Length);
@@ -76,10 +81,12 @@ public static class DigestExtensions
     /// <summary>
     /// Computes the hash of the supplied words.
     /// </summary>
-    /// <param name="hash"></param>
-    /// <param name="word1"></param>
-    /// <param name="word2"></param>
-    /// <returns></returns>
+    /// <param name="hash">The hash algorithm to use for computing the hash.</param>
+    /// <param name="word1">The first byte array to include in the hash computation.</param>
+    /// <param name="word2">The second byte array to include in the hash computation.</param>
+    /// <returns>
+    /// A byte array containing the computed hash.
+    /// </returns>
     public static byte[] ComputeHash(this IDigest hash, byte[] word1, byte[] word2)
     {
         hash.BlockUpdate(word1, 0, word1.Length);

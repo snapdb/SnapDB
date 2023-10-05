@@ -169,7 +169,7 @@ public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
     /// <summary>
     /// Clones the object, while incrementing the sequence number.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The clone of the object.</returns>
     public override FileHeaderBlock CloneEditable()
     {
         FileHeaderBlock clone = base.CloneEditable();
@@ -196,7 +196,7 @@ public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
     /// Creates a new file on the file system and returns the <see cref="SubFileHeader"/> associated with the new file.
     /// </summary>
     /// <param name="fileName">Represents the nature of the data that will be stored in this file.</param>
-    /// <returns></returns>
+    /// <returns>The newly created <see cref="SubFileHeader"/> instance.</returns>
     /// <remarks>A file system only supports 64 files. This is a fundamental limitation and cannot be changed easily.</remarks>
     public SubFileHeader CreateNewFile(SubFileName fileName)
     {
@@ -578,9 +578,9 @@ public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
     /// <summary>
     /// Creates a new file header.
     /// </summary>
-    /// <param name="blockSize">The block size to make the header</param>
-    /// <param name="flags">Flags to write to the file</param>
-    /// <returns></returns>
+    /// <param name="blockSize">The block size to make the header.</param>
+    /// <param name="flags">Flags to write to the file.</param>
+    /// <returns>The newly created <see cref="SubFileHeader"/> instance.</returns>
     public static FileHeaderBlock CreateNew(int blockSize, params Guid[] flags)
     {
         FileHeaderBlock header = new()
@@ -609,11 +609,11 @@ public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
     }
 
     /// <summary>
-    /// Creates a new file header.
+    /// Creates a new simplified <see cref="FileHeaderBlock"/> with the specified <paramref name="blockSize"/> and optional <paramref name="flags"/>.
     /// </summary>
-    /// <param name="blockSize">The block size to make the header</param>
-    /// <param name="flags">Flags to write to the file</param>
-    /// <returns></returns>
+    /// <param name="blockSize">The block size of the header.</param>
+    /// <param name="flags">Optional flags to set in the header.</param>
+    /// <returns>The newly created simplified <see cref="FileHeaderBlock"/> instance.</returns>
     public static FileHeaderBlock CreateNewSimplified(int blockSize, params Guid[] flags)
     {
         FileHeaderBlock header = new()
@@ -642,13 +642,10 @@ public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
     }
 
     /// <summary>
-    /// Opens a file header
+    /// Opens an existing <see cref="FileHeaderBlock"/> from the provided binary <paramref name="data"/>.
     /// </summary>
-    /// <param name="data">
-    /// The block of data to be loaded. The length of this block must be equal to the
-    /// block size of a partition.
-    /// </param>
-    /// <returns></returns>
+    /// <param name="data">The binary data representing the file header.</param>
+    /// <returns>The opened <see cref="FileHeaderBlock"/> instance.</returns>
     public static FileHeaderBlock Open(byte[] data)
     {
         FileHeaderBlock header = new();

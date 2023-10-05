@@ -190,7 +190,7 @@ public class SubFileName : IComparable<SubFileName>, IEquatable<SubFileName>
     /// <param name="fileName">A name associated with the data.</param>
     /// <param name="keyType">The GUID identifier of the type of the sorted tree store.</param>
     /// <param name="valueType">The GUID identifier of the value type of the sorted tree store.</param>
-    /// <returns></returns>
+    /// <returns>A <see cref="SubFileName"/> instance based on the provided parameters.</returns>
     public static unsafe SubFileName Create(string fileName, Guid keyType, Guid valueType)
     {
         byte[] data = new byte[16 * 2 + fileName.Length * 2];

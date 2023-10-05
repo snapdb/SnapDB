@@ -64,9 +64,11 @@ public class SecureStreamClientIntegratedSecurity : SecureStreamClientBase
     /// <summary>
     /// Authenticates with the remote server.
     /// </summary>
-    /// <param name="stream">the stream to authentication on</param>
-    /// <param name="certSignatures"></param>
-    /// <returns></returns>
+    /// <param name="stream">The stream for authentication.</param>
+    /// <param name="certSignatures">The certificate signatures to use for authentication.</param>
+    /// <returns>
+    /// True if authentication succeeds; otherwise, false.
+    /// </returns>
     protected override bool InternalTryAuthenticate(Stream stream, byte[] certSignatures)
     {
         stream.WriteByte((byte)AuthenticationMode.Integrated);

@@ -68,8 +68,15 @@ public partial class ArchiveList<TKey, TValue>
         /// Renews the snapshot of the archive file. This will acquire the latest
         /// read transaction so all new snapshots will use this later version.
         /// </summary>
-        /// <param name="archiveId">the ID of the archive snapshot to renew</param>
-        /// <returns></returns>
+        /// <param name="archiveId">The unique identifier of the archive to renew the snapshot for.</param>
+        /// <exception cref="ObjectDisposedException">
+        /// Thrown if the <see cref="ArchiveList{TKey, TValue}"/> or its associated resources are disposed.
+        /// </exception>
+        /// <remarks>
+        /// This method renews the archive snapshot associated with the specified <paramref name="archiveId"/>
+        /// in the <see cref="ArchiveList{TKey, TValue}"/> by creating a new snapshot with the same data
+        /// from the existing <see cref="SortedTreeTable{TKey, TValue}"/>.
+        /// </remarks>
         public override void RenewArchiveSnapshot(Guid archiveId)
         {
             if (m_disposed)
@@ -81,7 +88,7 @@ public partial class ArchiveList<TKey, TValue>
         /// <summary>
         /// Adds an archive file to the list with the given state information.
         /// </summary>
-        /// <param name="sortedTree">archive table to add</param>
+        /// <param name="sortedTree">Archive table to add.</param>
         public override void Add(SortedTreeTable<TKey, TValue> sortedTree)
         {
             if (m_disposed)
@@ -94,8 +101,13 @@ public partial class ArchiveList<TKey, TValue>
         /// <summary>
         /// Returns true if the archive list contains the provided file.
         /// </summary>
-        /// <param name="archiveId">the file</param>
-        /// <returns></returns>
+        /// <param name="archiveId">The unique identifier of the archive snapshot to check for.</param>
+        /// <returns>
+        /// <c>true</c> if an archive snapshot with the specified <paramref name="archiveId"/> is found in the list; otherwise, <c>false</c>.
+        /// </returns>
+        /// <remarks>
+        /// This method checks if the <see cref="ArchiveList{TKey, TValue}"/> contains an archive snapshot with the specified <paramref name="archiveId"/>.
+        /// </remarks>
         public override bool Contains(Guid archiveId)
         {
             return m_list.m_fileSummaries.ContainsKey(archiveId);

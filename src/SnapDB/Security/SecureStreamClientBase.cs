@@ -154,9 +154,13 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
     /// <summary>
     /// Authenticates the supplied stream. Returns the secure stream.
     /// </summary>
-    /// <param name="stream">the stream to authenticate</param>
-    /// <param name="useSsl">gets if SSL will be used to authenticate</param>
-    /// <returns></returns>
+    /// <param name="stream">The stream to authenticate.</param>
+    /// <param name="useSsl">
+    /// Indicates whether to use SSL for secure communication. Defaults to true if not specified.
+    /// </param>
+    /// <returns>
+    /// A secure stream if authentication succeeds; otherwise, an exception is thrown.
+    /// </returns>
     public Stream Authenticate(Stream stream, bool useSsl = true)
     {
         Stream secureStream = null;

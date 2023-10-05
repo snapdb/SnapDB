@@ -58,14 +58,14 @@ public class ScramServer
     #region [ Methods ]
 
     /// <summary>
-    /// Requests that the provided stream be authenticated
+    /// Requests that the provided stream be authenticated.
     /// </summary>
     /// <param name="stream"></param>
     /// <param name="additionalChallenge">
     /// Additional data to include in the challenge. If using SSL certificates,
     /// adding the thumbprint to the challenge will allow detecting man in the middle attacks.
     /// </param>
-    /// <returns></returns>
+    /// <returns>The authenticated stream.</returns>
     public ScramServerSession AuthenticateAsServer(Stream stream, byte[] additionalChallenge = null)
     {
         additionalChallenge ??= new byte[] { };

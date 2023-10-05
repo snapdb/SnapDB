@@ -385,7 +385,7 @@ public class MemoryPoolStreamCore : IDisposable
     /// This function will also autogrow the stream.
     /// </summary>
     /// <param name="position">The position to use to calculate the page to retrieve</param>
-    /// <returns></returns>
+    /// <returns>The memory page as a native pointer (nint).</returns>
     private nint GetPage(long position)
     {
         Settings settings = m_settings;
@@ -404,7 +404,6 @@ public class MemoryPoolStreamCore : IDisposable
     /// <summary>
     /// Increases the size of the Memory Stream and updated the settings if needed
     /// </summary>
-    /// <param name="pageCount"></param>
     private void IncreasePageCount(int pageCount)
     {
         lock (m_syncRoot)

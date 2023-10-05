@@ -51,8 +51,8 @@ public abstract class ArchiveList : DisposableLoggingClassBase
     /// <summary>
     /// Attaches the supplied paths or files.
     /// </summary>
-    /// <param name="paths">the path to file names or directories to enumerate.</param>
-    /// <returns></returns>
+    /// <param name="paths">The collection of path strings representing file names or directories to enumerate.</param>
+    /// <returns>Void.</returns>
     public abstract void AttachFileOrPath(IEnumerable<string> paths);
 
     /// <summary>
@@ -78,16 +78,16 @@ public abstract class ArchiveList : DisposableLoggingClassBase
     /// WARNING: Make changes quickly and dispose the returned class.  All calls to this class are blocked while
     /// editing this class.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>An instance of ArchiveListEditor representing the acquired edit lock.</returns>
     public ArchiveListEditor AcquireEditLock()
     {
         return InternalAcquireEditLock();
     }
 
     /// <summary>
-    /// Necessary to provide shadow method of <see cref="AcquireEditLock"/>
+    /// Necessary to provide shadow method of <see cref="AcquireEditLock"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>An instance of ArchiveListEditor representing the acquired edit lock.</returns>
     protected abstract ArchiveListEditor InternalAcquireEditLock();
 
     #endregion
@@ -97,7 +97,6 @@ public abstract class ArchiveList : DisposableLoggingClassBase
     ///// Client must call <see cref="IDisposable.Dispose"/> method when finished with these resources as they will not 
     ///// automatically be reclaimed by the garbage collector. Class will not be initiallized until calling <see cref="ArchiveListSnapshot{TKey,TValue}.UpdateSnapshot"/>.
     ///// </summary>
-    ///// <returns></returns>
     //public abstract ArchiveListSnapshot<TKey, TValue> CreateNewClientResources();
 
     ///// <summary>
@@ -105,6 +104,5 @@ public abstract class ArchiveList : DisposableLoggingClassBase
     ///// by any resource. 
     ///// </summary>
     ///// <param name="sortedTree"> file to search for.</param>
-    ///// <returns></returns>
     //public abstract bool IsFileBeingUsed(SortedTreeTable<TKey, TValue> sortedTree);
 }

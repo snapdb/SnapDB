@@ -100,9 +100,6 @@ internal static class Srp6Utilities
     /// Pads a byte[] to the specified length,
     /// with zeroes at the start of the buffer.
     /// </summary>
-    /// <param name="n"></param>
-    /// <param name="length"></param>
-    /// <returns></returns>
     private static byte[] GetPadded(BigInteger n, int length)
     {
         byte[] bs = BigIntegers.AsUnsignedByteArray(n);
@@ -117,12 +114,14 @@ internal static class Srp6Utilities
     }
 
     /// <summary>
-    /// Gets the byte representation of <see cref="n"/> that is padded to
-    /// match the byte length of <see cref="length"/>.
+    /// Gets the byte representation of <paramref name="n"/> that is padded to
+    /// match the byte length of <paramref name="length"/>.
     /// </summary>
-    /// <param name="n"></param>
-    /// <param name="length"></param>
-    /// <returns></returns>
+    /// <param name="n">The <see cref="BigInteger"/> to convert.</param>
+    /// <param name="length">The desired length of the resulting byte array.</param>
+    /// <returns>
+    /// A byte array containing the padded representation of the <see cref="BigInteger"/>.
+    /// </returns>
     public static byte[] ToPaddedArray(this BigInteger n, int length)
     {
         return GetPadded(n, length);

@@ -57,14 +57,14 @@ public class SrpServer
     #region [ Methods ]
 
     /// <summary>
-    /// Requests that the provided stream be authenticated
+    /// Requests that the provided stream be authenticated.
     /// </summary>
-    /// <param name="stream"></param>
+    /// <param name="stream">The input stream used for communication.</param>
     /// <param name="additionalChallenge">
     /// Additional data to include in the challenge. If using SSL certificates,
     /// adding the thumbprint to the challenge will allow detecting man in the middle attacks.
     /// </param>
-    /// <returns></returns>
+    /// <returns>A <see cref="SrpServerSession"/> representing the authenticated server session, or null if authentication fails.</returns>
     public SrpServerSession AuthenticateAsServer(Stream stream, byte[] additionalChallenge = null)
     {
         additionalChallenge ??= new byte[] { };
@@ -84,6 +84,7 @@ public class SrpServer
         SrpServerSession session = new(user);
         if (session.TryAuthenticate(stream, additionalChallenge))
             return session;
+
         return null;
     }
 

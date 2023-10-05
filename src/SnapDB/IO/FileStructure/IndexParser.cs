@@ -229,7 +229,7 @@ internal unsafe class IndexParser : IndexMapper
     /// <param name="offset">The offset inside the block to use to determine the next index block.</param>
     /// <param name="blockType">The value 1-4 which tell what indirect block this is.</param>
     /// <param name="blockBaseIndex">The lowest virtual address that can be referenced from this indirect block.</param>
-    /// <returns></returns>
+    /// <returns>The value at the specified offset within the specified block.</returns>
     private uint GetBlockIndexValue(uint blockIndex, int offset, BlockType blockType, uint blockBaseIndex)
     {
         DiskIoSession buffer = m_ioSessions.SourceIndex;

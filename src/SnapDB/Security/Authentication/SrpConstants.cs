@@ -106,37 +106,38 @@ internal class SrpConstants
     /// <summary>
     /// Looks up the valid precomputed constants for SRP given the specified bit strength.
     /// </summary>
-    /// <param name="strength">the bit strength to lookup.</param>
-    /// <returns></returns>
+    /// <param name="strength">The bit strength to lookup.</param>
+    /// <returns>The SRP constants for the specified strength.</returns>
     public static SrpConstants Lookup(SrpStrength strength)
     {
         int bits = (int)strength;
         if (!s_groupParameters.TryGetValue(bits, out SrpConstants value))
             throw new InvalidEnumArgumentException("strength");
+
         return value;
     }
 
     /// <summary>
     /// Computes the XOR of the supplied parameters
     /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns></returns>
     private static byte[] Xor(byte[] a, byte[] b)
     {
         if (a.Length != b.Length)
             throw new Exception();
+
         byte[] rv = new byte[a.Length];
+
         for (int x = 0; x < a.Length; x++)
             rv[x] = (byte)(a[x] ^ b[x]);
+
         return rv;
     }
 
     /// <summary>
     /// Computes the hash of all of the supplied parameters.
     /// </summary>
-    /// <param name="words"></param>
-    /// <returns></returns>
+    /// <param name="words">The byte arrays to be hashed.</param>
+    /// <returns>The computed SHA-512 hash as a byte array.</returns>
     private static byte[] ComputeHash(params byte[][] words)
     {
         Sha512Digest hash = new();

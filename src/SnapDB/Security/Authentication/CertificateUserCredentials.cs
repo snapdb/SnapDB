@@ -51,8 +51,8 @@ public class CertificateUserCredentials
     /// <summary>
     /// Looks up the username from the database.
     /// </summary>
-    /// <param name="username"></param>
-    /// <returns></returns>
+/// <param name="username">The username to look up.</param>
+/// <returns>The <see cref="CertificateUserCredential"/> associated with the specified username.</returns>
     public CertificateUserCredential Lookup(string username)
     {
         lock (m_users)
@@ -64,8 +64,10 @@ public class CertificateUserCredentials
     /// <summary>
     /// Gets if the user exists in the database
     /// </summary>
-    /// <param name="identity">the identity to check</param>
-    /// <returns></returns>
+    /// <param name="identity">The <see cref="IIdentity"/> to check for existence.</param>
+    /// <returns>
+    ///   <c>true</c> if a user with the specified <see cref="IIdentity"/> exists; otherwise, <c>false</c>.
+    /// </returns>
     public bool Exists(IIdentity identity)
     {
         if (identity is not WindowsIdentity i)
@@ -80,7 +82,7 @@ public class CertificateUserCredentials
     /// <summary>
     /// Adds the specified user to the credentials database.
     /// </summary>
-    /// <param name="username"></param>
+    /// <param name="username">The username of the user to add.</param>
     public void AddUser(string username)
     {
         CertificateUserCredential user = new(username);
