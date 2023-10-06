@@ -131,6 +131,13 @@ public sealed class SparseIndexWriter<TKey> : TreeStream<TKey, SnapUInt32> where
         Count++;
     }
 
+    /// <summary>
+    /// Switches the stream to reading mode.
+    /// </summary>
+    /// <remarks>
+    /// This method sets the stream position to the beginning and marks it as reading mode.
+    /// </remarks>
+    /// <exception cref="Exception">Thrown if this method is called more than once.</exception>
     public void SwitchToReading()
     {
         if (m_isReading)

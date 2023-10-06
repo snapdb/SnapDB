@@ -57,12 +57,34 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
 
     // private TKey m_lowerKey;
     // private TKey m_upperKey;
+    /// <summary>
+    /// Represents the custom methods for the keys used in this context.
+    /// </summary>
     protected SnapTypeCustomMethods<TKey> KeyMethods;
+
+    /// <summary>
+    /// Represents the size, in bytes, of the keys used in this context.
+    /// </summary>
     protected int KeySize;
+
+    /// <summary>
+    /// Represents the lower bound key used in this context.
+    /// </summary>
     protected TKey LowerKey = new();
+
+    /// <summary>
+    /// Represents the stream used in this context.
+    /// </summary>
     protected readonly BinaryStreamPointerBase Stream;
+
+    /// <summary>
+    /// Represents the upper bound key used in this context.
+    /// </summary>
     protected TKey UpperKey = new();
 
+    /// <summary>
+    /// Represents the size, in bytes, of the values used in this context.
+    /// </summary>
     protected int ValueSize;
 
     private readonly byte m_level;

@@ -28,7 +28,7 @@ using System.Linq;
 namespace UnitTests.Threading;
 
 [TestFixture]
-internal class TreadSafeListTest
+internal class ThreadSafeListTest
 {
     [Test]
     public void Test()
