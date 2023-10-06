@@ -67,11 +67,15 @@ public class RolloverLog
     #region [ Methods ]
 
     /// <summary>
-    /// Creates a rollover log file
+    /// Creates a new <see cref="RolloverLogFile"/> for specified source files and a destination file.
     /// </summary>
-    /// <param name="sourceFiles"></param>
-    /// <param name="destinationFile"></param>
-    /// <returns></returns>
+    /// <param name="sourceFiles">The list of source file identifiers to include in the rollover log.</param>
+    /// <param name="destinationFile">The identifier of the destination file for the rollover operation.</param>
+    /// <returns>A new instance of <see cref="RolloverLogFile"/> representing the rollover log.</returns>
+    /// <remarks>
+    /// The <see cref="Create"/> method generates a new unique file name using the archive's settings, and then creates a
+    /// <see cref="RolloverLogFile"/> instance to represent the rollover log for the specified source files and destination file.
+    /// </remarks>
     public RolloverLogFile Create(List<Guid> sourceFiles, Guid destinationFile)
     {
         string fileName = m_settings.GenerateNewFileName();

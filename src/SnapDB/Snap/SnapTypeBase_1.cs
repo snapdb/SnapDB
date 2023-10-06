@@ -183,10 +183,12 @@ public abstract class SnapTypeBase<T> : SnapTypeBase, IComparable<T>, IEquatable
     }
 
     /// <summary>
-    /// Compares the current instance to <see cref="other"/>.
+    /// Compares the current instance to <paramref name="other"/>.
     /// </summary>
     /// <param name="other">the key to compare to</param>
-    /// <returns></returns>
+    /// <returns>
+    /// A value that indicates the relative order of the objects being compared.
+    /// </returns>
     public abstract int CompareTo(T other);
 
     /// <summary>

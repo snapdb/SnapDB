@@ -108,8 +108,17 @@ public static class FileFlags
     /// <summary>
     /// Gets the flag associated with the supplied stage
     /// </summary>
-    /// <param name="stageNumber">The stage number, must be between 0 and 9 inclusive.</param>
-    /// <returns></returns>
+    /// <param name="stageNumber">The stage number for which to retrieve the <see cref="Guid"/>.</param>
+    /// <returns>
+    /// A predefined <see cref="Guid"/> corresponding to the specified stage number.
+    /// </returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when the <paramref name="stageNumber"/> is not between 0 and 9.
+    /// </exception>
+    /// <remarks>
+    /// The <see cref="GetStage"/> method returns a predefined <see cref="Guid"/> associated with a specific stage number.
+    /// Stages are typically used in multi-stage processes to represent different phases of an operation.
+    /// </remarks>
     public static Guid GetStage(int stageNumber)
     {
         switch (stageNumber)

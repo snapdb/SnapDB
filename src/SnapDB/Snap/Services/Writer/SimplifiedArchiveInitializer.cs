@@ -83,14 +83,19 @@ public class SimplifiedArchiveInitializer<TKey, TValue> where TKey : SnapTypeBas
     }
 
     /// <summary>
-    /// Creates a new <see cref="SortedTreeTable{TKey,TValue}"/> based on the settings passed to this class.
-    /// Once created, it is up to he caller to make sure that this class is properly disposed of.
+    /// Creates an archive file with specified keys, estimated size, and data.
     /// </summary>
-    /// <param name="startKey">the first key in the archive file</param>
-    /// <param name="endKey">the last key in the archive file</param>
-    /// <param name="estimatedSize">The estimated size of the file. -1 to ignore this feature and write to the first available directory.</param>
-    /// <param name="archiveIdCallback">the archiveId to assign to the new file.</param>
-    /// <returns></returns>
+    /// <param name="startKey">The first key of the archive file.</param>
+    /// <param name="endKey">The last key of the archive file.</param>
+    /// <param name="estimatedSize">The estimated size of the archive file.</param>
+    /// <param name="data">The data to be written to the archive file.</param>
+    /// <param name="archiveIdCallback">A callback function to handle the archive file's unique identifier.</param>
+    /// <returns>A sorted tree table representing the created archive file.</returns>
+    /// <remarks>
+    /// The <see cref="CreateArchiveFile"/> method creates an archive file with the specified start and end keys, estimated size,
+    /// and data. It uses a pending file to write the data and then renames it to the final file. The archive file is opened and
+    /// returned as a sorted tree table.
+    /// </remarks>
     public SortedTreeTable<TKey, TValue> CreateArchiveFile(TKey startKey, TKey endKey, long estimatedSize, TreeStream<TKey, TValue> data, Action<Guid> archiveIdCallback)
     {
         SimplifiedArchiveInitializerSettings settings = Settings;
@@ -106,7 +111,12 @@ public class SimplifiedArchiveInitializer<TKey, TValue> where TKey : SnapTypeBas
     /// <summary>
     /// Creates a new random file in one of the provided folders in a round robin fashion.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="path">The base path for the archive file.</param>
+    /// <returns>A unique archive file name.</returns>
+    /// <remarks>
+    /// This method generates a unique archive file name based on the specified path and includes
+    /// a timestamp, a unique identifier, and the specified file extension.
+    /// </remarks>
     private string CreateArchiveName(string path)
     {
         path = GetPath(path, DateTime.Now);
@@ -116,7 +126,14 @@ public class SimplifiedArchiveInitializer<TKey, TValue> where TKey : SnapTypeBas
     /// <summary>
     /// Creates a new random file in one of the provided folders in a round robin fashion.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="path">The base path for the archive file.</param>
+    /// <param name="startKey">The start key for the archive data range.</param>
+    /// <param name="endKey">The end key for the archive data range.</param>
+    /// <returns>A unique archive file name.</returns>
+    /// <remarks>
+    /// This method generates a unique archive file name based on the specified path, 
+    /// start key, end key, and includes a timestamp, a unique identifier, and the specified file extension.
+    /// </remarks>
     private string CreateArchiveName(string path, TKey startKey, TKey endKey)
     {
         if (startKey is not IHasTimestampField startTime || endKey is not IHasTimestampField endTime)

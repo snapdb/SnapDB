@@ -166,15 +166,22 @@ public class RolloverLogSettings : SettingsBase<RolloverLogSettings>
     }
 
     /// <summary>
-    /// Generates a new file name.
+    /// Generates a new unique file name for the log.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A new file name based on the log's settings and a unique identifier.</returns>
+    /// <exception cref="Exception">Thrown when attempting to generate a file name for a non-file backed log.</exception>
+    /// <remarks>
+    /// The <see cref="GenerateNewFileName"/> method creates a unique file name for the log based on the log's settings,
+    /// including the log file prefix, path, and file extension. If the log is not file-backed, an exception is thrown.
+    /// </remarks>
     internal string GenerateNewFileName()
     {
         if (!IsFileBacked)
             throw new Exception("Cannot generate a file name when the log is not a file backed log");
+        
         if (LogFilePrefix == string.Empty)
             return Path.Combine(LogPath, Guid.NewGuid() + LogFileExtension);
+        
         return Path.Combine(LogPath, LogFilePrefix + " " + Guid.NewGuid() + LogFileExtension);
     }
 

@@ -231,12 +231,14 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
     }
 
     /// <summary>
-    /// Stop all writing to this class.
-    /// Once stopped, it cannot be resumed.
-    /// All data is then immediately flushed to the output.
-    /// This method calls Dispose()
+    /// Stops the archive's write operations and performs necessary cleanup.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The last committed sequence number before stopping.</returns>
+    /// <remarks>
+    /// The <see cref="Stop"/> method is used to stop the archive's write operations gracefully. It sets an internal flag
+    /// to indicate that the archive has stopped writing, cancels any scheduled rollover tasks, and performs necessary cleanup.
+    /// After stopping, the method returns the last committed sequence number before the archive was stopped.
+    /// </remarks>
     public long Stop()
     {
         Log.Publish(MessageLevel.Info, "Stop() called", "Write is stopping");
