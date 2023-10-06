@@ -100,7 +100,7 @@ public class WriteProcessor<TKey, TValue> : DisposableLoggingClassBase where TKe
     }
 
     /// <summary>
-    /// Blocks until the specified point has progressed beyond the prestage level and can be queried by the user.
+    /// Blocks until the specified point has progressed beyond the pre-stage level and can be queried by the user.
     /// </summary>
     /// <param name="transactionId">the sequence number representing the desired point that was committed</param>
     public void SoftCommit(long transactionId)
@@ -110,7 +110,7 @@ public class WriteProcessor<TKey, TValue> : DisposableLoggingClassBase where TKe
 
     /// <summary>
     /// Blocks until the specified point has been committed to the disk subsystem. If running in a In-Memory mode, will return
-    /// as soon as it has been moved beyond the prestage level and can be queried by the user.
+    /// as soon as it has been moved beyond the pre-stage level and can be queried by the user.
     /// </summary>
     /// <param name="transactionId">the sequence number representing the desired point that was committed</param>
     public void HardCommit(long transactionId)

@@ -92,7 +92,7 @@ public class PrebufferWriter<TKey, TValue> : DisposableLoggingClassBase where TK
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates a prestage writer.
+    /// Creates a pre-stage writer.
     /// </summary>
     /// <param name="settings">The settings to use for this prebuffer writer</param>
     /// <param name="onRollover">delegate to call when a file is done with this stage.</param>

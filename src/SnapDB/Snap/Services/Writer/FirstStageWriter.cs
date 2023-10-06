@@ -34,14 +34,25 @@ using SnapDB.Threading;
 namespace SnapDB.Snap.Services.Writer;
 
 /// <summary>
-/// Handles how data is initially taken from prestage chunks and serialized to the disk.
+/// Handles how data is initially taken from pre-stage chunks and serialized to the disk.
 /// </summary>
 public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
 
+    /// <summary>
+    /// Event that notifies that a certain sequence number has been committed.
+    /// </summary>
+    public event Action<long>? SequenceNumberCommitted;
+
+    /// <summary>
+    /// Occurs after a rollover operation has completed and provides the sequence number associated with
+    /// the rollover.
+    /// </summary>
+    public event Action<long>? RolloverComplete;
+
     private readonly SimplifiedArchiveInitializer<TKey, TValue> m_createNextStageFile;
-    private readonly AtomicInt64 m_lastCommitedSequenceNumber = new();
+    private readonly AtomicInt64 m_lastCommittedSequenceNumber = new();
     private readonly AtomicInt64 m_lastRolledOverSequenceNumber = new();
     private readonly ArchiveList<TKey, TValue> m_list;
     private List<SortedTreeTable<TKey, TValue>> m_pendingTables1;
@@ -87,22 +98,41 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
     #region [ Methods ]
 
     /// <summary>
-    /// Event that notifies that a certain sequence number has been committed.
+    /// Releases the unmanaged resources used by the <see cref="FirstStageWriter{TKey,TValue}"/> object and optionally releases the managed resources.
     /// </summary>
-    public event Action<long> SequenceNumberCommitted;
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (!m_disposed && disposing)
+        {
+            lock (m_syncRoot)
+            {
+                if (m_disposed) //Prevents concurrent calls.
+                    return;
+                m_stopped = true;
+                m_disposed = true;
+            }
 
-    /// <summary>
-    /// Occurs after a rollover operation has completed and provides the sequence number associated with
-    /// the rollover.
-    /// </summary>
-    public event Action<long> RolloverComplete;
+            try
+            {
+                m_rolloverTask.Dispose();
+                m_rolloverComplete.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Log.Publish(MessageLevel.Info, MessageFlags.BugReport, "Unhandled exception in the dispose process", null, null, ex);
+            }
+        }
+
+        base.Dispose(disposing);
+    }
 
     /// <summary>
     /// Appends this data to this stage. Also queues up for deletion if necessary.
     /// </summary>
     /// <param name="args">
     /// arguments handed to this class from either the
-    /// PrestageWriter or another StageWriter of a previous generation
+    /// Pre-stage writer or another stage writer of a previous generation
     /// </param>
     /// <remarks>
     /// This method must be called in a single threaded manner.
@@ -123,6 +153,7 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
 
         SortedTreeFile file = SortedTreeFile.CreateInMemory();
         SortedTreeTable<TKey, TValue> table = file.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
+
         using (SortedTreeTableEditor<TKey, TValue> edit = table.BeginEdit())
         {
             edit.AddPoints(args.Stream);
@@ -130,6 +161,7 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
         }
 
         bool shouldWait = false;
+
         //If there is data to write then write it to the current archive.
         lock (m_syncRoot)
         {
@@ -157,8 +189,10 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
             if (m_pendingTables1.Count == 10)
             {
                 using UnionTreeStream<TKey, TValue> reader = new(m_pendingTables1.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true);
+
                 SortedTreeFile file1 = SortedTreeFile.CreateInMemory();
                 SortedTreeTable<TKey, TValue> table1 = file1.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
+
                 using (SortedTreeTableEditor<TKey, TValue> edit = table1.BeginEdit())
                 {
                     edit.AddPoints(reader);
@@ -181,8 +215,10 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
             if (m_pendingTables2.Count == 10)
             {
                 using UnionTreeStream<TKey, TValue> reader = new(m_pendingTables2.Select(x => new ArchiveTreeStreamWrapper<TKey, TValue>(x)), true);
+
                 SortedTreeFile file1 = SortedTreeFile.CreateInMemory();
                 SortedTreeTable<TKey, TValue> table1 = file1.OpenOrCreateTable<TKey, TValue>(m_settings.EncodingMethod);
+
                 using (SortedTreeTableEditor<TKey, TValue> edit = table1.BeginEdit())
                 {
                     edit.AddPoints(reader);
@@ -202,9 +238,10 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
                 m_pendingTables2.Clear();
             }
 
-            m_lastCommitedSequenceNumber.Value = args.TransactionId;
+            m_lastCommittedSequenceNumber.Value = args.TransactionId;
 
             long currentSizeMb = (m_pendingTables1.Sum(x => x.BaseFile.ArchiveSize) + m_pendingTables2.Sum(x => x.BaseFile.ArchiveSize)) >> 20;
+
             if (currentSizeMb > m_settings.MaximumAllowedMb)
             {
                 shouldWait = true;
@@ -248,7 +285,8 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
 
         m_rolloverTask.Dispose();
         Dispose();
-        return m_lastCommitedSequenceNumber;
+
+        return m_lastCommittedSequenceNumber;
     }
 
     /// <summary>
@@ -264,37 +302,7 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
         }
     }
 
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="FirstStageWriter{TKey,TValue}"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (!m_disposed && disposing)
-        {
-            lock (m_syncRoot)
-            {
-                if (m_disposed) //Prevents concurrent calls.
-                    return;
-                m_stopped = true;
-                m_disposed = true;
-            }
-
-            try
-            {
-                m_rolloverTask.Dispose();
-                m_rolloverComplete.Dispose();
-            }
-            catch (Exception ex)
-            {
-                Log.Publish(MessageLevel.Info, MessageFlags.BugReport, "Unhandled exception in the dispose process", null, null, ex);
-            }
-        }
-
-        base.Dispose(disposing);
-    }
-
-    private void RolloverTask_Running(object sender, EventArgs<ScheduledTaskRunningReason> e)
+    private void RolloverTask_Running(object? sender, EventArgs<ScheduledTaskRunningReason> e)
     {
         //The worker can be disposed either via the Stop() method or 
         //the Dispose() method.  If via the dispose method, then
@@ -311,12 +319,13 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
         List<SortedTreeTable<TKey, TValue>> pendingTables2;
         List<SortedTreeTable<TKey, TValue>> pendingTables3;
         long sequenceNumber;
+
         lock (m_syncRoot)
         {
             pendingTables1 = m_pendingTables1;
             pendingTables2 = m_pendingTables2;
             pendingTables3 = m_pendingTables3;
-            sequenceNumber = m_lastCommitedSequenceNumber;
+            sequenceNumber = m_lastCommittedSequenceNumber;
             m_pendingTables1 = new List<SortedTreeTable<TKey, TValue>>();
             m_pendingTables2 = new List<SortedTreeTable<TKey, TValue>>();
             m_pendingTables3 = new List<SortedTreeTable<TKey, TValue>>();
@@ -331,14 +340,18 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
         Log.Publish(MessageLevel.Info, "Pending Tables Report", "Pending Tables V1: " + pendingTables1.Count + " V2: " + pendingTables2.Count + " V3: " + pendingTables3.Count);
 
         List<ArchiveTableSummary<TKey, TValue>> summaryTables = new();
+
         foreach (SortedTreeTable<TKey, TValue> table in pendingTables1)
         {
             ArchiveTableSummary<TKey, TValue> summary = new(table);
+
             if (!summary.IsEmpty)
             {
                 summaryTables.Add(summary);
+
                 if (startKey.IsGreaterThan(summary.FirstKey))
                     summary.FirstKey.CopyTo(startKey);
+
                 if (endKey.IsLessThan(summary.LastKey))
                     summary.LastKey.CopyTo(endKey);
             }
@@ -347,11 +360,14 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
         foreach (SortedTreeTable<TKey, TValue> table in pendingTables2)
         {
             ArchiveTableSummary<TKey, TValue> summary = new(table);
+
             if (!summary.IsEmpty)
             {
                 summaryTables.Add(summary);
+
                 if (startKey.IsGreaterThan(summary.FirstKey))
                     summary.FirstKey.CopyTo(startKey);
+
                 if (endKey.IsLessThan(summary.LastKey))
                     summary.LastKey.CopyTo(endKey);
             }
@@ -360,16 +376,18 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
         foreach (SortedTreeTable<TKey, TValue> table in pendingTables3)
         {
             ArchiveTableSummary<TKey, TValue> summary = new(table);
+
             if (!summary.IsEmpty)
             {
                 summaryTables.Add(summary);
+
                 if (startKey.IsGreaterThan(summary.FirstKey))
                     summary.FirstKey.CopyTo(startKey);
+
                 if (endKey.IsLessThan(summary.LastKey))
                     summary.LastKey.CopyTo(endKey);
             }
         }
-
 
         long size = summaryTables.Sum(x => x.SortedTreeTable.BaseFile.ArchiveSize);
 
@@ -379,6 +397,7 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
             SortedTreeTable<TKey, TValue> newTable = m_createNextStageFile.CreateArchiveFile(startKey, endKey, size, reader, null);
 
             using ArchiveListEditor<TKey, TValue> edit = m_list.AcquireEditLock();
+
             //Add the newly created file.
             edit.Add(newTable);
 
