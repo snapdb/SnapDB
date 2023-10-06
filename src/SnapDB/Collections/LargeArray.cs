@@ -78,6 +78,11 @@ public class LargeArray<T>
     #region [ Properties ]
 
     /// <summary>
+    /// Gets the number of items in the array.
+    /// </summary>
+    public int Capacity { get; private set; }
+
+    /// <summary>
     /// Gets or sets the value in the specified index of the array.
     /// </summary>
     /// <param name="index">The index to address.</param>
@@ -95,11 +100,6 @@ public class LargeArray<T>
             m_array[index >> m_bitShift]![index & m_mask] = value;
         }
     }
-
-    /// <summary>
-    /// Gets the number of items in the array.
-    /// </summary>
-    public int Capacity { get; private set; }
 
     #endregion
 

@@ -65,19 +65,9 @@ public class WriteProcessorSettings : SettingsBase<WriteProcessorSettings>
     #region [ Properties ]
 
     /// <summary>
-    /// The settings for the prebuffer.
-    /// </summary>
-    public PrebufferWriterSettings PrebufferWriter { get; }
-
-    /// <summary>
     /// The settings for the first stage writer.
     /// </summary>
     public FirstStageWriterSettings FirstStageWriter { get; }
-
-    /// <summary>
-    /// Contains all of the staging rollovers.
-    /// </summary>
-    public ImmutableList<CombineFilesSettings> StagingRollovers { get; }
 
     /// <summary>
     /// Gets or sets if writing will be enabled.
@@ -91,6 +81,16 @@ public class WriteProcessorSettings : SettingsBase<WriteProcessorSettings>
             m_isEnabled = false;
         }
     }
+
+    /// <summary>
+    /// The settings for the prebuffer.
+    /// </summary>
+    public PrebufferWriterSettings PrebufferWriter { get; }
+
+    /// <summary>
+    /// Contains all of the staging rollovers.
+    /// </summary>
+    public ImmutableList<CombineFilesSettings> StagingRollovers { get; }
 
     #endregion
 

@@ -69,6 +69,31 @@ public class MemoryPool : IDisposable
     #region [ Members ]
 
     /// <summary>
+    /// Requests that classes using this <see cref="MemoryPool"/> release any unused buffers.
+    /// Failing to do so may result in an <see cref="OutOfMemoryException"/> to occur.
+    /// </summary>
+    /// <remarks>
+    /// IMPORTANT NOTICE: Do not call <see cref="AllocatePage"/> via the thread
+    /// that raises this event. Also, be careful about entering a lock via this thread
+    /// because a potential deadlock might occur.
+    /// Also, Do not remove a handler from within a lock context as the remove
+    /// blocks until all events have been called. A potential for another deadlock.
+    /// </remarks>
+    public event EventHandler<CollectionEventArgs> RequestCollection
+    {
+        add
+        {
+            m_requestCollectionEvent.Add(new WeakEventHandler<CollectionEventArgs>(value));
+            RemoveDeadEvents();
+        }
+        remove
+        {
+            m_requestCollectionEvent.RemoveAndWait(new WeakEventHandler<CollectionEventArgs>(value));
+            RemoveDeadEvents();
+        }
+    }
+
+    /// <summary>
     /// Represents the ceiling for the amount of memory the buffer pool can use (124GB).
     /// </summary>
     public const long MaximumTestedSupportedMemoryCeiling = 124 * 1024 * 1024 * 1024L;
@@ -161,20 +186,9 @@ public class MemoryPool : IDisposable
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the current <see cref="TargetUtilizationLevels"/>.
-    /// </summary>
-    public TargetUtilizationLevels TargetUtilizationLevel { get; private set; }
-
-    /// <summary>
     /// Returns the number of bytes currently allocated by the buffer pool to other objects.
     /// </summary>
     public long AllocatedBytes => CurrentAllocatedSize;
-
-    /// <summary>
-    /// The maximum amount of RAM that this memory pool is configured to support.
-    /// Attempting to allocate more than this will cause an out of memory exception.
-    /// </summary>
-    public long MaximumPoolSize => m_pageList.MaximumPoolSize;
 
     /// <summary>
     /// Returns the number of bytes allocated by all buffer pools.
@@ -192,6 +206,17 @@ public class MemoryPool : IDisposable
     /// Gets if this pool has been disposed.
     /// </summary>
     public bool IsDisposed { get; private set; }
+
+    /// <summary>
+    /// The maximum amount of RAM that this memory pool is configured to support.
+    /// Attempting to allocate more than this will cause an out of memory exception.
+    /// </summary>
+    public long MaximumPoolSize => m_pageList.MaximumPoolSize;
+
+    /// <summary>
+    /// Gets the current <see cref="TargetUtilizationLevels"/>.
+    /// </summary>
+    public TargetUtilizationLevels TargetUtilizationLevel { get; private set; }
 
     #endregion
 
@@ -215,31 +240,6 @@ public class MemoryPool : IDisposable
             {
                 IsDisposed = true; // Prevent duplicate dispose.
             }
-        }
-    }
-
-    /// <summary>
-    /// Requests that classes using this <see cref="MemoryPool"/> release any unused buffers.
-    /// Failing to do so may result in an <see cref="OutOfMemoryException"/> to occur.
-    /// </summary>
-    /// <remarks>
-    /// IMPORTANT NOTICE: Do not call <see cref="AllocatePage"/> via the thread
-    /// that raises this event. Also, be careful about entering a lock via this thread
-    /// because a potential deadlock might occur.
-    /// Also, Do not remove a handler from within a lock context as the remove
-    /// blocks until all events have been called. A potential for another deadlock.
-    /// </remarks>
-    public event EventHandler<CollectionEventArgs> RequestCollection
-    {
-        add
-        {
-            m_requestCollectionEvent.Add(new WeakEventHandler<CollectionEventArgs>(value));
-            RemoveDeadEvents();
-        }
-        remove
-        {
-            m_requestCollectionEvent.RemoveAndWait(new WeakEventHandler<CollectionEventArgs>(value));
-            RemoveDeadEvents();
         }
     }
 
@@ -511,29 +511,16 @@ public class MemoryPool : IDisposable
 
     private string GetCollectionLevelString(int iterations)
     {
-        switch (iterations)
+        return iterations switch
         {
-            case 0:
-                return "0 (None)";
-
-            case 1:
-                return "1 (Low)";
-
-            case 2:
-                return "2 (Normal)";
-
-            case 3:
-                return "3 (High)";
-
-            case 4:
-                return "4 (Very High)";
-
-            case 5:
-                return "5 (Critical)";
-
-            default:
-                return iterations + " (Unknown)";
-        }
+            0 => "0 (None)",
+            1 => "1 (Low)",
+            2 => "2 (Normal)",
+            3 => "3 (High)",
+            4 => "4 (Very High)",
+            5 => "5 (Critical)",
+            _ => iterations + " (Unknown)"
+        };
     }
 
     private void CalculateThresholds(long maximumBufferSize, TargetUtilizationLevels levels)

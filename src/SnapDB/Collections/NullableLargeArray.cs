@@ -64,14 +64,14 @@ public class NullableLargeArray<T> : IEnumerable<T?>
     public int Capacity => m_list.Capacity;
 
     /// <summary>
-    /// Gets the number of non-null items that are in the array.
-    /// </summary>
-    public int CountUsed => m_isUsed.SetCount;
-
-    /// <summary>
     /// Gets the number of available spaces in the array. Equal to <see cref="Capacity"/> - <see cref="CountUsed"/>.
     /// </summary>
     public int CountFree => m_isUsed.ClearCount;
+
+    /// <summary>
+    /// Gets the number of non-null items that are in the array.
+    /// </summary>
+    public int CountUsed => m_isUsed.SetCount;
 
     /// <summary>
     /// Gets the provided item from the array.
@@ -232,9 +232,8 @@ public class NullableLargeArray<T> : IEnumerable<T?>
     /// Returns an enumerator that iterates through the non-null elements of this collection.
     /// </summary>
     /// <returns>
-    /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
+    /// A <see cref="System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
     /// </returns>
-    /// <filterpriority>1</filterpriority>
     public IEnumerator<T?> GetEnumerator()
     {
         return m_isUsed.GetAllSetBits().Select(index => m_list[index]).GetEnumerator();

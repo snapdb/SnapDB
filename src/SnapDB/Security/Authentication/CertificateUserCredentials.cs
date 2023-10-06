@@ -51,8 +51,8 @@ public class CertificateUserCredentials
     /// <summary>
     /// Looks up the username from the database.
     /// </summary>
-/// <param name="username">The username to look up.</param>
-/// <returns>The <see cref="CertificateUserCredential"/> associated with the specified username.</returns>
+    /// <param name="username">The username to look up.</param>
+    /// <returns>The <see cref="CertificateUserCredential"/> associated with the specified username.</returns>
     public CertificateUserCredential Lookup(string username)
     {
         lock (m_users)
@@ -66,7 +66,7 @@ public class CertificateUserCredentials
     /// </summary>
     /// <param name="identity">The <see cref="IIdentity"/> to check for existence.</param>
     /// <returns>
-    ///   <c>true</c> if a user with the specified <see cref="IIdentity"/> exists; otherwise, <c>false</c>.
+    /// <c>true</c> if a user with the specified <see cref="IIdentity"/> exists; otherwise, <c>false</c>.
     /// </returns>
     public bool Exists(IIdentity identity)
     {

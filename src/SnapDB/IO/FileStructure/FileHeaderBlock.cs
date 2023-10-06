@@ -85,22 +85,6 @@ public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
     #region [ Properties ]
 
     /// <summary>
-    /// The number of bytes per block for the file structure.
-    /// </summary>
-    public int BlockSize { get; private set; }
-
-    /// <summary>
-    /// Determines if the file can be written to because enough features are recognized by this current version to do it without corrupting the file system.
-    /// </summary>
-    // TODO: Support changing files that are from an older version.
-    public bool CanWrite => m_minimumWriteVersion == FileAllocationWriteTableVersion;
-
-    /// <summary>
-    /// Determines if the archive file can be read
-    /// </summary>
-    public bool CanRead => m_minimumReadVersion <= FileAllocationWriteTableVersion;
-
-    /// <summary>
     /// The GUID number for this archive.
     /// </summary>
     public Guid ArchiveId => m_archiveId;
@@ -119,27 +103,25 @@ public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
     }
 
     /// <summary>
-    /// Gets if this file uses the simplified file format.
+    /// The number of bytes per block for the file structure.
     /// </summary>
-    public bool IsSimplifiedFileFormat { get; private set; }
+    public int BlockSize { get; private set; }
 
     /// <summary>
-    /// Gets the number of times the file header exists in the archive file.
+    /// Determines if the archive file can be read
     /// </summary>
-    public byte HeaderBlockCount { get; private set; }
+    public bool CanRead => m_minimumReadVersion <= FileAllocationWriteTableVersion;
 
     /// <summary>
-    /// Maintains a sequential number that represents the version of the file.
+    /// Determines if the file can be written to because enough features are recognized by this current version to do it without corrupting the file system.
     /// </summary>
-    /// <remarks>
-    /// This will be updated every time the file system has been modified. Initially, it will be one.
-    /// </remarks>
-    public uint SnapshotSequenceNumber { get; private set; }
+    // TODO: Support changing files that are from an older version.
+    public bool CanWrite => m_minimumWriteVersion == FileAllocationWriteTableVersion;
 
     /// <summary>
-    /// Represents the last block that has been allocated.
+    /// Gets the size of each data block (block size - overhead)
     /// </summary>
-    public uint LastAllocatedBlock { get; private set; }
+    public int DataBlockSize => BlockSize - FileStructureConstants.BlockFooterLength;
 
     /// <summary>
     /// Returns the number of files that are in this file system.
@@ -148,9 +130,9 @@ public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
     public int FileCount => Files.Count;
 
     /// <summary>
-    /// Gets the size of each data block (block size - overhead)
+    /// A list of all of the files in this collection.
     /// </summary>
-    public int DataBlockSize => BlockSize - FileStructureConstants.BlockFooterLength;
+    public ImmutableList<SubFileHeader?> Files { get; private set; } = default!;
 
     /// <summary>
     /// User definable flags to associate with archive files.
@@ -158,9 +140,27 @@ public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
     public ImmutableList<Guid> Flags { get; private set; } = default!;
 
     /// <summary>
-    /// A list of all of the files in this collection.
+    /// Gets the number of times the file header exists in the archive file.
     /// </summary>
-    public ImmutableList<SubFileHeader?> Files { get; private set; } = default!;
+    public byte HeaderBlockCount { get; private set; }
+
+    /// <summary>
+    /// Gets if this file uses the simplified file format.
+    /// </summary>
+    public bool IsSimplifiedFileFormat { get; private set; }
+
+    /// <summary>
+    /// Represents the last block that has been allocated.
+    /// </summary>
+    public uint LastAllocatedBlock { get; private set; }
+
+    /// <summary>
+    /// Maintains a sequential number that represents the version of the file.
+    /// </summary>
+    /// <remarks>
+    /// This will be updated every time the file system has been modified. Initially, it will be one.
+    /// </remarks>
+    public uint SnapshotSequenceNumber { get; private set; }
 
     #endregion
 

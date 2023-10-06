@@ -101,6 +101,15 @@ public sealed class TransactionalEdit : IDisposable
     #region [ Properties ]
 
     /// <summary>
+    /// The GUID for this archive type.
+    /// </summary>
+    public Guid ArchiveType
+    {
+        get => m_fileHeaderBlock.ArchiveType;
+        set => m_fileHeaderBlock.ArchiveType = value;
+    }
+
+    /// <summary>
     /// A list of all of the files in this collection.
     /// </summary>
     public ImmutableList<SubFileHeader?> Files
@@ -112,15 +121,6 @@ public sealed class TransactionalEdit : IDisposable
 
             return m_fileHeaderBlock.Files;
         }
-    }
-
-    /// <summary>
-    /// The GUID for this archive type.
-    /// </summary>
-    public Guid ArchiveType
-    {
-        get => m_fileHeaderBlock.ArchiveType;
-        set => m_fileHeaderBlock.ArchiveType = value;
     }
 
     #endregion

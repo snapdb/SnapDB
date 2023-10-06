@@ -52,6 +52,27 @@ public abstract class SortedTreeTableEditor<TKey, TValue> : IDisposable where TK
     }
 
     /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="SortedTreeTableEditor{TKey,TValue}"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!m_disposed)
+            try
+            {
+                // This will be done regardless of whether the object is finalized or disposed.
+                if (disposing)
+                {
+                    // This will be done only when the object is disposed by calling Dispose().
+                }
+            }
+            finally
+            {
+                m_disposed = true; // Prevent duplicate dispose.
+            }
+    }
+
+    /// <summary>
     /// Commits the edits to the current archive file and disposes of this class.
     /// </summary>
     public abstract void Commit();
@@ -90,27 +111,6 @@ public abstract class SortedTreeTableEditor<TKey, TValue> : IDisposable where TK
     /// </summary>
     /// <returns></returns>
     public abstract SortedTreeScannerBase<TKey, TValue> GetRange();
-
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="SortedTreeTableEditor{TKey,TValue}"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!m_disposed)
-            try
-            {
-                // This will be done regardless of whether the object is finalized or disposed.
-                if (disposing)
-                {
-                    // This will be done only when the object is disposed by calling Dispose().
-                }
-            }
-            finally
-            {
-                m_disposed = true; // Prevent duplicate dispose.
-            }
-    }
 
     #endregion
 }

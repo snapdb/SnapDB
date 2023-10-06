@@ -74,6 +74,31 @@ public class WriteProcessor<TKey, TValue> : DisposableLoggingClassBase where TKe
     #region [ Methods ]
 
     /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="WriteProcessor{TKey,TValue}"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (!m_disposed)
+            try
+            {
+                // This will be done regardless of whether the object is finalized or disposed.
+                if (disposing)
+                {
+                    // This will be done only when the object is disposed by calling Dispose().
+                    m_prebuffer.Stop();
+                    m_firstStageWriter.Stop();
+                    m_stagingRollovers.ForEach(x => x.Dispose());
+                }
+            }
+            finally
+            {
+                m_disposed = true; // Prevent duplicate dispose.
+                base.Dispose(disposing); // Call base class Dispose().
+            }
+    }
+
+    /// <summary>
     /// Writes the provided key/value to the engine.
     /// </summary>
     /// <param name="key"></param>
@@ -100,7 +125,7 @@ public class WriteProcessor<TKey, TValue> : DisposableLoggingClassBase where TKe
     }
 
     /// <summary>
-    /// Blocks until the specified point has progressed beyond the prestage level and can be queried by the user.
+    /// Blocks until the specified point has progressed beyond the pre-stage level and can be queried by the user.
     /// </summary>
     /// <param name="transactionId">the sequence number representing the desired point that was committed</param>
     public void SoftCommit(long transactionId)
@@ -110,7 +135,7 @@ public class WriteProcessor<TKey, TValue> : DisposableLoggingClassBase where TKe
 
     /// <summary>
     /// Blocks until the specified point has been committed to the disk subsystem. If running in a In-Memory mode, will return
-    /// as soon as it has been moved beyond the prestage level and can be queried by the user.
+    /// as soon as it has been moved beyond the pre-stage level and can be queried by the user.
     /// </summary>
     /// <param name="transactionId">the sequence number representing the desired point that was committed</param>
     public void HardCommit(long transactionId)
@@ -119,31 +144,6 @@ public class WriteProcessor<TKey, TValue> : DisposableLoggingClassBase where TKe
             SoftCommit(transactionId);
         else
             m_transactionTracker.WaitForHardCommit(transactionId);
-    }
-
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="WriteProcessor{TKey,TValue}"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (!m_disposed)
-            try
-            {
-                // This will be done regardless of whether the object is finalized or disposed.
-                if (disposing)
-                {
-                    // This will be done only when the object is disposed by calling Dispose().
-                    m_prebuffer.Stop();
-                    m_firstStageWriter.Stop();
-                    m_stagingRollovers.ForEach(x => x.Dispose());
-                }
-            }
-            finally
-            {
-                m_disposed = true; // Prevent duplicate dispose.
-                base.Dispose(disposing); // Call base class Dispose().
-            }
     }
 
     #endregion

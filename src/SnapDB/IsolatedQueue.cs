@@ -75,11 +75,6 @@ public class IsolatedQueue<T>
         #region [ Properties ]
 
         /// <summary>
-        /// Gets if the current node is out of entries.
-        /// </summary>
-        public bool DequeueMustMoveToNextNode => m_tail == m_lastBlock;
-
-        /// <summary>
         /// Gets if there are items that can be dequeued.
         /// </summary>
         public bool CanDequeue => m_head != m_tail;
@@ -88,6 +83,11 @@ public class IsolatedQueue<T>
         /// Gets if this list can be enqueued.
         /// </summary>
         public bool CanEnqueue => m_head != m_lastBlock;
+
+        /// <summary>
+        /// Gets if the current node is out of entries.
+        /// </summary>
+        public bool DequeueMustMoveToNextNode => m_tail == m_lastBlock;
 
         #endregion
 

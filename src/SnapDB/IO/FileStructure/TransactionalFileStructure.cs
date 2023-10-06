@@ -94,14 +94,14 @@ public class TransactionalFileStructure : IDisposable
     public long ArchiveSize => m_diskIo.FileSize;
 
     /// <summary>
-    /// Gets the last committed read snapshot on the file system.
-    /// </summary>
-    public ReadSnapshot Snapshot => m_currentReadTransaction;
-
-    /// <summary>
     /// Gets the file name for the <see cref="TransactionalFileStructure"/>
     /// </summary>
     public string FileName => m_diskIo.FileName;
+
+    /// <summary>
+    /// Gets the last committed read snapshot on the file system.
+    /// </summary>
+    public ReadSnapshot Snapshot => m_currentReadTransaction;
 
     #endregion
 

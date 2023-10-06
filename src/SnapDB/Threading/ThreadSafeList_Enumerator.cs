@@ -86,7 +86,6 @@ public partial class ThreadSafeList<T>
         /// <returns>
         /// The current element in the collection.
         /// </returns>
-        /// <filterpriority>2</filterpriority>
         object IEnumerator.Current => Current;
 
         #endregion
@@ -96,7 +95,6 @@ public partial class ThreadSafeList<T>
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        /// <filterpriority>2</filterpriority>
         public void Dispose()
         {
             if (!m_disposed)
@@ -118,8 +116,7 @@ public partial class ThreadSafeList<T>
         /// <returns>
         /// <c>true</c> if the enumerator was successfully advanced to the next element; <c>false</c> if the enumerator has passed the end of the collection.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-        /// <filterpriority>2</filterpriority>
+        /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
         public bool MoveNext()
         {
             if (m_disposed)
@@ -134,8 +131,7 @@ public partial class ThreadSafeList<T>
         /// <summary>
         /// Sets the enumerator to its initial position, which is before the first element in the collection.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-        /// <filterpriority>2</filterpriority>
+        /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
         public void Reset()
         {
             if (m_disposed)

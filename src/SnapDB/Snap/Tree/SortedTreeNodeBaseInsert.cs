@@ -57,11 +57,11 @@ public partial class SortedTreeNodeBase<TKey, TValue>
     /// <param name="stream">The sequential stream of key-value pairs to insert.</param>
     public virtual void TryInsertSequentialStream(InsertStreamHelper<TKey, TValue> stream)
     {
-        // First check to see if the sequentail insertion is valid.
+        // First check to see if the sequential insertion is valid.
         TKey key = new();
         TValue value = new();
 
-        // Exit if stream is not valid or not sequentail.
+        // Exit if stream is not valid or not sequential.
         if (!stream.IsValid || !stream.IsStillSequential)
             return;
 
@@ -109,6 +109,7 @@ public partial class SortedTreeNodeBase<TKey, TValue>
         NavigateToNode(key);
 
         int index = ~GetIndexOf(key); // See the ~ here.
+
         if (index < 0)
             return false;
 
@@ -123,6 +124,7 @@ public partial class SortedTreeNodeBase<TKey, TValue>
         }
 
         SplitNodeThenInsert(key, value);
+
         return true;
     }
 
@@ -137,8 +139,9 @@ public partial class SortedTreeNodeBase<TKey, TValue>
         key.CopyTo(dividingKey);
 
         uint newNodeIndex = m_getNextNewNodeIndex();
+
         if (!IsRightSiblingIndexNull)
-            throw new Exception("Incorrectly implemented"); 
+            throw new Exception("Incorrectly implemented");
 
         RightSiblingNodeIndex = newNodeIndex;
 
@@ -165,6 +168,7 @@ public partial class SortedTreeNodeBase<TKey, TValue>
         Split(newNodeIndex, dividingKey);
 
         SetNodeIndex(currentNode);
+
         if (IsKeyInsideBounds(key))
         {
             InsertUnlessFull(~GetIndexOf(key), key, value);

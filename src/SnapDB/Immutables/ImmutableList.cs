@@ -72,9 +72,9 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+    /// Gets the number of elements contained in the <see cref="System.Collections.Generic.ICollection`1"/>.
     /// </summary>
-    /// <returns>The number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</returns>
+    /// <returns>The number of elements contained in the <see cref="System.Collections.Generic.ICollection`1"/>.</returns>
     public int Count => m_list.Count;
 
     /// <summary>
@@ -101,10 +101,10 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     #region [ Methods ]
 
     /// <summary>
-    /// Adds the elements of the specified collection to the end of the <see cref="T:System.Collections.Generic.List`1"/>.
+    /// Adds the elements of the specified collection to the end of the <see cref="System.Collections.Generic.List`1"/>.
     /// </summary>
     /// <param name="collection">
-    /// The collection whose elements should be added to the end of the <see cref="T:System.Collections.Generic.List`1"/>.
+    /// The collection whose elements should be added to the end of the <see cref="System.Collections.Generic.List`1"/>.
     /// The collection itself cannot be <c>null</c>, but it can contain elements that are <c>null</c>.
     /// </param>
     public void AddRange(IEnumerable<T?> collection)
@@ -166,24 +166,22 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     }
 
     /// <summary>Returns an enumerator that iterates through the collection.</summary>
-    /// <returns>A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.</returns>
-    /// <filterpriority>1</filterpriority>
+    /// <returns>A <see cref="System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.</returns>
     public IEnumerator<T> GetEnumerator()
     {
         return m_list.GetEnumerator();
     }
 
     /// <summary>Returns an enumerator that iterates through a collection.</summary>
-    /// <returns>An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.</returns>
-    /// <filterpriority>2</filterpriority>
+    /// <returns>An <see cref="IEnumerator"/> object that can be used to iterate through the collection.</returns>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return ((IEnumerable)m_list).GetEnumerator();
     }
 
-    /// <summary>Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</summary>
-    /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
-    /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.</exception>
+    /// <summary>Adds an item to the <see cref="System.Collections.Generic.ICollection`1"/>.</summary>
+    /// <param name="item">The object to add to the <see cref="System.Collections.Generic.ICollection`1"/>.</param>
+    /// <exception cref="NotSupportedException">The <see cref="System.Collections.Generic.ICollection`1"/> is read-only.</exception>
     public void Add(T? item)
     {
         TestForEditable();
@@ -201,21 +199,21 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     }
 
     /// <summary>
-    /// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
+    /// Determines whether the <see cref="System.Collections.Generic.ICollection`1"/> contains a specific value.
     /// </summary>
-    /// <returns><c>true</c> if <paramref name="item"/> is found in the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, <c>false</c>.</returns>
-    /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+    /// <returns><c>true</c> if <paramref name="item"/> is found in the <see cref="System.Collections.Generic.ICollection`1"/>; otherwise, <c>false</c>.</returns>
+    /// <param name="item">The object to locate in the <see cref="System.Collections.Generic.ICollection`1"/>.</param>
     public bool Contains(T? item)
     {
         return m_list.Contains(item);
     }
 
     /// <summary>
-    /// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
+    /// Copies the elements of the <see cref="System.Collections.Generic.ICollection`1"/> to an <see cref="Array"/>, starting at a particular <see cref="Array"/> index.
     /// </summary>
     /// <param name="array">
-    /// The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1"/>.
-    /// The <see cref="T:System.Array"/> must have zero-based indexing.
+    /// The one-dimensional <see cref="Array"/> that is the destination of the elements copied from <see cref="System.Collections.Generic.ICollection`1"/>.
+    /// The <see cref="Array"/> must have zero-based indexing.
     /// </param>
     /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
     public void CopyTo(T?[] array, int arrayIndex)
@@ -224,13 +222,13 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     }
 
     /// <summary>
-    /// Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+    /// Removes the first occurrence of a specific object from the <see cref="System.Collections.Generic.ICollection`1"/>.
     /// </summary>
     /// <returns>
-    /// <c>true</c> if <paramref name="item"/> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1"/>;
-    /// otherwise, <c>false</c>. This method also returns false if <paramref name="item"/> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1"/>.
+    /// <c>true</c> if <paramref name="item"/> was successfully removed from the <see cref="System.Collections.Generic.ICollection`1"/>;
+    /// otherwise, <c>false</c>. This method also returns false if <paramref name="item"/> is not found in the original <see cref="System.Collections.Generic.ICollection`1"/>.
     /// </returns>
-    /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+    /// <param name="item">The object to remove from the <see cref="System.Collections.Generic.ICollection`1"/>.</param>
     public bool Remove(T? item)
     {
         TestForEditable();
@@ -238,20 +236,20 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     }
 
     /// <summary>
-    /// Determines the index of a specific item in the <see cref="T:System.Collections.Generic.IList`1"/>.
+    /// Determines the index of a specific item in the <see cref="System.Collections.Generic.IList`1"/>.
     /// </summary>
     /// <returns>The index of <paramref name="item"/> if found in the list; otherwise, -1.</returns>
-    /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.IList`1"/>.</param>
+    /// <param name="item">The object to locate in the <see cref="System.Collections.Generic.IList`1"/>.</param>
     public int IndexOf(T? item)
     {
         return m_list.IndexOf(item);
     }
 
     /// <summary>
-    /// Inserts an item to the <see cref="T:System.Collections.Generic.IList`1"/> at the specified index.
+    /// Inserts an item to the <see cref="System.Collections.Generic.IList`1"/> at the specified index.
     /// </summary>
     /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
-    /// <param name="item">The object to insert into the <see cref="T:System.Collections.Generic.IList`1"/>.</param>
+    /// <param name="item">The object to insert into the <see cref="System.Collections.Generic.IList`1"/>.</param>
     public void Insert(int index, T? item)
     {
         TestForEditable();
@@ -259,7 +257,7 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     }
 
     /// <summary>
-    /// Removes the <see cref="T:System.Collections.Generic.IList`1"/> item at the specified index.
+    /// Removes the <see cref="System.Collections.Generic.IList`1"/> item at the specified index.
     /// </summary>
     /// <param name="index">The zero-based index of the item to remove.</param>
     public void RemoveAt(int index)

@@ -112,6 +112,37 @@ public partial class SnapServer : DisposableLoggingClassBase
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="SnapServer"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (m_disposed)
+            return;
+
+        try
+        {
+            if (!disposing)
+                return;
+
+            foreach (SnapSocketListener socket in m_sockets.Values)
+                socket.Dispose();
+
+            m_sockets.Clear();
+
+            foreach (SnapServerDatabaseBase db in m_databases.Values)
+                db.Dispose();
+
+            m_databases.Clear();
+        }
+        finally
+        {
+            m_disposed = true; // Prevent duplicate dispose.
+            base.Dispose(disposing); // Call base class Dispose().
+        }
+    }
+
     public void AddDatabase(IToServerDatabaseSettings databaseConfig)
     {
         AddDatabase(databaseConfig.ToServerDatabaseSettings());
@@ -272,38 +303,7 @@ public partial class SnapServer : DisposableLoggingClassBase
     }
 
     /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="SnapServer"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (m_disposed)
-            return;
-
-        try
-        {
-            if (!disposing)
-                return;
-
-            foreach (SnapSocketListener socket in m_sockets.Values)
-                socket.Dispose();
-
-            m_sockets.Clear();
-
-            foreach (SnapServerDatabaseBase db in m_databases.Values)
-                db.Dispose();
-
-            m_databases.Clear();
-        }
-        finally
-        {
-            m_disposed = true; // Prevent duplicate dispose.
-            base.Dispose(disposing); // Call base class Dispose().
-        }
-    }
-
-    /// <summary>
-    /// Gets the database that matches <paramref name="databaseName"/>
+    /// Gets the database that matches <see cref="databaseName"/>
     /// </summary>
     /// <param name="databaseName">The name of the database to retrieve.</param>
     /// <returns>

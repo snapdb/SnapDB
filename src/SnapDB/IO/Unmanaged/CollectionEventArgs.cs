@@ -84,17 +84,17 @@ public class CollectionEventArgs : EventArgs
     #region [ Properties ]
 
     /// <summary>
+    /// The mode for the collection.
+    /// </summary>
+    public MemoryPoolCollectionMode CollectionMode { get; private set; }
+
+    /// <summary>
     /// When <see cref="CollectionMode"/> is <see cref="MemoryPoolCollectionMode.Emergency"/> or
     /// <see cref="MemoryPoolCollectionMode.Critical"/> this field contains the number of pages
     /// that need to be released by all of the objects. This value will automatically decrement
     /// every time a page has been released.
     /// </summary>
     public int DesiredPageReleaseCount { get; private set; }
-
-    /// <summary>
-    /// The mode for the collection.
-    /// </summary>
-    public MemoryPoolCollectionMode CollectionMode { get; private set; }
 
     #endregion
 

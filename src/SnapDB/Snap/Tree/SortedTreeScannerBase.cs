@@ -108,14 +108,21 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     #region [ Properties ]
 
     /// <summary>
-    /// The index of the current node.
+    /// Gets if the stream is always in sequential order. Do not return true unless it is guaranteed that
+    /// the data read from this stream is sequential.
     /// </summary>
-    protected uint NodeIndex { get; private set; }
+    public override bool IsAlwaysSequential => true;
 
     /// <summary>
-    /// The number of records in the current node.
+    /// Gets if the stream will never return duplicate keys. Do not return true unless it is guaranteed that
+    /// the data read from this stream will never contain duplicates.
     /// </summary>
-    protected ushort RecordCount { get; private set; }
+    public override bool NeverContainsDuplicates => true;
+
+    /// <summary>
+    /// The number of bytes in the header of any given node.
+    /// </summary>
+    protected int HeaderSize { get; }
 
     /// <summary>
     /// The node index of the previous sibling.
@@ -124,15 +131,9 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     protected uint LeftSiblingNodeIndex { get; private set; }
 
     /// <summary>
-    /// The node index of the next sibling.
-    /// uint.MaxValue means there is no sibling to the right.
+    /// The index of the current node.
     /// </summary>
-    protected uint RightSiblingNodeIndex { get; private set; }
-
-    /// <summary>
-    /// Gets the byte offset of the upper bounds key.
-    /// </summary>
-    private int OffsetOfUpperBounds => OffsetOfLowerBounds + KeySize;
+    protected uint NodeIndex { get; private set; }
 
     /// <summary>
     /// The pointer that is right after the header of the node.
@@ -147,21 +148,20 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     protected long PointerVersion { get; private set; }
 
     /// <summary>
-    /// The number of bytes in the header of any given node.
+    /// The number of records in the current node.
     /// </summary>
-    protected int HeaderSize { get; }
+    protected ushort RecordCount { get; private set; }
 
     /// <summary>
-    /// Gets if the stream is always in sequential order. Do not return true unless it is guaranteed that
-    /// the data read from this stream is sequential.
+    /// The node index of the next sibling.
+    /// uint.MaxValue means there is no sibling to the right.
     /// </summary>
-    public override bool IsAlwaysSequential => true;
+    protected uint RightSiblingNodeIndex { get; private set; }
 
     /// <summary>
-    /// Gets if the stream will never return duplicate keys. Do not return true unless it is guaranteed that
-    /// the data read from this stream will never contain duplicates.
+    /// Gets the byte offset of the upper bounds key.
     /// </summary>
-    public override bool NeverContainsDuplicates => true;
+    private int OffsetOfUpperBounds => OffsetOfLowerBounds + KeySize;
 
     #endregion
 
@@ -408,7 +408,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     }
 
     /// <summary>
-    /// Reads key-value pairs in the node while the key is less than the upper bounds, 
+    /// Reads key-value pairs in the node while the key is less than the upper bounds,
     /// handling various cases and advancing the cursor.
     /// </summary>
     /// <param name="key">The key to read into.</param>
@@ -501,7 +501,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     }
 
     /// <summary>
-    /// A catch all read function. 
+    /// A catch all read function.
     /// </summary>
     protected bool ReadCatchAll(TKey key, TValue value)
     {

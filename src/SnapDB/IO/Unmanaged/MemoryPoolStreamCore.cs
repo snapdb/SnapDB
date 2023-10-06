@@ -33,9 +33,7 @@ public class MemoryPoolStreamCore : IDisposable
 {
     #region [ Members ]
 
-    /// <summary>
-    /// This class was created to allow settings update to be atomic.
-    /// </summary>
+    // This class was created to allow settings update to be atomic.
     private class Settings
     {
         #region [ Members ]
@@ -45,27 +43,16 @@ public class MemoryPoolStreamCore : IDisposable
         private const int Mask = 1023;
         private const int ShiftBits = 10;
 
-        private int[][] m_pageIndex;
-        private nint[][] m_pagePointer;
-
-        #endregion
-
-        #region [ Constructors ]
-
-        public Settings()
-        {
-            m_pageIndex = new int[4][];
-            m_pagePointer = new nint[4][];
-            PageCount = 0;
-        }
+        private int[]?[] m_pageIndex = new int[4][];
+        private nint[][] m_pagePointer = new nint[4][];
 
         #endregion
 
         #region [ Properties ]
 
-        public int PageCount { get; private set; }
-
         public bool AddingRequiresClone => m_pagePointer.Length * ElementsPerRow == PageCount;
+
+        public int PageCount { get; private set; } = 0;
 
         #endregion
 
@@ -92,7 +79,7 @@ public class MemoryPoolStreamCore : IDisposable
             int smallIndex = index & Mask; // Calculate the inner array index.
 
             // Assign the page index and page pointer to their respective arrays.
-            m_pageIndex[bigIndex][smallIndex] = pageIndex;
+            m_pageIndex[bigIndex]![smallIndex] = pageIndex;
             m_pagePointer[bigIndex][smallIndex] = pagePointer;
 
             // Ensure memory visibility: Incrementing the page count must occur after the data is correct.
@@ -118,14 +105,14 @@ public class MemoryPoolStreamCore : IDisposable
 
         private int GetIndex(int page)
         {
-            return m_pageIndex[page >> ShiftBits][page & Mask];
+            return m_pageIndex[page >> ShiftBits]![page & Mask];
         }
 
         private void EnsureCapacity()
         {
             if (AddingRequiresClone)
             {
-                int[][] oldIndex = m_pageIndex;
+                int[]?[] oldIndex = m_pageIndex;
                 nint[][] oldPointer = m_pagePointer;
                 m_pageIndex = new int[m_pageIndex.Length * 2][];
                 m_pagePointer = new nint[m_pagePointer.Length * 2][];
@@ -134,6 +121,7 @@ public class MemoryPoolStreamCore : IDisposable
             }
 
             int bigIndex = PageCount >> ShiftBits;
+
             if (m_pageIndex[bigIndex] is null)
             {
                 m_pageIndex[bigIndex] = new int[ElementsPerRow];
@@ -144,42 +132,27 @@ public class MemoryPoolStreamCore : IDisposable
         #endregion
     }
 
-    /// <summary>
-    /// The first position of this stream. This may be different from <see cref="m_firstValidPosition"/>
-    /// due to alignment requirements.
-    /// </summary>
+    // The first position of this stream. This may be different from <see cref="m_firstValidPosition"/>
+    // due to alignment requirements.
     private long m_firstAddressablePosition;
 
-    /// <summary>
-    /// The first position that can be accessed by users of this stream.
-    /// </summary>
+    // The first position that can be accessed by users of this stream.
     private long m_firstValidPosition;
 
     private readonly long m_invertMask;
 
-    /// <summary>
-    /// The size of each page.
-    /// </summary>
+    // The size of each page.
     private readonly int m_pageSize;
 
-    /// <summary>
-    /// The buffer pool to utilize.
-    /// </summary>
+    // The buffer pool to utilize.
     private MemoryPool m_pool;
 
     private volatile Settings m_settings;
 
-    /// <summary>
-    /// The number of bits in the page size.
-    /// </summary>
+    // The number of bits in the page size.
     private readonly int m_shiftLength;
 
     private readonly object m_syncRoot;
-
-    /// <summary>
-    /// Releases all the resources used by the memory file object.
-    /// </summary>
-    private bool m_disposed;
 
     #endregion
 
@@ -220,7 +193,7 @@ public class MemoryPoolStreamCore : IDisposable
     /// <summary>
     /// Gets if the stream has been disposed.
     /// </summary>
-    public bool IsDisposed => m_disposed;
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Gets the length of the current stream.
@@ -234,14 +207,36 @@ public class MemoryPoolStreamCore : IDisposable
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
-    /// <filterpriority>2</filterpriority>
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Releases the unmanaged resources used by the memory file object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+    private void Dispose(bool disposing)
+    {
+        if (IsDisposed)
+            return;
+        
+        try
+        {
+            if (disposing && !m_pool.IsDisposed)
+                m_pool.ReleasePages(m_settings.GetAllPageIndexes());
+        }
+        finally
+        {
+            m_pool = null!;
+            m_settings = null!;
+            IsDisposed = true;
+        }
+    }
+
     // TODO: Consider removing these methods
+
     /// <summary>
     /// Reads from the underlying stream the requested set of data.
     /// This function is more user friendly than calling GetBlock().
@@ -251,7 +246,7 @@ public class MemoryPoolStreamCore : IDisposable
     /// <param name="validLength">The number of bytes that are valid after this position.</param>
     public void ReadBlock(long position, out nint pointer, out int validLength)
     {
-        if (m_disposed)
+        if (IsDisposed)
             throw new ObjectDisposedException("MemoryStream");
 
         if (position < m_firstValidPosition)
@@ -289,6 +284,7 @@ public class MemoryPoolStreamCore : IDisposable
     TryAgain:
 
         ReadBlock(position, out nint src, out int validLength);
+        
         if (validLength < length)
         {
             Memory.Copy(src, dest, validLength);
@@ -342,11 +338,11 @@ public class MemoryPoolStreamCore : IDisposable
     /// </summary>
     public void GetBlock(BlockArguments args)
     {
-        if (m_disposed)
+        if (IsDisposed)
             throw new ObjectDisposedException("MemoryStream");
 
         if (args.Position < m_firstValidPosition)
-            throw new ArgumentOutOfRangeException("position", "position is before the beginning of the stream");
+            throw new ArgumentOutOfRangeException(nameof(args), "position is before the beginning of the stream");
 
         args.Length = m_pageSize;
         args.FirstPosition = ((args.Position - m_firstAddressablePosition) & m_invertMask) + m_firstAddressablePosition;
@@ -361,28 +357,8 @@ public class MemoryPoolStreamCore : IDisposable
     }
 
     /// <summary>
-    /// Releases the unmanaged resources used by the memory file object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-    private void Dispose(bool disposing)
-    {
-        if (!m_disposed)
-            try
-            {
-                if (!m_pool.IsDisposed)
-                    m_pool.ReleasePages(m_settings.GetAllPageIndexes());
-            }
-            finally
-            {
-                m_pool = null;
-                m_settings = null;
-                m_disposed = true;
-            }
-    }
-
-    /// <summary>
     /// Returns the page that corresponds to the absolute position.
-    /// This function will also autogrow the stream.
+    /// This function will also auto-grow the stream.
     /// </summary>
     /// <param name="position">The position to use to calculate the page to retrieve</param>
     /// <returns>The memory page as a native pointer (nint).</returns>
@@ -410,6 +386,7 @@ public class MemoryPoolStreamCore : IDisposable
         {
             bool cloned = false;
             Settings settings = m_settings;
+           
             if (settings.AddingRequiresClone)
             {
                 cloned = true;

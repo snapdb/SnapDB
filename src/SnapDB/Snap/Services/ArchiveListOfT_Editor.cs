@@ -65,6 +65,31 @@ public partial class ArchiveList<TKey, TValue>
         #region [ Methods ]
 
         /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="Editor"/> object and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (!m_disposed)
+                try
+                {
+                    // This will be done regardless of whether the object is finalized or disposed.
+                    if (disposing)
+                    {
+                        m_disposed = true;
+                        m_list.m_listLog.SaveLogToDisk();
+                        Monitor.Exit(m_list.m_syncRoot);
+                        m_list = null;
+                    }
+                }
+                finally
+                {
+                    m_disposed = true; // Prevent duplicate dispose.
+                    base.Dispose(disposing); // Call base class Dispose().
+                }
+        }
+
+        /// <summary>
         /// Renews the snapshot of the archive file. This will acquire the latest
         /// read transaction so all new snapshots will use this later version.
         /// </summary>
@@ -75,7 +100,7 @@ public partial class ArchiveList<TKey, TValue>
         /// <remarks>
         /// This method renews the archive snapshot associated with the specified <paramref name="archiveId"/>
         /// in the <see cref="ArchiveList{TKey, TValue}"/> by creating a new snapshot with the same data
-        /// from the existing <see cref="SortedTreeTable{TKey, TValue}"/>.
+        /// from the existing <see cref="SortedTreeTable{TKey,TValue}"/>.
         /// </remarks>
         public override void RenewArchiveSnapshot(Guid archiveId)
         {
@@ -156,31 +181,6 @@ public partial class ArchiveList<TKey, TValue>
 
             m_list.AddFileToDelete(tree);
             return true;
-        }
-
-        /// <summary>
-        /// Releases the unmanaged resources used by the <see cref="Editor"/> object and optionally releases the managed resources.
-        /// </summary>
-        /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (!m_disposed)
-                try
-                {
-                    // This will be done regardless of whether the object is finalized or disposed.
-                    if (disposing)
-                    {
-                        m_disposed = true;
-                        m_list.m_listLog.SaveLogToDisk();
-                        Monitor.Exit(m_list.m_syncRoot);
-                        m_list = null;
-                    }
-                }
-                finally
-                {
-                    m_disposed = true; // Prevent duplicate dispose.
-                    base.Dispose(disposing); // Call base class Dispose().
-                }
         }
 
         #endregion

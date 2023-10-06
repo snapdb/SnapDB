@@ -76,19 +76,19 @@ internal class IndividualEncodingFixedSize<T> : IndividualEncodingBase<T> where 
     public override byte EndOfStreamSymbol => throw new NotSupportedException();
 
     /// <summary>
-    /// Gets if the previous value will need to be presented to the encoding algorithms to
-    /// property encode the next sample. Returning false will cause nulls to be passed
-    /// in a parameters to the encoding.
-    /// </summary>
-    public override bool UsesPreviousValue => false;
-
-    /// <summary>
     /// Gets the maximum amount of space that is required for the compression algorithm. This
     /// prevents lower levels from having overflows on the underlying streams. It is critical
     /// that this value be correct. Error on the side of too large of a value as a value
     /// too small will corrupt data and be next to impossible to track down the point of corruption
     /// </summary>
     public override int MaxCompressionSize => m_size;
+
+    /// <summary>
+    /// Gets if the previous value will need to be presented to the encoding algorithms to
+    /// property encode the next sample. Returning false will cause nulls to be passed
+    /// in a parameters to the encoding.
+    /// </summary>
+    public override bool UsesPreviousValue => false;
 
     #endregion
 

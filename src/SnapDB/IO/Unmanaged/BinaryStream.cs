@@ -103,6 +103,7 @@ public unsafe class BinaryStream : BinaryStreamPointerBase
 
         m_mainIoSession = stream.CreateIoSession();
     }
+
     /// <summary>
     /// Finalizes an instance of the BinaryStream class.
     /// </summary>
@@ -134,45 +135,6 @@ public unsafe class BinaryStream : BinaryStreamPointerBase
     #endregion
 
     #region [ Methods ]
-
-    /// <summary>
-    /// When accessing the underlying stream, a lock is placed on the data. Calling this method clears that lock.
-    /// </summary>
-    public void ClearLocks()
-    {
-        FirstPosition = Position;
-        LastPosition = FirstPosition;
-        Current = null;
-        First = null;
-        LastRead = null;
-        LastWrite = null;
-
-        m_mainIoSession?.Clear();
-        m_secondaryIoSession?.Clear();
-    }
-
-    /// <summary>
-    /// Updates the local buffer data.
-    /// </summary>
-    /// <param name="isWriting">hints to the stream if write access is desired.</param>
-    public override void UpdateLocalBuffer(bool isWriting)
-    {
-        // If the block block is already looked up, skip this step.
-        if ((isWriting && LastWrite - Current > 0) || (!isWriting && LastRead - Current > 0))
-            return;
-
-        long position = FirstPosition + (Current - First);
-        m_args.Position = position;
-        m_args.IsWriting = isWriting;
-        PointerVersion++;
-        m_mainIoSession.GetBlock(m_args);
-        FirstPosition = m_args.FirstPosition;
-        First = (byte*)m_args.FirstPointer;
-        LastRead = First + m_args.Length;
-        Current = First + (position - FirstPosition);
-        LastPosition = FirstPosition + m_args.Length;
-        LastWrite = m_args.SupportsWriting ? LastRead : First;
-    }
 
     /// <summary>
     /// Releases and cleans up resources associated with the object.
@@ -211,6 +173,45 @@ public unsafe class BinaryStream : BinaryStreamPointerBase
             }
 
         base.Dispose(disposing);
+    }
+
+    /// <summary>
+    /// When accessing the underlying stream, a lock is placed on the data. Calling this method clears that lock.
+    /// </summary>
+    public void ClearLocks()
+    {
+        FirstPosition = Position;
+        LastPosition = FirstPosition;
+        Current = null;
+        First = null;
+        LastRead = null;
+        LastWrite = null;
+
+        m_mainIoSession?.Clear();
+        m_secondaryIoSession?.Clear();
+    }
+
+    /// <summary>
+    /// Updates the local buffer data.
+    /// </summary>
+    /// <param name="isWriting">hints to the stream if write access is desired.</param>
+    public override void UpdateLocalBuffer(bool isWriting)
+    {
+        // If the block block is already looked up, skip this step.
+        if ((isWriting && LastWrite - Current > 0) || (!isWriting && LastRead - Current > 0))
+            return;
+
+        long position = FirstPosition + (Current - First);
+        m_args.Position = position;
+        m_args.IsWriting = isWriting;
+        PointerVersion++;
+        m_mainIoSession.GetBlock(m_args);
+        FirstPosition = m_args.FirstPosition;
+        First = (byte*)m_args.FirstPointer;
+        LastRead = First + m_args.Length;
+        Current = First + (position - FirstPosition);
+        LastPosition = FirstPosition + m_args.Length;
+        LastWrite = m_args.SupportsWriting ? LastRead : First;
     }
 
     #endregion

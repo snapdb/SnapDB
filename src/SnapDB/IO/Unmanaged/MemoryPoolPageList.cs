@@ -23,6 +23,7 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
+
 #pragma warning disable CS0649
 
 using System.Runtime.InteropServices;
@@ -44,6 +45,40 @@ namespace SnapDB.IO.Unmanaged;
 internal class MemoryPoolPageList : IDisposable
 {
     #region [ Members ]
+
+    // ReSharper disable IdentifierTypo
+    // ReSharper disable InconsistentNaming
+    // ReSharper disable NotAccessedField.Local
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    private class MEMORYSTATUSEX
+    {
+        #region [ Members ]
+
+        public uint dwLength;
+        public uint dwMemoryLoad;
+        public ulong ullAvailExtendedVirtual;
+        public ulong ullAvailPageFile;
+        public ulong ullAvailPhys;
+        public ulong ullAvailVirtual;
+        public ulong ullTotalPageFile;
+        public ulong ullTotalPhys;
+        public ulong ullTotalVirtual;
+
+        #endregion
+
+        #region [ Constructors ]
+
+        // ReSharper disable once ConvertConstructorToMemberInitializers
+        public MEMORYSTATUSEX()
+        {
+            dwLength = (uint)Marshal.SizeOf(typeof(MEMORYSTATUSEX));
+        }
+
+        #endregion
+    }
+    // ReSharper restore NotAccessedField.Local
+    // ReSharper restore InconsistentNaming
+    // ReSharper restore IdentifierTypo
 
     /// <summary>
     /// Defines the maximum supported number of bytes that can be allocated based
@@ -148,26 +183,16 @@ internal class MemoryPoolPageList : IDisposable
     #region [ Properties ]
 
     /// <summary>
-    /// The maximum amount of RAM that this memory pool is configured to support.
-    /// Attempting to allocate more than this will cause an out of memory exception
+    /// Returns the number of bytes allocated by all buffer pools.
+    /// This does not include any pages that have been allocated but are not in use.
     /// </summary>
-    public long MaximumPoolSize
-    {
-        get => m_maximumPoolSize.Value;
-        private set => m_maximumPoolSize.Value = value;
-    }
+    public long CurrentAllocatedSize => m_usedPageCount * (long)PageSize;
 
     /// <summary>
     /// Gets the number of bytes that have been allocated to this buffer pool
     /// by the OS.
     /// </summary>
     public long CurrentCapacity => m_memoryBlockAllocations * (long)m_memoryBlockSize;
-
-    /// <summary>
-    /// Returns the number of bytes allocated by all buffer pools.
-    /// This does not include any pages that have been allocated but are not in use.
-    /// </summary>
-    public long CurrentAllocatedSize => m_usedPageCount * (long)PageSize;
 
     /// <summary>
     /// Gets if there is any free space.
@@ -178,6 +203,16 @@ internal class MemoryPoolPageList : IDisposable
     /// Gets if the pool is currently full.
     /// </summary>
     public bool IsFull => CurrentCapacity == CurrentAllocatedSize;
+
+    /// <summary>
+    /// The maximum amount of RAM that this memory pool is configured to support.
+    /// Attempting to allocate more than this will cause an out of memory exception
+    /// </summary>
+    public long MaximumPoolSize
+    {
+        get => m_maximumPoolSize.Value;
+        private set => m_maximumPoolSize.Value = value;
+    }
 
     #endregion
 
@@ -458,34 +493,4 @@ internal class MemoryPoolPageList : IDisposable
     private static extern bool GlobalMemoryStatusEx([In] [Out] MEMORYSTATUSEX lpBuffer);
 
     #endregion
-
-    // ReSharper disable IdentifierTypo
-    // ReSharper disable InconsistentNaming
-    // ReSharper disable NotAccessedField.Local
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    private class MEMORYSTATUSEX
-    {
-        #region [ Members ]
-
-        public uint dwLength;
-        public uint dwMemoryLoad;
-        public ulong ullAvailExtendedVirtual;
-        public ulong ullAvailPageFile;
-        public ulong ullAvailPhys;
-        public ulong ullAvailVirtual;
-        public ulong ullTotalPageFile;
-        public ulong ullTotalPhys;
-        public ulong ullTotalVirtual;
-
-        #endregion
-
-        #region [ Constructors ]
-
-        public MEMORYSTATUSEX()
-        {
-            dwLength = (uint)Marshal.SizeOf(typeof(MEMORYSTATUSEX));
-        }
-
-        #endregion
-    }
 }

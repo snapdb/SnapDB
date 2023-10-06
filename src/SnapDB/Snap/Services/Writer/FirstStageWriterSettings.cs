@@ -46,6 +46,48 @@ public class FirstStageWriterSettings : SettingsBase<FirstStageWriterSettings>
     #region [ Properties ]
 
     /// <summary>
+    /// The encoding method that will be used to write files.
+    /// </summary>
+    public EncodingDefinition EncodingMethod
+    {
+        get => m_encodingMethod;
+        set
+        {
+            TestForEditable();
+            m_encodingMethod = value ?? throw new ArgumentNullException(nameof(value));
+        }
+    }
+
+    /// <summary>
+    /// The settings that will be used for the rolled over files.
+    /// </summary>
+    public SimplifiedArchiveInitializerSettings FinalSettings { get; } = new();
+
+    /// <summary>
+    /// The size after which the incoming write queue will pause
+    /// to wait for rollovers to complete.
+    /// </summary>
+    /// <remarks>
+    /// It is recommended to make this value larger than <see cref="RolloverSizeMb"/>.
+    /// If this value is smaller than <see cref="RolloverSizeMb"/> then <see cref="RolloverSizeMb"/> will be used.
+    /// Must be at least 1MB. Upper Limit should be Memory Constrained, but not larger than 1024MB.
+    /// </remarks>
+    public int MaximumAllowedMb
+    {
+        get => m_maximumAllowedMb;
+        set
+        {
+            TestForEditable();
+            if (value < 1)
+                m_maximumAllowedMb = 1;
+            else if (value > 1024)
+                m_maximumAllowedMb = 1024;
+            else
+                m_maximumAllowedMb = value;
+        }
+    }
+
+    /// <summary>
     /// The number of milliseconds before data is flushed to the disk.
     /// </summary>
     /// <remarks>
@@ -86,48 +128,6 @@ public class FirstStageWriterSettings : SettingsBase<FirstStageWriterSettings>
                 m_rolloverSizeMb = value;
         }
     }
-
-    /// <summary>
-    /// The size after which the incoming write queue will pause
-    /// to wait for rollovers to complete.
-    /// </summary>
-    /// <remarks>
-    /// It is recommended to make this value larger than <see cref="RolloverSizeMb"/>.
-    /// If this value is smaller than <see cref="RolloverSizeMb"/> then <see cref="RolloverSizeMb"/> will be used.
-    /// Must be at least 1MB. Upper Limit should be Memory Constrained, but not larger than 1024MB.
-    /// </remarks>
-    public int MaximumAllowedMb
-    {
-        get => m_maximumAllowedMb;
-        set
-        {
-            TestForEditable();
-            if (value < 1)
-                m_maximumAllowedMb = 1;
-            else if (value > 1024)
-                m_maximumAllowedMb = 1024;
-            else
-                m_maximumAllowedMb = value;
-        }
-    }
-
-    /// <summary>
-    /// The encoding method that will be used to write files.
-    /// </summary>
-    public EncodingDefinition EncodingMethod
-    {
-        get => m_encodingMethod;
-        set
-        {
-            TestForEditable();
-            m_encodingMethod = value ?? throw new ArgumentNullException(nameof(value));
-        }
-    }
-
-    /// <summary>
-    /// The settings that will be used for the rolled over files.
-    /// </summary>
-    public SimplifiedArchiveInitializerSettings FinalSettings { get; } = new();
 
     #endregion
 

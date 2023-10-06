@@ -79,9 +79,9 @@ internal sealed class SimplifiedSubFileStream : ISupportsBinaryStream
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the file used by the stream.
+    /// Determines if the file system has been disposed yet.
     /// </summary>
-    internal SubFileHeader? SubFile { get; }
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Gets if this file was opened in "read only" mode.
@@ -96,11 +96,6 @@ internal sealed class SimplifiedSubFileStream : ISupportsBinaryStream
             return false;
         }
     }
-
-    /// <summary>
-    /// Determines if the file system has been disposed yet.
-    /// </summary>
-    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Gets the number of available simultaneous read or write sessions.
@@ -125,6 +120,11 @@ internal sealed class SimplifiedSubFileStream : ISupportsBinaryStream
             return ++count;
         }
     }
+
+    /// <summary>
+    /// Gets the file used by the stream.
+    /// </summary>
+    internal SubFileHeader? SubFile { get; }
 
     #endregion
 

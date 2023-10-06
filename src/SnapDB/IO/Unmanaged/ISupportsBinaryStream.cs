@@ -34,13 +34,9 @@ public interface ISupportsBinaryStream : IDisposable
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the number of available simultaneous read and write sessions.
+    /// Gets if the stream has been disposed.
     /// </summary>
-    /// <remarks>
-    /// This value is used to determine if a binary stream can be cloned
-    /// to improve read, write, and copy performance.
-    /// </remarks>
-    int RemainingSupportedIoSessions { get; }
+    bool IsDisposed { get; }
 
     /// <summary>
     /// Gets if the stream can be written to.
@@ -48,9 +44,13 @@ public interface ISupportsBinaryStream : IDisposable
     bool IsReadOnly { get; }
 
     /// <summary>
-    /// Gets if the stream has been disposed.
+    /// Gets the number of available simultaneous read and write sessions.
     /// </summary>
-    bool IsDisposed { get; }
+    /// <remarks>
+    /// This value is used to determine if a binary stream can be cloned
+    /// to improve read, write, and copy performance.
+    /// </remarks>
+    int RemainingSupportedIoSessions { get; }
 
     #endregion
 

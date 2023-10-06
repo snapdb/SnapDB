@@ -74,16 +74,16 @@ public class SortedTree<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() whe
     #region [ Properties ]
 
     /// <summary>
-    /// Gets if the sorted tree needs to be flushed to the disk.
-    /// </summary>
-    public bool IsDirty => m_header.IsDirty;
-
-    /// <summary>
     /// The sorted tree will not continually call the <see cref="Flush"/> method every time the header is changed.
     /// When setting this to false, flushes must be manually invoked. Failing to do this can corrupt the SortedTree.
     /// Only set if you can guarantee that <see cref="Flush"/> will be called before disposing this class.
     /// </summary>
     public bool AutoFlush { get; set; }
+
+    /// <summary>
+    /// Gets if the sorted tree needs to be flushed to the disk.
+    /// </summary>
+    public bool IsDirty => m_header.IsDirty;
 
     /// <summary>
     /// Contains the block size that the tree nodes will be aligned on.
@@ -201,6 +201,7 @@ public class SortedTree<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() whe
         {
             if (IsDirty && AutoFlush)
                 m_header.SaveHeader(Stream);
+
             return true;
         }
 
@@ -298,7 +299,6 @@ public class SortedTree<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() whe
 
         if (treeNodeType is null)
             throw new ArgumentNullException(nameof(treeNodeType));
-
 
         m_isInitialized = true;
 

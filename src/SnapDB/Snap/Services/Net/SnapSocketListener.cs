@@ -90,20 +90,6 @@ public class SnapSocketListener : DisposableLoggingClassBase
     #region [ Methods ]
 
     /// <summary>
-    /// Gets the status of the <see cref="SnapSocketListener"/>.
-    /// </summary>
-    /// <param name="status"></param>
-    public void GetFullStatus(StringBuilder status)
-    {
-        lock (m_clients)
-        {
-            status.AppendFormat("Active Client Count: {0}\r\n", m_clients.Count);
-            foreach (SnapNetworkServer client in m_clients)
-                client.GetFullStatus(status);
-        }
-    }
-
-    /// <summary>
     /// Releases the unmanaged resources used by the <see cref="SnapSocketListener"/> object and optionally releases the managed resources.
     /// </summary>
     /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
@@ -133,6 +119,20 @@ public class SnapSocketListener : DisposableLoggingClassBase
                 m_disposed = true; // Prevent duplicate dispose.
                 base.Dispose(disposing); // Call base class Dispose().
             }
+    }
+
+    /// <summary>
+    /// Gets the status of the <see cref="SnapSocketListener"/>.
+    /// </summary>
+    /// <param name="status"></param>
+    public void GetFullStatus(StringBuilder status)
+    {
+        lock (m_clients)
+        {
+            status.AppendFormat("Active Client Count: {0}\r\n", m_clients.Count);
+            foreach (SnapNetworkServer client in m_clients)
+                client.GetFullStatus(status);
+        }
     }
 
     /// <summary>

@@ -107,6 +107,36 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
 
     #region [ Methods ]
 
+    // TODO: JRC - think about custom exception handling messages with SafeInvoke for missing UnhandledException above
+    //private void ProcessRemovals_UnhandledException(object sender, EventArgs<Exception> e)
+    //{
+    //    Log.Publish(MessageLevel.Error, "Unknown error encountered while removing archive files.", null, null, e.Argument);
+    //}
+
+    /// <summary>
+    /// Releases the unmanaged resources used by the log source base object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (!m_disposed && disposing)
+        {
+            ReleaseClientResources();
+            m_processRemovals.Dispose();
+            m_listLog.Dispose();
+
+            lock (m_syncRoot)
+            {
+                foreach (ArchiveTableSummary<TKey, TValue> summary in m_fileSummaries.Values)
+                    summary.SortedTreeTable.BaseFile.Dispose();
+            }
+
+            m_disposed = true;
+        }
+
+        base.Dispose(disposing);
+    }
+
     /// <summary>
     /// Attaches the supplied paths or files.
     /// </summary>
@@ -330,36 +360,6 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     protected override ArchiveListEditor InternalAcquireEditLock()
     {
         return AcquireEditLock();
-    }
-
-    // TODO: JRC - think about custom exception handling messages with SafeInvoke for missing UnhandledException above
-    //private void ProcessRemovals_UnhandledException(object sender, EventArgs<Exception> e)
-    //{
-    //    Log.Publish(MessageLevel.Error, "Unknown error encountered while removing archive files.", null, null, e.Argument);
-    //}
-
-    /// <summary>
-    /// Releases the unmanaged resources used by the log source base object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (!m_disposed && disposing)
-        {
-            ReleaseClientResources();
-            m_processRemovals.Dispose();
-            m_listLog.Dispose();
-
-            lock (m_syncRoot)
-            {
-                foreach (ArchiveTableSummary<TKey, TValue> summary in m_fileSummaries.Values)
-                    summary.SortedTreeTable.BaseFile.Dispose();
-            }
-
-            m_disposed = true;
-        }
-
-        base.Dispose(disposing);
     }
 
     /// <summary>

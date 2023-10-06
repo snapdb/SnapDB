@@ -60,30 +60,6 @@ internal class PairEncodingGeneric<TKey, TValue> : PairEncodingBase<TKey, TValue
 
     #region [ Properties ]
 
-    public override EncodingDefinition EncodingMethod { get; }
-
-    /// <summary>
-    /// Gets if the previous key will need to be presented to the encoding algorithms to
-    /// property encode the next sample. Returning <c>false</c> will cause nulls to be passed
-    /// in a parameters to the encoding.
-    /// </summary>
-    public override bool UsesPreviousKey => m_keyEncoding.UsesPreviousValue;
-
-    /// <summary>
-    /// Gets if the previous value will need to be presented to the encoding algorithms to
-    /// property encode the next sample. Returning <c>false</c> will cause nulls to be passed
-    /// in a parameters to the encoding.
-    /// </summary>
-    public override bool UsesPreviousValue => m_valueEncoding.UsesPreviousValue;
-
-    /// <summary>
-    /// Gets the maximum amount of space that is required for the compression algorithm. This
-    /// prevents lower levels from having overflows on the underlying streams. It is critical
-    /// that this value be correct. Error on the side of too large of a value as a value
-    /// too small will corrupt data and be next to impossible to track down the point of corruption
-    /// </summary>
-    public override int MaxCompressionSize => m_keyEncoding.MaxCompressionSize + m_valueEncoding.MaxCompressionSize;
-
     /// <summary>
     /// Gets if the stream supports a symbol that
     /// represents that the end of the stream has been encountered.
@@ -100,11 +76,35 @@ internal class PairEncodingGeneric<TKey, TValue> : PairEncodingBase<TKey, TValue
     /// </remarks>
     public override bool ContainsEndOfStreamSymbol => m_keyEncoding.ContainsEndOfStreamSymbol;
 
+    public override EncodingDefinition EncodingMethod { get; }
+
     /// <summary>
     /// The byte code to use as the end of stream symbol.
     /// May throw NotSupportedException if <see cref="PairEncodingBase{TKey,TValue}.ContainsEndOfStreamSymbol"/> is <c>false</c>.
     /// </summary>
     public override byte EndOfStreamSymbol => m_keyEncoding.EndOfStreamSymbol;
+
+    /// <summary>
+    /// Gets the maximum amount of space that is required for the compression algorithm. This
+    /// prevents lower levels from having overflows on the underlying streams. It is critical
+    /// that this value be correct. Error on the side of too large of a value as a value
+    /// too small will corrupt data and be next to impossible to track down the point of corruption
+    /// </summary>
+    public override int MaxCompressionSize => m_keyEncoding.MaxCompressionSize + m_valueEncoding.MaxCompressionSize;
+
+    /// <summary>
+    /// Gets if the previous key will need to be presented to the encoding algorithms to
+    /// property encode the next sample. Returning <c>false</c> will cause nulls to be passed
+    /// in a parameters to the encoding.
+    /// </summary>
+    public override bool UsesPreviousKey => m_keyEncoding.UsesPreviousValue;
+
+    /// <summary>
+    /// Gets if the previous value will need to be presented to the encoding algorithms to
+    /// property encode the next sample. Returning <c>false</c> will cause nulls to be passed
+    /// in a parameters to the encoding.
+    /// </summary>
+    public override bool UsesPreviousValue => m_valueEncoding.UsesPreviousValue;
 
     #endregion
 

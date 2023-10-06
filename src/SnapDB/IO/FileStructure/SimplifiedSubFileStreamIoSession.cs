@@ -92,6 +92,30 @@ internal unsafe class SimplifiedSubFileStreamIoSession : BinaryStreamIoSessionBa
     #region [ Methods ]
 
     /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="SimplifiedSubFileStreamIoSession"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (m_disposed)
+            return;
+
+        try
+        {
+            if (!disposing)
+                return;
+
+            Flush();
+            m_memory.Dispose();
+        }
+        finally
+        {
+            m_disposed = true; // Prevent duplicate dispose.
+            base.Dispose(disposing); // Call base class Dispose().
+        }
+    }
+
+    /// <summary>
     /// Sets the current usage of the <see cref="BinaryStreamIoSessionBase"/> to null.
     /// </summary>
     public override void Clear()
@@ -134,30 +158,6 @@ internal unsafe class SimplifiedSubFileStreamIoSession : BinaryStreamIoSessionBa
 
         args.FirstPointer = m_memory.Address;
         args.SupportsWriting = true;
-    }
-
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="SimplifiedSubFileStreamIoSession"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (m_disposed)
-            return;
-
-        try
-        {
-            if (!disposing)
-                return;
-
-            Flush();
-            m_memory.Dispose();
-        }
-        finally
-        {
-            m_disposed = true; // Prevent duplicate dispose.
-            base.Dispose(disposing); // Call base class Dispose().
-        }
     }
 
     private void Flush()

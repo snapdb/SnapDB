@@ -43,6 +43,8 @@ public class SynchronousEvent<T> : IDisposable where T : EventArgs
 {
     #region [ Members ]
 
+    public event EventHandler<T> CustomEvent;
+
     private readonly AsyncOperation m_asyncEventHelper;
     private readonly ManualResetEvent m_waiting;
     private bool m_disposed;
@@ -75,8 +77,6 @@ public class SynchronousEvent<T> : IDisposable where T : EventArgs
         Thread.MemoryBarrier();
         m_waiting.Set();
     }
-
-    public event EventHandler<T> CustomEvent;
 
     /// <summary>
     /// Raises the custom event with the provided event arguments.

@@ -36,6 +36,13 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
 {
     #region [ Members ]
 
+    /// <summary>
+    /// Event raised when the root of the tree changes,
+    /// thus <see cref="RootNodeIndexAddress"/> and <see cref="RootNodeLevel"/>
+    /// need to be saved to the header.
+    /// </summary>
+    public event EventHandler? RootHasChanged;
+
     private int m_blockSize;
     private Func<uint> m_getNextNewNodeIndex = default!;
 
@@ -80,13 +87,6 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
     #endregion
 
     #region [ Methods ]
-
-    /// <summary>
-    /// Event raised when the root of the tree changes,
-    /// thus <see cref="RootNodeIndexAddress"/> and <see cref="RootNodeLevel"/>
-    /// need to be saved to the header.
-    /// </summary>
-    public event EventHandler? RootHasChanged;
 
     /// <summary>
     /// Creates a sparse index on the tree.

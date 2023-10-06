@@ -36,15 +36,15 @@ internal interface IDiskMediumCoreFunctions : IDisposable
     #region [ Properties ]
 
     /// <summary>
+    /// Gets the file name associated with the medium. Returns an empty string if a memory file.
+    /// </summary>
+    string FileName { get; }
+
+    /// <summary>
     /// Gets the current number of bytes used by the file system.
     /// This is only intended to be an approximate figure.
     /// </summary>
     long Length { get; }
-
-    /// <summary>
-    /// Gets the file name associated with the medium. Returns an empty string if a memory file.
-    /// </summary>
-    string FileName { get; }
 
     #endregion
 

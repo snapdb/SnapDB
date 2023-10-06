@@ -47,19 +47,14 @@ internal static class Scram
 
     internal static IDigest CreateDigest(HashMethod hashMethod)
     {
-        switch (hashMethod)
+        return hashMethod switch
         {
-            case HashMethod.Sha1:
-                return new Sha1Digest();
-            case HashMethod.Sha256:
-                return new Sha256Digest();
-            case HashMethod.Sha384:
-                return new Sha384Digest();
-            case HashMethod.Sha512:
-                return new Sha512Digest();
-            default:
-                throw new InvalidEnumArgumentException("hashMethod", (int)hashMethod, typeof(HashMethod));
-        }
+            HashMethod.Sha1 => new Sha1Digest(),
+            HashMethod.Sha256 => new Sha256Digest(),
+            HashMethod.Sha384 => new Sha384Digest(),
+            HashMethod.Sha512 => new Sha512Digest(),
+            _ => throw new InvalidEnumArgumentException("hashMethod", (int)hashMethod, typeof(HashMethod))
+        };
     }
 
     internal static byte[] Xor(byte[] a, byte[] b)

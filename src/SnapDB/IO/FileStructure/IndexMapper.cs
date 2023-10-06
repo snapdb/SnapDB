@@ -108,6 +108,12 @@ internal class IndexMapper
     public int ThirdIndirectOffset { get; private set; }
 
     /// <summary>
+    /// Gets the index of the third cluster that can be accessed by this indirect block. This value is useful because
+    /// the footer of the indirect page will have this address.
+    /// </summary>
+    protected uint FourthIndirectBaseIndex { get; private set; }
+
+    /// <summary>
     /// Gets the offset position for the address that must be read within the indirect block
     /// at the forth indirect block.
     /// </summary>
@@ -125,12 +131,6 @@ internal class IndexMapper
     /// the footer of the indirect page will have this address.
     /// </summary>
     protected uint ThirdIndirectBaseIndex { get; private set; }
-
-    /// <summary>
-    /// Gets the index of the third cluster that can be accessed by this indirect block. This value is useful because
-    /// the footer of the indirect page will have this address.
-    /// </summary>
-    protected uint FourthIndirectBaseIndex { get; private set; }
 
     #endregion
 

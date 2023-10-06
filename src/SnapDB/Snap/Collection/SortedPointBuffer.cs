@@ -129,21 +129,15 @@ public class SortedPointBuffer<TKey, TValue> : TreeStream<TKey, TValue> where TK
     #region [ Properties ]
 
     /// <summary>
-    /// Gets if the stream will never return duplicate keys. Do not return <c>true</c> unless it is guaranteed that
-    /// the data read from this stream will never contain duplicates.
+    /// Gets the current number of items in the buffer
     /// </summary>
-    public override bool NeverContainsDuplicates => m_removeDuplicates || (object)m_duplicateHandler is not null;
+    public int Count => m_enqueueIndex - m_dequeueIndex;
 
     /// <summary>
     /// Gets if the stream is always in sequential order. Do not return <c>true</c> unless it is guaranteed that
     /// the data read from this stream is sequential.
     /// </summary>
     public override bool IsAlwaysSequential => true;
-
-    /// <summary>
-    /// Gets the current number of items in the buffer
-    /// </summary>
-    public int Count => m_enqueueIndex - m_dequeueIndex;
 
     /// <summary>
     /// Gets if this buffer is empty
@@ -186,6 +180,12 @@ public class SortedPointBuffer<TKey, TValue> : TreeStream<TKey, TValue> where TK
             }
         }
     }
+
+    /// <summary>
+    /// Gets if the stream will never return duplicate keys. Do not return <c>true</c> unless it is guaranteed that
+    /// the data read from this stream will never contain duplicates.
+    /// </summary>
+    public override bool NeverContainsDuplicates => m_removeDuplicates || (object)m_duplicateHandler is not null;
 
     #endregion
 

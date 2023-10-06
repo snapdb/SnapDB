@@ -37,8 +37,13 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     #region [ Members ]
 
     /// <summary>
+    /// Occurs when the node index is changed or cleared.
+    /// </summary>
+    protected event EventHandler NodeIndexChanged;
+
+    /// <summary>
     /// The size in bytes of an index value within the node's header.
-    /// </summary>    
+    /// </summary>
     protected const int IndexSize = sizeof(uint);
 
     /// <summary>
@@ -192,19 +197,40 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the byte offset of the upper bounds key.
+    /// The index of the left sibling. <see cref="uint.MaxValue"/> is the null case.
     /// </summary>
-    private int OffsetOfUpperBounds => OffsetOfLowerBounds + KeySize;
+    public uint LeftSiblingNodeIndex
+    {
+        get => m_leftSiblingNodeIndex;
+        set
+        {
+            *(uint*)(GetWritePointer() + OffsetOfLeftSibling) = value;
+            m_leftSiblingNodeIndex = value;
+        }
+    }
 
     /// <summary>
-    /// Gets the byte offset of the header size.
+    /// The lower bounds of the node. This is an inclusive bounds and always valid.
     /// </summary>
-    protected int HeaderSize => OffsetOfLowerBounds + KeySize * 2;
+    public TKey LowerKey
+    {
+        get => m_lowerKey;
+        set
+        {
+            value.Write(GetWritePointer() + OffsetOfLowerBounds);
+            value.CopyTo(m_lowerKey);
+        }
+    }
 
     /// <summary>
     /// Gets the node index of this current node.
     /// </summary>
     public uint NodeIndex { get; private set; }
+
+    /// <summary>
+    /// Gets the first position for the current node.
+    /// </summary>
+    public long NodePosition => BlockSize * NodeIndex;
 
     /// <summary>
     /// Gets or sets the number of records in this node.
@@ -220,37 +246,6 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     }
 
     /// <summary>
-    /// Gets or sets the number of unused bytes in the node.
-    /// </summary>
-    protected ushort RemainingBytes => (ushort)(BlockSize - m_validBytes);
-
-    /// <summary>
-    /// The number of bytes that are used in this node.
-    /// </summary>
-    public ushort ValidBytes
-    {
-        get => m_validBytes;
-        set
-        {
-            *(ushort*)(GetWritePointer() + OffsetOfValidBytes) = value;
-            m_validBytes = value;
-        }
-    }
-
-    /// <summary>
-    /// The index of the left sibling. <see cref="uint.MaxValue"/> is the null case.
-    /// </summary>
-    public uint LeftSiblingNodeIndex
-    {
-        get => m_leftSiblingNodeIndex;
-        set
-        {
-            *(uint*)(GetWritePointer() + OffsetOfLeftSibling) = value;
-            m_leftSiblingNodeIndex = value;
-        }
-    }
-
-    /// <summary>
     /// The index of the right sibling. <see cref="uint.MaxValue"/> is the null case.
     /// </summary>
     public uint RightSiblingNodeIndex
@@ -260,29 +255,6 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
         {
             *(uint*)(GetWritePointer() + OffsetOfRightSibling) = value;
             m_rightSiblingNodeIndex = value;
-        }
-    }
-
-    /// <summary>
-    /// Is the index of the right sibling null. i.e. equal to <see cref="uint.MaxValue"/>
-    /// </summary>
-    protected bool IsRightSiblingIndexNull => m_rightSiblingNodeIndex == uint.MaxValue;
-
-    /// <summary>
-    /// Is the index of the left sibling null. i.e. equal to <see cref="uint.MaxValue"/>
-    /// </summary>
-    protected bool IsLeftSiblingIndexNull => m_leftSiblingNodeIndex == uint.MaxValue;
-
-    /// <summary>
-    /// The lower bounds of the node. This is an inclusive bounds and always valid.
-    /// </summary>
-    public TKey LowerKey
-    {
-        get => m_lowerKey;
-        set
-        {
-            value.Write(GetWritePointer() + OffsetOfLowerBounds);
-            value.CopyTo(m_lowerKey);
         }
     }
 
@@ -302,15 +274,48 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     }
 
     /// <summary>
+    /// The number of bytes that are used in this node.
+    /// </summary>
+    public ushort ValidBytes
+    {
+        get => m_validBytes;
+        set
+        {
+            *(ushort*)(GetWritePointer() + OffsetOfValidBytes) = value;
+            m_validBytes = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets the byte offset of the header size.
+    /// </summary>
+    protected int HeaderSize => OffsetOfLowerBounds + KeySize * 2;
+
+    /// <summary>
+    /// Is the index of the left sibling null. i.e. equal to <see cref="uint.MaxValue"/>
+    /// </summary>
+    protected bool IsLeftSiblingIndexNull => m_leftSiblingNodeIndex == uint.MaxValue;
+
+    /// <summary>
+    /// Is the index of the right sibling null. i.e. equal to <see cref="uint.MaxValue"/>
+    /// </summary>
+    protected bool IsRightSiblingIndexNull => m_rightSiblingNodeIndex == uint.MaxValue;
+
+    /// <summary>
+    /// Gets or sets the number of unused bytes in the node.
+    /// </summary>
+    protected ushort RemainingBytes => (ushort)(BlockSize - m_validBytes);
+
+    /// <summary>
     /// The position that points to the location right after the header which is the
     /// start of the data within the node.
     /// </summary>
     protected long StartOfDataPosition => NodeIndex * BlockSize + HeaderSize;
 
     /// <summary>
-    /// Gets the first position for the current node.
+    /// Gets the byte offset of the upper bounds key.
     /// </summary>
-    public long NodePosition => BlockSize * NodeIndex;
+    private int OffsetOfUpperBounds => OffsetOfLowerBounds + KeySize;
 
     #endregion
 
@@ -388,7 +393,7 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     /// </summary>
     /// <param name="key">The key to check.</param>
     /// <returns>
-    ///   <c>true</c> if the key is within the node's bounds; otherwise, <c>false</c>.
+    /// <c>true</c> if the key is within the node's bounds; otherwise, <c>false</c>.
     /// </returns>
     public bool IsKeyInsideBounds(TKey key)
     {
@@ -422,11 +427,6 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
 
         return m_pointerAfterHeader;
     }
-
-    /// <summary>
-    /// Occurs when the node index is changed or cleared.
-    /// </summary>
-    protected event EventHandler NodeIndexChanged;
 
     /// <summary>
     /// Initializes the node with the given binary stream and block size.

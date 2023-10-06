@@ -92,7 +92,7 @@ public class PrebufferWriter<TKey, TValue> : DisposableLoggingClassBase where TK
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates a prestage writer.
+    /// Creates a pre-stage writer.
     /// </summary>
     /// <param name="settings">The settings to use for this prebuffer writer</param>
     /// <param name="onRollover">delegate to call when a file is done with this stage.</param>
@@ -134,6 +134,39 @@ public class PrebufferWriter<TKey, TValue> : DisposableLoggingClassBase where TK
     #endregion
 
     #region [ Methods ]
+
+    /// <summary>
+    /// Disposes the underlying queues contained in this class.
+    /// This method is not thread safe.
+    /// It is assumed this will be called after <see cref="Stop"/>.
+    /// </summary>
+    protected override void Dispose(bool disposing)
+    {
+        if (!m_disposed && disposing)
+        {
+            lock (m_syncRoot)
+            {
+                if (m_disposed) //Prevents concurrent calls.
+                    return;
+                m_stopped = true;
+                m_disposed = true;
+            }
+
+            try
+            {
+                m_rolloverTask.Dispose();
+                m_waitForEmptyActiveQueue.Dispose();
+                m_processingQueue.Dispose();
+                m_activeQueue.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Log.Publish(MessageLevel.Info, MessageFlags.BugReport, "Unhandled exception in the dispose process", null, null, ex);
+            }
+        }
+
+        base.Dispose(disposing);
+    }
 
     /// <summary>
     /// Triggers a rollover if the provided transaction id has not yet been triggered.
@@ -227,39 +260,6 @@ public class PrebufferWriter<TKey, TValue> : DisposableLoggingClassBase where TK
         m_rolloverTask.Dispose(); //This method block until the worker runs one last time
         Dispose();
         return m_latestTransactionId;
-    }
-
-    /// <summary>
-    /// Disposes the underlying queues contained in this class.
-    /// This method is not thread safe.
-    /// It is assumed this will be called after <see cref="Stop"/>.
-    /// </summary>
-    protected override void Dispose(bool disposing)
-    {
-        if (!m_disposed && disposing)
-        {
-            lock (m_syncRoot)
-            {
-                if (m_disposed) //Prevents concurrent calls.
-                    return;
-                m_stopped = true;
-                m_disposed = true;
-            }
-
-            try
-            {
-                m_rolloverTask.Dispose();
-                m_waitForEmptyActiveQueue.Dispose();
-                m_processingQueue.Dispose();
-                m_activeQueue.Dispose();
-            }
-            catch (Exception ex)
-            {
-                Log.Publish(MessageLevel.Info, MessageFlags.BugReport, "Unhandled exception in the dispose process", null, null, ex);
-            }
-        }
-
-        base.Dispose(disposing);
     }
 
     /// <summary>

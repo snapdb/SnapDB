@@ -161,15 +161,15 @@ internal partial class BufferedFile : IDiskMediumCoreFunctions
     #region [ Properties ]
 
     /// <summary>
+    /// Gets the file name associated with the medium. Returns an empty string if a memory file.
+    /// </summary>
+    public string FileName => m_queue.FileName;
+
+    /// <summary>
     /// Gets the current number of bytes used by the file system.
     /// This is only intended to be an approximate figure.
     /// </summary>
     public long Length => m_queue.Length;
-
-    /// <summary>
-    /// Gets the file name associated with the medium. Returns an empty string if a memory file.
-    /// </summary>
-    public string FileName => m_queue.FileName;
 
     #endregion
 

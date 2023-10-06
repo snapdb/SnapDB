@@ -34,14 +34,14 @@ public abstract class ClientDatabaseBase : IDisposable
     #region [ Properties ]
 
     /// <summary>
-    /// Checks isDisposed status.
-    /// </summary>
-    public abstract bool IsDisposed { get; }
-
-    /// <summary>
     /// Gets basic information about the current Database.
     /// </summary>
     public abstract DatabaseInfo Info { get; }
+
+    /// <summary>
+    /// Checks isDisposed status.
+    /// </summary>
+    public abstract bool IsDisposed { get; }
 
     #endregion
 
@@ -50,7 +50,6 @@ public abstract class ClientDatabaseBase : IDisposable
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
-    /// <filterpriority>2</filterpriority>
     public abstract void Dispose();
 
     /// <summary>

@@ -72,6 +72,24 @@ public class ServerDatabaseSettings : SettingsBase<ServerDatabaseSettings>, IToS
     #region [ Properties ]
 
     /// <summary>
+    /// The settings for the ArchiveList.
+    /// </summary>
+    public ArchiveListSettings ArchiveList { get; }
+
+    /// <summary>
+    /// The name associated with the database.
+    /// </summary>
+    public string DatabaseName
+    {
+        get => m_databaseName;
+        set
+        {
+            TestForEditable();
+            m_databaseName = value;
+        }
+    }
+
+    /// <summary>
     /// Gets the type of the key component.
     /// </summary>
     public Guid KeyType
@@ -81,6 +99,29 @@ public class ServerDatabaseSettings : SettingsBase<ServerDatabaseSettings>, IToS
         {
             TestForEditable();
             m_keyType = value;
+        }
+    }
+
+    /// <summary>
+    /// The settings for the rollover log.
+    /// </summary>
+    public RolloverLogSettings RolloverLog { get; }
+
+    /// <summary>
+    /// Gets the supported streaming methods.
+    /// </summary>
+    public ImmutableList<EncodingDefinition> StreamingEncodingMethods { get; }
+
+    /// <summary>
+    /// Gets if writing or file combination will be enabled.
+    /// </summary>
+    public bool SupportsWriting
+    {
+        get => m_supportsWriting;
+        set
+        {
+            TestForEditable();
+            m_supportsWriting = value;
         }
     }
 
@@ -98,50 +139,9 @@ public class ServerDatabaseSettings : SettingsBase<ServerDatabaseSettings>, IToS
     }
 
     /// <summary>
-    /// The name associated with the database.
-    /// </summary>
-    public string DatabaseName
-    {
-        get => m_databaseName;
-        set
-        {
-            TestForEditable();
-            m_databaseName = value;
-        }
-    }
-
-    /// <summary>
-    /// Gets the supported streaming methods.
-    /// </summary>
-    public ImmutableList<EncodingDefinition> StreamingEncodingMethods { get; }
-
-    /// <summary>
-    /// The settings for the ArchiveList.
-    /// </summary>
-    public ArchiveListSettings ArchiveList { get; }
-
-    /// <summary>
     /// Settings for the writer -- <c>null</c> if the server does not support writing.
     /// </summary>
     public WriteProcessorSettings WriteProcessor { get; }
-
-    /// <summary>
-    /// The settings for the rollover log.
-    /// </summary>
-    public RolloverLogSettings RolloverLog { get; }
-
-    /// <summary>
-    /// Gets if writing or file combination will be enabled.
-    /// </summary>
-    public bool SupportsWriting
-    {
-        get => m_supportsWriting;
-        set
-        {
-            TestForEditable();
-            m_supportsWriting = value;
-        }
-    }
 
     #endregion
 

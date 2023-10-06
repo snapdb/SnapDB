@@ -110,6 +110,35 @@ public class SimplifiedFileWriter : IDisposable
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="SimplifiedFileWriter"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (m_disposed)
+            return;
+
+        try
+        {
+            if (!disposing)
+                return;
+
+            if (m_subFileStream is not null)
+            {
+                m_subFileStream.Dispose();
+                m_subFileStream = null;
+            }
+
+            Stream?.Dispose();
+            File.Delete(m_pendingFileName);
+        }
+        finally
+        {
+            m_disposed = true; // Prevent duplicate dispose.
+        }
+    }
+
     /// </summary>
     /// <param name="fileName">The name of the file to create.</param>
     /// <returns>The <see cref="ISupportsBinaryStream"/> representing the newly created file.</returns>
@@ -147,35 +176,6 @@ public class SimplifiedFileWriter : IDisposable
         m_disposed = true;
 
         Dispose();
-    }
-
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="SimplifiedFileWriter"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (m_disposed)
-            return;
-
-        try
-        {
-            if (!disposing)
-                return;
-
-            if (m_subFileStream is not null)
-            {
-                m_subFileStream.Dispose();
-                m_subFileStream = null;
-            }
-
-            Stream?.Dispose();
-            File.Delete(m_pendingFileName);
-        }
-        finally
-        {
-            m_disposed = true; // Prevent duplicate dispose.
-        }
     }
 
     private void CloseCurrentFile()

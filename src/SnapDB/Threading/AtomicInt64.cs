@@ -74,7 +74,7 @@ public class AtomicInt64
 
     #endregion
 
-    #region [ Static ]
+    #region [ Operators ]
 
     /// <summary>
     /// Implicitly converts an AtomicInt64 to a long.

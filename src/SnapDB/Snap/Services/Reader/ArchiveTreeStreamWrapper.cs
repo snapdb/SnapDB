@@ -86,17 +86,6 @@ public class ArchiveTreeStreamWrapper<TKey, TValue> : TreeStream<TKey, TValue> w
     #region [ Methods ]
 
     /// <summary>
-    /// Reads the next key-value pair from the underlying data source using the scanner.
-    /// </summary>
-    /// <param name="key">The key to read.</param>
-    /// <param name="value">The value to read.</param>
-    /// <returns>True if the read operation was successful, otherwise false.</returns>
-    protected override bool ReadNext(TKey key, TValue value)
-    {
-        return m_scanner.Read(key, value);
-    }
-
-    /// <summary>
     /// Releases the unmanaged resources used by the <see cref="ArchiveTreeStreamWrapper{TKey,TValue}"/> object and optionally releases the managed resources.
     /// </summary>
     /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
@@ -118,6 +107,17 @@ public class ArchiveTreeStreamWrapper<TKey, TValue> : TreeStream<TKey, TValue> w
                 m_disposed = true; // Prevent duplicate dispose.
                 base.Dispose(disposing); // Call base class Dispose().
             }
+    }
+
+    /// <summary>
+    /// Reads the next key-value pair from the underlying data source using the scanner.
+    /// </summary>
+    /// <param name="key">The key to read.</param>
+    /// <param name="value">The value to read.</param>
+    /// <returns>True if the read operation was successful, otherwise false.</returns>
+    protected override bool ReadNext(TKey key, TValue value)
+    {
+        return m_scanner.Read(key, value);
     }
 
     #endregion

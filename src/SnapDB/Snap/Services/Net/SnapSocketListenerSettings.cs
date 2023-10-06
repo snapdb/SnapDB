@@ -98,6 +98,19 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     #region [ Properties ]
 
     /// <summary>
+    /// Force the use of SSL for all clients connecting to this socket.
+    /// </summary>
+    public bool ForceSsl
+    {
+        get => m_forceSsl;
+        set
+        {
+            TestForEditable();
+            m_forceSsl = value;
+        }
+    }
+
+    /// <summary>
     /// Gets the local <see cref="IPEndPoint"/> from the values in <see cref="m_localIpAddress"/> and <see cref="m_localTcpPort"/>
     /// </summary>
     public IPEndPoint LocalEndPoint
@@ -119,20 +132,15 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     }
 
     /// <summary>
-    /// A list of all Windows users that are allowed to connect to the historian.
+    /// The local IP address to host on. Leave empty to bind to all local interfaces.
     /// </summary>
-    public ImmutableList<string> Users { get; } = new();
-
-    /// <summary>
-    /// Force the use of SSL for all clients connecting to this socket.
-    /// </summary>
-    public bool ForceSsl
+    public string LocalIpAddress
     {
-        get => m_forceSsl;
+        get => m_localIpAddress;
         set
         {
             TestForEditable();
-            m_forceSsl = value;
+            m_localIpAddress = value;
         }
     }
 
@@ -150,17 +158,9 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     }
 
     /// <summary>
-    /// The local IP address to host on. Leave empty to bind to all local interfaces.
+    /// A list of all Windows users that are allowed to connect to the historian.
     /// </summary>
-    public string LocalIpAddress
-    {
-        get => m_localIpAddress;
-        set
-        {
-            TestForEditable();
-            m_localIpAddress = value;
-        }
-    }
+    public ImmutableList<string> Users { get; } = new();
 
     #endregion
 

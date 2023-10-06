@@ -81,6 +81,30 @@ internal class ArchiveListLog : DisposableLoggingClassBase
     #region [ Methods ]
 
     /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="ArchiveListLog"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        lock (m_syncRoot)
+        {
+            if (!m_disposed)
+                try
+                {
+                    // This will be done regardless of whether the object is finalized or disposed.
+                    if (disposing)
+                        SaveLogToDisk();
+                    // This will be done only when the object is disposed by calling Dispose().
+                }
+                finally
+                {
+                    m_disposed = true; // Prevent duplicate dispose.
+                    base.Dispose(disposing); // Call base class Dispose().
+                }
+        }
+    }
+
+    /// <summary>
     /// If the log is file backed
     /// </summary>
     public void SaveLogToDisk()
@@ -160,30 +184,6 @@ internal class ArchiveListLog : DisposableLoggingClassBase
             m_allFilesToDelete ??= GetAllFilesToDelete();
 
             return m_allFilesToDelete.Contains(fileId);
-        }
-    }
-
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="ArchiveListLog"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        lock (m_syncRoot)
-        {
-            if (!m_disposed)
-                try
-                {
-                    // This will be done regardless of whether the object is finalized or disposed.
-                    if (disposing)
-                        SaveLogToDisk();
-                    // This will be done only when the object is disposed by calling Dispose().
-                }
-                finally
-                {
-                    m_disposed = true; // Prevent duplicate dispose.
-                    base.Dispose(disposing); // Call base class Dispose().
-                }
         }
     }
 

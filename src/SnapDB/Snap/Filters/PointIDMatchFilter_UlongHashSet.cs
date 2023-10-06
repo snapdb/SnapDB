@@ -32,6 +32,7 @@ namespace SnapDB.Snap.Filters;
 public partial class PointIdMatchFilter
 {
     #region [ Members ]
+
     private class ULongHashSet<TKey, TValue> : MatchFilterBase<TKey, TValue> where TKey : TimestampPointIdBase<TKey>, new()
     {
         #region [ Members ]

@@ -344,28 +344,19 @@ public class BinaryStreamTest
 
     private static ulong mask(int bytes)
     {
-        switch (bytes)
+        return bytes switch
         {
-            case 0:
-                return 0x00;
-            case 1:
-                return 0xFF;
-            case 2:
-                return 0xFFFF;
-            case 3:
-                return 0xFFFFFF;
-            case 4:
-                return 0xFFFFFFFF;
-            case 5:
-                return 0xFFFFFFFFFF;
-            case 6:
-                return 0xFFFFFFFFFFFF;
-            case 7:
-                return 0xFFFFFFFFFFFFFF;
-            case 8:
-                return 0xFFFFFFFFFFFFFFFF;
-        }
-        throw new Exception();
+            0 => 0x00,
+            1 => 0xFF,
+            2 => 0xFFFF,
+            3 => 0xFFFFFF,
+            4 => 0xFFFFFFFF,
+            5 => 0xFFFFFFFFFF,
+            6 => 0xFFFFFFFFFFFF,
+            7 => 0xFFFFFFFFFFFFFF,
+            8 => 0xFFFFFFFFFFFFFFFF,
+            _ => throw new Exception()
+        };
     }
 
     private static unsafe DateTime NextDate(byte[] data, Random rand)

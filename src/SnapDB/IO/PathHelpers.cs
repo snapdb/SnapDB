@@ -38,7 +38,7 @@ public static class PathHelpers
     /// </summary>
     /// <param name="extension">the extension to format. Can be *.exe, or .exe, or exe</param>
     /// <returns>
-    /// A vaild extension.
+    /// A valid extension.
     /// </returns>
     /// <remarks>
     /// Throws a series of exceptions if the <paramref name="extension"/> is invalid.
@@ -81,7 +81,7 @@ public static class PathHelpers
             throw new ArgumentNullException(nameof(fileName), "Extension cannot be null or empty space");
 
         if (fileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
-            throw new ArgumentException("filename has invalid characters.", "value");
+            throw new ArgumentException("filename has invalid characters.", nameof(fileName));
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ public static class PathHelpers
             throw new ArgumentNullException(nameof(pathName), "Extension cannot be null or empty space");
 
         if (pathName.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
-            throw new ArgumentException("filename has invalid characters.", "value");
+            throw new ArgumentException("filename has invalid characters.", nameof(pathName));
     }
 
     #endregion

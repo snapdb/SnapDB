@@ -33,15 +33,7 @@ public partial class MemoryPoolStream : MemoryPoolStreamCore, ISupportsBinaryStr
 {
     #region [ Members ]
 
-    /// <summary>
-    /// The size of each page.
-    /// </summary>
-    private readonly int m_blockSize;
-
-    /// <summary>
-    /// Releases all the resources used by the <see cref="MemoryPoolStream"/> object.
-    /// </summary>
-    private bool m_disposed;
+    // The size of each page.
 
     #endregion
 
@@ -59,7 +51,7 @@ public partial class MemoryPoolStream : MemoryPoolStreamCore, ISupportsBinaryStr
     /// </summary>
     public MemoryPoolStream(MemoryPool pool) : base(pool)
     {
-        m_blockSize = pool.PageSize;
+        BlockSize = pool.PageSize;
     }
 
     #endregion
@@ -69,7 +61,7 @@ public partial class MemoryPoolStream : MemoryPoolStreamCore, ISupportsBinaryStr
     /// <summary>
     /// Gets the unit size of an individual block.
     /// </summary>
-    public int BlockSize => m_blockSize;
+    public int BlockSize { get; }
 
     /// <summary>
     /// Gets if the stream can be written to.

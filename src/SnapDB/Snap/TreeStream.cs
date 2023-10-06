@@ -65,7 +65,6 @@ public abstract class TreeStream<TKey, TValue> : IDisposable where TKey : class,
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
-    /// <filterpriority>2</filterpriority>
     public void Dispose()
     {
         if (!m_disposed)
@@ -80,6 +79,15 @@ public abstract class TreeStream<TKey, TValue> : IDisposable where TKey : class,
             }
 
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="TreeStream{TKey,TValue}"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        Eos = true;
     }
 
     /// <summary>
@@ -128,15 +136,6 @@ public abstract class TreeStream<TKey, TValue> : IDisposable where TKey : class,
     /// <c>true</c> if the advance was successful; <c>false</c> if the end of the stream was reached.
     /// </returns>
     protected abstract bool ReadNext(TKey key, TValue value);
-
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="TreeStream{TKey,TValue}"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-    protected virtual void Dispose(bool disposing)
-    {
-        Eos = true;
-    }
 
     #endregion
 }

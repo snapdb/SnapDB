@@ -53,23 +53,15 @@ public class ArchiveListLogSettings : SettingsBase<ArchiveListLogSettings>
     public bool IsFileBacked => m_logPath != string.Empty;
 
     /// <summary>
-    /// The path to store all log files. Can be an empty string to
-    /// not enable file based logging.
+    /// The file extension to write the log files.
     /// </summary>
-    public string LogPath
+    public string LogFileExtension
     {
-        get => m_logPath;
+        get => m_logFileExtension;
         set
         {
             TestForEditable();
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                m_logPath = string.Empty;
-                return;
-            }
-
-            PathHelpers.ValidatePathName(value);
-            m_logPath = value;
+            m_logFileExtension = PathHelpers.FormatExtension(value);
         }
     }
 
@@ -94,15 +86,23 @@ public class ArchiveListLogSettings : SettingsBase<ArchiveListLogSettings>
     }
 
     /// <summary>
-    /// The file extension to write the log files.
+    /// The path to store all log files. Can be an empty string to
+    /// not enable file based logging.
     /// </summary>
-    public string LogFileExtension
+    public string LogPath
     {
-        get => m_logFileExtension;
+        get => m_logPath;
         set
         {
             TestForEditable();
-            m_logFileExtension = PathHelpers.FormatExtension(value);
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                m_logPath = string.Empty;
+                return;
+            }
+
+            PathHelpers.ValidatePathName(value);
+            m_logPath = value;
         }
     }
 
@@ -173,10 +173,10 @@ public class ArchiveListLogSettings : SettingsBase<ArchiveListLogSettings>
     {
         if (!IsFileBacked)
             throw new Exception("Cannot generate a file name when the log is not a file backed log");
-        
+
         if (LogFilePrefix == string.Empty)
             return Path.Combine(LogPath, Guid.NewGuid() + LogFileExtension);
-        
+
         return Path.Combine(LogPath, LogFilePrefix + " " + Guid.NewGuid() + LogFileExtension);
     }
 

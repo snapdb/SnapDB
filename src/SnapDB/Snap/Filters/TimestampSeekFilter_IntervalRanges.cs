@@ -30,7 +30,7 @@ using SnapDB.Snap.Types;
 namespace SnapDB.Snap.Filters;
 
 /// <summary>
-/// Partial class using a timestamp seek filter for interval ranges. 
+/// Partial class using a timestamp seek filter for interval ranges.
 /// </summary>
 public partial class TimestampSeekFilter
 {
@@ -107,15 +107,7 @@ public partial class TimestampSeekFilter
 
         #region [ Properties ]
 
-        private ulong StartOfWindow
-        {
-            get => StartOfFrame.Timestamp;
-            set
-            {
-                StartOfFrame.SetMin();
-                StartOfFrame.Timestamp = value;
-            }
-        }
+        public override Guid FilterType => TimestampSeekFilterDefinition.FilterGuid;
 
         private ulong EndOfWindow
         {
@@ -127,7 +119,15 @@ public partial class TimestampSeekFilter
             }
         }
 
-        public override Guid FilterType => TimestampSeekFilterDefinition.FilterGuid;
+        private ulong StartOfWindow
+        {
+            get => StartOfFrame.Timestamp;
+            set
+            {
+                StartOfFrame.SetMin();
+                StartOfFrame.Timestamp = value;
+            }
+        }
 
         #endregion
 

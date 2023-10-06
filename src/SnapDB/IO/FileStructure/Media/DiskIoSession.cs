@@ -98,6 +98,15 @@ internal unsafe class DiskIoSession : IDisposable
     #region [ Properties ]
 
     /// <summary>
+    /// Gets the indexed page of this block.
+    /// </summary>
+    public uint BlockIndex { get; private set; }
+
+    public byte BlockType { get; private set; }
+
+    public uint IndexValue { get; private set; }
+
+    /// <summary>
     /// Returns <c>true</c> if this class is disposed.
     /// </summary>
     public bool IsDisposed { get; private set; }
@@ -113,18 +122,9 @@ internal unsafe class DiskIoSession : IDisposable
     public int Length { get; private set; }
 
     /// <summary>
-    /// Gets the indexed page of this block.
-    /// </summary>
-    public uint BlockIndex { get; private set; }
-
-    /// <summary>
     /// Gets a pointer to the block.
     /// </summary>
     public byte* Pointer { get; private set; }
-
-    public byte BlockType { get; private set; }
-
-    public uint IndexValue { get; private set; }
 
     #endregion
 

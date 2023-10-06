@@ -100,6 +100,16 @@ public sealed class BitArray
     #region [ Properties ]
 
     /// <summary>
+    /// Gets the number of bits that are cleared in this array.
+    /// </summary>
+    public int ClearCount => Count - SetCount;
+
+    /// <summary>
+    /// Gets the number of bits this array contains.
+    /// </summary>
+    public int Count { get; private set; }
+
+    /// <summary>
     /// Gets or Sets individual bits in this array.
     /// </summary>
     /// <param name="index">Bit position to access.</param>
@@ -117,19 +127,9 @@ public sealed class BitArray
     }
 
     /// <summary>
-    /// Gets the number of bits this array contains.
-    /// </summary>
-    public int Count { get; private set; }
-
-    /// <summary>
     /// Gets the number of bits that are set in this array.
     /// </summary>
     public int SetCount { get; private set; }
-
-    /// <summary>
-    /// Gets the number of bits that are cleared in this array.
-    /// </summary>
-    public int ClearCount => Count - SetCount;
 
     #endregion
 

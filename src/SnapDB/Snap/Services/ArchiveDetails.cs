@@ -42,19 +42,17 @@ public class ArchiveDetails
     #region [ Properties ]
 
     /// <summary>
-    /// The ID for the file
+    /// Gets the end time of the archive, if applicable to Key type.
     /// </summary>
-    public Guid Id { get; private set; }
+    /// <remarks>
+    /// If Key type does not expose a TimestampAsDate property, value will be <see cref="DateTime.MaxValue"/>.
+    /// </remarks>
+    public DateTime EndTime { get; private set; }
 
     /// <summary>
     /// The name of the file
     /// </summary>
     public string FileName { get; private set; }
-
-    /// <summary>
-    /// Gets if the file contains anything.
-    /// </summary>
-    public bool IsEmpty { get; private set; }
 
     /// <summary>
     /// Gets the size of the file in bytes.
@@ -65,6 +63,16 @@ public class ArchiveDetails
     /// Gets the first key as a string.
     /// </summary>
     public string FirstKey { get; private set; }
+
+    /// <summary>
+    /// The ID for the file
+    /// </summary>
+    public Guid Id { get; private set; }
+
+    /// <summary>
+    /// Gets if the file contains anything.
+    /// </summary>
+    public bool IsEmpty { get; private set; }
 
     /// <summary>
     /// Gets the last key as a string.
@@ -78,14 +86,6 @@ public class ArchiveDetails
     /// If Key type does not expose a TimestampAsDate property, value will be <see cref="DateTime.MinValue"/>.
     /// </remarks>
     public DateTime StartTime { get; private set; }
-
-    /// <summary>
-    /// Gets the end time of the archive, if applicable to Key type.
-    /// </summary>
-    /// <remarks>
-    /// If Key type does not expose a TimestampAsDate property, value will be <see cref="DateTime.MaxValue"/>.
-    /// </remarks>
-    public DateTime EndTime { get; private set; }
 
     #endregion
 

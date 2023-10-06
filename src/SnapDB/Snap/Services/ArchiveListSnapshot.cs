@@ -36,6 +36,16 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable where TKey : SnapTy
     #region [ Members ]
 
     /// <summary>
+    /// Signals that a disposal of this object has been requested.
+    /// </summary>
+    /// <remarks>
+    /// A race condition exists such that this class gets a dispose request before the client
+    /// registers this event. Therefore, be sure to check <see cref="IsDisposeRequested"/>
+    /// after assigning the event handler.
+    /// </remarks>
+    public event Action? DisposeRequested;
+
+    /// <summary>
     /// A callback to get the latest list of resources from <see cref="ArchiveList{TKey,TValue}"/>.
     /// </summary>
     private Action<ArchiveListSnapshot<TKey, TValue>> m_acquireResources;
@@ -78,6 +88,18 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable where TKey : SnapTy
     #region [ Properties ]
 
     /// <summary>
+    /// Gets if this class has been disposed.
+    /// </summary>
+    public bool IsDisposed { get; private set; }
+
+    /// <summary>
+    /// Gets if the engine is requesting that this snapshot gets disposed.
+    /// if this is true this means the engine is waiting for the release
+    /// of this object before it can continue its next task.
+    /// </summary>
+    public bool IsDisposeRequested { get; private set; }
+
+    /// <summary>
     /// Gets the list of all partitions that are currently in use.  Set partition to null to indicate
     /// that is is no longer needed.  Set the entire array to null to release all partitions.
     /// </summary>
@@ -98,18 +120,6 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable where TKey : SnapTy
             m_tables = value ?? Array.Empty<ArchiveTableSummary<TKey, TValue>>();
         }
     }
-
-    /// <summary>
-    /// Gets if the engine is requesting that this snapshot gets disposed.
-    /// if this is true this means the engine is waiting for the release
-    /// of this object before it can continue its next task.
-    /// </summary>
-    public bool IsDisposeRequested { get; private set; }
-
-    /// <summary>
-    /// Gets if this class has been disposed.
-    /// </summary>
-    public bool IsDisposed { get; private set; }
 
     #endregion
 
@@ -137,16 +147,6 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable where TKey : SnapTy
         m_acquireResources = null!;
         IsDisposed = true;
     }
-
-    /// <summary>
-    /// Signals that a disposal of this object has been requested.
-    /// </summary>
-    /// <remarks>
-    /// A race condition exists such that this class gets a dispose request before the client
-    /// registers this event. Therefore, be sure to check <see cref="IsDisposeRequested"/>
-    /// after assigning the event handler.
-    /// </remarks>
-    public event Action? DisposeRequested;
 
     /// <summary>
     /// Attempts to get the file for the provided fileId

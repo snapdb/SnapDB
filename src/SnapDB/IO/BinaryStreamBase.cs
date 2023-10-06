@@ -46,9 +46,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     /// </summary>
     public readonly BinaryStreamStream Stream;
 
-    /// <summary>
-    /// A temporary buffer where data is read and written to before it is serialized to the stream.
-    /// </summary>
+    // A temporary buffer where data is read and written to before it is serialized to the stream.
     private readonly byte[] m_buffer = new byte[16];
 
     private bool m_disposed;
@@ -70,23 +68,11 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     #region [ Properties ]
 
     /// <summary>
-    /// When overridden in a derived class, gets a value indicating whether the current stream supports writing.
-    /// </summary>
-    /// <returns>
-    /// <c>true</c> if the stream supports writing; otherwise, <c>false</c>.
-    /// </returns>
-    /// <filterpriority>1</filterpriority>
-
-    public abstract bool CanWrite { get; }
-
-    /// <summary>
     /// When overridden in a derived class, gets a value indicating whether the current stream supports reading.
     /// </summary>
     /// <returns>
     /// <c>true</c> if the stream supports reading; otherwise, <c>false</c>.
     /// </returns>
-    /// <filterpriority>1</filterpriority>
-
     public abstract bool CanRead { get; }
 
     /// <summary>
@@ -95,8 +81,15 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     /// <returns>
     /// <c>true</c> if the stream supports seeking; otherwise, <c>false</c>.
     /// </returns>
-    /// <filterpriority>1</filterpriority>
     public abstract bool CanSeek { get; }
+
+    /// <summary>
+    /// When overridden in a derived class, gets a value indicating whether the current stream supports writing.
+    /// </summary>
+    /// <returns>
+    /// <c>true</c> if the stream supports writing; otherwise, <c>false</c>.
+    /// </returns>
+    public abstract bool CanWrite { get; }
 
     /// <summary>
     /// When overridden in a derived class, gets the length in bytes of the stream.
@@ -104,9 +97,8 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     /// <returns>
     /// A long value representing the length of the stream in bytes.
     /// </returns>
-    /// <exception cref="T:System.NotSupportedException">A class derived from Stream does not support seeking. </exception>
-    /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
-    /// <filterpriority>1</filterpriority>
+    /// <exception cref="NotSupportedException">A class derived from Stream does not support seeking. </exception>
+    /// <exception cref="ObjectDisposedException">Methods were called after the stream was closed.</exception>
     public abstract long Length { get; }
 
     /// <summary>
@@ -115,10 +107,9 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     /// <returns>
     /// The current position within the stream.
     /// </returns>
-    /// <exception cref="T:System.IO.IOException">An I/O error occurs.</exception>
-    /// <exception cref="T:System.NotSupportedException">The stream does not support seeking.</exception>
-    /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
-    /// <filterpriority>1</filterpriority>
+    /// <exception cref="IOException">An I/O error occurs.</exception>
+    /// <exception cref="NotSupportedException">The stream does not support seeking.</exception>
+    /// <exception cref="ObjectDisposedException">Methods were called after the stream was closed.</exception>
     public abstract long Position { get; set; }
 
     #endregion
@@ -135,29 +126,49 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="BinaryStreamBase"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">Set to <c>true</c> to release both managed and unmanaged resources; set to <c>false</c> to release only unmanaged resources.</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (m_disposed)
+            return;
+        
+        try
+        {
+            // This will be done regardless of whether the object is finalized or disposed.
+            if (disposing)
+            {
+                // This will be done only when the object is disposed by calling Dispose().
+            }
+        }
+        finally
+        {
+            m_disposed = true; // Prevent duplicate dispose.
+        }
+    }
+
+    /// <summary>
     /// When overridden in a derived class, writes a sequence of bytes to the current stream and advances the current position within this stream by the number of bytes written.
     /// </summary>
     /// <param name="buffer">An array of bytes. This method copies <paramref name="count"/> bytes from <paramref name="buffer"/> to the current stream.</param>
     /// <param name="offset">The zero-based byte offset in <paramref name="buffer"/> at which to begin copying bytes to the current stream.</param>
     /// <param name="count">The number of bytes to be written to the current stream.</param>
-    /// <filterpriority>1</filterpriority>
     public abstract void Write(byte[] buffer, int offset, int count);
 
     /// <summary>
     /// When overridden in a derived class, sets the length of the current stream.
     /// </summary>
     /// <param name="value">The desired length of the current stream in bytes.</param>
-    /// <exception cref="T:System.IO.IOException">An I/O error occurs.</exception>
-    /// <exception cref="T:System.NotSupportedException">The stream does not support both writing and seeking, such as if the stream is constructed from a pipe or console output.</exception>
-    /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
-    /// <filterpriority>2</filterpriority>
+    /// <exception cref="IOException">An I/O error occurs.</exception>
+    /// <exception cref="NotSupportedException">The stream does not support both writing and seeking, such as if the stream is constructed from a pipe or console output.</exception>
+    /// <exception cref="ObjectDisposedException">Methods were called after the stream was closed.</exception>
     public abstract void SetLength(long value);
 
     /// <summary>
     /// When overridden in a derived class, clears all buffers for this stream and causes any buffered data to be written to the underlying device.
     /// </summary>
-    /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
-    /// <filterpriority>2</filterpriority>
+    /// <exception cref="IOException">An I/O error occurs. </exception>
     public abstract void Flush();
 
     /// <summary>
@@ -172,13 +183,12 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     /// </param>
     /// <param name="offset">The zero-based byte offset in <paramref name="buffer"/> at which to begin storing the data read from the current stream.</param>
     /// <param name="count">The maximum number of bytes to be read from the current stream.</param>
-    /// <exception cref="T:System.ArgumentException">The sum of <paramref name="offset"/> and <paramref name="count"/> is larger than the buffer length.</exception>
-    /// <exception cref="T:System.ArgumentNullException"><paramref name="buffer"/> is <c>null</c>.</exception>
-    /// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="offset"/> or <paramref name="count"/> is negative.</exception>
-    /// <exception cref="T:System.IO.IOException">An I/O error occurs.</exception>
-    /// <exception cref="T:System.NotSupportedException">The stream does not support reading.</exception>
-    /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
-    /// <filterpriority>1</filterpriority>
+    /// <exception cref="ArgumentException">The sum of <paramref name="offset"/> and <paramref name="count"/> is larger than the buffer length.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="buffer"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> or <paramref name="count"/> is negative.</exception>
+    /// <exception cref="IOException">An I/O error occurs.</exception>
+    /// <exception cref="NotSupportedException">The stream does not support reading.</exception>
+    /// <exception cref="ObjectDisposedException">Methods were called after the stream was closed.</exception>
     public abstract int Read(byte[] buffer, int offset, int count);
 
     /// <summary>
@@ -188,11 +198,10 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     /// The new position within the current stream.
     /// </returns>
     /// <param name="offset">A byte offset relative to the <paramref name="origin"/> parameter.</param>
-    /// <param name="origin">A value of type <see cref="T:System.IO.SeekOrigin"/> indicating the reference point used to obtain the new position.</param>
-    /// <exception cref="T:System.IO.IOException">An I/O error occurs.</exception>
-    /// <exception cref="T:System.NotSupportedException">The stream does not support seeking, such as if the stream is constructed from a pipe or console output.</exception>
-    /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
-    /// <filterpriority>1</filterpriority>
+    /// <param name="origin">A value of type <see cref="SeekOrigin"/> indicating the reference point used to obtain the new position.</param>
+    /// <exception cref="IOException">An I/O error occurs.</exception>
+    /// <exception cref="NotSupportedException">The stream does not support seeking, such as if the stream is constructed from a pipe or console output.</exception>
+    /// <exception cref="ObjectDisposedException">Methods were called after the stream was closed.</exception>
     public long Seek(long offset, SeekOrigin origin)
     {
         if (!CanSeek)
@@ -234,6 +243,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     {
         byte[] data = new byte[length];
         long oldPos = Position;
+
         Position = source;
         ReadAll(data, 0, length);
         Position = destination;
@@ -248,7 +258,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     /// <param name="numberOfBytes">The number of bytes to insert</param>
     /// <param name="lengthOfValidDataToShift">The number of bytes that will need to be shifted to perform this insert</param>
     /// <remarks>
-    /// Internally this fuction merely acomplishes an Array.Copy(stream,position,stream,position+numberOfBytes,lengthOfValidDataToShift)
+    /// Internally this function merely accomplishes an Array.Copy(stream,position,stream,position+numberOfBytes,lengthOfValidDataToShift)
     /// However, it's much more complicated than this. So this is a pretty useful function.
     /// The newly created space is uninitialized.
     /// </remarks>
@@ -265,14 +275,14 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     /// </summary>
     /// <param name="numberOfBytes">
     /// The distance to shift.  Positive means shifting to the right (ie. inserting data)
-    /// Negative means shift to the left (ie. deleteing data)
+    /// Negative means shift to the left (ie. deleting data)
     /// </param>
     /// <param name="lengthOfValidDataToShift">
     /// The number of bytes that will need to be shifted to perform the remove.
     /// This only includes the data that is valid after the shift is complete, and not the data that will be removed.
     /// </param>
     /// <remarks>
-    /// Internally this fuction merely acomplishes an Array.Copy(stream,position+numberOfBytes,stream,position,lengthOfValidDataToShift)
+    /// Internally this function merely accomplishes an Array.Copy(stream,position+numberOfBytes,stream,position,lengthOfValidDataToShift)
     /// However, it's much more complicated than this. So this is a pretty useful function.
     /// The space at the end of the copy is uninitialized.
     /// </remarks>
@@ -284,7 +294,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(sbyte value)
@@ -293,20 +303,19 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(bool value)
     {
         if (value)
             Write((byte)1);
-
         else
             Write((byte)0);
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(ushort value)
@@ -315,7 +324,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(uint value)
@@ -324,7 +333,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(ulong value)
@@ -333,7 +342,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(float value)
@@ -342,7 +351,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(double value)
@@ -351,7 +360,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(DateTime value)
@@ -360,7 +369,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public virtual void Write(byte value)
@@ -370,18 +379,19 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public virtual void Write(short value)
     {
         m_buffer[0] = (byte)value;
         m_buffer[1] = (byte)(value >> 8);
+
         Write(m_buffer, 0, 2);
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public virtual void Write(int value)
@@ -390,11 +400,12 @@ public abstract unsafe class BinaryStreamBase : IDisposable
         m_buffer[1] = (byte)(value >> 8);
         m_buffer[2] = (byte)(value >> 16);
         m_buffer[3] = (byte)(value >> 24);
+
         Write(m_buffer, 0, 4);
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public virtual void Write(long value)
@@ -407,11 +418,12 @@ public abstract unsafe class BinaryStreamBase : IDisposable
         m_buffer[5] = (byte)(value >> 40);
         m_buffer[6] = (byte)(value >> 48);
         m_buffer[7] = (byte)(value >> 56);
+
         Write(m_buffer, 0, 8);
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(decimal value)
@@ -426,6 +438,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
         else
         {
             byte* ptr = (byte*)&value;
+
             m_buffer[0] = ptr[3];
             m_buffer[1] = ptr[2];
             m_buffer[2] = ptr[1];
@@ -448,12 +461,13 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(Guid value)
     {
         byte* src = (byte*)&value;
+
         fixed (byte* dst = m_buffer)
         {
             if (BitConverter.IsLittleEndian)
@@ -484,7 +498,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void WriteUInt24(uint value)
@@ -494,7 +508,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void WriteUInt40(ulong value)
@@ -504,7 +518,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void WriteUInt48(ulong value)
@@ -514,7 +528,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void WriteUInt56(ulong value)
@@ -525,7 +539,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     /// <param name="bytes">The number of bytes to write.</param>
@@ -565,7 +579,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public virtual void Write7Bit(uint value)
@@ -574,7 +588,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public virtual void Write7Bit(ulong value)
@@ -583,7 +597,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(string value)
@@ -592,7 +606,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void Write(byte[] value)
@@ -601,7 +615,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="value"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="value"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="value">The value to write.</param>
     public void WriteWithLength(byte[] value)
@@ -611,7 +625,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     }
 
     /// <summary>
-    /// Writes the specifed <paramref name="buffer"/> to the underlying stream in little-endian format.
+    /// Writes the specified <paramref name="buffer"/> to the underlying stream in little-endian format.
     /// </summary>
     /// <param name="buffer">The pointer to the first byte.</param>
     /// <param name="length">The number of bytes to write.</param>
@@ -713,29 +727,19 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     /// <returns>The data read.</returns>
     public ulong ReadUInt(int bytes)
     {
-        switch (bytes)
+        return bytes switch
         {
-            case 0:
-                return 0;
-            case 1:
-                return ReadUInt8();
-            case 2:
-                return ReadUInt16();
-            case 3:
-                return ReadUInt24();
-            case 4:
-                return ReadUInt32();
-            case 5:
-                return ReadUInt40();
-            case 6:
-                return ReadUInt48();
-            case 7:
-                return ReadUInt56();
-            case 8:
-                return ReadUInt64();
-        }
-
-        throw new ArgumentOutOfRangeException(nameof(bytes), "must be between 0 and 8 inclusive.");
+            0 => 0,
+            1 => ReadUInt8(),
+            2 => ReadUInt16(),
+            3 => ReadUInt24(),
+            4 => ReadUInt32(),
+            5 => ReadUInt40(),
+            6 => ReadUInt48(),
+            7 => ReadUInt56(),
+            8 => ReadUInt64(),
+            _ => throw new ArgumentOutOfRangeException(nameof(bytes), "must be between 0 and 8 inclusive.")
+        };
     }
 
     /// <summary>
@@ -816,10 +820,12 @@ public abstract unsafe class BinaryStreamBase : IDisposable
         ReadAll(m_buffer, 0, 16);
 
         if (BitConverter.IsLittleEndian)
+        {
             fixed (byte* lp = m_buffer)
             {
                 return *(decimal*)lp;
             }
+        }
 
         decimal rv;
         byte* ptr = (byte*)&rv;
@@ -843,6 +849,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
         ptr[14] = m_buffer[13];
         ptr[13] = m_buffer[14];
         ptr[12] = m_buffer[15];
+
         return rv;
     }
 
@@ -856,11 +863,12 @@ public abstract unsafe class BinaryStreamBase : IDisposable
 
         Guid rv;
         byte* dst = (byte*)&rv;
+
         fixed (byte* src = m_buffer)
         {
             if (BitConverter.IsLittleEndian)
             {
-                // Internal stucture is correct - just copy.
+                // Internal structure is correct - just copy.
                 *(long*)(dst + 0) = *(long*)(src + 0);
                 *(long*)(dst + 8) = *(long*)(src + 8);
             }
@@ -932,9 +940,10 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     /// <returns>
     /// <c>true</c> If a byte array is successfully read within the specified maximum length; otherwise, <c>false</c>.
     /// </returns>
-    public bool TryReadBytes(int maxLength, out byte[] value)
+    public bool TryReadBytes(int maxLength, out byte[]? value)
     {
         int length = (int)Read7BitUInt32();
+
         if (length < 0 || length > maxLength)
         {
             value = null;
@@ -962,22 +971,21 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     /// <returns>
     /// <c>true</c> if a byte array is successfully read within the specified maximum length; otherwise, <c>false</c>.
     /// </returns>
-    public bool TryReadString(int maxLength, out string value)
+    public bool TryReadString(int maxLength, out string? value)
     {
-        if (!TryReadBytes(maxLength * 6, out byte[] data))
+        if (!TryReadBytes(maxLength * 6, out byte[]? data))
         {
             value = null;
             return false;
         }
 
-        value = Utf8.GetString(data);
-        if (value.Length > maxLength)
-        {
-            value = null;
-            return false;
-        }
+        value = Utf8.GetString(data!);
 
-        return true;
+        if (value.Length <= maxLength)
+            return true;
+        
+        value = null;
+        return false;
     }
 
     /// <summary>
@@ -1004,35 +1012,17 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     public void ReadAll(byte[] buffer, int position, int length)
     {
         buffer.ValidateParameters(position, length);
+
         while (length > 0)
         {
             int bytesRead = Read(buffer, position, length);
+
             if (bytesRead == 0)
                 throw new EndOfStreamException();
+
             length -= bytesRead;
             position += bytesRead;
         }
-    }
-
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="BinaryStreamBase"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">Set to <c>true</c> to release both managed and unmanaged resources; set to <c>false</c> to release only unmanaged resources.</param>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!m_disposed)
-            try
-            {
-                // This will be done regardless of whether the object is finalized or disposed.
-                if (disposing)
-                {
-                    // This will be done only when the object is disposed by calling Dispose().
-                }
-            }
-            finally
-            {
-                m_disposed = true; // Prevent duplicate dispose.
-            }
     }
 
     #endregion

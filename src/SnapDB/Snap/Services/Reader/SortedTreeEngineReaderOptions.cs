@@ -81,11 +81,6 @@ public class SortedTreeEngineReaderOptions
     #region [ Properties ]
 
     /// <summary>
-    /// The time before the query times out.
-    /// </summary>
-    public TimeSpan Timeout { get; }
-
-    /// <summary>
     /// The maximum number of points to return. 0 means no limit.
     /// </summary>
     public long MaxReturnedCount { get; }
@@ -100,6 +95,11 @@ public class SortedTreeEngineReaderOptions
     /// The maximum number of seeks permitted
     /// </summary>
     public long MaxSeekCount { get; }
+
+    /// <summary>
+    /// The time before the query times out.
+    /// </summary>
+    public TimeSpan Timeout { get; }
 
     #endregion
 

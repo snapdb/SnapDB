@@ -36,6 +36,8 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
 {
     #region [ Members ]
 
+    public event Action<SequentialReaderStream<TKey, TValue>> Disposed;
+
     private BufferedArchiveStream<TKey, TValue> m_firstTable;
     private SortedTreeScannerBase<TKey, TValue> m_firstTableScanner;
 
@@ -141,7 +143,46 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
 
     #region [ Methods ]
 
-    public event Action<SequentialReaderStream<TKey, TValue>> Disposed;
+    protected override void Dispose(bool disposing)
+    {
+        try
+        {
+            Disposed?.Invoke(this);
+        }
+        catch (Exception)
+        {
+        }
+
+        Interlocked.Add(ref Stats.PointsReturned, m_pointCount);
+        m_pointCount = 0;
+
+        if (m_timeout is not null)
+        {
+            m_timeout.Cancel();
+            m_timeout = null;
+        }
+
+        if (m_tablesOrigList is not null)
+        {
+            m_tablesOrigList.ForEach(x => x.Dispose());
+            m_tablesOrigList = null;
+            Array.Clear(m_snapshot.Tables, 0, m_snapshot.Tables.Length);
+        }
+
+        m_timedOut = true;
+
+        if (m_snapshot is not null)
+        {
+            m_snapshot.Dispose();
+            m_snapshot = null;
+        }
+
+        if (m_workerThreadSynchronization is not null && m_ownsWorkerThreadSynchronization)
+        {
+            m_workerThreadSynchronization.Dispose();
+            m_workerThreadSynchronization = null;
+        }
+    }
 
     /// <summary>
     /// Provides a thread safe way to cancel a reader.
@@ -189,47 +230,6 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
         }
 
         return ReadCatchAll(key, value);
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        try
-        {
-            Disposed?.Invoke(this);
-        }
-        catch (Exception)
-        {
-        }
-
-        Interlocked.Add(ref Stats.PointsReturned, m_pointCount);
-        m_pointCount = 0;
-
-        if (m_timeout is not null)
-        {
-            m_timeout.Cancel();
-            m_timeout = null;
-        }
-
-        if (m_tablesOrigList is not null)
-        {
-            m_tablesOrigList.ForEach(x => x.Dispose());
-            m_tablesOrigList = null;
-            Array.Clear(m_snapshot.Tables, 0, m_snapshot.Tables.Length);
-        }
-
-        m_timedOut = true;
-
-        if (m_snapshot is not null)
-        {
-            m_snapshot.Dispose();
-            m_snapshot = null;
-        }
-
-        if (m_workerThreadSynchronization is not null && m_ownsWorkerThreadSynchronization)
-        {
-            m_workerThreadSynchronization.Dispose();
-            m_workerThreadSynchronization = null;
-        }
     }
 
     private bool ReadCatchAll(TKey key, TValue value)

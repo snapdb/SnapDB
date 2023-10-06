@@ -87,15 +87,13 @@ public class SrpServerSession
         byte mode = stream.ReadNextByte();
         Sha512Digest hash = new();
 
-        switch (mode)
+        return mode switch
         {
-            case 1:
-                return StandardAuthentication(hash, stream, additionalChallenge);
-            case 2: //resume ticket
-                return ResumeTicket(hash, stream, additionalChallenge);
-            default:
-                return false;
-        }
+            1 => StandardAuthentication(hash, stream, additionalChallenge),
+            2 => //resume ticket
+                ResumeTicket(hash, stream, additionalChallenge),
+            _ => false
+        };
     }
 
     private bool StandardAuthentication(IDigest hash, Stream stream, byte[] additionalChallenge)

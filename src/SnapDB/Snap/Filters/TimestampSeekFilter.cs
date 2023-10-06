@@ -144,20 +144,13 @@ public partial class TimestampSeekFilter
     {
         byte version = stream.ReadUInt8();
 
-        switch (version)
+        return version switch
         {
-            case 0:
-                return null;
-
-            case 1:
-                return new FixedRange<TKey>(stream);
-
-            case 2:
-                return new IntervalRanges<TKey>(stream);
-
-            default:
-                throw new VersionNotFoundException("Unknown Version");
-        }
+            0 => null,
+            1 => new FixedRange<TKey>(stream),
+            2 => new IntervalRanges<TKey>(stream),
+            _ => throw new VersionNotFoundException("Unknown Version")
+        };
     }
 
     #endregion

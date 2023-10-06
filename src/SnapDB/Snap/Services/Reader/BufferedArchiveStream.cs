@@ -62,7 +62,6 @@ public class BufferedArchiveStream<TKey, TValue> : IDisposable where TKey : Snap
 
     private readonly ArchiveTableSummary<TKey, TValue> m_table;
 
-
     #endregion
 
     #region [ Constructors ]

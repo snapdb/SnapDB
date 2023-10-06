@@ -57,20 +57,9 @@ public class SortedTreeFile : IDisposable
     #region [ Properties ]
 
     /// <summary>
-    /// Determines if the archive file has been disposed.
+    /// Gets the size of the file.
     /// </summary>
-    public bool IsDisposed { get; private set; }
-
-    /// <summary>
-    /// Returns the name of the file.  Returns <see cref="String.Empty"/> if this is a memory archive.
-    /// This is the name of the entire path.
-    /// </summary>
-    public string FilePath { get; private set; }
-
-    /// <summary>
-    /// Gets if the file is a memory file.
-    /// </summary>
-    public bool IsMemoryFile => FilePath == string.Empty;
+    public long ArchiveSize => m_fileStructure.ArchiveSize;
 
     /// <summary>
     /// Gets the name of the file, but only the file, not the entire path.
@@ -86,15 +75,26 @@ public class SortedTreeFile : IDisposable
     }
 
     /// <summary>
+    /// Returns the name of the file.  Returns <see cref="String.Empty"/> if this is a memory archive.
+    /// This is the name of the entire path.
+    /// </summary>
+    public string FilePath { get; private set; }
+
+    /// <summary>
+    /// Determines if the archive file has been disposed.
+    /// </summary>
+    public bool IsDisposed { get; private set; }
+
+    /// <summary>
+    /// Gets if the file is a memory file.
+    /// </summary>
+    public bool IsMemoryFile => FilePath == string.Empty;
+
+    /// <summary>
     /// Gets the last committed read snapshot on the file system.
     /// </summary>
     /// <returns></returns>
     public ReadSnapshot Snapshot => m_fileStructure.Snapshot;
-
-    /// <summary>
-    /// Gets the size of the file.
-    /// </summary>
-    public long ArchiveSize => m_fileStructure.ArchiveSize;
 
     #endregion
 

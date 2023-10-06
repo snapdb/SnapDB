@@ -49,14 +49,14 @@ public abstract class IndividualEncodingBase<T>
     public abstract byte EndOfStreamSymbol { get; }
 
     /// <summary>
-    /// Gets a value indicating whether this encoding strategy uses the previous value for encoding.
-    /// </summary>
-    public abstract bool UsesPreviousValue { get; }
-
-    /// <summary>
     /// Gets the maximum amount of space required by the compression algorithm.
     /// </summary>
     public abstract int MaxCompressionSize { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether this encoding strategy uses the previous value for encoding.
+    /// </summary>
+    public abstract bool UsesPreviousValue { get; }
 
     #endregion
 

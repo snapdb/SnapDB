@@ -79,6 +79,24 @@ internal partial class PageReplacementAlgorithm
 
         #region [ Methods ]
 
+        protected override void Dispose(bool disposing)
+        {
+            if (!m_disposed)
+            {
+                CurrentPageIndex = -1; // Reset current page index.
+                m_disposed = true; // Mark object as disposed.
+
+                if (disposing)
+                    lock (m_parent.m_syncRoot) // Lock the parent's synchronization root for thread safety.
+                    {
+                        if (!m_parent.m_disposed)
+                            m_parent.m_arrayIndexLocks.Remove(this); // If parent is not already disposed, remove this instance from the parent's list of locks.
+                    }
+            }
+
+            base.Dispose(disposing);
+        }
+
         /// <summary>
         /// Releases a lock.
         /// </summary>
@@ -171,13 +189,12 @@ internal partial class PageReplacementAlgorithm
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/>.
+        /// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="System.Object"/>.
         /// </summary>
         /// <returns>
         /// <c>true</c> if the specified object  is equal to the current object; otherwise, <c>false</c>.
         /// </returns>
         /// <param name="obj">The object to compare with the current object.</param>
-        /// <filterpriority>2</filterpriority>
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj);
@@ -187,30 +204,11 @@ internal partial class PageReplacementAlgorithm
         /// Serves as a hash function for a particular type.
         /// </summary>
         /// <returns>
-        /// A hash code for the current <see cref="T:System.Object"/>.
+        /// A hash code for the current <see cref="System.Object"/>.
         /// </returns>
-        /// <filterpriority>2</filterpriority>
         public override int GetHashCode()
         {
             return m_hashCode;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (!m_disposed)
-            {
-                CurrentPageIndex = -1; // Reset current page index.
-                m_disposed = true; // Mark object as disposed.
-
-                if (disposing)
-                    lock (m_parent.m_syncRoot) // Lock the parent's synchronization root for thread safety.
-                    {
-                        if (!m_parent.m_disposed)
-                            m_parent.m_arrayIndexLocks.Remove(this); // If parent is not already disposed, remove this instance from the parent's list of locks.
-                    }
-            }
-
-            base.Dispose(disposing);
         }
 
         /// <summary>
