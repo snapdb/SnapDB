@@ -81,13 +81,12 @@ public class SubFileName : IComparable<SubFileName>, IEquatable<SubFileName>
     }
 
     /// <summary>
-    /// Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/>.
+    /// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="System.Object"/>.
     /// </summary>
     /// <returns>
     /// <c>true</c> if the specified object  is equal to the current object; otherwise, <c>false</c>.
     /// </returns>
     /// <param name="obj">The object to compare with the current object.</param>
-    /// <filterpriority>2</filterpriority>
     public override bool Equals(object? obj)
     {
         if (obj is null)
@@ -100,9 +99,8 @@ public class SubFileName : IComparable<SubFileName>, IEquatable<SubFileName>
     /// Serves as a hash function for a particular type.
     /// </summary>
     /// <returns>
-    /// A hash code for the current <see cref="T:System.Object"/>.
+    /// A hash code for the current <see cref="System.Object"/>.
     /// </returns>
-    /// <filterpriority>2</filterpriority>
     public override int GetHashCode()
     {
         // Since using SHA1 to compute the name. Taking a single field is good enough.
@@ -144,6 +142,38 @@ public class SubFileName : IComparable<SubFileName>, IEquatable<SubFileName>
     public bool Equals(SubFileName? other)
     {
         return this == other;
+    }
+
+    #endregion
+
+    #region [ Operators ]
+
+    /// <summary>
+    /// Compares the equality of the two file names.
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns><c>true</c>if they are equal, <c>false</c> if they are not.</returns>
+    public static bool operator ==(SubFileName? a, SubFileName? b)
+    {
+        if (ReferenceEquals(a, b))
+            return true;
+
+        if (a is null || b is null)
+            return false;
+
+        return a.RawValue1 == b.RawValue1 && a.RawValue2 == b.RawValue2 && a.RawValue3 == b.RawValue3;
+    }
+
+    /// <summary>
+    /// Compares the two files if they are not equal.
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns>The two files.</returns>
+    public static bool operator !=(SubFileName? a, SubFileName? b)
+    {
+        return !(a == b);
     }
 
     #endregion
@@ -232,34 +262,6 @@ public class SubFileName : IComparable<SubFileName>, IEquatable<SubFileName>
         int value3 = reader.ReadInt32();
 
         return new SubFileName(value1, value2, value3);
-    }
-
-    /// <summary>
-    /// Compares the equality of the two file names.
-    /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns><c>true</c>if they are equal, <c>false</c> if they are not.</returns>
-    public static bool operator ==(SubFileName? a, SubFileName? b)
-    {
-        if (ReferenceEquals(a, b))
-            return true;
-
-        if (a is null || b is null)
-            return false;
-
-        return a.RawValue1 == b.RawValue1 && a.RawValue2 == b.RawValue2 && a.RawValue3 == b.RawValue3;
-    }
-
-    /// <summary>
-    /// Compares the two files if they are not equal.
-    /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns>The two files.</returns>
-    public static bool operator !=(SubFileName? a, SubFileName? b)
-    {
-        return !(a == b);
     }
 
     #endregion

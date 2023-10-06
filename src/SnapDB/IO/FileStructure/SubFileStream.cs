@@ -108,9 +108,9 @@ public sealed partial class SubFileStream : ISupportsBinaryStream
     #region [ Properties ]
 
     /// <summary>
-    /// The file used by the stream.
+    /// Determines if the file system has been disposed yet.
     /// </summary>
-    internal SubFileHeader? SubFile { get; }
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Gets if this file was opened in readonly mode.
@@ -125,11 +125,6 @@ public sealed partial class SubFileStream : ISupportsBinaryStream
             return m_isReadOnly;
         }
     }
-
-    /// <summary>
-    /// Determines if the file system has been disposed yet.
-    /// </summary>
-    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Gets the number of available simultaneous read/write sessions.
@@ -156,6 +151,11 @@ public sealed partial class SubFileStream : ISupportsBinaryStream
         }
     }
 
+    /// <summary>
+    /// The file used by the stream.
+    /// </summary>
+    internal SubFileHeader? SubFile { get; }
+
     #endregion
 
     #region [ Methods ]
@@ -163,7 +163,6 @@ public sealed partial class SubFileStream : ISupportsBinaryStream
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
-    /// <filterpriority>2</filterpriority>
     public void Dispose()
     {
         if (IsDisposed)

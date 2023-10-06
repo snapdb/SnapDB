@@ -52,11 +52,31 @@ public abstract class ArchiveListEditor : IDisposable
     }
 
     /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="ArchiveListEditor"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!m_disposed)
+            try
+            {
+                // This will be done regardless of whether the object is finalized or disposed.
+                if (disposing)
+                {
+                    // This will be done only when the object is disposed by calling Dispose().
+                }
+            }
+            finally
+            {
+                m_disposed = true; // Prevent duplicate dispose.
+            }
+    }
+
+    /// <summary>
     /// Renews the snapshot of the archive file. This will acquire the latest
     /// read transaction so all new snapshots will use this later version.
     /// </summary>
     /// <param name="archiveId">The unique identifier of the archive snapshot to renew.</param>
-
     public abstract void RenewArchiveSnapshot(Guid archiveId);
 
     /// <summary>
@@ -82,27 +102,6 @@ public abstract class ArchiveListEditor : IDisposable
     /// <param name="archiveId">file to remove and delete.</param>
     /// <returns>true if deleted, false otherwise</returns>
     public abstract bool TryRemoveAndDelete(Guid archiveId);
-
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="ArchiveListEditor"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!m_disposed)
-            try
-            {
-                // This will be done regardless of whether the object is finalized or disposed.
-                if (disposing)
-                {
-                    // This will be done only when the object is disposed by calling Dispose().
-                }
-            }
-            finally
-            {
-                m_disposed = true; // Prevent duplicate dispose.
-            }
-    }
 
     #endregion
 }

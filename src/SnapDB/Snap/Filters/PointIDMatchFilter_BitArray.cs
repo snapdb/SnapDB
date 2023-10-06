@@ -46,16 +46,6 @@ public class PointIdMatchFilterBitArray
     {
         #region [ Members ]
 
-        /// <summary>
-        /// Gets or sets the maximum value used in the bit array. Cannot be larger than <see cref="int.MaxValue" /> - 1.
-        /// </summary>
-        public ulong MaxValue { get; set; } = ulong.MaxValue;
-
-        /// <summary>
-        /// Gets or sets the minimum value used in the bit array.
-        /// </summary>
-        public ulong MinValue { get; set; } = ulong.MinValue;
-
         private readonly BitArray m_points;
 
         #endregion
@@ -121,9 +111,20 @@ public class PointIdMatchFilterBitArray
         /// </summary>
         public override Guid FilterType => PointIdMatchFilterDefinition.FilterGuid;
 
+        /// <summary>
+        /// Gets or sets the maximum value used in the bit array. Cannot be larger than <see cref="int.MaxValue"/> - 1.
+        /// </summary>
+        public ulong MaxValue { get; set; } = ulong.MaxValue;
+
+        /// <summary>
+        /// Gets or sets the minimum value used in the bit array.
+        /// </summary>
+        public ulong MinValue { get; set; } = ulong.MinValue;
+
         #endregion
 
         #region [ Methods ]
+
         /// <summary>
         /// Saves the filter data to the specified <see cref="BinaryStreamBase"/>.
         /// </summary>

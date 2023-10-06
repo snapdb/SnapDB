@@ -62,6 +62,30 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
     #region [ Properties ]
 
     /// <summary>
+    /// The desired number of bytes to leave on the disk after a rollover has completed.
+    /// Otherwise, pick a different directory or throw an out of disk space exception.
+    /// </summary>
+    /// <remarks>
+    /// Value must be between 100MB and 1TB.
+    /// </remarks>
+    public long DesiredRemainingSpace
+    {
+        get => m_desiredRemainingSpace;
+        set
+        {
+            TestForEditable();
+            if (value < 100 * 1024L * 1024L)
+                m_desiredRemainingSpace = 100 * 1024L * 1024L;
+
+            if (value > 1024 * 1024L * 1024L * 1024L)
+                m_desiredRemainingSpace = 1024 * 1024L * 1024L * 1024L;
+
+            else
+                m_desiredRemainingSpace = value;
+        }
+    }
+
+    /// <summary>
     /// Gets the method that the directory structure will follow when writing a new file.
     /// </summary>
     public ArchiveDirectoryMethod DirectoryMethod
@@ -71,6 +95,52 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
         {
             TestForEditable();
             m_directoryMethod = value;
+        }
+    }
+
+    /// <summary>
+    /// The encoding method that will be used to write files.
+    /// </summary>
+    public EncodingDefinition EncodingMethod
+    {
+        get => m_encodingMethod;
+        set
+        {
+            TestForEditable();
+
+            m_encodingMethod = value ?? throw new ArgumentNullException(nameof(value));
+        }
+    }
+
+
+    /// <summary>
+    /// The extension to name the file.
+    /// </summary>
+    public string FinalExtension
+    {
+        get => m_finalExtension;
+        set
+        {
+            TestForEditable();
+            m_finalExtension = PathHelpers.FormatExtension(value);
+        }
+    }
+
+    /// <summary>
+    /// The flags that will be added to any created archive files.
+    /// </summary>
+    public ImmutableList<Guid> Flags { get; private set; }
+
+    /// <summary>
+    /// The extension to name the file.
+    /// </summary>
+    public string PendingExtension
+    {
+        get => m_pendingExtension;
+        set
+        {
+            TestForEditable();
+            m_pendingExtension = PathHelpers.FormatExtension(value);
         }
     }
 
@@ -101,76 +171,6 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
     /// The list of all available paths to write files to.
     /// </summary>
     public ImmutableList<string> WritePath { get; private set; }
-
-    /// <summary>
-    /// The extension to name the file.
-    /// </summary>
-    public string PendingExtension
-    {
-        get => m_pendingExtension;
-        set
-        {
-            TestForEditable();
-            m_pendingExtension = PathHelpers.FormatExtension(value);
-        }
-    }
-
-
-    /// <summary>
-    /// The extension to name the file.
-    /// </summary>
-    public string FinalExtension
-    {
-        get => m_finalExtension;
-        set
-        {
-            TestForEditable();
-            m_finalExtension = PathHelpers.FormatExtension(value);
-        }
-    }
-
-    /// <summary>
-    /// The flags that will be added to any created archive files.
-    /// </summary>
-    public ImmutableList<Guid> Flags { get; private set; }
-
-    /// <summary>
-    /// The encoding method that will be used to write files.
-    /// </summary>
-    public EncodingDefinition EncodingMethod
-    {
-        get => m_encodingMethod;
-        set
-        {
-            TestForEditable();
-
-            m_encodingMethod = value ?? throw new ArgumentNullException(nameof(value));
-        }
-    }
-
-    /// <summary>
-    /// The desired number of bytes to leave on the disk after a rollover has completed.
-    /// Otherwise, pick a different directory or throw an out of disk space exception.
-    /// </summary>
-    /// <remarks>
-    /// Value must be between 100MB and 1TB.
-    /// </remarks>
-    public long DesiredRemainingSpace
-    {
-        get => m_desiredRemainingSpace;
-        set
-        {
-            TestForEditable();
-            if (value < 100 * 1024L * 1024L)
-                m_desiredRemainingSpace = 100 * 1024L * 1024L;
-
-            if (value > 1024 * 1024L * 1024L * 1024L)
-                m_desiredRemainingSpace = 1024 * 1024L * 1024L * 1024L;
-
-            else
-                m_desiredRemainingSpace = value;
-        }
-    }
 
     #endregion
 

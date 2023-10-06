@@ -134,6 +134,17 @@ public class Pbkdf2 : DeriveBytes
     #region [ Methods ]
 
     /// <summary>
+    /// When overridden in a derived class, releases the unmanaged resources used by the <see cref="DeriveBytes"/> class and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+            m_hash1 = null;
+        base.Dispose(disposing);
+    }
+
+    /// <summary>
     /// When overridden in a derived class, resets the state of the operation.
     /// </summary>
     public override void Reset()
@@ -163,18 +174,6 @@ public class Pbkdf2 : DeriveBytes
         }
 
         return results;
-    }
-
-
-    /// <summary>
-    /// When overridden in a derived class, releases the unmanaged resources used by the <see cref="T:System.Security.Cryptography.DeriveBytes"/> class and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-            m_hash1 = null;
-        base.Dispose(disposing);
     }
 
     private void Initialize(HMac hash, byte[] passwordBytes, byte[] salt, int iterations)

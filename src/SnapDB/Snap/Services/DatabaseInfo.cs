@@ -90,19 +90,19 @@ public class DatabaseInfo
     public string DatabaseName { get; }
 
     /// <summary>
+    /// Gets the type for the database key.
+    /// </summary>
+    public Type KeyType { get; private set; }
+
+    /// <summary>
     /// Gets the ID for the database key.
     /// </summary>
     public Guid KeyTypeId { get; }
 
     /// <summary>
-    /// Gets the ID for the database value.
+    /// Gets all of the supported streaming modes for the server.
     /// </summary>
-    public Guid ValueTypeId { get; }
-
-    /// <summary>
-    /// Gets the type for the database key.
-    /// </summary>
-    public Type KeyType { get; private set; }
+    public ReadOnlyCollection<EncodingDefinition> SupportedStreamingModes { get; }
 
     /// <summary>
     /// Gets the type for the database value.
@@ -110,9 +110,9 @@ public class DatabaseInfo
     public Type ValueType { get; private set; }
 
     /// <summary>
-    /// Gets all of the supported streaming modes for the server.
+    /// Gets the ID for the database value.
     /// </summary>
-    public ReadOnlyCollection<EncodingDefinition> SupportedStreamingModes { get; }
+    public Guid ValueTypeId { get; }
 
     #endregion
 

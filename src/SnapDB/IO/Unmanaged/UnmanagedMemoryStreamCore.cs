@@ -35,9 +35,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
 {
     #region [ Members ]
 
-    /// <summary>
-    /// This class was created to allow settings update to be atomic.
-    /// </summary>
+    // This class was created to allow settings update to be atomic.
     private class Settings
     {
         #region [ Members ]
@@ -49,7 +47,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
         private const int ShiftBits = 6;
 
         // Array to store IntPtr pointers for memory management.
-        private nint[][] m_pagePointer;
+        private nint[]?[] m_pagePointer;
 
         #endregion
 
@@ -69,14 +67,14 @@ public class UnmanagedMemoryStreamCore : IDisposable
         #region [ Properties ]
 
         /// <summary>
-        /// Gets the total number of pages stored in the memory manager.
-        /// </summary>
-        public int PageCount { get; private set; }
-
-        /// <summary>
         /// Determines if adding a new page requires cloning the array to increase capacity.
         /// </summary>
         public bool AddingRequiresClone => m_pagePointer.Length * ElementsPerRow == PageCount;
+
+        /// <summary>
+        /// Gets the total number of pages stored in the memory manager.
+        /// </summary>
+        public int PageCount { get; private set; }
 
         #endregion
 
@@ -89,7 +87,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
         /// <returns>The IntPtr pointer at the specified page index.</returns>
         public nint GetPointer(int page)
         {
-            return m_pagePointer[page >> ShiftBits][page & Mask];
+            return m_pagePointer[page >> ShiftBits]![page & Mask];
         }
 
         /// <summary>
@@ -99,10 +97,12 @@ public class UnmanagedMemoryStreamCore : IDisposable
         public void AddNewPage(nint pagePointer)
         {
             EnsureCapacity();
+            
             int index = PageCount;
             int bigIndex = index >> ShiftBits;
             int smallIndex = index & Mask;
-            m_pagePointer[bigIndex][smallIndex] = pagePointer;
+            m_pagePointer[bigIndex]![smallIndex] = pagePointer;
+     
             Thread.MemoryBarrier(); // Incrementing the page count must occur after the data is correct.
             PageCount++;
         }
@@ -123,53 +123,39 @@ public class UnmanagedMemoryStreamCore : IDisposable
         {
             if (AddingRequiresClone)
             {
-                nint[][] oldPointer = m_pagePointer;
+                nint[]?[] oldPointer = m_pagePointer;
 
                 m_pagePointer = new nint[m_pagePointer.Length * 2][];
                 oldPointer.CopyTo(m_pagePointer, 0);
             }
 
             int bigIndex = PageCount >> ShiftBits;
-            if (m_pagePointer[bigIndex] is null)
-                m_pagePointer[bigIndex] = new nint[ElementsPerRow];
+            m_pagePointer[bigIndex] ??= new nint[ElementsPerRow];
         }
 
         #endregion
     }
 
-    /// <summary>
-    /// The first position of this stream. This may be different from <see cref="m_firstValidPosition"/>
-    /// due to alignment requirements.
-    /// </summary>
+    // The first position of this stream. This may be different from <see cref="m_firstValidPosition"/>
+    // due to alignment requirements.
     private long m_firstAddressablePosition;
 
-    /// <summary>
-    /// The first position that can be accessed by users of this stream.
-    /// </summary>
+    // The first position that can be accessed by users of this stream.
     private long m_firstValidPosition;
 
     private readonly long m_invertMask;
 
     private List<Memory> m_memoryBlocks;
 
-    /// <summary>
-    /// The size of each page.
-    /// </summary>
+    // The size of each page.
     private readonly int m_pageSize;
 
     private volatile Settings m_settings;
 
-    /// <summary>
-    /// The number of bits in the page size.
-    /// </summary>
+    // The number of bits in the page size.
     private readonly int m_shiftLength;
 
     private readonly object m_syncRoot;
-
-    /// <summary>
-    /// Releases all the resources used by the memory file object.
-    /// </summary>
-    private bool m_disposed;
 
     #endregion
 
@@ -182,6 +168,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     {
         if (!BitMath.IsPowerOfTwo(allocationSize) || allocationSize < 4096 || allocationSize > 1024 * 1024)
             throw new ArgumentOutOfRangeException(nameof(allocationSize), "Must be a power of 2 between 4KB and 1MB");
+
         m_shiftLength = BitMath.CountBitsSet((uint)(allocationSize - 1));
         m_pageSize = allocationSize;
         m_invertMask = ~(allocationSize - 1);
@@ -197,7 +184,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// <summary>
     /// Gets if the stream has been disposed.
     /// </summary>
-    public bool IsDisposed => m_disposed;
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Gets the length of the current stream.
@@ -211,10 +198,34 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
-    /// <filterpriority>2</filterpriority>
     public void Dispose()
     {
         Dispose(true);
+    }
+
+    /// <summary>
+    /// Releases the unmanaged resources used by the memory file object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+    private void Dispose(bool disposing)
+    {
+        if (IsDisposed)
+            return;
+        
+        try
+        {
+            if (!disposing)
+                return;
+
+            foreach (Memory page in m_memoryBlocks)
+                page.Dispose();
+        }
+        finally
+        {
+            m_memoryBlocks = null!;
+            m_settings = null!;
+            IsDisposed = true;
+        }
     }
 
     /// <summary>
@@ -226,7 +237,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// <param name="validLength">The number of bytes that are valid after this position.</param>
     public void ReadBlock(long position, out nint pointer, out int validLength)
     {
-        if (m_disposed)
+        if (IsDisposed)
             throw new ObjectDisposedException("MemoryStream");
 
         if (position < m_firstValidPosition)
@@ -269,10 +280,13 @@ public class UnmanagedMemoryStreamCore : IDisposable
     {
         if (startPosition < 0)
             throw new ArgumentOutOfRangeException(nameof(startPosition), "Cannot be negative");
+
         if (alignment <= 0)
             throw new ArgumentOutOfRangeException(nameof(alignment), "Must be a positive factor of the buffer pool's page size.");
+
         if (alignment > m_pageSize)
             throw new ArgumentOutOfRangeException(nameof(alignment), "Cannot be greater than the buffer pool's page size.");
+
         if (m_pageSize % alignment != 0)
             throw new ArgumentException("Must be an even factor of the buffer pool's page size", nameof(alignment));
 
@@ -285,41 +299,22 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// </summary>
     public void GetBlock(BlockArguments args)
     {
-        if (m_disposed)
+        if (IsDisposed)
             throw new ObjectDisposedException("MemoryStream");
+
         if (args.Position < m_firstValidPosition)
-            throw new ArgumentOutOfRangeException("position", "position is before the beginning of the stream");
+            throw new ArgumentOutOfRangeException(nameof(args), "position is before the beginning of the stream");
 
         args.Length = m_pageSize;
         args.FirstPosition = ((args.Position - m_firstAddressablePosition) & m_invertMask) + m_firstAddressablePosition;
         args.FirstPointer = GetPage(args.Position - m_firstAddressablePosition);
 
-        if (args.FirstPosition < m_firstValidPosition)
-        {
-            args.FirstPointer += (int)(m_firstValidPosition - args.FirstPosition);
-            args.Length -= (int)(m_firstValidPosition - args.FirstPosition);
-            args.FirstPosition = m_firstValidPosition;
-        }
-    }
-
-    /// <summary>
-    /// Releases the unmanaged resources used by the memory file object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-    private void Dispose(bool disposing)
-    {
-        if (!m_disposed)
-            try
-            {
-                foreach (Memory page in m_memoryBlocks)
-                    page.Dispose();
-            }
-            finally
-            {
-                m_memoryBlocks = null;
-                m_settings = null;
-                m_disposed = true;
-            }
+        if (args.FirstPosition >= m_firstValidPosition)
+            return;
+        
+        args.FirstPointer += (int)(m_firstValidPosition - args.FirstPosition);
+        args.Length -= (int)(m_firstValidPosition - args.FirstPosition);
+        args.FirstPosition = m_firstValidPosition;
     }
 
     /// <summary>
@@ -380,11 +375,11 @@ public class UnmanagedMemoryStreamCore : IDisposable
                 settings.AddNewPage(pagePointer);
             }
 
-            if (cloned)
-            {
-                Thread.MemoryBarrier(); // Make sure that all of the settings are saved before assigning.
-                m_settings = settings;
-            }
+            if (!cloned)
+                return;
+            
+            Thread.MemoryBarrier(); // Make sure that all of the settings are saved before assigning.
+            m_settings = settings;
         }
     }
 

@@ -72,11 +72,6 @@ public partial class SnapServerDatabase<TKey, TValue>
         #region [ Properties ]
 
         /// <summary>
-        /// Gets if has been disposed.
-        /// </summary>
-        public override bool IsDisposed => m_disposed;
-
-        /// <summary>
         /// Gets basic information about the current Database.
         /// </summary>
         public override DatabaseInfo Info
@@ -90,9 +85,32 @@ public partial class SnapServerDatabase<TKey, TValue>
             }
         }
 
+        /// <summary>
+        /// Gets if has been disposed.
+        /// </summary>
+        public override bool IsDisposed => m_disposed;
+
         #endregion
 
         #region [ Methods ]
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public override void Dispose()
+        {
+            if (m_disposed)
+                return;
+
+            lock (m_syncRoot)
+            {
+                foreach (SequentialReaderStream<TKey, TValue> stream in m_openStreams)
+                    stream.Dispose();
+
+                m_onDispose(this);
+                m_disposed = true;
+            }
+        }
 
         public override void AttachFilesOrPaths(IEnumerable<string> paths)
         {
@@ -140,25 +158,6 @@ public partial class SnapServerDatabase<TKey, TValue>
                 throw new ObjectDisposedException(GetType().FullName);
 
             m_server.HardCommit();
-        }
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        /// <filterpriority>2</filterpriority>
-        public override void Dispose()
-        {
-            if (m_disposed)
-                return;
-
-            lock (m_syncRoot)
-            {
-                foreach (SequentialReaderStream<TKey, TValue> stream in m_openStreams)
-                    stream.Dispose();
-
-                m_onDispose(this);
-                m_disposed = true;
-            }
         }
 
         /// <summary>

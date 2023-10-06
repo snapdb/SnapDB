@@ -65,6 +65,33 @@ public partial class SubFileStream
         #region [ Methods ]
 
         /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="IoSession"/> object and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (m_disposed)
+                return;
+
+            try
+            {
+                if (!disposing)
+                    return;
+
+                if (m_dataIoSession is null)
+                    return;
+
+                m_dataIoSession.Dispose();
+            }
+            finally
+            {
+                m_dataIoSession = null!;
+                m_disposed = true; // Prevent duplicate dispose.
+                base.Dispose(disposing); // Call base class Dispose().
+            }
+        }
+
+        /// <summary>
         /// Sets the current usage of the <see cref="BinaryStreamIoSessionBase"/> to <c>null</c>.
         /// </summary>
         public override void Clear()
@@ -112,33 +139,6 @@ public partial class SubFileStream
             m_dataIoSession.Read(physicalBlockIndex, BlockType.DataBlock, indexPosition);
             args.FirstPointer = (nint)m_dataIoSession.Pointer;
             args.SupportsWriting = false;
-        }
-
-        /// <summary>
-        /// Releases the unmanaged resources used by the <see cref="IoSession"/> object and optionally releases the managed resources.
-        /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (m_disposed)
-                return;
-
-            try
-            {
-                if (!disposing)
-                    return;
-
-                if (m_dataIoSession is null)
-                    return;
-
-                m_dataIoSession.Dispose();
-            }
-            finally
-            {
-                m_dataIoSession = null!;
-                m_disposed = true; // Prevent duplicate dispose.
-                base.Dispose(disposing); // Call base class Dispose().
-            }
         }
 
         #endregion

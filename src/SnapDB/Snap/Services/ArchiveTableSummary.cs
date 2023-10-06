@@ -56,14 +56,14 @@ public class ArchiveTableSummary<TKey, TValue> where TKey : SnapTypeBase<TKey>, 
     #region [ Properties ]
 
     /// <summary>
+    /// Gets the most recent <see cref="SortedTreeTableSnapshotInfo{TKey,TValue}"/> of this class when it was created.
+    /// </summary>
+    public SortedTreeTableSnapshotInfo<TKey, TValue> ActiveSnapshotInfo { get; }
+
+    /// <summary>
     /// Gets the ID for this file.
     /// </summary>
     public Guid FileId { get; }
-
-    /// <summary>
-    /// Gets the <see cref="SortedTreeTable{TKey, TValue}"/> that this class represents.
-    /// </summary>
-    public SortedTreeTable<TKey, TValue> SortedTreeTable { get; }
 
     /// <summary>
     /// Gets the first key contained in this partition.
@@ -71,19 +71,19 @@ public class ArchiveTableSummary<TKey, TValue> where TKey : SnapTypeBase<TKey>, 
     public TKey FirstKey { get; }
 
     /// <summary>
-    /// Gets the last key contained in this partition.
-    /// </summary>
-    public TKey LastKey { get; }
-
-    /// <summary>
     /// Gets if this table is empty.
     /// </summary>
     public bool IsEmpty => FirstKey.IsGreaterThan(LastKey);
 
     /// <summary>
-    /// Gets the most recent <see cref="SortedTreeTableSnapshotInfo{TKey,TValue}"/> of this class when it was created.
+    /// Gets the last key contained in this partition.
     /// </summary>
-    public SortedTreeTableSnapshotInfo<TKey, TValue> ActiveSnapshotInfo { get; }
+    public TKey LastKey { get; }
+
+    /// <summary>
+    /// Gets the <see cref="SortedTreeTable{TKey, TValue}"/> that this class represents.
+    /// </summary>
+    public SortedTreeTable<TKey, TValue> SortedTreeTable { get; }
 
     #endregion
 

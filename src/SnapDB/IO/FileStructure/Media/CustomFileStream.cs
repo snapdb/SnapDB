@@ -120,16 +120,6 @@ internal sealed class CustomFileStream : IDisposable
     #region [ Properties ]
 
     /// <summary>
-    /// Gets if the file was opened read-only.
-    /// </summary>
-    public bool IsReadOnly { get; private set; }
-
-    /// <summary>
-    /// Gets if the file was opened allowing shared read access.
-    /// </summary>
-    public bool IsSharingEnabled { get; private set; }
-
-    /// <summary>
     /// Gets the name of the file.
     /// </summary>
     public string FileName { get; private set; }
@@ -143,6 +133,16 @@ internal sealed class CustomFileStream : IDisposable
     /// Gets the number of bytes in each I/O operation.
     /// </summary>
     public int IoSize { get; }
+
+    /// <summary>
+    /// Gets if the file was opened read-only.
+    /// </summary>
+    public bool IsReadOnly { get; private set; }
+
+    /// <summary>
+    /// Gets if the file was opened allowing shared read access.
+    /// </summary>
+    public bool IsSharingEnabled { get; private set; }
 
     /// <summary>
     /// Gets the length of the stream.

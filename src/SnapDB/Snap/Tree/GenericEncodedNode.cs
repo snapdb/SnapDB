@@ -90,15 +90,6 @@ public unsafe class GenericEncodedNode<TKey, TValue> : SortedTreeNodeBase<TKey, 
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the maximum overhead expected when combining two nodes of this type.
-    /// </summary>
-    /// <remarks>
-    /// The maximum overhead includes the storage required for the data in both nodes, plus one additional byte.
-    /// This property is used in node combining operations to estimate the maximum storage needed for the resulting node.
-    /// </remarks>
-    protected override int MaxOverheadWithCombineNodes => MaximumStorageSize * 2 + 1;
-
-    /// <summary>
     /// Gets the maximum storage size, in bytes, required for encoding a single key-value pair.
     /// </summary>
     /// <remarks>
@@ -107,6 +98,15 @@ public unsafe class GenericEncodedNode<TKey, TValue> : SortedTreeNodeBase<TKey, 
     /// can occupy in the data store, which can be useful for calculating storage requirements.
     /// </remarks>
     protected int MaximumStorageSize => m_encoding.MaxCompressionSize;
+
+    /// <summary>
+    /// Gets the maximum overhead expected when combining two nodes of this type.
+    /// </summary>
+    /// <remarks>
+    /// The maximum overhead includes the storage required for the data in both nodes, plus one additional byte.
+    /// This property is used in node combining operations to estimate the maximum storage needed for the resulting node.
+    /// </remarks>
+    protected override int MaxOverheadWithCombineNodes => MaximumStorageSize * 2 + 1;
 
     #endregion
 

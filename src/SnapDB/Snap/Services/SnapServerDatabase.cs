@@ -97,25 +97,6 @@ public partial class SnapServerDatabase<TKey, TValue> : SnapServerDatabaseBase w
     #region [ Methods ]
 
     /// <summary>
-    /// Gets status information for the SortedTreeEngine
-    /// </summary>
-    /// <param name="status">Target status output <see cref="StringBuilder"/>.</param>
-    /// <param name="maxFileListing">Maximum file listing.</param>
-    public override void GetFullStatus(StringBuilder status, int maxFileListing = -1)
-    {
-        m_archiveList.GetFullStatus(status, maxFileListing);
-    }
-
-    /// <summary>
-    /// Creates a <see cref="ClientDatabase"/>
-    /// </summary>
-    /// <returns></returns>
-    public override ClientDatabaseBase CreateClientDatabase(SnapClient client, Action<ClientDatabaseBase> onDispose)
-    {
-        return new ClientDatabase(this, client, onDispose);
-    }
-
-    /// <summary>
     /// Releases the unmanaged resources used by the <see cref="SnapServerDatabase{TKey,TValue}"/> object and optionally releases the managed resources.
     /// </summary>
     /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
@@ -141,6 +122,25 @@ public partial class SnapServerDatabase<TKey, TValue> : SnapServerDatabaseBase w
             m_disposed = true; // Prevent duplicate dispose.
             base.Dispose(disposing); // Call base class Dispose().
         }
+    }
+
+    /// <summary>
+    /// Gets status information for the SortedTreeEngine
+    /// </summary>
+    /// <param name="status">Target status output <see cref="StringBuilder"/>.</param>
+    /// <param name="maxFileListing">Maximum file listing.</param>
+    public override void GetFullStatus(StringBuilder status, int maxFileListing = -1)
+    {
+        m_archiveList.GetFullStatus(status, maxFileListing);
+    }
+
+    /// <summary>
+    /// Creates a <see cref="ClientDatabase"/>
+    /// </summary>
+    /// <returns></returns>
+    public override ClientDatabaseBase CreateClientDatabase(SnapClient client, Action<ClientDatabaseBase> onDispose)
+    {
+        return new ClientDatabase(this, client, onDispose);
     }
 
     /// <summary>

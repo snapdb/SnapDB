@@ -70,17 +70,6 @@ internal class DiskMedium : IDisposable
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the current number of bytes used by the file system.
-    /// This is only intended to be an approximate figure.
-    /// </summary>
-    public long Length => m_disk.Length;
-
-    /// <summary>
-    /// Gets the most recent committed header from the archive file.
-    /// </summary>
-    public FileHeaderBlock Header { get; private set; }
-
-    /// <summary>
     /// Gets the number of bytes in the file structure block size.
     /// </summary>
     /// <remarks>
@@ -90,6 +79,17 @@ internal class DiskMedium : IDisposable
 
     public string FileName => m_disk.FileName;
 
+    /// <summary>
+    /// Gets the most recent committed header from the archive file.
+    /// </summary>
+    public FileHeaderBlock Header { get; private set; }
+
+    /// <summary>
+    /// Gets the current number of bytes used by the file system.
+    /// This is only intended to be an approximate figure.
+    /// </summary>
+    public long Length => m_disk.Length;
+
     #endregion
 
     #region [ Methods ]
@@ -97,7 +97,6 @@ internal class DiskMedium : IDisposable
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
-    /// <filterpriority>2</filterpriority>
     public void Dispose()
     {
         if (m_disposed)

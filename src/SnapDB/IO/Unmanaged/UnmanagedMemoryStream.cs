@@ -31,15 +31,6 @@ namespace SnapDB.IO.Unmanaged;
 /// </summary>
 public partial class UnmanagedMemoryStream : UnmanagedMemoryStreamCore, ISupportsBinaryStream
 {
-    #region [ Members ]
-
-    /// <summary>
-    /// Releases all the resources used by the <see cref="MemoryPoolStream"/> object.
-    /// </summary>
-    private bool m_disposed;
-
-    #endregion
-
     #region [ Constructors ]
 
     /// <summary>

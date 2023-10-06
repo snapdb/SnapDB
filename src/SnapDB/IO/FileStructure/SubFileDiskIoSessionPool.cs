@@ -88,13 +88,13 @@ internal class SubFileDiskIoSessionPool : IDisposable
 
     public FileHeaderBlock Header { get; private set; }
 
-    // Contains the last block that is considered as "read only". This is the same as the end of the committed space
-    // in the transactional file system.
-    public uint LastReadonlyBlock { get; private set; }
+    public bool IsDisposed { get; private set; }
 
     public bool IsReadOnly { get; }
 
-    public bool IsDisposed { get; private set; }
+    // Contains the last block that is considered as "read only". This is the same as the end of the committed space
+    // in the transactional file system.
+    public uint LastReadonlyBlock { get; private set; }
 
     #endregion
 
@@ -103,7 +103,6 @@ internal class SubFileDiskIoSessionPool : IDisposable
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
-    /// <filterpriority>2</filterpriority>
     public void Dispose()
     {
         GC.SuppressFinalize(this);

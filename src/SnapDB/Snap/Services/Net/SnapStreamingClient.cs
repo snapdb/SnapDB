@@ -78,6 +78,45 @@ public class SnapStreamingClient : SnapClient
     #region [ Methods ]
 
     /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="SnapNetworkClient"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (m_disposed)
+            return;
+
+        try
+        {
+            if (!disposing)
+                return;
+
+            m_sortedTreeEngine?.Dispose();
+
+            m_sortedTreeEngine = null;
+
+            try
+            {
+                m_stream.Write((byte)ServerCommand.Disconnect);
+                m_stream.Flush();
+            }
+            catch (Exception ex)
+            {
+                Logger.SwallowException(ex);
+            }
+
+            m_rawStream?.Dispose();
+
+            m_rawStream = null;
+        }
+        finally
+        {
+            m_disposed = true; // Prevent duplicate dispose.
+            base.Dispose(disposing); // Call base class Dispose().
+        }
+    }
+
+    /// <summary>
     /// Gets the database that matches <paramref name="databaseName"/>.
     /// </summary>
     /// <param name="databaseName">The case insensitive name of the database.</param>
@@ -172,45 +211,6 @@ public class SnapStreamingClient : SnapClient
         }
 
         RefreshDatabaseInfo();
-    }
-
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="SnapNetworkClient"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (m_disposed)
-            return;
-
-        try
-        {
-            if (!disposing)
-                return;
-
-            m_sortedTreeEngine?.Dispose();
-
-            m_sortedTreeEngine = null;
-
-            try
-            {
-                m_stream.Write((byte)ServerCommand.Disconnect);
-                m_stream.Flush();
-            }
-            catch (Exception ex)
-            {
-                Logger.SwallowException(ex);
-            }
-
-            m_rawStream?.Dispose();
-
-            m_rawStream = null;
-        }
-        finally
-        {
-            m_disposed = true; // Prevent duplicate dispose.
-            base.Dispose(disposing); // Call base class Dispose().
-        }
     }
 
     private void RefreshDatabaseInfo()

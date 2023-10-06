@@ -77,7 +77,6 @@ public class StreamingClientDatabase<TKey, TValue> : ClientDatabaseBase<TKey, TV
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        /// <filterpriority>2</filterpriority>
         public void Dispose()
         {
             if (m_disposed)
@@ -129,6 +128,14 @@ public class StreamingClientDatabase<TKey, TValue> : ClientDatabaseBase<TKey, TV
 
         #region [ Methods ]
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                Cancel();
+
+            base.Dispose(disposing);
+        }
+
         /// <summary>
         /// Cancels the read operation.
         /// </summary>
@@ -163,14 +170,6 @@ public class StreamingClientDatabase<TKey, TValue> : ClientDatabaseBase<TKey, TV
 
             Complete();
             return false;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-                Cancel();
-
-            base.Dispose(disposing);
         }
 
         private void Complete()
@@ -237,18 +236,48 @@ public class StreamingClientDatabase<TKey, TValue> : ClientDatabaseBase<TKey, TV
     #region [ Properties ]
 
     /// <summary>
-    /// Gets if has been disposed.
-    /// </summary>
-    public override bool IsDisposed => m_disposed;
-
-    /// <summary>
     /// Gets basic information about the current Database.
     /// </summary>
     public override DatabaseInfo Info { get; }
 
+    /// <summary>
+    /// Gets if has been disposed.
+    /// </summary>
+    public override bool IsDisposed => m_disposed;
+
     #endregion
 
     #region [ Methods ]
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// </summary>
+    public override void Dispose()
+    {
+        if (m_disposed)
+            return;
+
+        m_disposed = true;
+
+        m_reader?.Dispose();
+
+        m_stream.Write((byte)ServerCommand.DisconnectDatabase);
+        m_stream.Flush();
+        m_onDispose();
+
+        ServerResponse command = (ServerResponse)m_stream.ReadUInt8();
+
+        switch (command)
+        {
+            case ServerResponse.UnhandledException:
+                string exception = m_stream.ReadString();
+                throw new Exception("Server UnhandledException: \n" + exception);
+            case ServerResponse.DatabaseDisconnected:
+                break;
+            default:
+                throw new Exception("Unknown server response: " + command);
+        }
+    }
 
     /// <summary>
     /// Defines the encoding method to use for the server.
@@ -453,37 +482,6 @@ public class StreamingClientDatabase<TKey, TValue> : ClientDatabaseBase<TKey, TV
     public override void HardCommit()
     {
         //throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-    /// </summary>
-    /// <filterpriority>2</filterpriority>
-    public override void Dispose()
-    {
-        if (m_disposed)
-            return;
-
-        m_disposed = true;
-
-        m_reader?.Dispose();
-
-        m_stream.Write((byte)ServerCommand.DisconnectDatabase);
-        m_stream.Flush();
-        m_onDispose();
-
-        ServerResponse command = (ServerResponse)m_stream.ReadUInt8();
-
-        switch (command)
-        {
-            case ServerResponse.UnhandledException:
-                string exception = m_stream.ReadString();
-                throw new Exception("Server UnhandledException: \n" + exception);
-            case ServerResponse.DatabaseDisconnected:
-                break;
-            default:
-                throw new Exception("Unknown server response: " + command);
-        }
     }
 
     #endregion

@@ -39,33 +39,6 @@ public abstract class PairEncodingBase<TKey, TValue>
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the encoding method that this class implements.
-    /// </summary>
-    public abstract EncodingDefinition EncodingMethod { get; }
-
-    /// <summary>
-    /// Gets if the previous key will need to be presented to the encoding algorithms to
-    /// property encode the next sample. Returning <c>false</c> will cause nulls to be passed
-    /// in a parameters to the encoding.
-    /// </summary>
-    public abstract bool UsesPreviousKey { get; }
-
-    /// <summary>
-    /// Gets if the previous value will need to be presented to the encoding algorithms to
-    /// property encode the next sample. Returning <c>false</c> will cause nulls to be passed
-    /// in a parameters to the encoding.
-    /// </summary>
-    public abstract bool UsesPreviousValue { get; }
-
-    /// <summary>
-    /// Gets the maximum amount of space that is required for the compression algorithm. This
-    /// prevents lower levels from having overflows on the underlying streams. It is critical
-    /// that this value be correct. Error on the side of too large of a value as a value
-    /// too small will corrupt data and be next to impossible to track down the point of corruption
-    /// </summary>
-    public abstract int MaxCompressionSize { get; }
-
-    /// <summary>
     /// Gets if the stream supports a symbol that
     /// represents that the end of the stream has been encountered.
     /// </summary>
@@ -82,10 +55,37 @@ public abstract class PairEncodingBase<TKey, TValue>
     public abstract bool ContainsEndOfStreamSymbol { get; }
 
     /// <summary>
+    /// Gets the encoding method that this class implements.
+    /// </summary>
+    public abstract EncodingDefinition EncodingMethod { get; }
+
+    /// <summary>
     /// The byte code to use as the end of stream symbol.
     /// May throw NotSupportedException if <see cref="ContainsEndOfStreamSymbol"/> is <c>false</c>.
     /// </summary>
     public abstract byte EndOfStreamSymbol { get; }
+
+    /// <summary>
+    /// Gets the maximum amount of space that is required for the compression algorithm. This
+    /// prevents lower levels from having overflows on the underlying streams. It is critical
+    /// that this value be correct. Error on the side of too large of a value as a value
+    /// too small will corrupt data and be next to impossible to track down the point of corruption
+    /// </summary>
+    public abstract int MaxCompressionSize { get; }
+
+    /// <summary>
+    /// Gets if the previous key will need to be presented to the encoding algorithms to
+    /// property encode the next sample. Returning <c>false</c> will cause nulls to be passed
+    /// in a parameters to the encoding.
+    /// </summary>
+    public abstract bool UsesPreviousKey { get; }
+
+    /// <summary>
+    /// Gets if the previous value will need to be presented to the encoding algorithms to
+    /// property encode the next sample. Returning <c>false</c> will cause nulls to be passed
+    /// in a parameters to the encoding.
+    /// </summary>
+    public abstract bool UsesPreviousValue { get; }
 
     #endregion
 

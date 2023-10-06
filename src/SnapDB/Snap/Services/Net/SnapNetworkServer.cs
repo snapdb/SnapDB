@@ -59,18 +59,6 @@ internal class SnapNetworkServer : SnapStreamingServer
 
     #region [ Methods ]
 
-    public void GetFullStatus(StringBuilder status)
-    {
-        try
-        {
-            status.AppendLine(m_client.Client.RemoteEndPoint.ToString());
-        }
-        catch (Exception)
-        {
-            status.AppendLine("Error getting remote endpoint");
-        }
-    }
-
     /// <summary>
     /// Releases the unmanaged resources used by the <see cref="SnapNetworkServer"/> object and optionally releases the managed resources.
     /// </summary>
@@ -93,6 +81,18 @@ internal class SnapNetworkServer : SnapStreamingServer
         finally
         {
             m_disposed = true; // Prevent duplicate dispose.
+        }
+    }
+
+    public void GetFullStatus(StringBuilder status)
+    {
+        try
+        {
+            status.AppendLine(m_client.Client.RemoteEndPoint.ToString());
+        }
+        catch (Exception)
+        {
+            status.AppendLine("Error getting remote endpoint");
         }
     }
 

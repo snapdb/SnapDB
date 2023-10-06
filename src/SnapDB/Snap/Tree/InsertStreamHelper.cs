@@ -77,11 +77,11 @@ public class InsertStreamHelper<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
 
     public TKey Key => IsKvp1 ? Key1 : Key2;
 
-    public TValue Value => IsKvp1 ? Value1 : Value2;
-
     public TKey PrevKey => IsKvp1 ? Key2 : Key1;
 
     public TValue PrevValue => IsKvp1 ? Value2 : Value1;
+
+    public TValue Value => IsKvp1 ? Value1 : Value2;
 
     #endregion
 

@@ -152,11 +152,6 @@ public unsafe class NodeHeader<TKey> where TKey : SnapTypeBase<TKey>, new()
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the byte offset of the upper bounds key.
-    /// </summary>
-    private int OffsetOfUpperBounds => OffsetOfLowerBounds + KeySize;
-
-    /// <summary>
     /// Gets the byte offset of the header size.
     /// </summary>
     public int HeaderSize => OffsetOfLowerBounds + KeySize * 2;
@@ -167,6 +162,11 @@ public unsafe class NodeHeader<TKey> where TKey : SnapTypeBase<TKey>, new()
     /// <param name="level">The level of the node within the B-tree structure.</param>
     /// <param name="blockSize">The size, in bytes, of the node block.</param>
     public ushort RemainingBytes => (ushort)(BlockSize - ValidBytes);
+
+    /// <summary>
+    /// Gets the byte offset of the upper bounds key.
+    /// </summary>
+    private int OffsetOfUpperBounds => OffsetOfLowerBounds + KeySize;
 
     #endregion
 

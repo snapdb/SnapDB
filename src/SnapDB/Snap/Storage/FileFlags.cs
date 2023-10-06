@@ -112,31 +112,20 @@ public static class FileFlags
     /// <returns></returns>
     public static Guid GetStage(int stageNumber)
     {
-        switch (stageNumber)
+        return stageNumber switch
         {
-            case 0:
-                return Stage0;
-            case 1:
-                return Stage1;
-            case 2:
-                return Stage2;
-            case 3:
-                return Stage3;
-            case 4:
-                return Stage4;
-            case 5:
-                return Stage5;
-            case 6:
-                return Stage6;
-            case 7:
-                return Stage7;
-            case 8:
-                return Stage8;
-            case 9:
-                return Stage9;
-        }
-
-        throw new ArgumentOutOfRangeException(nameof(stageNumber), "Must be between 0 and 9");
+            0 => Stage0,
+            1 => Stage1,
+            2 => Stage2,
+            3 => Stage3,
+            4 => Stage4,
+            5 => Stage5,
+            6 => Stage6,
+            7 => Stage7,
+            8 => Stage8,
+            9 => Stage9,
+            _ => throw new ArgumentOutOfRangeException(nameof(stageNumber), "Must be between 0 and 9")
+        };
     }
 
     #endregion

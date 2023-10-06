@@ -83,6 +83,30 @@ public class SnapStreamingServer : DisposableLoggingClassBase
     #region [ Methods ]
 
     /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="SnapNetworkServer"/> object and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (m_disposed)
+            return;
+
+        try
+        {
+            if (disposing)
+            {
+                m_host?.Dispose();
+                m_host = null;
+            }
+        }
+        finally
+        {
+            m_disposed = true; // Prevent duplicate dispose.
+            base.Dispose(disposing); // Call base class Dispose().
+        }
+    }
+
+    /// <summary>
     /// This function will verify the connection, create all necessary streams, set timeouts, and catch any exceptions and terminate the connection
     /// </summary>
     /// <remarks></remarks>
@@ -144,31 +168,6 @@ public class SnapStreamingServer : DisposableLoggingClassBase
         m_rawStream = stream;
         m_authentication = authentication;
         m_server = server;
-    }
-
-
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="SnapNetworkServer"/> object and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (m_disposed)
-            return;
-
-        try
-        {
-            if (disposing)
-            {
-                m_host?.Dispose();
-                m_host = null;
-            }
-        }
-        finally
-        {
-            m_disposed = true; // Prevent duplicate dispose.
-            base.Dispose(disposing); // Call base class Dispose().
-        }
     }
 
     /// <summary>

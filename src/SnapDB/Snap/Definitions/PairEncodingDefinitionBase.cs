@@ -41,14 +41,14 @@ public abstract class PairEncodingDefinitionBase
     public abstract Type KeyTypeIfNotGeneric { get; }
 
     /// <summary>
-    /// The value type supported by the encoded method. Can be <c>null</c> if the encoding is not type specific.
-    /// </summary>
-    public abstract Type ValueTypeIfNotGeneric { get; }
-
-    /// <summary>
     /// The encoding method that defines this class.
     /// </summary>
     public abstract EncodingDefinition Method { get; }
+
+    /// <summary>
+    /// The value type supported by the encoded method. Can be <c>null</c> if the encoding is not type specific.
+    /// </summary>
+    public abstract Type ValueTypeIfNotGeneric { get; }
 
     #endregion
 

@@ -37,6 +37,16 @@ public abstract class SeekFilterBase<TKey>
     #region [ Properties ]
 
     /// <summary>
+    /// the end of the frame to search [Inclusive]
+    /// </summary>
+    public TKey EndOfFrame { get; protected set; }
+
+    /// <summary>
+    /// the end of the entire range to search [Inclusive]
+    /// </summary>
+    public TKey EndOfRange { get; protected set; }
+
+    /// <summary>
     /// The filter guid
     /// </summary>
     public abstract Guid FilterType { get; }
@@ -47,19 +57,9 @@ public abstract class SeekFilterBase<TKey>
     public TKey StartOfFrame { get; protected set; }
 
     /// <summary>
-    /// the end of the frame to search [Inclusive]
-    /// </summary>
-    public TKey EndOfFrame { get; protected set; }
-
-    /// <summary>
     /// the start of the entire range to search [Inclusive]
     /// </summary>
     public TKey StartOfRange { get; protected set; }
-
-    /// <summary>
-    /// the end of the entire range to search [Inclusive]
-    /// </summary>
-    public TKey EndOfRange { get; protected set; }
 
     #endregion
 

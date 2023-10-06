@@ -88,6 +88,20 @@ public sealed class SparseIndexWriter<TKey> : TreeStream<TKey, SnapUInt32> where
     #region [ Methods ]
 
     /// <summary>
+    /// Releases the resources used by the current instance of the class.
+    /// </summary>
+    /// <param name="disposing">A flag indicating whether to release both managed and unmanaged resources (<c>true</c>), or only unmanaged resources (<c>false</c>).</param>
+    /// <remarks>
+    /// This method is called by the <see cref="Dispose"/> method and the finalizer to release the resources used by the current instance of the class.
+    /// It disposes of the underlying stream.
+    /// </remarks>
+    protected override void Dispose(bool disposing)
+    {
+        m_stream.Dispose();
+        base.Dispose(disposing);
+    }
+
+    /// <summary>
     /// Adds the following node pointer to the sparse index.
     /// </summary>
     /// <param name="leftPointer">The pointer to the left element, Only used to prime the list.</param>
@@ -123,20 +137,6 @@ public sealed class SparseIndexWriter<TKey> : TreeStream<TKey, SnapUInt32> where
             throw new Exception("Duplicate call.");
         m_isReading = true;
         m_stream.Position = 0;
-    }
-
-    /// <summary>
-    /// Releases the resources used by the current instance of the class.
-    /// </summary>
-    /// <param name="disposing">A flag indicating whether to release both managed and unmanaged resources (<c>true</c>), or only unmanaged resources (<c>false</c>).</param>
-    /// <remarks>
-    /// This method is called by the <see cref="Dispose"/> method and the finalizer to release the resources used by the current instance of the class.
-    /// It disposes of the underlying stream.
-    /// </remarks>
-    protected override void Dispose(bool disposing)
-    {
-        m_stream.Dispose();
-        base.Dispose(disposing);
     }
 
     /// <summary>

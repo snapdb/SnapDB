@@ -25,6 +25,7 @@
 //******************************************************************************************************
 
 using System.Net.Sockets;
+using Gemstone.Diagnostics;
 using SnapDB.IO;
 using SnapDB.Threading;
 
@@ -37,7 +38,7 @@ public class NetworkBinaryStream : RemoteBinaryStream
 {
     #region [ Members ]
 
-    private Socket m_socket;
+    private Socket? m_socket;
 
     #endregion
 
@@ -65,20 +66,15 @@ public class NetworkBinaryStream : RemoteBinaryStream
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the underlying socket used for communication.
+    /// Gets the number of available bytes to read from the stream.
     /// </summary>
-    public Socket Socket => m_socket;
-
-    /// <summary>
-    /// Gets or sets the socket timeout in milliseconds.
-    /// </summary>
-    public int Timeout
+    public int AvailableReadBytes
     {
-        get => m_socket.ReceiveTimeout;
-        set
+        get
         {
-            m_socket.ReceiveTimeout = value;
-            m_socket.SendTimeout = value;
+            WorkerThreadSynchronization.PulseSafeToCallback();
+
+            return ReceiveBufferAvailable + m_socket?.Available ?? 0;
         }
     }
 
@@ -88,49 +84,29 @@ public class NetworkBinaryStream : RemoteBinaryStream
     public bool Connected => m_socket is not null && m_socket.Connected;
 
     /// <summary>
-    /// Gets the number of available bytes to read from the stream.
+    /// Gets the underlying socket used for communication.
     /// </summary>
-    public int AvailableReadBytes
-    {
-        get
-        {
-            WorkerThreadSynchronization.PulseSafeToCallback();
+    public Socket? Socket => m_socket;
 
-            return ReceiveBufferAvailable + m_socket.Available;
+    /// <summary>
+    /// Gets or sets the socket timeout in milliseconds.
+    /// </summary>
+    public int Timeout
+    {
+        get => m_socket?.ReceiveTimeout ?? 0;
+        set
+        {
+            if (m_socket is null)
+                return;
+
+            m_socket.ReceiveTimeout = value;
+            m_socket.SendTimeout = value;
         }
     }
 
     #endregion
 
     #region [ Methods ]
-
-    /// <summary>
-    /// Disconnects the socket.
-    /// </summary>
-    public void Disconnect()
-    {
-        Socket socket = Interlocked.Exchange(ref m_socket, null);
-        if (socket is not null)
-        {
-            try
-            {
-                socket.Shutdown(SocketShutdown.Both);
-            }
-            catch
-            {
-            }
-
-            try
-            {
-                socket.Close();
-            }
-            catch
-            {
-            }
-        }
-
-        WorkerThreadSynchronization.BeginSafeToCallbackRegion();
-    }
 
     /// <summary>
     /// Disposes of the <see cref="NetworkBinaryStream"/> instance, disconnecting the socket if necessary.
@@ -142,6 +118,37 @@ public class NetworkBinaryStream : RemoteBinaryStream
             Disconnect();
 
         base.Dispose(disposing);
+    }
+
+    /// <summary>
+    /// Disconnects the socket.
+    /// </summary>
+    public void Disconnect()
+    {
+        Socket? socket = Interlocked.Exchange(ref m_socket, null);
+
+        if (socket is not null)
+        {
+            try
+            {
+                socket.Shutdown(SocketShutdown.Both);
+            }
+            catch (Exception ex)
+            {
+                Logger.SwallowException(ex);
+            }
+
+            try
+            {
+                socket.Close();
+            }
+            catch (Exception ex)
+            {
+                Logger.SwallowException(ex);
+            }
+        }
+
+        WorkerThreadSynchronization.BeginSafeToCallbackRegion();
     }
 
     #endregion

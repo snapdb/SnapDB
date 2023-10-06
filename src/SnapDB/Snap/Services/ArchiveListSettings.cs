@@ -66,9 +66,9 @@ public class ArchiveListSettings : SettingsBase<ArchiveListSettings>
     #region [ Properties ]
 
     /// <summary>
-    /// The log settings to use for logging deletions.
+    /// A set of all file extensions that will need to be loaded from each path.
     /// </summary>
-    public ArchiveListLogSettings LogSettings { get; }
+    public IEnumerable<string> ImportExtensions => m_importExtensions;
 
     /// <summary>
     /// A set of all import paths to load upon initialization.
@@ -79,9 +79,9 @@ public class ArchiveListSettings : SettingsBase<ArchiveListSettings>
     public IEnumerable<string> ImportPaths => m_importPaths;
 
     /// <summary>
-    /// A set of all file extensions that will need to be loaded from each path.
+    /// The log settings to use for logging deletions.
     /// </summary>
-    public IEnumerable<string> ImportExtensions => m_importExtensions;
+    public ArchiveListLogSettings LogSettings { get; }
 
     #endregion
 

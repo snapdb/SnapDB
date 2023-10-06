@@ -56,16 +56,6 @@ public class BinaryStreamWrapper : BinaryStreamBase
     #region [ Properties ]
 
     /// <summary>
-    /// Gets a value indicating whether the underlying stream supports writing.
-    /// </summary>
-    public override bool CanWrite => m_stream.CanWrite;
-
-    /// <summary>
-    /// Gets the length (in bytes) of the underlying stream.
-    /// </summary>
-    public override long Length => m_stream.Length;
-
-    /// <summary>
     /// Gets a value indicating whether the underlying stream supports reading.
     /// </summary>
     public override bool CanRead => m_stream.CanRead;
@@ -74,6 +64,16 @@ public class BinaryStreamWrapper : BinaryStreamBase
     /// Gets a value indicating whether the underlying stream supports seeking.
     /// </summary>
     public override bool CanSeek => m_stream.CanSeek;
+
+    /// <summary>
+    /// Gets a value indicating whether the underlying stream supports writing.
+    /// </summary>
+    public override bool CanWrite => m_stream.CanWrite;
+
+    /// <summary>
+    /// Gets the length (in bytes) of the underlying stream.
+    /// </summary>
+    public override long Length => m_stream.Length;
 
     /// <summary>
     /// Gets or sets the current position for the stream.
@@ -91,8 +91,19 @@ public class BinaryStreamWrapper : BinaryStreamBase
 
     #endregion
 
-
     #region [ Methods ]
+
+    /// <summary>
+    /// Releases and cleans up resources associated with the object.
+    /// </summary>
+    /// <param name="disposing">Indicates whether the method is called from an explicit disposal or during finalization.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing && m_ownsStream)
+            m_stream.Dispose();
+
+        base.Dispose(disposing);
+    }
 
     /// <summary>
     /// Writes a byte to the underlying stream.
@@ -121,6 +132,7 @@ public class BinaryStreamWrapper : BinaryStreamBase
     public override byte ReadUInt8()
     {
         int value = m_stream.ReadByte();
+
         if (value < 0)
             throw new EndOfStreamException();
 
@@ -154,17 +166,6 @@ public class BinaryStreamWrapper : BinaryStreamBase
     public override int Read(byte[] value, int offset, int count)
     {
         return m_stream.Read(value, offset, count);
-    }
-
-    /// <summary>
-    /// Releases and cleans up resources associated with the object.
-    /// </summary>
-    /// <param name="disposing">Indicates whether the method is called from an explicit disposal or during finalization.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing && m_ownsStream)
-            m_stream.Dispose();
-        base.Dispose(disposing);
     }
 
     #endregion

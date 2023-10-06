@@ -70,6 +70,7 @@ public class UltraStreamWriter
     {
         if (m_position < FlushSize)
             Flush();
+
         m_buffer[m_position] = value;
         m_position++;
     }
@@ -82,6 +83,7 @@ public class UltraStreamWriter
     {
         if (m_position < FlushSize)
             Flush();
+
         m_position += value.WriteToChars(m_buffer, m_position);
     }
 
@@ -92,6 +94,7 @@ public class UltraStreamWriter
     {
         if (m_position < FlushSize)
             Flush();
+
         if (m_nl.Length == 2)
         {
             m_buffer[m_position] = m_nl[0];
@@ -113,6 +116,7 @@ public class UltraStreamWriter
     {
         if (m_position > 0)
             m_stream.Write(m_buffer, 0, m_position);
+
         m_position = 0;
     }
 

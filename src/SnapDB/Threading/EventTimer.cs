@@ -38,6 +38,12 @@ public class EventTimer : DisposableLoggingClassBase
 {
     #region [ Members ]
 
+    /// <summary>
+    /// Occurs when the timer elapses.
+    /// Event occurs on the ThreadPool
+    /// </summary>
+    public event Action Elapsed;
+
     private readonly TimeSpan m_dayOffset;
     private bool m_isRunning;
 
@@ -117,10 +123,22 @@ public class EventTimer : DisposableLoggingClassBase
     #region [ Methods ]
 
     /// <summary>
-    /// Occurs when the timer elapses.
-    /// Event occurs on the ThreadPool
+    /// Releases the resources used by the event timer and stops it.
     /// </summary>
-    public event Action Elapsed;
+    /// <param name="disposing">
+    /// A Boolean value that determines whether the method was called from the
+    /// <see cref="Dispose"/> method rather than from the finalizer.
+    /// </param>
+    protected override void Dispose(bool disposing)
+    {
+        if (!m_disposed)
+        {
+            m_disposed = true;
+            Stop();
+        }
+
+        base.Dispose(disposing);
+    }
 
     /// <summary>
     /// Starts the event timer.
@@ -175,24 +193,6 @@ public class EventTimer : DisposableLoggingClassBase
         }
 
         Log.Publish(MessageLevel.Info, "EventTimer Started");
-    }
-
-    /// <summary>
-    /// Releases the resources used by the event timer and stops it.
-    /// </summary>
-    /// <param name="disposing">
-    /// A Boolean value that determines whether the method was called from the
-    /// <see cref="Dispose"/> method rather than from the finalizer.
-    /// </param>
-    protected override void Dispose(bool disposing)
-    {
-        if (!m_disposed)
-        {
-            m_disposed = true;
-            Stop();
-        }
-
-        base.Dispose(disposing);
     }
 
     /// <summary>

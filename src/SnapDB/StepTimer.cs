@@ -36,22 +36,6 @@ public static class StepTimer
 {
     #region [ Members ]
 
-    /// <summary>
-    /// Represents an interface for measuring and recording the execution time of code segments.
-    /// </summary>
-    public interface ITimer
-    {
-        #region [ Methods ]
-
-        /// <summary>
-        /// Stops the timer and records the elapsed time for the code segment.
-        /// </summary>
-        /// <param name="loopCount">The number of times the code segment was executed (default is 1).</param>
-        void Stop(int loopCount = 1);
-
-        #endregion
-    }
-
     private class RunCount : ITimer
     {
         #region [ Members ]
@@ -68,6 +52,22 @@ public static class StepTimer
             Sw.Stop();
             RunResults.Add(Sw.Elapsed.TotalSeconds / loopCount);
         }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Represents an interface for measuring and recording the execution time of code segments.
+    /// </summary>
+    public interface ITimer
+    {
+        #region [ Methods ]
+
+        /// <summary>
+        /// Stops the timer and records the elapsed time for the code segment.
+        /// </summary>
+        /// <param name="loopCount">The number of times the code segment was executed (default is 1).</param>
+        void Stop(int loopCount = 1);
 
         #endregion
     }

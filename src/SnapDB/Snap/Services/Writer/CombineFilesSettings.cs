@@ -48,45 +48,15 @@ public class CombineFilesSettings : SettingsBase<CombineFilesSettings>
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the rate a which a rollover check is executed
-    /// Time is in milliseconds.
+    /// The settings for the archive initializer. This value cannot be null.
     /// </summary>
-    /// <remarks>
-    /// Default is every 60,000 milliseconds.
-    /// Must be between 1 second and 10 minutes.
-    /// Anything outside this range will substitute for the closest valid value.
-    /// </remarks>
-    public int ExecuteTimer
+    public SimplifiedArchiveInitializerSettings ArchiveSettings
     {
-        get => m_executeTimer;
+        get => m_archiveSettings;
         set
         {
             TestForEditable();
-            if (value < 1000)
-                m_executeTimer = 1000;
-            else if (value > 600000)
-                m_executeTimer = 600000;
-            else
-                m_executeTimer = value;
-        }
-    }
-
-    /// <summary>
-    /// The path to write the log file for the rollover process.
-    /// </summary>
-    /// <remarks>
-    /// A value of String.Empty means that rollover logs will not be created.
-    /// </remarks>
-    public string LogPath
-    {
-        get => m_logPath;
-        set
-        {
-            TestForEditable();
-            if (string.IsNullOrWhiteSpace(value))
-                m_logPath = string.Empty;
-            else
-                m_logPath = value;
+            m_archiveSettings = value ?? throw new ArgumentNullException(nameof(value));
         }
     }
 
@@ -134,6 +104,49 @@ public class CombineFilesSettings : SettingsBase<CombineFilesSettings>
     }
 
     /// <summary>
+    /// Gets the rate a which a rollover check is executed
+    /// Time is in milliseconds.
+    /// </summary>
+    /// <remarks>
+    /// Default is every 60,000 milliseconds.
+    /// Must be between 1 second and 10 minutes.
+    /// Anything outside this range will substitute for the closest valid value.
+    /// </remarks>
+    public int ExecuteTimer
+    {
+        get => m_executeTimer;
+        set
+        {
+            TestForEditable();
+            if (value < 1000)
+                m_executeTimer = 1000;
+            else if (value > 600000)
+                m_executeTimer = 600000;
+            else
+                m_executeTimer = value;
+        }
+    }
+
+    /// <summary>
+    /// The path to write the log file for the rollover process.
+    /// </summary>
+    /// <remarks>
+    /// A value of String.Empty means that rollover logs will not be created.
+    /// </remarks>
+    public string LogPath
+    {
+        get => m_logPath;
+        set
+        {
+            TestForEditable();
+            if (string.IsNullOrWhiteSpace(value))
+                m_logPath = string.Empty;
+            else
+                m_logPath = value;
+        }
+    }
+
+    /// <summary>
     /// The archive flag to do the file combination on.
     /// </summary>
     public Guid MatchFlag
@@ -143,19 +156,6 @@ public class CombineFilesSettings : SettingsBase<CombineFilesSettings>
         {
             TestForEditable();
             m_matchFlag = value;
-        }
-    }
-
-    /// <summary>
-    /// The settings for the archive initializer. This value cannot be null.
-    /// </summary>
-    public SimplifiedArchiveInitializerSettings ArchiveSettings
-    {
-        get => m_archiveSettings;
-        set
-        {
-            TestForEditable();
-            m_archiveSettings = value ?? throw new ArgumentNullException(nameof(value));
         }
     }
 

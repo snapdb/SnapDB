@@ -83,23 +83,23 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the method of how the directory will be stored. Defaults to
-    /// top directory only.
+    /// Gets the default encoding methods for storing files.
     /// </summary>
-    public ArchiveDirectoryMethod DirectoryMethod { get; set; }
+    public EncodingDefinition ArchiveEncodingMethod { get; set; }
+
+    /// <summary>
+    /// The number of milliseconds before data is taken from it's cache and put in the
+    /// memory file.
+    /// </summary>
+    /// <remarks>
+    /// Must be between 1 and 1,000
+    /// </remarks>
+    public int CacheFlushInterval { get; set; }
 
     /// <summary>
     /// The name associated with the database.
     /// </summary>
     public string DatabaseName { get; }
-
-    /// <summary>
-    /// Gets or sets the desired size of the final stage archive files.
-    /// </summary>
-    /// <remarks>
-    /// Value must be between 100MB and 1TB.
-    /// </remarks>
-    public long TargetFileSize { get; set; }
 
     /// <summary>
     /// Gets or sets the desired remaining drive space, in bytes, for final stage files.
@@ -110,18 +110,18 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
     public long DesiredRemainingSpace { get; set; }
 
     /// <summary>
-    /// The number of stages.
+    /// Gets the method of how the directory will be stored. Defaults to
+    /// top directory only.
     /// </summary>
-    public int StagingCount { get; set; }
+    public ArchiveDirectoryMethod DirectoryMethod { get; set; }
 
     /// <summary>
-    /// The extension to use for the intermediate files
+    /// The number of milliseconds before data is automatically flushed to the disk.
     /// </summary>
-    public string IntermediateFileExtension
-    {
-        get => m_intermediateFileExtension;
-        set => m_intermediateFileExtension = PathHelpers.FormatExtension(value);
-    }
+    /// <remarks>
+    /// Must be between 1,000 ms and 60,000 ms.
+    /// </remarks>
+    public int DiskFlushInterval { get; set; }
 
     /// <summary>
     /// The extension to use for the final file
@@ -131,6 +131,12 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
         get => m_finalFileExtension;
         set => m_finalFileExtension = PathHelpers.FormatExtension(value);
     }
+
+    /// <summary>
+    /// The list of directories where final files can be placed written.
+    /// If nothing is specified, the main directory is used.
+    /// </summary>
+    public List<string> FinalWritePaths { get; }
 
     /// <summary>
     /// Determines whether the server should import attached paths at startup.
@@ -144,15 +150,18 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
     public List<string> ImportPaths { get; }
 
     /// <summary>
-    /// The list of directories where final files can be placed written.
-    /// If nothing is specified, the main directory is used.
+    /// The extension to use for the intermediate files
     /// </summary>
-    public List<string> FinalWritePaths { get; }
+    public string IntermediateFileExtension
+    {
+        get => m_intermediateFileExtension;
+        set => m_intermediateFileExtension = PathHelpers.FormatExtension(value);
+    }
 
     /// <summary>
-    /// Gets the default encoding methods for storing files.
+    /// The number of stages.
     /// </summary>
-    public EncodingDefinition ArchiveEncodingMethod { get; set; }
+    public int StagingCount { get; set; }
 
     /// <summary>
     /// Gets the supported encoding methods for streaming data. This list is in a prioritized order.
@@ -165,21 +174,12 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
     public bool SupportsWriting { get; }
 
     /// <summary>
-    /// The number of milliseconds before data is automatically flushed to the disk.
+    /// Gets or sets the desired size of the final stage archive files.
     /// </summary>
     /// <remarks>
-    /// Must be between 1,000 ms and 60,000 ms.
+    /// Value must be between 100MB and 1TB.
     /// </remarks>
-    public int DiskFlushInterval { get; set; }
-
-    /// <summary>
-    /// The number of milliseconds before data is taken from it's cache and put in the
-    /// memory file.
-    /// </summary>
-    /// <remarks>
-    /// Must be between 1 and 1,000
-    /// </remarks>
-    public int CacheFlushInterval { get; set; }
+    public long TargetFileSize { get; set; }
 
     #endregion
 

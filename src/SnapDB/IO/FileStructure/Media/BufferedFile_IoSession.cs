@@ -77,18 +77,6 @@ internal partial class BufferedFile
 
         #region [ Methods ]
 
-        /// <summary>
-        /// Gets a block for the following I/O session.
-        /// </summary>
-        /// <param name="args">The <see cref="BlockArguments"/> to use to read and write to a block.</param>
-        public override void GetBlock(BlockArguments args)
-        {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
-
-            m_stream.GetBlock(this, args);
-        }
-
         protected override void Dispose(bool disposing)
         {
             if (!m_disposed)
@@ -100,6 +88,18 @@ internal partial class BufferedFile
             }
 
             base.Dispose(disposing);
+        }
+
+        /// <summary>
+        /// Gets a block for the following I/O session.
+        /// </summary>
+        /// <param name="args">The <see cref="BlockArguments"/> to use to read and write to a block.</param>
+        public override void GetBlock(BlockArguments args)
+        {
+            if (IsDisposed)
+                throw new ObjectDisposedException(GetType().FullName);
+
+            m_stream.GetBlock(this, args);
         }
 
         #endregion

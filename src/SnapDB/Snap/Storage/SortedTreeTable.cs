@@ -67,14 +67,14 @@ public partial class SortedTreeTable<TKey, TValue> : IDisposable where TKey : Sn
     #region [ Properties ]
 
     /// <summary>
+    /// Gets the unique identifier (ID) of the archive associated with this table.
+    /// </summary>
+    public Guid ArchiveId => BaseFile.Snapshot.Header.ArchiveId;
+
+    /// <summary>
     /// Gets the archive file where this table exists.
     /// </summary>
     public SortedTreeFile BaseFile { get; }
-
-    /// <summary>
-    /// Determines if the archive file has been disposed.
-    /// </summary>
-    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// The first key.  Note: Values only update on commit.
@@ -82,14 +82,14 @@ public partial class SortedTreeTable<TKey, TValue> : IDisposable where TKey : Sn
     public TKey FirstKey { get; }
 
     /// <summary>
+    /// Determines if the archive file has been disposed.
+    /// </summary>
+    public bool IsDisposed { get; private set; }
+
+    /// <summary>
     /// The last key.  Note: Values only update on commit.
     /// </summary>
     public TKey LastKey { get; }
-
-    /// <summary>
-    /// Gets the unique identifier (ID) of the archive associated with this table.
-    /// </summary>
-    public Guid ArchiveId => BaseFile.Snapshot.Header.ArchiveId;
 
     #endregion
 

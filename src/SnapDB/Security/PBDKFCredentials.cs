@@ -99,23 +99,14 @@ internal class PbdkfCredentials
 
         if (hasChanged)
         {
-            switch (hashMethod)
+            SaltedPassword = hashMethod switch
             {
-                case HashMethod.Sha1:
-                    SaltedPassword = Pbkdf2.ComputeSaltedPassword(HmacMethod.Sha1, m_passwordBytes, m_salt, m_iterations, 20);
-                    break;
-                case HashMethod.Sha256:
-                    SaltedPassword = Pbkdf2.ComputeSaltedPassword(HmacMethod.Sha256, m_passwordBytes, m_salt, m_iterations, 32);
-                    break;
-                case HashMethod.Sha384:
-                    SaltedPassword = Pbkdf2.ComputeSaltedPassword(HmacMethod.Sha384, m_passwordBytes, m_salt, m_iterations, 48);
-                    break;
-                case HashMethod.Sha512:
-                    SaltedPassword = Pbkdf2.ComputeSaltedPassword(HmacMethod.Sha512, m_passwordBytes, m_salt, m_iterations, 64);
-                    break;
-                default:
-                    throw new Exception("Invalid Hash Method");
-            }
+                HashMethod.Sha1 => Pbkdf2.ComputeSaltedPassword(HmacMethod.Sha1, m_passwordBytes, m_salt, m_iterations, 20),
+                HashMethod.Sha256 => Pbkdf2.ComputeSaltedPassword(HmacMethod.Sha256, m_passwordBytes, m_salt, m_iterations, 32),
+                HashMethod.Sha384 => Pbkdf2.ComputeSaltedPassword(HmacMethod.Sha384, m_passwordBytes, m_salt, m_iterations, 48),
+                HashMethod.Sha512 => Pbkdf2.ComputeSaltedPassword(HmacMethod.Sha512, m_passwordBytes, m_salt, m_iterations, 64),
+                _ => throw new Exception("Invalid Hash Method")
+            };
 
             return true;
         }

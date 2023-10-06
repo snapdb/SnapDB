@@ -99,16 +99,6 @@ public class SubFileHeader : ImmutableObjectAutoBase<SubFileHeader>
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the unique file identifier for this file.
-    /// </summary>
-    public ushort FileIdNumber { get; }
-
-    /// <summary>
-    /// Gets the <see cref="SubFileName"/> that represents what type of data is contained in this file.
-    /// </summary>
-    public SubFileName FileName { get; }
-
-    /// <summary>
     /// Gets the number of blocks the data portion of this file contains.
     /// </summary>
     public uint DataBlockCount
@@ -118,21 +108,6 @@ public class SubFileHeader : ImmutableObjectAutoBase<SubFileHeader>
         {
             TestForEditable();
             m_dataBlockCount = value;
-        }
-    }
-
-    /// <summary>
-    /// Gets the total number of blocks that has been used by this file.
-    /// This includes meta data blocks and previous version blocks.
-    /// </summary>
-    public uint TotalBlockCount
-    {
-        get => m_isSimplified ? m_dataBlockCount : m_totalBlocksCount;
-        set
-        {
-            TestSimplifiedFile();
-            TestForEditable();
-            m_totalBlocksCount = value;
         }
     }
 
@@ -147,24 +122,6 @@ public class SubFileHeader : ImmutableObjectAutoBase<SubFileHeader>
         {
             TestForEditable();
             m_directBlock = value;
-        }
-    }
-
-    /// <summary>
-    /// Gets the block address for the single indirect block.
-    /// </summary>
-    public uint SingleIndirectBlock
-    {
-        get
-        {
-            TestSimplifiedFile();
-            return m_singleIndirectBlock;
-        }
-        set
-        {
-            TestForEditable();
-            TestSimplifiedFile();
-            m_singleIndirectBlock = value;
         }
     }
 
@@ -187,22 +144,14 @@ public class SubFileHeader : ImmutableObjectAutoBase<SubFileHeader>
     }
 
     /// <summary>
-    /// Gets the block address for the triple indirect block.
+    /// Gets the unique file identifier for this file.
     /// </summary>
-    public uint TripleIndirectBlock
-    {
-        get
-        {
-            TestSimplifiedFile();
-            return m_tripleIndirectBlock;
-        }
-        set
-        {
-            TestForEditable();
-            TestSimplifiedFile();
-            m_tripleIndirectBlock = value;
-        }
-    }
+    public ushort FileIdNumber { get; }
+
+    /// <summary>
+    /// Gets the <see cref="SubFileName"/> that represents what type of data is contained in this file.
+    /// </summary>
+    public SubFileName FileName { get; }
 
     /// <summary>
     /// Gets the block address for the quadruple indirect block.
@@ -219,6 +168,57 @@ public class SubFileHeader : ImmutableObjectAutoBase<SubFileHeader>
             TestForEditable();
             TestSimplifiedFile();
             m_quadrupleIndirectBlock = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets the block address for the single indirect block.
+    /// </summary>
+    public uint SingleIndirectBlock
+    {
+        get
+        {
+            TestSimplifiedFile();
+            return m_singleIndirectBlock;
+        }
+        set
+        {
+            TestForEditable();
+            TestSimplifiedFile();
+            m_singleIndirectBlock = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets the total number of blocks that has been used by this file.
+    /// This includes meta data blocks and previous version blocks.
+    /// </summary>
+    public uint TotalBlockCount
+    {
+        get => m_isSimplified ? m_dataBlockCount : m_totalBlocksCount;
+        set
+        {
+            TestSimplifiedFile();
+            TestForEditable();
+            m_totalBlocksCount = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets the block address for the triple indirect block.
+    /// </summary>
+    public uint TripleIndirectBlock
+    {
+        get
+        {
+            TestSimplifiedFile();
+            return m_tripleIndirectBlock;
+        }
+        set
+        {
+            TestForEditable();
+            TestSimplifiedFile();
+            m_tripleIndirectBlock = value;
         }
     }
 

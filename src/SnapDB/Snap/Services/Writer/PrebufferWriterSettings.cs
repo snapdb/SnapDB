@@ -45,27 +45,6 @@ public class PrebufferWriterSettings : SettingsBase<PrebufferWriterSettings>
     #region [ Properties ]
 
     /// <summary>
-    /// The maximum interval to wait in milliseconds before taking the prebuffer and rolling it into a Stage 0 Archive.
-    /// </summary>
-    /// <remarks>
-    /// Must be between 1 and 1,000
-    /// </remarks>
-    public int RolloverInterval
-    {
-        get => m_rolloverInterval;
-        set
-        {
-            TestForEditable();
-            if (value < 1)
-                m_rolloverInterval = 1;
-            else if (value > 1000)
-                m_rolloverInterval = 1000;
-            else
-                m_rolloverInterval = value;
-        }
-    }
-
-    /// <summary>
     /// The maximum number of points to have in the prebuffer before rolling this into the Stage 0 Archive.
     /// </summary>
     /// <remarks>
@@ -83,6 +62,27 @@ public class PrebufferWriterSettings : SettingsBase<PrebufferWriterSettings>
                 m_maximumPointCount = 100000;
             else
                 m_maximumPointCount = value;
+        }
+    }
+
+    /// <summary>
+    /// The maximum interval to wait in milliseconds before taking the prebuffer and rolling it into a Stage 0 Archive.
+    /// </summary>
+    /// <remarks>
+    /// Must be between 1 and 1,000
+    /// </remarks>
+    public int RolloverInterval
+    {
+        get => m_rolloverInterval;
+        set
+        {
+            TestForEditable();
+            if (value < 1)
+                m_rolloverInterval = 1;
+            else if (value > 1000)
+                m_rolloverInterval = 1000;
+            else
+                m_rolloverInterval = value;
         }
     }
 

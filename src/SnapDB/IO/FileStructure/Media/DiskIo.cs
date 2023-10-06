@@ -73,24 +73,7 @@ internal sealed class DiskIo : IDisposable
     /// </summary>
     public int BlockSize { get; }
 
-    /// <summary>
-    /// Gets if the disk supports writing.
-    /// </summary>
-    public bool IsReadOnly
-    {
-        get
-        {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
-
-            return m_isReadOnly;
-        }
-    }
-
-    /// <summary>
-    /// Gets if the class has been disposed.
-    /// </summary>
-    public bool IsDisposed { get; private set; }
+    public string FileName => m_stream.FileName;
 
     /// <summary>
     /// Gets the current size of the file.
@@ -107,16 +90,21 @@ internal sealed class DiskIo : IDisposable
     }
 
     /// <summary>
-    /// Returns the last block that is read-only.
+    /// Gets if the class has been disposed.
     /// </summary>
-    public uint LastReadonlyBlock
+    public bool IsDisposed { get; private set; }
+
+    /// <summary>
+    /// Gets if the disk supports writing.
+    /// </summary>
+    public bool IsReadOnly
     {
         get
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
-            return m_stream.Header.LastAllocatedBlock;
+            return m_isReadOnly;
         }
     }
 
@@ -134,7 +122,19 @@ internal sealed class DiskIo : IDisposable
         }
     }
 
-    public string FileName => m_stream.FileName;
+    /// <summary>
+    /// Returns the last block that is read-only.
+    /// </summary>
+    public uint LastReadonlyBlock
+    {
+        get
+        {
+            if (IsDisposed)
+                throw new ObjectDisposedException(GetType().FullName);
+
+            return m_stream.Header.LastAllocatedBlock;
+        }
+    }
 
     #endregion
 

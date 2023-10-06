@@ -64,6 +64,26 @@ public partial class SnapServer
 
         #region [ Methods ]
 
+        protected override void Dispose(bool disposing)
+        {
+            if (!m_disposed)
+                if (disposing)
+                {
+                    lock (m_syncRoot)
+                    {
+                        // Must include .ToArray because calling dispose will remove the item from the m_coonectionDatabase via a callback.
+                        foreach (ClientDatabaseBase db in m_connectedDatabases.Values.ToArray())
+                            db.Dispose();
+                    }
+
+                    m_server.UnRegisterClient(this);
+                    m_server = null;
+                    m_disposed = true;
+                }
+
+            base.Dispose(disposing);
+        }
+
         /// <summary>
         /// Gets the database that matches <see cref="databaseName"/>.
         /// </summary>
@@ -125,26 +145,6 @@ public partial class SnapServer
                 throw new ObjectDisposedException(GetType().FullName);
 
             return m_server.GetDatabaseInfo();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (!m_disposed)
-                if (disposing)
-                {
-                    lock (m_syncRoot)
-                    {
-                        // Must include .ToArray because calling dispose will remove the item from the m_coonectionDatabase via a callback.
-                        foreach (ClientDatabaseBase db in m_connectedDatabases.Values.ToArray())
-                            db.Dispose();
-                    }
-
-                    m_server.UnRegisterClient(this);
-                    m_server = null;
-                    m_disposed = true;
-                }
-
-            base.Dispose(disposing);
         }
 
         /// <summary>

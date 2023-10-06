@@ -36,14 +36,14 @@ public abstract class IndividualEncodingDefinitionBase
     #region [ Properties ]
 
     /// <summary>
-    /// The type supported by the encoded method. Can be <c>null</c> if the encoding is not type specific.
-    /// </summary>
-    public abstract Type TypeIfNotGeneric { get; }
-
-    /// <summary>
     /// The encoding method as specified by a <see cref="Guid"/>.
     /// </summary>
     public abstract Guid Method { get; }
+
+    /// <summary>
+    /// The type supported by the encoded method. Can be <c>null</c> if the encoding is not type specific.
+    /// </summary>
+    public abstract Type TypeIfNotGeneric { get; }
 
     #endregion
 
