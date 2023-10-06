@@ -351,20 +351,22 @@ public unsafe class GenericEncodedNode<TKey, TValue> : SortedTreeNodeBase<TKey, 
     /// <summary>
     /// Inserts a point before the current position.
     /// </summary>
-    /// <param name="index"></param>
-    /// <param name="key"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
+    /// <param name="index">The index at which to insert the key-value pair.</param>
+    /// <param name="key">The key to insert.</param>
+    /// <param name="value">The value to insert.</param>
+    /// <returns>
+    /// <c>true</c> if the key-value pair was inserted successfully; otherwise, <c>false</c> if the tree is already full.
+    /// </returns>
     protected override bool InsertUnlessFull(int index, TKey key, TValue value)
     {
         if (index == RecordCount)
         {
-            //Insert After
+            // Insert After
             SeekTo(index);
             return InsertAfter(key, value);
         }
 
-        //Insert Between
+        // Insert Between
         SeekTo(index);
         return InsertBetween(key, value);
     }

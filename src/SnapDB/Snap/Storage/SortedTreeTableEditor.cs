@@ -188,7 +188,12 @@ public partial class SortedTreeTable<TKey, TValue>
         /// <summary>
         /// Opens a tree scanner for this archive file
         /// </summary>
-        /// <returns></returns>
+        /// <summary>
+        /// Gets a new instance of <see cref="SortedTreeScannerBase{TKey, TValue}"/> to scan the entire range of the SortedTreeTable.
+        /// </summary>
+        /// <returns>
+        /// A new instance of <see cref="SortedTreeScannerBase{TKey, TValue}"/> for scanning the entire range.
+        /// </returns>
         public override SortedTreeScannerBase<TKey, TValue> GetRange()
         {
             if (m_disposed)

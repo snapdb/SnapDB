@@ -146,12 +146,13 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
     /// <summary>
     /// Gets the node index of the last leaf node in the tree.
     /// </summary>
-    /// <param name="level">the level of the node requesting the lookup</param>
-    /// <returns></returns>
+    /// <param name="level">The level of the node to find.</param>
+    /// <returns>The index address of the last node at the specified level.</returns>
     public uint GetLastIndex(byte level)
     {
         if (RootNodeLevel == level)
             return RootNodeIndexAddress;
+
         uint nodeIndexAddress = RootNodeIndexAddress;
         byte nodeLevel = RootNodeLevel;
         while (nodeLevel > level)
@@ -342,9 +343,12 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
     /// <summary>
     /// Gets the node at the provided <paramref name="level"/> where the provided <paramref name="key"/> fits.
     /// </summary>
-    /// <param name="key">the key to search for.</param>
-    /// <param name="level">the level of the tree </param>
-    /// <returns></returns>
+    /// <param name="key">The key to find or insert.</param>
+    /// <param name="level">The level of the node to find.</param>
+    /// <returns>The node at the specified level that contains or should contain the given key.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown if <paramref name="level"/> is less than or equal to 0, or greater than the root node level.
+    /// </exception>
     private SortedTreeNodeBase<TKey, SnapUInt32> FindNode(TKey key, int level)
     {
         if (level <= 0)

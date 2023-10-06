@@ -112,7 +112,9 @@ public partial class SortedTreeTable<TKey, TValue> : IDisposable where TKey : Sn
     /// <summary>
     /// Acquires a read snapshot of the current archive file.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A new instance of <see cref="SortedTreeTableSnapshotInfo{TKey, TValue}"/> representing the acquired read snapshot.
+    /// </returns>
     /// <remarks>
     /// Once the snapshot has been acquired, any future commits
     /// will not effect this snapshot. The snapshot has a tiny footprint
@@ -122,13 +124,16 @@ public partial class SortedTreeTable<TKey, TValue> : IDisposable where TKey : Sn
     {
         if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         return new SortedTreeTableSnapshotInfo<TKey, TValue>(m_fileStructure, m_fileName);
     }
 
     /// <summary>
     /// Allows the user to get a read snapshot on the table.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A new instance of <see cref="SortedTreeTableReadSnapshot{TKey, TValue}"/> representing the read snapshot.
+    /// </returns>
     public SortedTreeTableReadSnapshot<TKey, TValue> BeginRead()
     {
         return AcquireReadSnapshot().CreateReadSnapshot();

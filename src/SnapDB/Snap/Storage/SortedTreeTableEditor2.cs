@@ -109,7 +109,9 @@ public abstract class SortedTreeTableEditor<TKey, TValue> : IDisposable where TK
     /// <summary>
     /// Opens a tree scanner for this archive file
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A new instance of <see cref="SortedTreeScannerBase{TKey, TValue}"/> for scanning a specific range of keys.
+    /// </returns>
     public abstract SortedTreeScannerBase<TKey, TValue> GetRange();
 
     #endregion

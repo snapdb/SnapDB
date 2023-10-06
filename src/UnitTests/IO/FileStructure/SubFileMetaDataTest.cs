@@ -92,9 +92,9 @@ public class SubFileMetaDataTest
     /// <summary>
     /// Determines if the two objects are equal in value.
     /// </summary>
-    /// <param name="a">the object to compare this class to</param>
-    /// <returns></returns>
-    /// <remarks>A debug function</remarks>
+    /// <param name="a">The first <see cref="SubFileHeader"/> to compare.</param>
+    /// <param name="b">The second <see cref="SubFileHeader"/> to compare.</param>
+    /// <returns><c>true</c> if the two instances are equal; otherwise, <c>false</c>.</returns>
     internal static bool AreEqual(SubFileHeader a, SubFileHeader b)
     {
         if (a is null || b is null)

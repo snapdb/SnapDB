@@ -257,7 +257,7 @@ public class SortedTree<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() whe
     /// <summary>
     /// Creates a tree scanner that can be used to seek this tree.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A tree scanner instance for the sorted tree.</returns>
     public SortedTreeScannerBase<TKey, TValue> CreateTreeScanner()
     {
         return LeafStorage.CreateTreeScanner();
@@ -267,7 +267,7 @@ public class SortedTree<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() whe
     /// Returns the node index address for a freshly allocated block.
     /// </summary>
     /// <returns>Node index address for a freshly allocated block.</returns>
-    /// <remarks>Also saves the header data</remarks>
+    /// <remarks>Also saves the header data.</remarks>
     protected uint GetNextNewNodeIndex()
     {
         m_header.LastAllocatedBlock++;

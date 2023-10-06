@@ -91,9 +91,12 @@ public class SortedTreeFile : IDisposable
     public bool IsMemoryFile => FilePath == string.Empty;
 
     /// <summary>
-    /// Gets the last committed read snapshot on the file system.
+    /// Gets the last committed read-only snapshot associated with this instance.
     /// </summary>
-    /// <returns></returns>
+    /// <remarks>
+    /// The <see cref="Snapshot"/> property provides access to the read-only snapshot of the associated data.
+    /// This snapshot allows for querying and reading data but does not support write operations.
+    /// </remarks>
     public ReadSnapshot Snapshot => m_fileStructure.Snapshot;
 
     #endregion
@@ -171,12 +174,12 @@ public class SortedTreeFile : IDisposable
     /// Opens the default table for this TKey and TValue. If it does not exists,
     /// it will be created with the provided compression method.
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <param name="storageMethod">The method of compression to utilize in this table.</param>
-    /// <param name="maxSortedTreeBlockSize">the maximum desired block size for a SortedTree. Must be at least 1024.</param>
-    /// <param name="tableName">the name of an internal table</param>
-    /// <returns></returns>
+    /// <typeparam name="TKey">The type of the keys in the table.</typeparam>
+    /// <typeparam name="TValue">The type of the values in the table.</typeparam>
+    /// <param name="storageMethod">The encoding method used for storage.</param>
+    /// <param name="tableName">The name of the table.</param>
+    /// <param name="maxSortedTreeBlockSize">The maximum block size for the sorted tree (default is 4096).</param>
+    /// <returns>An instance of <see cref="SortedTreeTable{TKey, TValue}"/>.</returns>
     public SortedTreeTable<TKey, TValue> OpenOrCreateTable<TKey, TValue>(EncodingDefinition storageMethod, string tableName, int maxSortedTreeBlockSize = 4096) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         if (storageMethod is null)
@@ -190,11 +193,13 @@ public class SortedTreeFile : IDisposable
     /// Opens the default table for this TKey and TValue. If it does not exists,
     /// it will be created with the provided compression method.
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <param name="storageMethod">The method of compression to utilize in this table.</param>
-    /// <param name="maxSortedTreeBlockSize">the maximum desired block size for a SortedTree. Must be at least 1024.</param>
-    /// <returns></returns>
+    /// <typeparam name="TKey">The type parameter specifying the data type for keys.</typeparam>
+    /// <typeparam name="TValue">The type parameter specifying the data type for values.</typeparam>
+    /// <param name="storageMethod">The encoding method used to store data.</param>
+    /// <param name="maxSortedTreeBlockSize">The maximum block size for the created <see cref="SortedTreeTable{TKey, TValue}"/>.</param>
+    /// <returns>
+    /// A <see cref="SortedTreeTable{TKey, TValue}"/> instance associated with the specified storage method and options.
+    /// </returns>
     public SortedTreeTable<TKey, TValue> OpenOrCreateTable<TKey, TValue>(EncodingDefinition storageMethod, int maxSortedTreeBlockSize = 4096) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         if (storageMethod is null)
@@ -249,9 +254,11 @@ public class SortedTreeFile : IDisposable
     /// <summary>
     /// Helper method. Creates the <see cref="SubFileName"/> for the default table.
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <returns></returns>
+    /// <typeparam name="TKey">The type parameter specifying the data type for keys.</typeparam>
+    /// <typeparam name="TValue">The type parameter specifying the data type for values.</typeparam>
+    /// <returns>
+    /// A unique <see cref="SubFileName"/> associated with the specified key and value types.
+    /// </returns>
     private SubFileName GetFileName<TKey, TValue>() where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         Guid keyType = new TKey().GenericTypeGuid;
@@ -337,9 +344,11 @@ public class SortedTreeFile : IDisposable
     /// <summary>
     /// Opens an archive file.
     /// </summary>
-    /// <param name="file"></param>
-    /// <param name="isReadOnly"></param>
-    /// <returns></returns>
+    /// <param name="file">The path to the SortedTreeFile to open.</param>
+    /// <param name="isReadOnly">True if the file should be opened in read-only mode; otherwise, false.</param>
+    /// <returns>
+    /// A new instance of <see cref="SortedTreeFile"/> representing the opened SortedTreeFile.
+    /// </returns>
     public static SortedTreeFile OpenFile(string file, bool isReadOnly)
     {
         SortedTreeFile af = new();
@@ -348,6 +357,7 @@ public class SortedTreeFile : IDisposable
         af.m_fileStructure = TransactionalFileStructure.OpenFile(file, isReadOnly);
         if (af.m_fileStructure.Snapshot.Header.ArchiveType != FileType)
             throw new Exception("Archive type is unknown");
+
         return af;
     }
 

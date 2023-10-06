@@ -137,7 +137,11 @@ public partial class SnapServerDatabase<TKey, TValue> : SnapServerDatabaseBase w
     /// <summary>
     /// Creates a <see cref="ClientDatabase"/>
     /// </summary>
-    /// <returns></returns>
+    /// <param name="client">The SnapClient instance that will use the created database.</param>
+    /// <param name="onDispose">An optional action to execute when the client database is disposed.</param>
+    /// <returns>
+    /// A new <see cref="ClientDatabaseBase"/> instance associated with this SnapServer.
+    /// </returns>
     public override ClientDatabaseBase CreateClientDatabase(SnapClient client, Action<ClientDatabaseBase> onDispose)
     {
         return new ClientDatabase(this, client, onDispose);
@@ -146,7 +150,7 @@ public partial class SnapServerDatabase<TKey, TValue> : SnapServerDatabaseBase w
     /// <summary>
     /// Loads the provided files from all of the specified paths.
     /// </summary>
-    /// <param name="paths">all of the paths of archive files to attach. These can either be a path, or an individual file name.</param>
+    /// <param name="paths">All of the paths of archive files to attach. These can either be a path, or an individual file name.</param>
     private void AttachFilesOrPaths(IEnumerable<string> paths)
     {
         m_archiveList.AttachFileOrPath(paths);

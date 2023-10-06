@@ -98,7 +98,9 @@ public class SortedTreeTableReadSnapshot<TKey, TValue> : IDisposable where TKey 
     /// <summary>
     /// Gets a reader that can be used to parse an archive file.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A new instance of <see cref="SortedTreeScannerBase{TKey, TValue}"/> for scanning the entire SortedTreeTable.
+    /// </returns>
     public SortedTreeScannerBase<TKey, TValue> GetTreeScanner()
     {
         return m_tree.CreateTreeScanner();

@@ -59,7 +59,9 @@ public class SortedTreeTableSnapshotInfo<TKey, TValue> where TKey : SnapTypeBase
     /// <summary>
     /// Opens an instance of the archive file to allow for concurrent reading of a snapshot.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A new <see cref="SortedTreeTableReadSnapshot{TKey, TValue}"/> instance for reading data from the table.
+    /// </returns>
     public SortedTreeTableReadSnapshot<TKey, TValue> CreateReadSnapshot()
     {
         return new SortedTreeTableReadSnapshot<TKey, TValue>(m_currentTransaction, m_fileName);

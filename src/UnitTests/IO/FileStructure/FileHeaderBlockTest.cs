@@ -62,11 +62,11 @@ public class FileHeaderBlockTest
 
 
     /// <summary>
-    /// 
+    /// Compares two instances of <see cref="FileHeaderBlock"/> for equality.
     /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
-    /// <remarks>A debug function</remarks>
+    /// <param name="other">The <see cref="FileHeaderBlock"/> to compare to.</param>
+    /// <param name="self">The <see cref="FileHeaderBlock"/> to compare from.</param>
+    /// <returns><c>true</c> if the two instances are equal; otherwise, <c>false</c>.</returns>
     internal static bool AreEqual(FileHeaderBlock other, FileHeaderBlock self)
     {
         if (other is null)
