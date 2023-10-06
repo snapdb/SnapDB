@@ -23,6 +23,7 @@
 
 using System;
 using System.Diagnostics;
+using Gemstone;
 using NUnit.Framework;
 
 namespace UnitTests;

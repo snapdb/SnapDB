@@ -21,6 +21,10 @@
 //
 //******************************************************************************************************
 
+using SnapDB;
+using SnapDB.IO.Unmanaged;
+using SnapDB.Snap;
+using SnapDB.Snap.Tree;
 using System;
 using System.Text;
 

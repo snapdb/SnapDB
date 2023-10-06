@@ -22,6 +22,7 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB.Threading;
 using System.Linq;
 
 namespace UnitTests.Threading;

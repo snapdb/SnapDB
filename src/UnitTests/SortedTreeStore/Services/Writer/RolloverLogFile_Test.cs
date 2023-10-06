@@ -21,7 +21,9 @@
 //
 //******************************************************************************************************
 
+using Gemstone.Diagnostics;
 using NUnit.Framework;
+using SnapDB.Snap.Services.Writer;
 using System;
 using System.Collections.Generic;
 using System.Linq;

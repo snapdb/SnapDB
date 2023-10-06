@@ -22,6 +22,10 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using Org.BouncyCastle.Crypto.Digests;
+using SnapDB;
+using SnapDB.Security;
+using SnapDB.Security.Authentication;
 using System;
 using System.Diagnostics;
 using System.IO;

@@ -22,6 +22,7 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB.Immutables;
 
 namespace UnitTests.Collections;
 

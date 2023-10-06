@@ -25,6 +25,8 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB;
+using SnapDB.IO.FileStructure;
 using System;
 
 namespace UnitTests.IO.FileStructure;
@@ -63,7 +65,7 @@ public class SubFileStreamTest
         header.CreateNewFile(SubFileName.CreateRandom());
         header.CreateNewFile(SubFileName.CreateRandom());
 
-        SubFileStream ds = new SubFileStream(stream, node, header, false);
+        SubFileStream ds = new(stream, node, header, false);
         BinaryStreamTest.Test(ds);
     }
 

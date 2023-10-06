@@ -21,6 +21,7 @@
 //
 //******************************************************************************************************
 
+using SnapDB.Snap;
 using System;
 
 namespace UnitTests.SortedTreeStore.Tree.Generic;

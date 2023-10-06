@@ -25,10 +25,12 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB.IO;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using UnitTests.IO.Unmanaged;
 
 namespace UnitTests.IO;
 

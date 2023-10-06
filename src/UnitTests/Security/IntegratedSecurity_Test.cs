@@ -22,6 +22,8 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB.IO;
+using SnapDB.Security.Authentication;
 using System;
 using System.Diagnostics;
 using System.IO;

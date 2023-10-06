@@ -24,10 +24,12 @@
 //
 //******************************************************************************************************
 
-using GSF.IO.Unmanaged.Test;
 using NUnit.Framework;
+using SnapDB;
+using SnapDB.IO.FileStructure;
 using System;
 using System.Linq;
+using UnitTests.IO.Unmanaged;
 
 namespace UnitTests.IO.FileStructure;
 

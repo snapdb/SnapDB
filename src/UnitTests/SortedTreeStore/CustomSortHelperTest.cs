@@ -25,8 +25,10 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB.Snap;
 using System;
 using System.Collections.Generic;
+using UnitTests.IO.Unmanaged;
 
 namespace UnitTests.SortedTreeStore;
 

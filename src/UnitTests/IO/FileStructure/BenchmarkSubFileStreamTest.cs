@@ -26,6 +26,9 @@
 
 
 using NUnit.Framework;
+using SnapDB.IO.FileStructure;
+using SnapDB.IO.Unmanaged;
+using UnitTests.IO.Unmanaged;
 
 namespace UnitTests.IO.FileStructure;
 

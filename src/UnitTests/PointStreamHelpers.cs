@@ -24,6 +24,9 @@
 //
 //******************************************************************************************************
 
+using SnapDB.Snap;
+using SnapDB.Snap.Storage;
+using SnapDB.Snap.Tree;
 using System;
 
 namespace UnitTests;

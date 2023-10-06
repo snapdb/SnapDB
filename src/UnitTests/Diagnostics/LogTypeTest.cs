@@ -21,6 +21,7 @@
 //
 //******************************************************************************************************
 
+using Gemstone.Diagnostics;
 using NUnit.Framework;
 
 namespace UnitTests.Diagnostics;

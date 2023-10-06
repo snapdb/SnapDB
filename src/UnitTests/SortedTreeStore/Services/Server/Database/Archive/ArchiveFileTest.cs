@@ -22,6 +22,8 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB.Snap.Storage;
+using SnapDB.Snap.Tree;
 
 namespace UnitTests.SortedTreeStore.Services.Server.Database.Archive;
 

@@ -25,6 +25,8 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Generators;
 using System;
 using System.Diagnostics;
 using System.Linq;

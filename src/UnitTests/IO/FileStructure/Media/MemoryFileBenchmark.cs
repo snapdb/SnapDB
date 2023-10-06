@@ -25,6 +25,9 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB;
+using SnapDB.IO.Unmanaged;
+using UnitTests.IO.Unmanaged;
 
 namespace UnitTests.IO.FileStructure.Media;
 

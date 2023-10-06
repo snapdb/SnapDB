@@ -22,6 +22,8 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB.Snap;
+using SnapDB.Snap.Storage;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

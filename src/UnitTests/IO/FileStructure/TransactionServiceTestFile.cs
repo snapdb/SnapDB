@@ -25,6 +25,9 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB;
+using SnapDB.IO.FileStructure;
+using SnapDB.IO.Unmanaged;
 using System;
 using System.IO;
 

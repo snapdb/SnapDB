@@ -24,9 +24,13 @@
 //
 //******************************************************************************************************
 
+using Gemstone;
 using NUnit.Framework;
+using SnapDB;
+using SnapDB.IO.Unmanaged;
 using System.Diagnostics;
 using System.Text;
+using UnitTests.IO.Unmanaged;
 
 namespace UnitTests.IO;
 

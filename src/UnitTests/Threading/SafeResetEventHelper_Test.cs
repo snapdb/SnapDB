@@ -24,7 +24,9 @@
 //
 //******************************************************************************************************
 
+using Gemstone.Diagnostics;
 using NUnit.Framework;
+using SnapDB.Threading;
 using System;
 using System.Threading;
 

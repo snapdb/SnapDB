@@ -22,6 +22,8 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB;
+using SnapDB.Snap.Types;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;

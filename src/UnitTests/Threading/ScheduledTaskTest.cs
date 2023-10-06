@@ -21,6 +21,7 @@
 //
 //******************************************************************************************************
 
+using Gemstone.Threading;
 using NUnit.Framework;
 using System;
 using System.Threading;

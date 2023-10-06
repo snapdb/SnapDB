@@ -22,6 +22,7 @@
 //******************************************************************************************************
 
 using System;
+using Gemstone;
 using NUnit.Framework;
 
 namespace UnitTests;

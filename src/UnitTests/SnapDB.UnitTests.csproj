@@ -15,11 +15,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Gemstone.Common" Version="1.0.100" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
     <PackageReference Include="NUnit" Version="3.13.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SnapDB\SnapDB.csproj" />
   </ItemGroup>
 
 </Project>

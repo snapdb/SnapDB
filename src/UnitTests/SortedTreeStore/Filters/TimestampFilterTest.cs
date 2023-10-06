@@ -22,6 +22,9 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB.IO.Unmanaged;
+using SnapDB.Snap;
+using SnapDB.Snap.Filters;
 using System;
 using System.Collections.Generic;
 

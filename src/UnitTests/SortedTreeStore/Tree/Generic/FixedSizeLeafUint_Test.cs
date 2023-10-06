@@ -22,6 +22,9 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB.Snap;
+using SnapDB.Snap.Tree;
+using SnapDB.Snap.Types;
 using System;
 using System.Collections.Generic;
 

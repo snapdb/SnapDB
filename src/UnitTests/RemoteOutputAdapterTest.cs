@@ -22,6 +22,7 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB.Snap.Services;
 using System.Threading;
 
 namespace UnitTests;

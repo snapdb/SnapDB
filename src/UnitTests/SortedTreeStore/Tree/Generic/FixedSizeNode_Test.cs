@@ -22,6 +22,9 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB.IO.Unmanaged;
+using SnapDB.Snap.Tree;
+using SnapDB.Snap.Types;
 using System;
 using System.Diagnostics;
 

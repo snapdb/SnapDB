@@ -25,6 +25,10 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB.IO.Unmanaged;
+using SnapDB.Snap.Collection;
+using SnapDB.Snap.Tree;
+using SnapDB.Snap.Tree.Specialized;
 using System;
 using System.Diagnostics;
 

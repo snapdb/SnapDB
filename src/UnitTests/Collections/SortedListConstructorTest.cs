@@ -22,8 +22,10 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
+using SnapDB;
 using System;
 using System.Collections.Generic;
+using UnitTests.IO.Unmanaged;
 
 namespace UnitTests.Collections;
 
