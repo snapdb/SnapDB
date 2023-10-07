@@ -21,22 +21,55 @@
 //
 //******************************************************************************************************
 
-using Gemstone.Threading;
-using NUnit.Framework;
 using System;
 using System.Threading;
+using Gemstone.Threading;
+using NUnit.Framework;
 
-namespace UnitTests.Threading;
+namespace SnapDB.UnitTests.Threading;
 
 [TestFixture]
 public class ScheduledTaskTest
 {
+    #region [ Members ]
+
+    private class NestedDispose
+    {
+        #region [ Members ]
+
+        public readonly ScheduledTask Worker;
+
+        #endregion
+
+        #region [ Constructors ]
+
+        public NestedDispose()
+        {
+            Worker = new ScheduledTask(ThreadingMode.DedicatedForeground);
+            Worker.Running += Method;
+        }
+
+        #endregion
+
+        #region [ Methods ]
+
+        private void Method(object sender, EventArgs eventArgs)
+        {
+        }
+
+        #endregion
+    }
+
+    #endregion
+
+    #region [ Methods ]
+
     [Test]
     public void TestDisposed()
     {
         int count = 0;
-        ScheduledTask worker = new ScheduledTask(ThreadingMode.DedicatedForeground);
-        WeakReference workerWeak = new WeakReference(worker);
+        ScheduledTask worker = new(ThreadingMode.DedicatedForeground);
+        WeakReference workerWeak = new(worker);
         worker = null;
         GC.Collect();
         GC.WaitForPendingFinalizers();
@@ -48,8 +81,8 @@ public class ScheduledTaskTest
     public void TestDisposedNested()
     {
         int count = 0;
-        NestedDispose worker = new NestedDispose();
-        WeakReference workerWeak = new WeakReference(worker);
+        NestedDispose worker = new();
+        WeakReference workerWeak = new(worker);
         worker = null;
         GC.Collect();
         GC.WaitForPendingFinalizers();
@@ -58,36 +91,19 @@ public class ScheduledTaskTest
     }
 
 
-    private class NestedDispose
-    {
-        public readonly ScheduledTask worker;
-
-        public NestedDispose()
-        {
-            worker = new ScheduledTask(ThreadingMode.DedicatedForeground);
-            worker.Running += Method;
-        }
-
-        private void Method(object sender, EventArgs eventArgs)
-        {
-        }
-    }
-
-
     [Test]
     public void Test()
     {
-        using (ScheduledTask work = new ScheduledTask(ThreadingMode.DedicatedForeground))
+        using (ScheduledTask work = new(ThreadingMode.DedicatedForeground))
         {
             work.Running += work_DoWork;
             work.Running += work_CleanupWork;
             work.Start();
         }
+
         double x = 1;
         while (x > 3)
-        {
             x--;
-        }
     }
 
     private void work_CleanupWork(object sender, EventArgs eventArgs)
@@ -99,4 +115,6 @@ public class ScheduledTaskTest
     {
         Thread.Sleep(100);
     }
+
+    #endregion
 }

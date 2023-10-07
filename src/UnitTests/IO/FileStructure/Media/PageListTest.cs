@@ -24,36 +24,37 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB;
-using SnapDB.IO.Unmanaged;
-using System;
 using System.Collections.Generic;
+using NUnit.Framework;
+using SnapDB.IO.FileStructure.Media;
+using SnapDB.IO.Unmanaged;
 
-namespace UnitTests.IO.FileStructure.Media;
+namespace SnapDB.UnitTests.IO.FileStructure.Media;
 
 /// <summary>
-///This is a test class for PageMetaDataListTest and is intended
-///to contain all PageMetaDataListTest Unit Tests
-///</summary>
-[TestFixture()]
+/// This is a test class for PageMetaDataListTest and is intended
+/// to contain all PageMetaDataListTest Unit Tests
+/// </summary>
+[TestFixture]
 public class PageListTest
 {
+    #region [ Methods ]
 
     /// <summary>
-    ///A test for PageMetaDataList Constructor
-    ///</summary>
-    [Test()]
-    unsafe public void PageMetaDataListConstructorTest()
+    /// A test for PageMetaDataList Constructor
+    /// </summary>
+    [Test]
+    public void PageMetaDataListConstructorTest()
     {
         Assert.AreEqual(0, Globals.MemoryPool.AllocatedBytes);
 
-        using (PageList target = new PageList(Globals.MemoryPool))
+        using (PageList target = new(Globals.MemoryPool))
         {
             target.Dispose();
         }
+
         Assert.AreEqual(0, Globals.MemoryPool.AllocatedBytes);
-        using (PageList target2 = new PageList(Globals.MemoryPool))
+        using (PageList target2 = new(Globals.MemoryPool))
         {
             target2.AllocateNewPage(1);
             Assert.AreNotEqual(0, Globals.MemoryPool.AllocatedBytes);
@@ -63,53 +64,52 @@ public class PageListTest
     }
 
     /// <summary>
-    ///A test for AllocateNewPage
-    ///</summary>
-    [Test()]
+    /// A test for AllocateNewPage
+    /// </summary>
+    [Test]
     public void AllocateNewPageTest()
     {
         Assert.AreEqual(0, Globals.MemoryPool.AllocatedBytes);
-        using (PageList target = new PageList(Globals.MemoryPool))
+        using (PageList target = new(Globals.MemoryPool))
         {
             Assert.AreEqual(0, target.AllocateNewPage(0));
             Assert.AreEqual(Globals.MemoryPool.PageSize * 1, Globals.MemoryPool.AllocatedBytes);
             Assert.AreEqual(1, target.AllocateNewPage(2));
             Assert.AreEqual(Globals.MemoryPool.PageSize * 2, Globals.MemoryPool.AllocatedBytes);
-            target.DoCollection(32, new HashSet<int>(new int[] { 1 }), GetEventArgs());
+            target.DoCollection(32, new HashSet<int>(new[] { 1 }), GetEventArgs());
             Assert.AreEqual(Globals.MemoryPool.PageSize * 1, Globals.MemoryPool.AllocatedBytes);
             Assert.AreEqual(0, target.AllocateNewPage(0));
             Assert.AreEqual(2, target.AllocateNewPage(24352));
 
-            Assert.AreNotEqual(IntPtr.Zero, target.GetPointerToPage(0, 0));
-            Assert.AreNotEqual(IntPtr.Zero, target.GetPointerToPage(1, 0));
-            Assert.AreNotEqual(IntPtr.Zero, target.GetPointerToPage(2, 0));
+            Assert.AreNotEqual(nint.Zero, target.GetPointerToPage(0, 0));
+            Assert.AreNotEqual(nint.Zero, target.GetPointerToPage(1, 0));
+            Assert.AreNotEqual(nint.Zero, target.GetPointerToPage(2, 0));
         }
+
         Assert.AreEqual(0, Globals.MemoryPool.AllocatedBytes);
     }
 
     /// <summary>
-    ///A test for Dispose
-    ///</summary>
-    [Test()]
+    /// A test for Dispose
+    /// </summary>
+    [Test]
     public void DisposeTest()
     {
         Assert.AreEqual(0, Globals.MemoryPool.AllocatedBytes);
-        using (PageList target = new PageList(Globals.MemoryPool))
-        {
-            target.AllocateNewPage(0);
-            target.Dispose();
-            Assert.AreEqual(0, Globals.MemoryPool.AllocatedBytes);
-        }
+        using PageList target = new(Globals.MemoryPool);
+        target.AllocateNewPage(0);
+        target.Dispose();
+        Assert.AreEqual(0, Globals.MemoryPool.AllocatedBytes);
     }
 
     /// <summary>
-    ///A test for DoCollection
-    ///</summary>
-    [Test()]
+    /// A test for DoCollection
+    /// </summary>
+    [Test]
     public void DoCollectionTest()
     {
         Assert.AreEqual(0, Globals.MemoryPool.AllocatedBytes);
-        using (PageList target = new PageList(Globals.MemoryPool))
+        using (PageList target = new(Globals.MemoryPool))
         {
             target.AllocateNewPage(0);
             target.AllocateNewPage(1);
@@ -137,23 +137,31 @@ public class PageListTest
             Assert.AreEqual(0, target.DoCollection(1, new HashSet<int>(), GetEventArgs()));
             Assert.AreEqual(1, target.DoCollection(1, new HashSet<int>(), GetEventArgs()));
         }
+
         Assert.AreEqual(0, Globals.MemoryPool.AllocatedBytes);
-
     }
 
-    static CollectionEventArgs GetEventArgs()
+    #endregion
+
+    #region [ Static ]
+
+    private static CollectionEventArgs GetEventArgs()
     {
-        return new CollectionEventArgs((x) => Globals.MemoryPool.ReleasePage(x), MemoryPoolCollectionMode.Normal, 0);
+        return new CollectionEventArgs(x => Globals.MemoryPool.ReleasePage(x), MemoryPoolCollectionMode.Normal, 0);
     }
 
+    #endregion
 }
 
-static class Extension
+internal static class Extension
 {
+    #region [ Static ]
+
     public static int AllocateNewPage(this PageList page, int pageNumber)
     {
-        Globals.MemoryPool.AllocatePage(out int index, out IntPtr ptr);
+        Globals.MemoryPool.AllocatePage(out int index, out nint ptr);
         return page.AddNewPage(pageNumber, ptr, index);
     }
-}
 
+    #endregion
+}

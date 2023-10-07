@@ -24,22 +24,24 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB.Collections;
 using System;
 using System.Linq;
-using UnitTests.IO.Unmanaged;
+using NUnit.Framework;
+using SnapDB.Collections;
+using SnapDB.UnitTests.IO.Unmanaged;
 
-namespace UnitTests.Collections;
+namespace SnapDB.UnitTests.Collections;
 
-[TestFixture()]
+[TestFixture]
 public class BitArrayTest
 {
-    [Test()]
+    #region [ Methods ]
+
+    [Test]
     public void BitArray()
     {
         MemoryPoolTest.TestMemoryLeak();
-        Random rand = new Random();
+        Random rand = new();
         int seed = rand.Next();
 
         TestSequential(rand.Next(30));
@@ -51,91 +53,11 @@ public class BitArrayTest
         MemoryPoolTest.TestMemoryLeak();
     }
 
-    private static void TestSequential(int count)
-    {
-        BitArray array = new BitArray(true, count);
-        for (int x = 0; x < count; x++)
-        {
-            if (!array.GetBit(x))
-                throw new Exception("each bit should be set");
-        }
-
-        array = new BitArray(false, count);
-        for (int x = 0; x < count; x++)
-        {
-            if (array.GetBit(x))
-                throw new Exception("each bit should be cleared");
-        }
-        for (int x = 0; x < count; x++)
-        {
-            array.SetBit(x);
-            if (!array.GetBit(x))
-                throw new Exception("each bit should be cleared");
-            array.ClearBit(x);
-            if (array.GetBit(x))
-                throw new Exception("each bit should be cleared");
-            array.SetBit(x);
-
-            if (array.FindClearedBit() != (x == count - 1 ? -1 : x + 1))
-                throw new Exception();
-        }
-    }
-
-    private static void TestSequentialInv(int count)
-    {
-        BitArray array = new BitArray(false, count);
-        for (int x = 0; x < count; x++)
-        {
-            if (array.GetBit(x))
-                throw new Exception("each bit should be cleared");
-        }
-
-        array = new BitArray(true, count);
-        for (int x = 0; x < count; x++)
-        {
-            if (!array.GetBit(x))
-                throw new Exception("each bit should be set");
-        }
-        for (int x = 0; x < count; x++)
-        {
-            array.ClearBit(x);
-            if (array.GetBit(x))
-                throw new Exception("each bit should be cleared");
-            array.SetBit(x);
-            if (!array.GetBit(x))
-                throw new Exception("each bit should be cleared");
-            array.ClearBit(x);
-
-            if (array.FindSetBit() != (x == count - 1 ? -1 : x + 1))
-                throw new Exception();
-        }
-    }
-
-    private static void TestRandom(int seed)
-    {
-        Random rand = new Random(seed);
-        int count = rand.Next(1000000);
-
-        bool[] tmp = new bool[count];
-        BitArray array = new BitArray(false, count);
-        for (int x = 0; x < count << 1; x++)
-        {
-            int index = rand.Next(count);
-            array.SetBit(index);
-            tmp[index] = true;
-        }
-        for (int x = 0; x < count; x++)
-        {
-            if (tmp[x] != array.GetBit(x))
-                throw new Exception();
-        }
-    }
-
-    [Test()]
+    [Test]
     public void TestCounts()
     {
         MemoryPoolTest.TestMemoryLeak();
-        BitArray bit = new BitArray(true, 1000);
+        BitArray bit = new(true, 1000);
 
         for (int x = 0; x < 1000; x++)
         {
@@ -169,14 +91,15 @@ public class BitArrayTest
             Assert.AreEqual(1000 - x, bit.ClearCount);
             bit[x] = true;
         }
+
         MemoryPoolTest.TestMemoryLeak();
     }
-  
+
     [Test]
     public void FindBits()
     {
-        BitArray arraySet = new BitArray(true, 15);
-        BitArray arrayClear = new BitArray(false, 15);
+        BitArray arraySet = new(true, 15);
+        BitArray arrayClear = new(false, 15);
 
         if (arraySet.FindClearedBit() != -1)
             throw new Exception();
@@ -214,28 +137,23 @@ public class BitArrayTest
 
         if (arraySet.ClearCount != 0)
             throw new Exception();
-
     }
 
     [Test]
     public void GetSetBits()
     {
-        BitArray array = new BitArray(false, 15);
-     
+        BitArray array = new(false, 15);
+
         for (int x = 0; x < 15; x++)
-        {
             if (array[x])
                 throw new Exception();
-        }
 
         for (int x = 0; x < 15; x++)
-        {
             if (array.GetBitUnchecked(x))
                 throw new Exception();
-        }
 
         array[1] = true;
-        if(array.TrySetBit(1))
+        if (array.TrySetBit(1))
             throw new Exception();
 
         if (!array.TrySetBit(2))
@@ -252,21 +170,21 @@ public class BitArrayTest
 
         //Here, bit 1 is set. 
 
-        if (!array.AreAllBitsSet(1,1))
+        if (!array.AreAllBitsSet(1, 1))
             throw new Exception();
 
-        if (array.AreAllBitsSet(1,3))
+        if (array.AreAllBitsSet(1, 3))
             throw new Exception();
 
-        if (!array.AreAllBitsCleared(2,8))
+        if (!array.AreAllBitsCleared(2, 8))
             throw new Exception();
 
         if (array.AreAllBitsCleared(0, 8))
             throw new Exception();
 
 
-        array.SetBits(1,8);
-        if (!array.AreAllBitsSet(1,8))
+        array.SetBits(1, 8);
+        if (!array.AreAllBitsSet(1, 8))
             throw new Exception();
 
         array.ClearBits(1, 8);
@@ -283,4 +201,81 @@ public class BitArrayTest
         if (!array.AreAllBitsCleared(62, 500))
             throw new Exception();
     }
+
+    #endregion
+
+    #region [ Static ]
+
+    private static void TestSequential(int count)
+    {
+        BitArray array = new(true, count);
+        for (int x = 0; x < count; x++)
+            if (!array.GetBit(x))
+                throw new Exception("each bit should be set");
+
+        array = new BitArray(false, count);
+        for (int x = 0; x < count; x++)
+            if (array.GetBit(x))
+                throw new Exception("each bit should be cleared");
+        for (int x = 0; x < count; x++)
+        {
+            array.SetBit(x);
+            if (!array.GetBit(x))
+                throw new Exception("each bit should be cleared");
+            array.ClearBit(x);
+            if (array.GetBit(x))
+                throw new Exception("each bit should be cleared");
+            array.SetBit(x);
+
+            if (array.FindClearedBit() != (x == count - 1 ? -1 : x + 1))
+                throw new Exception();
+        }
+    }
+
+    private static void TestSequentialInv(int count)
+    {
+        BitArray array = new(false, count);
+        for (int x = 0; x < count; x++)
+            if (array.GetBit(x))
+                throw new Exception("each bit should be cleared");
+
+        array = new BitArray(true, count);
+        for (int x = 0; x < count; x++)
+            if (!array.GetBit(x))
+                throw new Exception("each bit should be set");
+        for (int x = 0; x < count; x++)
+        {
+            array.ClearBit(x);
+            if (array.GetBit(x))
+                throw new Exception("each bit should be cleared");
+            array.SetBit(x);
+            if (!array.GetBit(x))
+                throw new Exception("each bit should be cleared");
+            array.ClearBit(x);
+
+            if (array.FindSetBit() != (x == count - 1 ? -1 : x + 1))
+                throw new Exception();
+        }
+    }
+
+    private static void TestRandom(int seed)
+    {
+        Random rand = new(seed);
+        int count = rand.Next(1000000);
+
+        bool[] tmp = new bool[count];
+        BitArray array = new(false, count);
+        for (int x = 0; x < count << 1; x++)
+        {
+            int index = rand.Next(count);
+            array.SetBit(index);
+            tmp[index] = true;
+        }
+
+        for (int x = 0; x < count; x++)
+            if (tmp[x] != array.GetBit(x))
+                throw new Exception();
+    }
+
+    #endregion
 }

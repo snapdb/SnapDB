@@ -21,29 +21,35 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB.IO;
-using SnapDB.Security.Authentication;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using NUnit.Framework;
+using SnapDB.IO;
+using SnapDB.Security.Authentication;
 
-namespace UnitTests.Security;
+namespace SnapDB.UnitTests.Security;
 
 [TestFixture]
-public class IntegratedSecurity_Test
+public class IntegratedSecurityTest
 {
-    readonly Stopwatch m_sw = new Stopwatch();
+    #region [ Members ]
+
+    private readonly Stopwatch m_sw = new();
+
+    #endregion
+
+    #region [ Methods ]
 
     [Test]
     public void Test1()
     {
         m_sw.Reset();
 
-        NetworkStreamSimulator net = new NetworkStreamSimulator();
+        NetworkStreamSimulator net = new();
 
-        IntegratedSecurityServer sa = new IntegratedSecurityServer();
+        IntegratedSecurityServer sa = new();
         sa.Users.AddUser("zthe\\steven");
 
         ThreadPool.QueueUserWorkItem(Client1, net.ClientStream);
@@ -55,27 +61,28 @@ public class IntegratedSecurity_Test
         Thread.Sleep(100);
     }
 
-    void Client1(object state)
-    {
-        Stream client = (Stream)state;
-        IntegratedSecurityClient sa = new IntegratedSecurityClient();
-        m_sw.Start();
-        _ = sa.TryAuthenticateAsClient(client);
-        m_sw.Stop();
-        System.Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
-        m_sw.Restart();
-        bool success = sa.TryAuthenticateAsClient(client);
-        m_sw.Stop();
-        System.Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
-        if (!success)
-            throw new Exception();
-    }
-
     [Test]
     public void TestRepeat()
     {
         for (int x = 0; x < 5; x++)
             Test1();
-
     }
+
+    private void Client1(object state)
+    {
+        Stream client = (Stream)state;
+        IntegratedSecurityClient sa = new();
+        m_sw.Start();
+        _ = sa.TryAuthenticateAsClient(client);
+        m_sw.Stop();
+        Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
+        m_sw.Restart();
+        bool success = sa.TryAuthenticateAsClient(client);
+        m_sw.Stop();
+        Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
+        if (!success)
+            throw new Exception();
+    }
+
+    #endregion
 }

@@ -26,18 +26,20 @@
 
 using NUnit.Framework;
 using SnapDB.Collections;
-using UnitTests.IO.Unmanaged;
+using SnapDB.UnitTests.IO.Unmanaged;
 
-namespace UnitTests.Collections;
+namespace SnapDB.UnitTests.Collections;
 
-[TestFixture()]
+[TestFixture]
 public class ResourceQueueCollectionTest
 {
-    [Test()]
+    #region [ Methods ]
+
+    [Test]
     public void Test()
     {
         MemoryPoolTest.TestMemoryLeak();
-        ResourceQueueCollection<int, string> queue = new ResourceQueueCollection<int, string>((x) => () => x.ToString(), 3, 3);
+        ResourceQueueCollection<int, string> queue = new(x => () => x.ToString(), 3, 3);
 
         Assert.AreEqual("1", queue[1].Dequeue());
         Assert.AreEqual("250", queue[250].Dequeue());
@@ -52,11 +54,11 @@ public class ResourceQueueCollectionTest
         MemoryPoolTest.TestMemoryLeak();
     }
 
-    [Test()]
+    [Test]
     public void Test2()
     {
         MemoryPoolTest.TestMemoryLeak();
-        ResourceQueueCollection<int, string> queue = new ResourceQueueCollection<int, string>((x) => x.ToString(), 3, 3);
+        ResourceQueueCollection<int, string> queue = new(x => x.ToString(), 3, 3);
 
         Assert.AreEqual("1", queue[1].Dequeue());
         Assert.AreEqual("250", queue[250].Dequeue());
@@ -71,11 +73,11 @@ public class ResourceQueueCollectionTest
         MemoryPoolTest.TestMemoryLeak();
     }
 
-    [Test()]
+    [Test]
     public void Test3()
     {
         MemoryPoolTest.TestMemoryLeak();
-        ResourceQueueCollection<int, string> queue = new ResourceQueueCollection<int, string>(() => 3.ToString(), 3, 3);
+        ResourceQueueCollection<int, string> queue = new(() => 3.ToString(), 3, 3);
 
         Assert.AreEqual("3", queue[1].Dequeue());
         Assert.AreEqual("3", queue[250].Dequeue());
@@ -89,4 +91,6 @@ public class ResourceQueueCollectionTest
         Assert.AreEqual("3", queue[250].Dequeue());
         MemoryPoolTest.TestMemoryLeak();
     }
+
+    #endregion
 }

@@ -26,19 +26,21 @@
 
 using NUnit.Framework;
 using SnapDB.Collections;
-using UnitTests.IO.Unmanaged;
+using SnapDB.UnitTests.IO.Unmanaged;
 
-namespace UnitTests.Collections;
+namespace SnapDB.UnitTests.Collections;
 
-[TestFixture()]
+[TestFixture]
 public class ResourceQueueTest
 {
-    [Test()]
+    #region [ Methods ]
+
+    [Test]
     public void Test()
     {
         MemoryPoolTest.TestMemoryLeak();
         int x = 0;
-        ResourceQueue<string> queue = new ResourceQueue<string>(() => (x++).ToString(), 3, 4);
+        ResourceQueue<string> queue = new(() => (x++).ToString(), 3, 4);
 
         x = 10;
 
@@ -68,4 +70,6 @@ public class ResourceQueueTest
         Assert.AreEqual(queue.Dequeue(), "13");
         MemoryPoolTest.TestMemoryLeak();
     }
+
+    #endregion
 }

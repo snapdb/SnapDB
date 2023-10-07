@@ -4,6 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <Configurations>Debug;Release;Development</Configurations>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Development'">
@@ -11,10 +12,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\**" />
+    <Compile Remove="SortedTreeStore\Services\Net\**" />
+    <EmbeddedResource Remove="Data\**" />
+    <EmbeddedResource Remove="SortedTreeStore\Services\Net\**" />
+    <None Remove="Data\**" />
+    <None Remove="SortedTreeStore\Services\Net\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Program.cs" />
+    <Compile Remove="RemoteOutputAdapterTest.cs" />
+    <Compile Remove="SortedTreeStore\Tree\Generic\CustomCompression\HistorianCompressionDelta_Test.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
     <PackageReference Include="Gemstone.Common" Version="1.0.100" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />

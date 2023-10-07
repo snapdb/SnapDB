@@ -21,21 +21,23 @@
 //
 //******************************************************************************************************
 
+using System;
+using System.Diagnostics;
 using NUnit.Framework;
 using SnapDB.IO.Unmanaged;
 using SnapDB.Snap.Tree;
 using SnapDB.Snap.Types;
-using System;
-using System.Diagnostics;
 
-namespace UnitTests.SortedTreeStore.Tree.Generic;
+namespace SnapDB.UnitTests.SortedTreeStore.Tree.Generic;
 
-public static class Extension_FixedSizeNode_uint_uint
+public static class ExtensionFixedSizeNodeUintUint
 {
+    #region [ Static ]
+
     public static uint Get(this FixedSizeNode<SnapUInt32, SnapUInt32> tree, uint key)
     {
-        SnapUInt32 k = new SnapUInt32(key);
-        SnapUInt32 v = new SnapUInt32();
+        SnapUInt32 k = new(key);
+        SnapUInt32 v = new();
         if (!tree.TryGet(k, v))
             throw new Exception();
         return v.Value;
@@ -43,8 +45,8 @@ public static class Extension_FixedSizeNode_uint_uint
 
     public static bool TryGet(this FixedSizeNode<SnapUInt32, SnapUInt32> tree, uint key, out uint value)
     {
-        SnapUInt32 k = new SnapUInt32(key);
-        SnapUInt32 v = new SnapUInt32();
+        SnapUInt32 k = new(key);
+        SnapUInt32 v = new();
         bool rv = tree.TryGet(k, v);
         value = v.Value;
         return rv;
@@ -52,32 +54,32 @@ public static class Extension_FixedSizeNode_uint_uint
 
     public static uint GetOrGetNext(this FixedSizeNode<SnapUInt32, SnapUInt32> tree, uint key)
     {
-        SnapUInt32 k = new SnapUInt32(key);
-        SnapUInt32 v = new SnapUInt32();
+        SnapUInt32 k = new(key);
+        SnapUInt32 v = new();
         tree.GetOrGetNext(k, v);
         return v.Value;
     }
 
     public static bool TryInsert(this FixedSizeNode<SnapUInt32, SnapUInt32> tree, uint key, uint value)
     {
-        SnapUInt32 k = new SnapUInt32(key);
-        SnapUInt32 v = new SnapUInt32(value);
+        SnapUInt32 k = new(key);
+        SnapUInt32 v = new(value);
         bool rv = tree.TryInsert(k, v);
         return rv;
     }
 
     public static void Insert(this FixedSizeNode<SnapUInt32, SnapUInt32> tree, uint key, uint value)
     {
-        SnapUInt32 k = new SnapUInt32(key);
-        SnapUInt32 v = new SnapUInt32(value);
+        SnapUInt32 k = new(key);
+        SnapUInt32 v = new(value);
         if (!tree.TryInsert(k, v))
             throw new Exception();
     }
 
     public static void GetFirstKeyValue(this FixedSizeNode<SnapUInt32, SnapUInt32> tree, out uint key, out uint value)
     {
-        SnapUInt32 k = new SnapUInt32();
-        SnapUInt32 v = new SnapUInt32();
+        SnapUInt32 k = new();
+        SnapUInt32 v = new();
         tree.TryGetFirstRecord(k, v);
         key = k.Value;
         value = v.Value;
@@ -85,24 +87,24 @@ public static class Extension_FixedSizeNode_uint_uint
 
     public static uint GetFirstKey(this FixedSizeNode<SnapUInt32, SnapUInt32> tree)
     {
-        SnapUInt32 k = new SnapUInt32();
-        SnapUInt32 v = new SnapUInt32();
+        SnapUInt32 k = new();
+        SnapUInt32 v = new();
         tree.TryGetFirstRecord(k, v);
         return k.Value;
     }
 
     public static uint GetFirstValue(this FixedSizeNode<SnapUInt32, SnapUInt32> tree)
     {
-        SnapUInt32 k = new SnapUInt32();
-        SnapUInt32 v = new SnapUInt32();
+        SnapUInt32 k = new();
+        SnapUInt32 v = new();
         tree.TryGetFirstRecord(k, v);
         return v.Value;
     }
 
     public static void GetLastKeyValue(this FixedSizeNode<SnapUInt32, SnapUInt32> tree, out uint key, out uint value)
     {
-        SnapUInt32 k = new SnapUInt32();
-        SnapUInt32 v = new SnapUInt32();
+        SnapUInt32 k = new();
+        SnapUInt32 v = new();
         tree.TryGetLastRecord(k, v);
         key = k.Value;
         value = v.Value;
@@ -110,23 +112,23 @@ public static class Extension_FixedSizeNode_uint_uint
 
     public static uint GetLastKey(this FixedSizeNode<SnapUInt32, SnapUInt32> tree)
     {
-        SnapUInt32 k = new SnapUInt32();
-        SnapUInt32 v = new SnapUInt32();
+        SnapUInt32 k = new();
+        SnapUInt32 v = new();
         tree.TryGetLastRecord(k, v);
         return k.Value;
     }
 
     public static uint GetLastValue(this FixedSizeNode<SnapUInt32, SnapUInt32> tree)
     {
-        SnapUInt32 k = new SnapUInt32();
-        SnapUInt32 v = new SnapUInt32();
+        SnapUInt32 k = new();
+        SnapUInt32 v = new();
         tree.TryGetLastRecord(k, v);
         return v.Value;
     }
 
     public static bool KeyInsideBounds(this FixedSizeNode<SnapUInt32, SnapUInt32> tree, uint key)
     {
-        SnapUInt32 k = new SnapUInt32(key);
+        SnapUInt32 k = new(key);
         return tree.IsKeyInsideBounds(k);
     }
 
@@ -139,12 +141,20 @@ public static class Extension_FixedSizeNode_uint_uint
     {
         return tree.LowerKey.Value;
     }
+
+    #endregion
 }
 
 [TestFixture]
-public class FixedSizeNode_Test
+public class FixedSizeNodeTest
 {
+    #region [ Members ]
+
     private const int Max = 1000000;
+
+    #endregion
+
+    #region [ Methods ]
 
     [Test]
     public void Test_CreateRootNode_Get()
@@ -153,60 +163,69 @@ public class FixedSizeNode_Test
         byte rootLevel = 0;
 
         uint nextKeyIndex = 0;
-        Func<uint> getNextKey = () =>
+
+        uint GetNextKey()
         {
             nextKeyIndex++;
             return nextKeyIndex - 1;
-        };
-        Action<SnapUInt32, uint, byte> addToParent = (int32, u, arg3) => int32 = int32;
-        Func<SnapUInt32, uint> findLeafNode = int32 => 0;
-
-        Stopwatch swWrite = new Stopwatch();
-        Stopwatch swRead = new Stopwatch();
-        using (BinaryStream bs = new BinaryStream())
-        {
-            uint k, v;
-            FixedSizeNode<SnapUInt32, SnapUInt32> node = new FixedSizeNode<SnapUInt32, SnapUInt32>(0);
-
-            node.Initialize(bs, 1024, getNextKey, null);
-
-            node.CreateEmptyNode(0);
-            node.Insert(1, 100);
-            node.Insert(2, 200);
-
-            Assert.AreEqual(0u, node.NodeIndex);
-            Assert.AreEqual(uint.MaxValue, node.LeftSiblingNodeIndex);
-            Assert.AreEqual(uint.MaxValue, node.RightSiblingNodeIndex);
-
-            Assert.AreEqual(1u, node.GetFirstKey());
-            Assert.AreEqual(100u, node.GetFirstValue());
-            Assert.AreEqual(2u, node.GetLastKey());
-            Assert.AreEqual(200u, node.GetLastValue());
-
-            Assert.AreEqual(100u, node.Get(1));
-            Assert.AreEqual(200u, node.Get(2));
-            Assert.AreEqual(100u, node.GetOrGetNext(1));
-            Assert.AreEqual(200u, node.GetOrGetNext(2));
-            Assert.AreEqual(200u, node.GetOrGetNext(3));
-
-            node.SetNodeIndex(0);
-
-            Assert.AreEqual(0u, node.NodeIndex);
-            Assert.AreEqual(uint.MaxValue, node.LeftSiblingNodeIndex);
-            Assert.AreEqual(uint.MaxValue, node.RightSiblingNodeIndex);
-
-            Assert.AreEqual(1u, node.GetFirstKey());
-            Assert.AreEqual(100u, node.GetFirstValue());
-            Assert.AreEqual(2u, node.GetLastKey());
-            Assert.AreEqual(200u, node.GetLastValue());
-
-            Assert.AreEqual(100u, node.Get(1));
-            Assert.AreEqual(200u, node.Get(2));
-            Assert.AreEqual(100u, node.GetOrGetNext(1));
-            Assert.AreEqual(200u, node.GetOrGetNext(2));
-            Assert.AreEqual(200u, node.GetOrGetNext(3));
         }
+
+        void AddToParent(SnapUInt32 int32, uint u, byte arg3)
+        {
+            int32 = int32;
+        }
+
+        uint FindLeafNode(SnapUInt32 int32)
+        {
+            return 0;
+        }
+
+        Stopwatch swWrite = new();
+        Stopwatch swRead = new();
+        using BinaryStream bs = new();
+        uint k, v;
+        FixedSizeNode<SnapUInt32, SnapUInt32> node = new(0);
+
+        node.Initialize(bs, 1024, GetNextKey, null);
+
+        node.CreateEmptyNode(0);
+        node.Insert(1, 100);
+        node.Insert(2, 200);
+
+        Assert.AreEqual(0u, node.NodeIndex);
+        Assert.AreEqual(uint.MaxValue, node.LeftSiblingNodeIndex);
+        Assert.AreEqual(uint.MaxValue, node.RightSiblingNodeIndex);
+
+        Assert.AreEqual(1u, node.GetFirstKey());
+        Assert.AreEqual(100u, node.GetFirstValue());
+        Assert.AreEqual(2u, node.GetLastKey());
+        Assert.AreEqual(200u, node.GetLastValue());
+
+        Assert.AreEqual(100u, node.Get(1));
+        Assert.AreEqual(200u, node.Get(2));
+        Assert.AreEqual(100u, node.GetOrGetNext(1));
+        Assert.AreEqual(200u, node.GetOrGetNext(2));
+        Assert.AreEqual(200u, node.GetOrGetNext(3));
+
+        node.SetNodeIndex(0);
+
+        Assert.AreEqual(0u, node.NodeIndex);
+        Assert.AreEqual(uint.MaxValue, node.LeftSiblingNodeIndex);
+        Assert.AreEqual(uint.MaxValue, node.RightSiblingNodeIndex);
+
+        Assert.AreEqual(1u, node.GetFirstKey());
+        Assert.AreEqual(100u, node.GetFirstValue());
+        Assert.AreEqual(2u, node.GetLastKey());
+        Assert.AreEqual(200u, node.GetLastValue());
+
+        Assert.AreEqual(100u, node.Get(1));
+        Assert.AreEqual(200u, node.Get(2));
+        Assert.AreEqual(100u, node.GetOrGetNext(1));
+        Assert.AreEqual(200u, node.GetOrGetNext(2));
+        Assert.AreEqual(200u, node.GetOrGetNext(3));
     }
+
+    #endregion
 
     //[Test]
     //public void Test_Split()

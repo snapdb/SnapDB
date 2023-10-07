@@ -21,20 +21,21 @@
 //
 //******************************************************************************************************
 
-using SnapDB.Snap;
 using System;
+using SnapDB.Snap;
 
-namespace UnitTests.SortedTreeStore.Tree.Generic;
+namespace SnapDB.UnitTests.SortedTreeStore.Tree.Generic;
 
 public static class KeyValueStreamExtension
 {
-    public static TreeStreamSequential<TKey, TValue> TestSequential<TKey, TValue>(this TreeStream<TKey, TValue> stream)
-        where TKey : SnapTypeBase<TKey>, new()
-        where TValue : SnapTypeBase<TValue>, new()
+    #region [ Static ]
+
+    public static TreeStreamSequential<TKey, TValue> TestSequential<TKey, TValue>(this TreeStream<TKey, TValue> stream) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         return new TreeStreamSequential<TKey, TValue>(stream);
     }
 
+    #endregion
 }
 
 /// <summary>
@@ -42,38 +43,42 @@ public static class KeyValueStreamExtension
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-public class TreeStreamSequential<TKey, TValue>
-    : TreeStream<TKey, TValue>
-    where TKey : SnapTypeBase<TKey>, new()
-    where TValue : SnapTypeBase<TValue>, new()
+public class TreeStreamSequential<TKey, TValue> : TreeStream<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    #region [ Members ]
 
-    bool m_isEndOfStream;
-    private bool IsValid;
-    private readonly TKey CurrentKey;
-    private readonly TValue CurrentValue;
-
-    private bool m_baseStreamIsValid;
+    private readonly TreeStream<TKey, TValue> m_baseStream;
     private readonly TKey m_baseStreamCurrentKey;
     private readonly TValue m_baseStreamCurrentValue;
 
+    private bool m_baseStreamIsValid;
+    private readonly TKey m_currentKey;
+    private readonly TValue m_currentValue;
+    private bool m_isEndOfStream;
+    private bool m_isValid;
 
-    readonly TreeStream<TKey, TValue> m_baseStream;
+    #endregion
+
+    #region [ Constructors ]
 
     public TreeStreamSequential(TreeStream<TKey, TValue> baseStream)
     {
         m_isEndOfStream = false;
         m_baseStream = baseStream;
-        IsValid = false;
-        CurrentKey = new TKey();
-        CurrentValue = new TValue();
+        m_isValid = false;
+        m_currentKey = new TKey();
+        m_currentValue = new TValue();
         m_baseStreamCurrentKey = new TKey();
         m_baseStreamCurrentValue = new TValue();
         m_baseStreamIsValid = false;
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     /// <summary>
-    /// Advances the stream to the next value. 
+    /// Advances the stream to the next value.
     /// If before the beginning of the stream, advances to the first value
     /// </summary>
     /// <returns>True if the advance was successful. False if the end of the stream was reached.</returns>
@@ -83,7 +88,7 @@ public class TreeStreamSequential<TKey, TValue>
         {
             if (m_baseStream.Read(key, value))
                 throw new Exception("Data exists past the end of the stream");
-            if (m_baseStream.EOS)
+            if (m_baseStream.Eos)
                 throw new Exception("Should not be valid");
             return false;
         }
@@ -93,26 +98,26 @@ public class TreeStreamSequential<TKey, TValue>
         {
             if (!m_baseStreamIsValid)
                 throw new Exception("Should be valid");
-            if (IsValid)
-                if (CurrentKey.IsGreaterThanOrEqualTo(m_baseStreamCurrentKey))// CurrentKey.IsGreaterThanOrEqualTo(m_baseStream.CurrentKey))
+            if (m_isValid)
+                if (m_currentKey.IsGreaterThanOrEqualTo(m_baseStreamCurrentKey)) // CurrentKey.IsGreaterThanOrEqualTo(m_baseStream.CurrentKey))
                     throw new Exception("Stream is not sequential");
 
-            IsValid = true;
-            m_baseStreamCurrentKey.CopyTo(CurrentKey); //m_baseStream.CurrentKey.CopyTo(CurrentKey);
-            m_baseStreamCurrentValue.CopyTo(CurrentValue); // m_baseStream.CurrentValue.CopyTo(CurrentValue);
+            m_isValid = true;
+            m_baseStreamCurrentKey.CopyTo(m_currentKey); //m_baseStream.CurrentKey.CopyTo(CurrentKey);
+            m_baseStreamCurrentValue.CopyTo(m_currentValue); // m_baseStream.CurrentValue.CopyTo(CurrentValue);
             return true;
         }
-        else
-        {
-            m_baseStreamIsValid = m_baseStream.Read(m_baseStreamCurrentKey, m_baseStreamCurrentValue);
-            if (m_baseStreamIsValid)
-                throw new Exception("Data exists past the end of the stream");
-            if (m_baseStreamIsValid)
-                throw new Exception("Should not be valid");
 
-            m_isEndOfStream = true;
-            IsValid = false;
-            return false;
-        }
+        m_baseStreamIsValid = m_baseStream.Read(m_baseStreamCurrentKey, m_baseStreamCurrentValue);
+        if (m_baseStreamIsValid)
+            throw new Exception("Data exists past the end of the stream");
+        if (m_baseStreamIsValid)
+            throw new Exception("Should not be valid");
+
+        m_isEndOfStream = true;
+        m_isValid = false;
+        return false;
     }
+
+    #endregion
 }

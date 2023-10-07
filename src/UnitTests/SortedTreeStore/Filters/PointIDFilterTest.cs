@@ -21,84 +21,82 @@
 //
 //******************************************************************************************************
 
+using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using SnapDB.IO.Unmanaged;
 using SnapDB.Snap;
 using SnapDB.Snap.Filters;
-using System;
-using System.Collections.Generic;
+using SnapDB.UnitTests.Snap;
 
-namespace UnitTests.SortedTreeStore.Filters;
+namespace SnapDB.UnitTests.SortedTreeStore.Filters;
 
 [TestFixture]
-public class PointIDFilterTest
+public class PointIdFilterTest
 {
+    #region [ Methods ]
+
     [Test]
     public void TestBitArray()
     {
-        List<ulong> list = new List<ulong>();
+        List<ulong> list = new();
         MatchFilterBase<HistorianKey, HistorianValue> pointId = PointIdMatchFilter.CreateFromList<HistorianKey, HistorianValue>(list);
 
         if (!pointId.GetType().FullName.Contains("BitArrayFilter"))
             throw new Exception("Wrong type");
 
-        using (BinaryStream bs = new BinaryStream(allocatesOwnMemory: true))
-        {
-            bs.Write(pointId.FilterType);
-            pointId.Save(bs);
-            bs.Position = 0;
+        using BinaryStream bs = new(true);
+        bs.Write(pointId.FilterType);
+        pointId.Save(bs);
+        bs.Position = 0;
 
-            MatchFilterBase<HistorianKey, HistorianValue> filter = Library.Filters.GetMatchFilter<HistorianKey, HistorianValue>(bs.ReadGuid(), bs);
+        MatchFilterBase<HistorianKey, HistorianValue> filter = Library.Filters.GetMatchFilter<HistorianKey, HistorianValue>(bs.ReadGuid(), bs);
 
-            if (!filter.GetType().FullName.Contains("BitArrayFilter"))
-                throw new Exception("Wrong type");
-        }
+        if (!filter.GetType().FullName.Contains("BitArrayFilter"))
+            throw new Exception("Wrong type");
     }
 
     [Test]
     public void TestUintHashSet()
     {
-        List<ulong> list = new List<ulong>();
+        List<ulong> list = new();
         list.Add(132412341);
         MatchFilterBase<HistorianKey, HistorianValue> pointId = PointIdMatchFilter.CreateFromList<HistorianKey, HistorianValue>(list);
 
         if (!pointId.GetType().FullName.Contains("UIntHashSet"))
             throw new Exception("Wrong type");
 
-        using (BinaryStream bs = new BinaryStream(allocatesOwnMemory: true))
-        {
-            bs.Write(pointId.FilterType);
-            pointId.Save(bs);
-            bs.Position = 0;
+        using BinaryStream bs = new(true);
+        bs.Write(pointId.FilterType);
+        pointId.Save(bs);
+        bs.Position = 0;
 
-            MatchFilterBase<HistorianKey, HistorianValue> filter = Library.Filters.GetMatchFilter<HistorianKey, HistorianValue>(bs.ReadGuid(), bs);
+        MatchFilterBase<HistorianKey, HistorianValue> filter = Library.Filters.GetMatchFilter<HistorianKey, HistorianValue>(bs.ReadGuid(), bs);
 
-            if (!filter.GetType().FullName.Contains("UIntHashSet"))
-                throw new Exception("Wrong type");
-        }
+        if (!filter.GetType().FullName.Contains("UIntHashSet"))
+            throw new Exception("Wrong type");
     }
 
     [Test]
     public void TestUlongHashSet()
     {
-        List<ulong> list = new List<ulong>();
+        List<ulong> list = new();
         list.Add(13242345234523412341ul);
         MatchFilterBase<HistorianKey, HistorianValue> pointId = PointIdMatchFilter.CreateFromList<HistorianKey, HistorianValue>(list);
 
         if (!pointId.GetType().FullName.Contains("ULongHashSet"))
             throw new Exception("Wrong type");
 
-        using (BinaryStream bs = new BinaryStream(allocatesOwnMemory: true))
-        {
-            bs.Write(pointId.FilterType);
-            pointId.Save(bs);
-            bs.Position = 0;
+        using BinaryStream bs = new(true);
+        bs.Write(pointId.FilterType);
+        pointId.Save(bs);
+        bs.Position = 0;
 
-            MatchFilterBase<HistorianKey, HistorianValue> filter = Library.Filters.GetMatchFilter<HistorianKey, HistorianValue>(bs.ReadGuid(), bs);
+        MatchFilterBase<HistorianKey, HistorianValue> filter = Library.Filters.GetMatchFilter<HistorianKey, HistorianValue>(bs.ReadGuid(), bs);
 
-            if (!filter.GetType().FullName.Contains("ULongHashSet"))
-                throw new Exception("Wrong type");
-        }
+        if (!filter.GetType().FullName.Contains("ULongHashSet"))
+            throw new Exception("Wrong type");
     }
 
+    #endregion
 }

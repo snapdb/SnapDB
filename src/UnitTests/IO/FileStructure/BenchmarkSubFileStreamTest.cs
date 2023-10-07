@@ -28,48 +28,41 @@
 using NUnit.Framework;
 using SnapDB.IO.FileStructure;
 using SnapDB.IO.Unmanaged;
-using UnitTests.IO.Unmanaged;
+using SnapDB.UnitTests.IO.Unmanaged;
 
-namespace UnitTests.IO.FileStructure;
+namespace SnapDB.UnitTests.IO.FileStructure;
 
 [TestFixture]
 internal class BenchmarkSubFileStreamTest
 {
+    #region [ Methods ]
+
     [Test]
     public void TestSubFileStream()
     {
-        const int BlockSize = 256;
+        const int blockSize = 256;
         MemoryPoolTest.TestMemoryLeak();
         //string file = Path.GetTempFileName();
         //System.IO.File.Delete(file);
-        try
-        {
-            //using (FileSystemSnapshotService service = FileSystemSnapshotService.CreateFile(file))
-            using (TransactionalFileStructure service = TransactionalFileStructure.CreateInMemory(BlockSize))
-            {
-                using (TransactionalEdit edit = service.BeginEdit())
-                {
-                    SubFileStream fs = edit.CreateFile(SubFileName.Empty);
-                    BinaryStream bs = new BinaryStream(fs);
+        //using (FileSystemSnapshotService service = FileSystemSnapshotService.CreateFile(file))
+        using TransactionalFileStructure service = TransactionalFileStructure.CreateInMemory(blockSize);
+        using TransactionalEdit edit = service.BeginEdit();
+        SubFileStream fs = edit.CreateFile(SubFileName.Empty);
+        BinaryStream bs = new(fs);
 
-                    for (int x = 0; x < 20000000; x++)
-                        bs.Write(1L);
+        for (int x = 0; x < 20000000; x++)
+            bs.Write(1L);
 
-                    bs.Position = 0;
+        bs.Position = 0;
 
-                    BinaryStreamBenchmark.Run(bs, false);
+        BinaryStreamBenchmark.Run(bs, false);
 
-                    bs.Dispose();
-                    fs.Dispose();
-                    edit.CommitAndDispose();
-                }
-            }
-        }
-        finally
-        {
-            //System.IO.File.Delete(file);
-        }
+        bs.Dispose();
+        fs.Dispose();
+        edit.CommitAndDispose();
 
         MemoryPoolTest.TestMemoryLeak();
     }
+
+    #endregion
 }

@@ -21,24 +21,30 @@
 //
 //******************************************************************************************************
 
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Threading;
 using Gemstone.Diagnostics;
 using Gemstone.IO.StreamExtensions;
 using NUnit.Framework;
 using SnapDB.IO;
 using SnapDB.Security;
 using SnapDB.Security.Authentication;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
 
-namespace UnitTests.Security;
+namespace SnapDB.UnitTests.Security;
 
 [TestFixture]
-public class SecureStream_Test
+public class SecureStreamTest
 {
+    #region [ Members ]
+
     public NullToken T;
-    readonly Stopwatch m_sw = new Stopwatch();
+    private readonly Stopwatch m_sw = new();
+
+    #endregion
+
+    #region [ Methods ]
 
     //[Test]
     //public void Test1()
@@ -97,39 +103,21 @@ public class SecureStream_Test
         Logger.Console.Verbose = VerboseLevel.All;
         m_sw.Reset();
 
-        NetworkStreamSimulator net = new NetworkStreamSimulator();
-        SecureStreamServer<NullToken> sa = new SecureStreamServer<NullToken>();
+        NetworkStreamSimulator net = new();
+        SecureStreamServer<NullToken> sa = new();
         sa.SetDefaultUser(true, new NullToken());
         ThreadPool.QueueUserWorkItem(ClientDefault, net.ClientStream);
 
         if (!sa.TryAuthenticateAsServer(net.ServerStream, true, out Stream stream, out T))
-        {
             throw new Exception();
-        }
-        
+
         stream.Write("Message");
         stream.Flush();
         if (stream.ReadString() != "Response")
             throw new Exception();
         stream.Dispose();
-        
+
         Thread.Sleep(100);
-    }
-
-    void ClientDefault(object state)
-    {
-        Stream client = (Stream)state;
-        SecureStreamClientDefault sa = new SecureStreamClientDefault();
-        if (!sa.TryAuthenticate(client, true, out Stream stream))
-        {
-            throw new Exception();
-        }
-
-        if (stream.ReadString() != "Message")
-            throw new Exception();
-        stream.Write("Response");
-        stream.Flush();
-        stream.Dispose();
     }
 
     [Test]
@@ -137,17 +125,17 @@ public class SecureStream_Test
     {
         for (int x = 0; x < 5; x++)
             TestBenchmarkDefault();
-
     }
+
     [Test]
     public void TestBenchmarkDefault()
     {
         Logger.Console.Verbose = VerboseLevel.All;
         m_sw.Reset();
 
-        NetworkStreamSimulator net = new NetworkStreamSimulator();
+        NetworkStreamSimulator net = new();
 
-        SecureStreamServer<NullToken> sa = new SecureStreamServer<NullToken>();
+        SecureStreamServer<NullToken> sa = new();
         sa.SetDefaultUser(true, new NullToken());
         ThreadPool.QueueUserWorkItem(ClientBenchmarkDefault, net.ClientStream);
 
@@ -160,36 +148,6 @@ public class SecureStream_Test
         Thread.Sleep(100);
     }
 
-    void ClientBenchmarkDefault(object state)
-    {
-        Stream client = (Stream)state;
-        SecureStreamClientDefault sa = new SecureStreamClientDefault();
-        m_sw.Start();
-        sa.TryAuthenticate(client, false);
-        m_sw.Stop();
-        System.Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
-
-        m_sw.Restart();
-        sa.TryAuthenticate(client);
-        m_sw.Stop();
-        System.Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
-
-        m_sw.Restart();
-        sa.TryAuthenticate(client, false);
-        m_sw.Stop();
-        System.Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
-
-        m_sw.Restart();
-        sa.TryAuthenticate(client);
-        m_sw.Stop();
-        System.Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
-
-        m_sw.Restart();
-        sa.TryAuthenticate(client, false);
-        m_sw.Stop();
-        System.Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
-    }
-
     [Test]
     public void TestBenchmarkIntegrated()
     {
@@ -197,9 +155,9 @@ public class SecureStream_Test
         Logger.Console.Verbose = VerboseLevel.All;
         m_sw.Reset();
 
-        NetworkStreamSimulator net = new NetworkStreamSimulator();
+        NetworkStreamSimulator net = new();
 
-        SecureStreamServer<NullToken> sa = new SecureStreamServer<NullToken>();
+        SecureStreamServer<NullToken> sa = new();
         sa.AddUserIntegratedSecurity("Zthe\\steven", new NullToken());
         ThreadPool.QueueUserWorkItem(ClientBenchmarkIntegrated, net.ClientStream);
 
@@ -213,41 +171,86 @@ public class SecureStream_Test
         Thread.Sleep(100);
     }
 
-    void ClientBenchmarkIntegrated(object state)
-    {
-        Stream client = (Stream)state;
-        SecureStreamClientIntegratedSecurity sa = new SecureStreamClientIntegratedSecurity();
-        m_sw.Start();
-        sa.TryAuthenticate(client);
-        m_sw.Stop();
-        System.Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
-
-        m_sw.Restart();
-        sa.TryAuthenticate(client);
-        m_sw.Stop();
-        System.Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
-
-        m_sw.Restart();
-        sa.TryAuthenticate(client);
-        m_sw.Stop();
-        System.Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
-
-        m_sw.Restart();
-        sa.TryAuthenticate(client);
-        m_sw.Stop();
-        System.Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
-
-        m_sw.Restart();
-        sa.TryAuthenticate(client);
-        m_sw.Stop();
-        System.Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
-    }
-
     [Test]
     public void TestRepeatIntegrated()
     {
         for (int x = 0; x < 5; x++)
             TestBenchmarkIntegrated();
-
     }
+
+    private void ClientDefault(object state)
+    {
+        Stream client = (Stream)state;
+        SecureStreamClientDefault sa = new();
+        if (!sa.TryAuthenticate(client, true, out Stream stream))
+            throw new Exception();
+
+        if (stream.ReadString() != "Message")
+            throw new Exception();
+        stream.Write("Response");
+        stream.Flush();
+        stream.Dispose();
+    }
+
+    private void ClientBenchmarkDefault(object state)
+    {
+        Stream client = (Stream)state;
+        SecureStreamClientDefault sa = new();
+        m_sw.Start();
+        sa.TryAuthenticate(client, false);
+        m_sw.Stop();
+        Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
+
+        m_sw.Restart();
+        sa.TryAuthenticate(client);
+        m_sw.Stop();
+        Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
+
+        m_sw.Restart();
+        sa.TryAuthenticate(client, false);
+        m_sw.Stop();
+        Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
+
+        m_sw.Restart();
+        sa.TryAuthenticate(client);
+        m_sw.Stop();
+        Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
+
+        m_sw.Restart();
+        sa.TryAuthenticate(client, false);
+        m_sw.Stop();
+        Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
+    }
+
+    private void ClientBenchmarkIntegrated(object state)
+    {
+        Stream client = (Stream)state;
+        SecureStreamClientIntegratedSecurity sa = new();
+        m_sw.Start();
+        sa.TryAuthenticate(client);
+        m_sw.Stop();
+        Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
+
+        m_sw.Restart();
+        sa.TryAuthenticate(client);
+        m_sw.Stop();
+        Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
+
+        m_sw.Restart();
+        sa.TryAuthenticate(client);
+        m_sw.Stop();
+        Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
+
+        m_sw.Restart();
+        sa.TryAuthenticate(client);
+        m_sw.Stop();
+        Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
+
+        m_sw.Restart();
+        sa.TryAuthenticate(client);
+        m_sw.Stop();
+        Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
+    }
+
+    #endregion
 }

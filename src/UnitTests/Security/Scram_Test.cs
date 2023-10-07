@@ -21,35 +21,40 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB.IO;
-using SnapDB.Security;
-using SnapDB.Security.Authentication;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using NUnit.Framework;
+using SnapDB.IO;
+using SnapDB.Security.Authentication;
 
-namespace UnitTests.Security;
+namespace SnapDB.UnitTests.Security;
 
 [TestFixture]
-public class Scram_Test
+public class ScramTest
 {
-    readonly Stopwatch m_sw = new Stopwatch();
+    #region [ Members ]
+
+    private readonly Stopwatch m_sw = new();
+
+    #endregion
+
+    #region [ Methods ]
 
     [Test]
     public void Test1()
     {
         m_sw.Reset();
 
-        NetworkStreamSimulator net = new NetworkStreamSimulator();
+        NetworkStreamSimulator net = new();
 
-        Stopwatch sw = new Stopwatch();
-        ScramServer sa = new ScramServer();
+        Stopwatch sw = new();
+        ScramServer sa = new();
         sw.Start();
-        sa.Users.AddUser("user1", "password1", 10000, 1, HashMethod.Sha256);
+        sa.Users.AddUser("user1", "password1", 10000, 1);
         sw.Stop();
-        System.Console.WriteLine(sw.Elapsed.TotalMilliseconds);
+        Console.WriteLine(sw.Elapsed.TotalMilliseconds);
         ThreadPool.QueueUserWorkItem(Client1, net.ClientStream);
         ScramServerSession user = sa.AuthenticateAsServer(net.ServerStream, new byte[] { 100, 29 });
         user = sa.AuthenticateAsServer(net.ServerStream, new byte[] { 100, 29 });
@@ -57,19 +62,6 @@ public class Scram_Test
             throw new Exception();
 
         Thread.Sleep(100);
-    }
-
-    void Client1(object state)
-    {
-        Stream client = (Stream)state;
-        ScramClient sa = new ScramClient("user1", "password1");
-        sa.AuthenticateAsClient(client, new byte[] { 100, 29 });
-        m_sw.Start();
-        bool success = sa.AuthenticateAsClient(client, new byte[] { 100, 29 });
-        m_sw.Stop();
-        System.Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
-        if (!success)
-            throw new Exception();
     }
 
     [Test]
@@ -84,4 +76,18 @@ public class Scram_Test
         Test1();
     }
 
+    private void Client1(object state)
+    {
+        Stream client = (Stream)state;
+        ScramClient sa = new("user1", "password1");
+        sa.AuthenticateAsClient(client, new byte[] { 100, 29 });
+        m_sw.Start();
+        bool success = sa.AuthenticateAsClient(client, new byte[] { 100, 29 });
+        m_sw.Stop();
+        Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
+        if (!success)
+            throw new Exception();
+    }
+
+    #endregion
 }

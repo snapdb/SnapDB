@@ -24,31 +24,36 @@
 //
 //******************************************************************************************************
 
+using System;
 using NUnit.Framework;
-using SnapDB;
+using SnapDB.IO.FileStructure.Media;
 using SnapDB.IO.Unmanaged;
-using UnitTests.IO.Unmanaged;
+using SnapDB.UnitTests.IO.Unmanaged;
 
-namespace UnitTests.IO.FileStructure.Media;
+namespace SnapDB.UnitTests.IO.FileStructure.Media;
 
 [TestFixture]
 internal class MemoryFileBenchmark
 {
+    #region [ Methods ]
+
     [Test]
     public void Test1()
     {
         MemoryPoolTest.TestMemoryLeak();
-        MemoryPoolFile file = new MemoryPoolFile(Globals.MemoryPool);
+        MemoryPoolFile file = new(Globals.MemoryPool);
 
         BinaryStreamIoSessionBase session = file.CreateIoSession();
 
-        BlockArguments blockArguments = new BlockArguments();
-        blockArguments.IsWriting = true;
-        blockArguments.Position = 10000000;
+        BlockArguments blockArguments = new()
+        {
+            IsWriting = true,
+            Position = 10000000
+        };
         session.GetBlock(blockArguments);
 
 
-        System.Console.WriteLine("Get Block\t" + StepTimer.Time(10, () =>
+        Console.WriteLine("Get Block\t" + StepTimer.Time(10, () =>
         {
             blockArguments.Position = 100000;
             session.GetBlock(blockArguments);
@@ -74,4 +79,6 @@ internal class MemoryFileBenchmark
         file.Dispose();
         MemoryPoolTest.TestMemoryLeak();
     }
+
+    #endregion
 }

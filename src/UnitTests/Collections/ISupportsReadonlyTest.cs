@@ -24,14 +24,16 @@
 using NUnit.Framework;
 using SnapDB.Immutables;
 
-namespace UnitTests.Collections;
+namespace SnapDB.UnitTests.Collections;
 
 /// <summary>
-///This is a test class for ISupportsReadonlyTest and is intended
-///to contain all ISupportsReadonlyTest Unit Tests
-///</summary>
-public class ISupportsReadonlyTest
+/// This is a test class for ISupportsReadonlyTest and is intended
+/// to contain all ISupportsReadonlyTest Unit Tests
+/// </summary>
+public class SupportsReadonlyTest
 {
+    #region [ Static ]
+
     public static void Test<T>(IImmutableObject<T> obj)
     {
         bool origional = obj.IsReadOnly;
@@ -52,4 +54,6 @@ public class ISupportsReadonlyTest
 
         HelperFunctions.ExpectError(() => ro.IsReadOnly = false);
     }
+
+    #endregion
 }

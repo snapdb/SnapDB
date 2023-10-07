@@ -21,20 +21,28 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB.Snap;
-using SnapDB.Snap.Storage;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using NUnit.Framework;
+using SnapDB.Snap;
+using SnapDB.Snap.Services.Reader;
+using SnapDB.Snap.Storage;
+using SnapDB.UnitTests.Snap;
 
-namespace UnitTests.SortedTreeStore.Services.Reader;
+namespace SnapDB.UnitTests.SortedTreeStore.Services.Reader;
 
 [TestFixture]
 public class UnionReaderTest
 {
-    private int seed = 1;
+    #region [ Members ]
+
+    private int m_seed = 1;
+
+    #endregion
+
+    #region [ Methods ]
 
     [Test]
     public void Test200()
@@ -46,63 +54,54 @@ public class UnionReaderTest
     public void Test()
     {
         for (int x = 1; x < 1000; x *= 2)
-        {
             Test(x);
-        }
     }
 
     public void Test(int count)
     {
-        List<SortedTreeTable<HistorianKey, HistorianValue>> lst = new List<SortedTreeTable<HistorianKey, HistorianValue>>();
+        List<SortedTreeTable<HistorianKey, HistorianValue>> lst = new();
         for (int x = 0; x < count; x++)
-        {
             lst.Add(CreateTable());
-        }
 
-        using (UnionTreeStream<HistorianKey, HistorianValue> reader = new UnionTreeStream<HistorianKey, HistorianValue>(lst.Select(x => new ArchiveTreeStreamWrapper<HistorianKey, HistorianValue>(x)), true))
+        using (UnionTreeStream<HistorianKey, HistorianValue> reader = new(lst.Select(x => new ArchiveTreeStreamWrapper<HistorianKey, HistorianValue>(x)), true))
         {
-            HistorianKey key = new HistorianKey();
-            HistorianValue value = new HistorianValue();
-            Stopwatch sw = new Stopwatch();
+            HistorianKey key = new();
+            HistorianValue value = new();
+            Stopwatch sw = new();
             sw.Start();
             while (reader.Read(key, value))
                 ;
             sw.Stop();
-            System.Console.Write("{0}\t{1}\t{2}", count, sw.Elapsed.TotalSeconds, sw.Elapsed.TotalSeconds / count);
-            System.Console.WriteLine();
+            Console.Write("{0}\t{1}\t{2}", count, sw.Elapsed.TotalSeconds, sw.Elapsed.TotalSeconds / count);
+            Console.WriteLine();
         }
 
         lst.ForEach(x => x.Dispose());
     }
 
 
-    SortedTreeTable<HistorianKey, HistorianValue> CreateTable()
+    private SortedTreeTable<HistorianKey, HistorianValue> CreateTable()
     {
-        Random r = new Random(seed++);
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        Random r = new(m_seed++);
+        HistorianKey key = new();
+        HistorianValue value = new();
         SortedTreeFile file = SortedTreeFile.CreateInMemory();
         SortedTreeTable<HistorianKey, HistorianValue> table = file.OpenOrCreateTable<HistorianKey, HistorianValue>(EncodingDefinition.FixedSizeCombinedEncoding);
 
-        using (SortedTreeTableEditor<HistorianKey, HistorianValue> edit = table.BeginEdit())
+        using SortedTreeTableEditor<HistorianKey, HistorianValue> edit = table.BeginEdit();
+        for (int x = 0; x < 1000; x++)
         {
-            for (int x = 0; x < 1000; x++)
-            {
-                key.Timestamp = (ulong)r.Next();
-                key.PointID = (ulong)r.Next();
-                key.EntryNumber = (ulong)r.Next();
-                edit.AddPoint(key, value);
-            }
-            edit.Commit();
+            key.Timestamp = (ulong)r.Next();
+            key.PointId = (ulong)r.Next();
+            key.EntryNumber = (ulong)r.Next();
+            edit.AddPoint(key, value);
         }
 
-
+        edit.Commit();
 
 
         return table;
     }
 
-
-
-
+    #endregion
 }

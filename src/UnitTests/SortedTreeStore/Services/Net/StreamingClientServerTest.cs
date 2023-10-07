@@ -21,6 +21,7 @@
 //
 //******************************************************************************************************
 
+using System.Threading;
 using Gemstone.Diagnostics;
 using NUnit.Framework;
 using SnapDB.IO;
@@ -29,9 +30,10 @@ using SnapDB.Snap.Services;
 using SnapDB.Snap.Services.Net;
 using SnapDB.Snap.Storage;
 using SnapDB.Snap.Tree;
-using System.Threading;
+using SnapDB.UnitTests.Snap;
+using SnapDB.UnitTests.SortedTreeStore.Tree.Generic;
 
-namespace UnitTests.SortedTreeStore.Services.Net;
+namespace SnapDB.UnitTests.SortedTreeStore.Services.Net;
 
 [TestFixture]
 public class StreamingClientServerTest
@@ -41,11 +43,11 @@ public class StreamingClientServerTest
     {
         Logger.Console.Verbose = VerboseLevel.All;
 
-        NetworkStreamSimulator netStream = new NetworkStreamSimulator();
+        NetworkStreamSimulator netStream = new();
 
         HistorianServerDatabaseConfig dbcfg = new HistorianServerDatabaseConfig("DB", @"C:\Archive", true);
         HistorianServer server = new HistorianServer(dbcfg);
-        SecureStreamServer<SocketUserPermissions> auth = new SecureStreamServer<SocketUserPermissions>();
+        SecureStreamServer<SocketUserPermissions> auth = new();
         auth.SetDefaultUser(true, new SocketUserPermissions()
         {
             CanRead = true,
@@ -53,11 +55,11 @@ public class StreamingClientServerTest
             IsAdmin = true
         });
 
-        SnapStreamingServer netServer = new SnapStreamingServer(auth, netStream.ServerStream, server.Host);
+        SnapStreamingServer netServer = new(auth, netStream.ServerStream, server.Host);
 
         ThreadPool.QueueUserWorkItem(ProcessClient, netServer);
 
-        SnapStreamingClient client = new SnapStreamingClient(netStream.ClientStream, new SecureStreamClientDefault(), true);
+        SnapStreamingClient client = new(netStream.ClientStream, new SecureStreamClientDefault(), true);
 
         ClientDatabaseBase db = client.GetDatabase("DB");
 
@@ -71,31 +73,28 @@ public class StreamingClientServerTest
         //		FilePath	"C:\\Temp\\Historian\\635287587300536177-Stage1-d559e63e-d938-46a9-8d57-268f7c8ba194.d2"	string
         //635329017197429979-Stage1-38887e11-4097-4937-b269-ce4037157691.d2
         //using (var file = SortedTreeFile.OpenFile(@"C:\Temp\Historian\635287587300536177-Stage1-d559e63e-d938-46a9-8d57-268f7c8ba194.d2", true))
-        using (SortedTreeFile file = SortedTreeFile.OpenFile(@"C:\Archive\635329017197429979-Stage1-38887e11-4097-4937-b269-ce4037157691.d2", true))
-        //using (var file = SortedTreeFile.OpenFile(@"C:\Temp\Historian\635255664136496199-Stage2-6e758046-b2af-40ff-ae4e-85cd0c0e4501.d2", true))
-        using (SortedTreeTable<HistorianKey, HistorianValue> table = file.OpenTable<HistorianKey, HistorianValue>())
-        using (SortedTreeTableReadSnapshot<HistorianKey, HistorianValue> reader = table.BeginRead())
+        using SortedTreeFile file = SortedTreeFile.OpenFile(@"C:\Archive\635329017197429979-Stage1-38887e11-4097-4937-b269-ce4037157691.d2", true);
+        using SortedTreeTable<HistorianKey, HistorianValue> table = file.OpenTable<HistorianKey, HistorianValue>();
+        using SortedTreeTableReadSnapshot<HistorianKey, HistorianValue> reader = table.BeginRead();
+        SortedTreeScannerBase<HistorianKey, HistorianValue> scanner = reader.GetTreeScanner();
+        scanner.SeekToStart();
+        scanner.TestSequential().Count();
+
+        HistorianKey key = new();
+        HistorianValue value = new();
+
+        int x = 0;
+        scanner.Peek(key, value);
+
+        while (scanner.Read(key, value) && x < 10000)
         {
-            SortedTreeScannerBase<HistorianKey, HistorianValue> scanner = reader.GetTreeScanner();
-            scanner.SeekToStart();
-            scanner.TestSequential().Count();
+            System.Console.WriteLine(key.PointId);
+            x++;
 
-            HistorianKey key = new HistorianKey();
-            HistorianValue value = new HistorianValue();
-
-            int x = 0;
             scanner.Peek(key, value);
-
-            while (scanner.Read(key, value) && x < 10000)
-            {
-                System.Console.WriteLine(key.PointID);
-                x++;
-
-                scanner.Peek(key, value);
-            }
-
-            scanner.Count();
         }
+
+        scanner.Count();
     }
 
     [Test]
@@ -103,11 +102,11 @@ public class StreamingClientServerTest
     {
         Logger.Console.Verbose = VerboseLevel.All;
 
-        NetworkStreamSimulator netStream = new NetworkStreamSimulator();
+        NetworkStreamSimulator netStream = new();
 
         HistorianServerDatabaseConfig dbcfg = new HistorianServerDatabaseConfig("DB", @"C:\Archive", true);
         HistorianServer server = new HistorianServer(dbcfg);
-        SecureStreamServer<SocketUserPermissions> auth = new SecureStreamServer<SocketUserPermissions>();
+        SecureStreamServer<SocketUserPermissions> auth = new();
         auth.SetDefaultUser(true, new SocketUserPermissions()
         {
             CanRead = true,
@@ -115,11 +114,11 @@ public class StreamingClientServerTest
             IsAdmin = true
         });
 
-        SnapStreamingServer netServer = new SnapStreamingServer(auth, netStream.ServerStream, server.Host);
+        SnapStreamingServer netServer = new(auth, netStream.ServerStream, server.Host);
 
         ThreadPool.QueueUserWorkItem(ProcessClient, netServer);
 
-        SnapStreamingClient client = new SnapStreamingClient(netStream.ClientStream, new SecureStreamClientDefault(), true);
+        SnapStreamingClient client = new(netStream.ClientStream, new SecureStreamClientDefault(), true);
 
         ClientDatabaseBase<HistorianKey, HistorianValue> db = client.GetDatabase<HistorianKey, HistorianValue>("DB");
         long len = db.Read().Count();
@@ -133,17 +132,17 @@ public class StreamingClientServerTest
     [Test]
     public void TestWriteServer()
     {
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
         Logger.Console.Verbose = VerboseLevel.All;
         Logger.FileWriter.SetPath(@"C:\Temp\", VerboseLevel.All);
 
-        NetworkStreamSimulator netStream = new NetworkStreamSimulator();
+        NetworkStreamSimulator netStream = new();
 
         HistorianServerDatabaseConfig dbcfg = new HistorianServerDatabaseConfig("DB", @"C:\Temp\Scada", true);
         HistorianServer server = new HistorianServer(dbcfg);
-        SecureStreamServer<SocketUserPermissions> auth = new SecureStreamServer<SocketUserPermissions>();
+        SecureStreamServer<SocketUserPermissions> auth = new();
         auth.SetDefaultUser(true, new SocketUserPermissions()
         {
             CanRead = true,
@@ -151,11 +150,11 @@ public class StreamingClientServerTest
             IsAdmin = true
         });
 
-        SnapStreamingServer netServer = new SnapStreamingServer(auth, netStream.ServerStream, server.Host);
+        SnapStreamingServer netServer = new(auth, netStream.ServerStream, server.Host);
 
         ThreadPool.QueueUserWorkItem(ProcessClient, netServer);
 
-        SnapStreamingClient client = new SnapStreamingClient(netStream.ClientStream, new SecureStreamClientDefault(), false);
+        SnapStreamingClient client = new(netStream.ClientStream, new SecureStreamClientDefault(), false);
 
         ClientDatabaseBase<HistorianKey, HistorianValue> db = client.GetDatabase<HistorianKey, HistorianValue>("DB");
         for (uint x = 0; x < 1000; x++)

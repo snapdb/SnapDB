@@ -24,7 +24,7 @@
 using System;
 using System.IO;
 
-namespace UnitTests;
+namespace SnapDB.UnitTests;
 
 internal static class Program
 {
@@ -72,8 +72,8 @@ internal static class Program
 
         //OptimizeCompressionMethodTest.Run3();
         return;
-        Application.EnableVisualStyles();
-        Application.SetCompatibleTextRenderingDefault(false);
+        //Application.EnableVisualStyles();
+        //Application.SetCompatibleTextRenderingDefault(false);
         //var c = new SortedTree64Test();
         //c.TestSortedTree(10000,true);
     }

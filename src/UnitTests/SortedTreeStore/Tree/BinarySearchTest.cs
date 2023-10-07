@@ -21,55 +21,22 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB;
-using SnapDB.Snap.Types;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using NUnit.Framework;
+using SnapDB.Snap.Types;
 
-namespace UnitTests.SortedTreeStore.Tree;
+namespace SnapDB.UnitTests.SortedTreeStore.Tree;
 
 [TestFixture]
 public class BinarySearchTest
 {
-    public static void Shuffle<T>(IList<T> list)
-    {
-        RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
-        int n = list.Count;
-        while (n > 1)
-        {
-            byte[] box = new byte[1];
-            do provider.GetBytes(box); while (!(box[0] < n * (Byte.MaxValue / n)));
-            int k = box[0] % n;
-            n--;
-            T value = list[k];
-            list[k] = list[n];
-            list[n] = value;
-        }
-    }
-
-    public static void Shuffle<T>(IList<T> list, int seed, int loopCount)
-    {
-        Random rng = new Random(seed);
-        for (int l = 0; l < loopCount; l++)
-        {
-            int n = list.Count;
-            while (n > 1)
-            {
-                n--;
-                int k = rng.Next(n + 1);
-                T value = list[k];
-                list[k] = list[n];
-                list[n] = value;
-            }
-            rng = new Random(rng.Next());
-        }
-    }
+    #region [ Methods ]
 
     [Test]
-    public unsafe void TestRandom()
+    public void TestRandom()
     {
         int x = 64;
         while (x < 10000)
@@ -91,6 +58,7 @@ public class BinarySearchTest
             items[x] = 2 * x;
             lookupList[x] = 2 * x + 1;
         }
+
         Shuffle(lookupList, 3, 10);
 
         StepTimer.Reset();
@@ -103,11 +71,11 @@ public class BinarySearchTest
             //GC.WaitForPendingFinalizers();
             //System.Threading.Thread.Sleep(10);
 
-            SnapCustomMethodsUInt32 bin = new SnapCustomMethodsUInt32();
+            SnapCustomMethodsUInt32 bin = new();
             fixed (uint* lp = items)
             {
                 byte* lpp = (byte*)lp;
-                SnapUInt32 box = new SnapUInt32();
+                SnapUInt32 box = new();
 
                 StepTimer.ITimer timer = StepTimer.Start("Lookup");
                 for (int x = 0; x < lookupList.Length; x++)
@@ -116,16 +84,63 @@ public class BinarySearchTest
                     bin.BinarySearch(lpp, box, count, 4);
                     //BoxKeyMethodsUint32.BinarySearchTest(lpp, box, count, 4);
                 }
+
                 timer.Stop();
             }
         }
 
-        StringBuilder SB = new StringBuilder();
+        StringBuilder sb = new();
         //Console.Write(count.ToString("Tree\t0\t"));
         //SB.Append((count * 4).ToString("0\t") + (count / StepTimer.GetAverage("Lookup") / 1000000).ToString("0.000\t"));
         //SB.Append((count * 4.0 / 1024).ToString("0.###\t") + ((StepTimer.GetAverage("Lookup") / Math.Log(count, 2)) / count * 1000000000).ToString("0.00\t"));
-        SB.Append((StepTimer.GetSlowest("Lookup") / Math.Log(count, 2) / count * 1000000000).ToString("0.00\t"));
+        sb.Append((StepTimer.GetSlowest("Lookup") / Math.Log(count, 2) / count * 1000000000).ToString("0.00\t"));
         //SB.Append(((StepTimer.GetAverage("Lookup") / Math.Log(count, 2)) / count * 1000000000).ToString("0.00\t"));
-        Console.WriteLine(SB.ToString());
+        Console.WriteLine(sb.ToString());
     }
+
+    #endregion
+
+    #region [ Static ]
+
+    public static void Shuffle<T>(IList<T> list)
+    {
+        RNGCryptoServiceProvider provider = new();
+        int n = list.Count;
+        while (n > 1)
+        {
+            byte[] box = new byte[1];
+            do
+            {
+                provider.GetBytes(box);
+            }
+            while (!(box[0] < n * (byte.MaxValue / n)));
+
+            int k = box[0] % n;
+            n--;
+            T value = list[k];
+            list[k] = list[n];
+            list[n] = value;
+        }
+    }
+
+    public static void Shuffle<T>(IList<T> list, int seed, int loopCount)
+    {
+        Random rng = new(seed);
+        for (int l = 0; l < loopCount; l++)
+        {
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
+
+            rng = new Random(rng.Next());
+        }
+    }
+
+    #endregion
 }

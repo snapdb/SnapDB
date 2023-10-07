@@ -21,32 +21,38 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB.Snap.Collection;
-using SnapDB.Snap.Storage;
 using System;
 using System.Diagnostics;
 using System.IO;
+using NUnit.Framework;
+using SnapDB.IO.FileStructure;
+using SnapDB.Snap;
+using SnapDB.Snap.Collection;
+using SnapDB.Snap.Storage;
+using SnapDB.Snap.Tree;
+using SnapDB.UnitTests.Snap;
 
-namespace UnitTests.SortedTreeStore.Storage;
+namespace SnapDB.UnitTests.SortedTreeStore.Storage;
 
 [TestFixture]
 public class SortedTreeFileSimpleWriterTest
 {
+    #region [ Methods ]
+
     [Test]
     public void TestOld()
     {
         Test(1000, false);
 
         int pointCount = 10000000;
-        SortedPointBuffer<HistorianKey, HistorianValue> points = new SortedPointBuffer<HistorianKey, HistorianValue>(pointCount, true);
+        SortedPointBuffer<HistorianKey, HistorianValue> points = new(pointCount, true);
 
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointID = (ulong)x;
+            key.PointId = (ulong)x;
             points.TryEnqueue(key, value);
         }
 
@@ -55,7 +61,7 @@ public class SortedTreeFileSimpleWriterTest
         File.Delete(@"C:\Temp\fileTemp.~d2i");
         File.Delete(@"C:\Temp\fileTemp.d2i");
 
-        Stopwatch sw = new Stopwatch();
+        Stopwatch sw = new();
         sw.Start();
 
         using (SortedTreeFile file = SortedTreeFile.CreateFile(@"C:\Temp\fileTemp.~d2i"))
@@ -72,26 +78,25 @@ public class SortedTreeFileSimpleWriterTest
 
         sw.Stop();
 
-        System.Console.WriteLine(SimplifiedSubFileStreamIoSession.ReadBlockCount);
-        System.Console.WriteLine(SimplifiedSubFileStreamIoSession.WriteBlockCount);
-        System.Console.WriteLine(sw.Elapsed.TotalSeconds.ToString());
-
+        Console.WriteLine(SimplifiedSubFileStreamIoSession.ReadBlockCount);
+        Console.WriteLine(SimplifiedSubFileStreamIoSession.WriteBlockCount);
+        Console.WriteLine(sw.Elapsed.TotalSeconds.ToString());
     }
 
     [Test]
-    public void CountIO()
+    public void CountIo()
     {
         Test(1000, false);
 
         int pointCount = 10000000;
-        SortedPointBuffer<HistorianKey, HistorianValue> points = new SortedPointBuffer<HistorianKey, HistorianValue>(pointCount, true);
+        SortedPointBuffer<HistorianKey, HistorianValue> points = new(pointCount, true);
 
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointID = (ulong)x;
+            key.PointId = (ulong)x;
             points.TryEnqueue(key, value);
         }
 
@@ -100,17 +105,16 @@ public class SortedTreeFileSimpleWriterTest
         File.Delete(@"C:\Temp\fileTemp.~d2i");
         File.Delete(@"C:\Temp\fileTemp.d2i");
 
-        Stopwatch sw = new Stopwatch();
+        Stopwatch sw = new();
         sw.Start();
 
         SortedTreeFileSimpleWriter<HistorianKey, HistorianValue>.Create(@"C:\Temp\fileTemp.~d2i", @"C:\Temp\fileTemp.d2i", 4096, null, EncodingDefinition.FixedSizeCombinedEncoding, points);
 
         sw.Stop();
 
-        System.Console.WriteLine(SimplifiedSubFileStreamIoSession.ReadBlockCount);
-        System.Console.WriteLine(SimplifiedSubFileStreamIoSession.WriteBlockCount);
-        System.Console.WriteLine(sw.Elapsed.TotalSeconds.ToString());
-
+        Console.WriteLine(SimplifiedSubFileStreamIoSession.ReadBlockCount);
+        Console.WriteLine(SimplifiedSubFileStreamIoSession.WriteBlockCount);
+        Console.WriteLine(sw.Elapsed.TotalSeconds.ToString());
     }
 
 
@@ -120,20 +124,20 @@ public class SortedTreeFileSimpleWriterTest
         for (int x = 1; x < 1000000; x *= 2)
         {
             Test(x, true);
-            System.Console.WriteLine(x);
+            Console.WriteLine(x);
         }
     }
 
     public void Test(int pointCount, bool verify)
     {
-        SortedPointBuffer<HistorianKey, HistorianValue> points = new SortedPointBuffer<HistorianKey, HistorianValue>(pointCount, true);
+        SortedPointBuffer<HistorianKey, HistorianValue> points = new(pointCount, true);
 
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointID = (ulong)x;
+            key.PointId = (ulong)x;
             points.TryEnqueue(key, value);
         }
 
@@ -145,24 +149,22 @@ public class SortedTreeFileSimpleWriterTest
         SortedTreeFileSimpleWriter<HistorianKey, HistorianValue>.Create(@"C:\Temp\fileTemp.~d2i", @"C:\Temp\fileTemp.d2i", 4096, null, EncodingDefinition.FixedSizeCombinedEncoding, points);
         if (!verify)
             return;
-        using (SortedTreeFile file = SortedTreeFile.OpenFile(@"C:\Temp\fileTemp.d2i", true))
-        using (SortedTreeTable<HistorianKey, HistorianValue> table = file.OpenTable<HistorianKey, HistorianValue>())
-        using (SortedTreeTableReadSnapshot<HistorianKey, HistorianValue> read = table.AcquireReadSnapshot().CreateReadSnapshot())
+        using SortedTreeFile file = SortedTreeFile.OpenFile(@"C:\Temp\fileTemp.d2i", true);
+        using SortedTreeTable<HistorianKey, HistorianValue> table = file.OpenTable<HistorianKey, HistorianValue>();
+        using SortedTreeTableReadSnapshot<HistorianKey, HistorianValue> read = table.AcquireReadSnapshot().CreateReadSnapshot();
         using (SortedTreeScannerBase<HistorianKey, HistorianValue> scanner = read.GetTreeScanner())
         {
             scanner.SeekToStart();
             int cnt = 0;
             while (scanner.Read(key, value))
             {
-                if (key.PointID != (ulong)cnt)
+                if (key.PointId != (ulong)cnt)
                     throw new Exception();
                 cnt++;
-
             }
+
             if (cnt != pointCount)
                 throw new Exception();
-
-
         }
     }
 
@@ -172,20 +174,20 @@ public class SortedTreeFileSimpleWriterTest
         for (int x = 1; x < 1000000; x *= 2)
         {
             TestNonSequential(x, true);
-            System.Console.WriteLine(x);
+            Console.WriteLine(x);
         }
     }
 
     public void TestNonSequential(int pointCount, bool verify)
     {
-        SortedPointBuffer<HistorianKey, HistorianValue> points = new SortedPointBuffer<HistorianKey, HistorianValue>(pointCount, true);
+        SortedPointBuffer<HistorianKey, HistorianValue> points = new(pointCount, true);
 
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointID = (ulong)x;
+            key.PointId = (ulong)x;
             points.TryEnqueue(key, value);
         }
 
@@ -197,24 +199,24 @@ public class SortedTreeFileSimpleWriterTest
         SortedTreeFileSimpleWriter<HistorianKey, HistorianValue>.CreateNonSequential(@"C:\Temp\fileTemp.~d2i", @"C:\Temp\fileTemp.d2i", 4096, null, EncodingDefinition.FixedSizeCombinedEncoding, points);
         if (!verify)
             return;
-        using (SortedTreeFile file = SortedTreeFile.OpenFile(@"C:\Temp\fileTemp.d2i", true))
-        using (SortedTreeTable<HistorianKey, HistorianValue> table = file.OpenTable<HistorianKey, HistorianValue>())
-        using (SortedTreeTableReadSnapshot<HistorianKey, HistorianValue> read = table.AcquireReadSnapshot().CreateReadSnapshot())
+        using SortedTreeFile file = SortedTreeFile.OpenFile(@"C:\Temp\fileTemp.d2i", true);
+        using SortedTreeTable<HistorianKey, HistorianValue> table = file.OpenTable<HistorianKey, HistorianValue>();
+        using SortedTreeTableReadSnapshot<HistorianKey, HistorianValue> read = table.AcquireReadSnapshot().CreateReadSnapshot();
         using (SortedTreeScannerBase<HistorianKey, HistorianValue> scanner = read.GetTreeScanner())
         {
             scanner.SeekToStart();
             int cnt = 0;
             while (scanner.Read(key, value))
             {
-                if (key.PointID != (ulong)cnt)
+                if (key.PointId != (ulong)cnt)
                     throw new Exception();
                 cnt++;
-
             }
+
             if (cnt != pointCount)
                 throw new Exception();
-
-
         }
     }
+
+    #endregion
 }

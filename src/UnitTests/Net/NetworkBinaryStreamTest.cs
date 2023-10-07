@@ -24,35 +24,37 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB.Net;
 using System;
 using System.Net;
 using System.Net.Sockets;
-using UnitTests.IO.Unmanaged;
+using NUnit.Framework;
+using SnapDB.Net;
+using SnapDB.UnitTests.IO.Unmanaged;
 
-namespace UnitTests.Net;
+namespace SnapDB.UnitTests.Net;
 
 [TestFixture]
-class NetworkBinaryStreamTest
+internal class NetworkBinaryStreamTest
 {
+    #region [ Methods ]
+
     [Test]
     public void Test1()
     {
         MemoryPoolTest.TestMemoryLeak();
-        TcpListener listener = new TcpListener(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 42134));
+        TcpListener listener = new(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 42134));
         listener.Start();
-        TcpClient client = new TcpClient();
+        TcpClient client = new();
         client.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 42134));
         TcpClient server = listener.AcceptTcpClient();
 
-        NetworkBinaryStream c = new NetworkBinaryStream(client.Client);
-        NetworkBinaryStream s = new NetworkBinaryStream(server.Client);
+        NetworkBinaryStream c = new(client.Client);
+        NetworkBinaryStream s = new(server.Client);
 
-        Random r = new Random();
+        Random r = new();
         int seed = r.Next();
-        Random sr = new Random(seed);
-        Random cr = new Random(seed);
+        Random sr = new(seed);
+        Random cr = new(seed);
 
         for (int x = 0; x < 2000; x++)
         {
@@ -62,6 +64,7 @@ class NetworkBinaryStreamTest
                 c.Write(val);
                 c.Write((byte)val);
             }
+
             c.Flush();
             for (int y = 0; y < x; y++)
             {
@@ -72,11 +75,12 @@ class NetworkBinaryStreamTest
                     throw new Exception("Error");
             }
         }
-        
+
         server.Close();
         client.Close();
         listener.Stop();
         MemoryPoolTest.TestMemoryLeak();
-
     }
+
+    #endregion
 }

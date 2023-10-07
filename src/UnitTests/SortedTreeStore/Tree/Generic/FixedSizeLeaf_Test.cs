@@ -21,23 +21,28 @@
 //
 //******************************************************************************************************
 
+using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using SnapDB.Snap;
 using SnapDB.Snap.Tree;
 using SnapDB.Snap.Types;
-using System;
-using System.Collections.Generic;
 
-namespace UnitTests.SortedTreeStore.Tree.Generic;
+namespace SnapDB.UnitTests.SortedTreeStore.Tree.Generic;
 
-internal class SequentialTest
-    : TreeNodeRandomizerBase<SnapUInt32, SnapUInt32>
+internal class SequentialTest : TreeNodeRandomizerBase<SnapUInt32, SnapUInt32>
 {
-    private readonly SortedList<uint, uint> m_sortedItems = new SortedList<uint, uint>();
-    private readonly List<KeyValuePair<uint, uint>> m_items = new List<KeyValuePair<uint, uint>>();
+    #region [ Members ]
+
+    private uint m_current;
+    private readonly List<KeyValuePair<uint, uint>> m_items = new();
 
     private int m_maxCount;
-    private uint m_current;
+    private readonly SortedList<uint, uint> m_sortedItems = new();
+
+    #endregion
+
+    #region [ Methods ]
 
     public override void Reset(int maxCount)
     {
@@ -66,16 +71,23 @@ internal class SequentialTest
         key.Value = m_sortedItems.Keys[index];
         value.Value = m_sortedItems.Values[index];
     }
+
+    #endregion
 }
 
-internal class ReverseSequentialTest
-    : TreeNodeRandomizerBase<SnapUInt32, SnapUInt32>
+internal class ReverseSequentialTest : TreeNodeRandomizerBase<SnapUInt32, SnapUInt32>
 {
-    private readonly SortedList<uint, uint> m_sortedItems = new SortedList<uint, uint>();
-    private readonly List<KeyValuePair<uint, uint>> m_items = new List<KeyValuePair<uint, uint>>();
+    #region [ Members ]
+
+    private uint m_current;
+    private readonly List<KeyValuePair<uint, uint>> m_items = new();
 
     private int m_maxCount;
-    private uint m_current;
+    private readonly SortedList<uint, uint> m_sortedItems = new();
+
+    #endregion
+
+    #region [ Methods ]
 
     public override void Reset(int maxCount)
     {
@@ -104,26 +116,33 @@ internal class ReverseSequentialTest
         key.Value = m_sortedItems.Keys[index];
         value.Value = m_sortedItems.Values[index];
     }
+
+    #endregion
 }
 
-internal class RandomTest
-    : TreeNodeRandomizerBase<SnapUInt32, SnapUInt32>
+internal class RandomTest : TreeNodeRandomizerBase<SnapUInt32, SnapUInt32>
 {
-    private readonly SortedList<uint, uint> m_sortedItems = new SortedList<uint, uint>();
-    private readonly List<KeyValuePair<uint, uint>> m_items = new List<KeyValuePair<uint, uint>>();
+    #region [ Members ]
 
-    private Random r;
+    private readonly List<KeyValuePair<uint, uint>> m_items = new();
+
+    private Random m_r;
+    private readonly SortedList<uint, uint> m_sortedItems = new();
+
+    #endregion
+
+    #region [ Methods ]
 
     public override void Reset(int maxCount)
     {
-        r = new Random(1);
+        m_r = new Random(1);
         m_sortedItems.Clear();
         m_items.Clear();
     }
 
     public override void Next()
     {
-        uint rand = (uint)r.Next();
+        uint rand = (uint)m_r.Next();
         m_sortedItems.Add(rand, rand * 2);
         m_items.Add(new KeyValuePair<uint, uint>(rand, rand * 2));
     }
@@ -140,12 +159,20 @@ internal class RandomTest
         key.Value = m_sortedItems.Keys[index];
         value.Value = m_sortedItems.Values[index];
     }
+
+    #endregion
 }
 
 [TestFixture]
 public class FixedSizeNodeTest
 {
+    #region [ Members ]
+
     private const int Max = 1000000;
+
+    #endregion
+
+    #region [ Methods ]
 
     [Test]
     public void TestSequently()
@@ -203,5 +230,5 @@ public class FixedSizeNodeTest
         LeafNodeTest.TestSpeed(tree, new RandomTest(), 5000, 4096);
     }
 
-
+    #endregion
 }

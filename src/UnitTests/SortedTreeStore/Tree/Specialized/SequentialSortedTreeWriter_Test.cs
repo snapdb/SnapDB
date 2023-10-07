@@ -24,19 +24,24 @@
 //
 //******************************************************************************************************
 
+using System;
+using System.Diagnostics;
 using NUnit.Framework;
 using SnapDB.IO.Unmanaged;
+using SnapDB.Snap;
 using SnapDB.Snap.Collection;
 using SnapDB.Snap.Tree;
 using SnapDB.Snap.Tree.Specialized;
-using System;
-using System.Diagnostics;
+using SnapDB.UnitTests.Snap;
+using SnapDB.UnitTests.Snap.Definitions;
 
-namespace UnitTests.SortedTreeStore.Tree.Specialized;
+namespace SnapDB.UnitTests.SortedTreeStore.Tree.Specialized;
 
 [TestFixture]
-public class SequentialSortedTreeWriter_Test
+public class SequentialSortedTreeWriterTest
 {
+    #region [ Methods ]
+
     [Test]
     public void BenchmarkOld2()
     {
@@ -45,27 +50,26 @@ public class SequentialSortedTreeWriter_Test
         BenchmarkOld2(10000);
         BenchmarkOld2(100000);
         BenchmarkOld2(1000000);
-
     }
 
     public void BenchmarkOld2(int pointCount)
     {
-        SortedPointBuffer<HistorianKey, HistorianValue> points = new SortedPointBuffer<HistorianKey, HistorianValue>(pointCount, true);
+        SortedPointBuffer<HistorianKey, HistorianValue> points = new(pointCount, true);
 
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointID = (ulong)x;
+            key.PointId = (ulong)x;
             points.TryEnqueue(key, value);
         }
 
         points.IsReadingMode = true;
 
-        Stopwatch sw = new Stopwatch();
+        Stopwatch sw = new();
         sw.Start();
-        using (BinaryStream bs = new BinaryStream(true))
+        using (BinaryStream bs = new(true))
         {
             SortedTree<HistorianKey, HistorianValue> st = SortedTree<HistorianKey, HistorianValue>.Create(bs, 4096, HistorianFileEncodingDefinition.TypeGuid);
 
@@ -73,9 +77,10 @@ public class SequentialSortedTreeWriter_Test
 
             //SequentialSortedTreeWriter<HistorianKey, HistorianValue>.Create(bs, 4096, SortedTree.FixedSizeNode, points);
         }
+
         sw.Stop();
 
-        System.Console.WriteLine("Points {0}: {1}MPPS", pointCount, (pointCount / sw.Elapsed.TotalSeconds / 1000000).ToString("0.0"));
+        Console.WriteLine("Points {0}: {1}MPPS", pointCount, (pointCount / sw.Elapsed.TotalSeconds / 1000000).ToString("0.0"));
     }
 
     [Test]
@@ -90,30 +95,31 @@ public class SequentialSortedTreeWriter_Test
 
     public void BenchmarkOld(int pointCount)
     {
-        SortedPointBuffer<HistorianKey, HistorianValue> points = new SortedPointBuffer<HistorianKey, HistorianValue>(pointCount, true);
+        SortedPointBuffer<HistorianKey, HistorianValue> points = new(pointCount, true);
 
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointID = (ulong)x;
+            key.PointId = (ulong)x;
             points.TryEnqueue(key, value);
         }
 
         points.IsReadingMode = true;
 
-        Stopwatch sw = new Stopwatch();
+        Stopwatch sw = new();
         sw.Start();
-        using (BinaryStream bs = new BinaryStream(true))
+        using (BinaryStream bs = new(true))
         {
             SortedTree<HistorianKey, HistorianValue> st = SortedTree<HistorianKey, HistorianValue>.Create(bs, 4096, HistorianFileEncodingDefinition.TypeGuid);
             st.TryAddRange(points);
             //SequentialSortedTreeWriter<HistorianKey, HistorianValue>.Create(bs, 4096, SortedTree.FixedSizeNode, points);
         }
+
         sw.Stop();
 
-        System.Console.WriteLine("Points {0}: {1}MPPS", pointCount, (pointCount / sw.Elapsed.TotalSeconds / 1000000).ToString("0.0"));
+        Console.WriteLine("Points {0}: {1}MPPS", pointCount, (pointCount / sw.Elapsed.TotalSeconds / 1000000).ToString("0.0"));
     }
 
     [Test]
@@ -124,34 +130,34 @@ public class SequentialSortedTreeWriter_Test
         Benchmark(10000);
         Benchmark(100000);
         Benchmark(1000000);
-
     }
 
     public void Benchmark(int pointCount)
     {
-        SortedPointBuffer<HistorianKey, HistorianValue> points = new SortedPointBuffer<HistorianKey, HistorianValue>(pointCount, true);
+        SortedPointBuffer<HistorianKey, HistorianValue> points = new(pointCount, true);
 
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointID = (ulong)x;
+            key.PointId = (ulong)x;
             points.TryEnqueue(key, value);
         }
 
         points.IsReadingMode = true;
 
-        Stopwatch sw = new Stopwatch();
+        Stopwatch sw = new();
         sw.Start();
-        using (BinaryStream bs = new BinaryStream(true))
+        using (BinaryStream bs = new(true))
         {
             SequentialSortedTreeWriter<HistorianKey, HistorianValue>.Create(bs, 4096, HistorianFileEncodingDefinition.TypeGuid, points);
             //SequentialSortedTreeWriter<HistorianKey, HistorianValue>.Create(bs, 4096, SortedTree.FixedSizeNode, points);
         }
+
         sw.Stop();
 
-        System.Console.WriteLine("Points {0}: {1}MPPS", pointCount, (pointCount / sw.Elapsed.TotalSeconds / 1000000).ToString("0.0"));
+        Console.WriteLine("Points {0}: {1}MPPS", pointCount, (pointCount / sw.Elapsed.TotalSeconds / 1000000).ToString("0.0"));
     }
 
     [Test]
@@ -160,48 +166,45 @@ public class SequentialSortedTreeWriter_Test
         for (int x = 1; x < 1000000; x *= 2)
         {
             Test(x);
-            System.Console.WriteLine(x);
+            Console.WriteLine(x);
         }
-
     }
 
     public void Test(int pointCount)
     {
-        SortedPointBuffer<HistorianKey, HistorianValue> points = new SortedPointBuffer<HistorianKey, HistorianValue>(pointCount, true);
-        Random r = new Random(1);
+        SortedPointBuffer<HistorianKey, HistorianValue> points = new(pointCount, true);
+        Random r = new(1);
 
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointID = (ulong)r.Next();
+            key.PointId = (ulong)r.Next();
             key.Timestamp = (ulong)r.Next();
-            value.Value1 = key.PointID;
+            value.Value1 = key.PointId;
             points.TryEnqueue(key, value);
         }
 
         points.IsReadingMode = true;
 
-        using (BinaryStream bs = new BinaryStream(true))
+        using BinaryStream bs = new(true);
+        //var tree = new SequentialSortedTreeWriter<HistorianKey, HistorianValue>(bs, 256, SortedTree.FixedSizeNode);
+        //SequentialSortedTreeWriter<HistorianKey, HistorianValue>.Create(bs, 512, CreateTsCombinedEncoding.TypeGuid, points);
+        SequentialSortedTreeWriter<HistorianKey, HistorianValue>.Create(bs, 512, EncodingDefinition.FixedSizeCombinedEncoding, points);
+
+        SortedTree<HistorianKey, HistorianValue> sts = SortedTree<HistorianKey, HistorianValue>.Open(bs);
+        r = new Random(1);
+
+        for (int x = 0; x < pointCount; x++)
         {
-            //var tree = new SequentialSortedTreeWriter<HistorianKey, HistorianValue>(bs, 256, SortedTree.FixedSizeNode);
-            //SequentialSortedTreeWriter<HistorianKey, HistorianValue>.Create(bs, 512, CreateTsCombinedEncoding.TypeGuid, points);
-            SequentialSortedTreeWriter<HistorianKey, HistorianValue>.Create(bs, 512, EncodingDefinition.FixedSizeCombinedEncoding, points);
-
-            SortedTree<HistorianKey, HistorianValue> sts = SortedTree<HistorianKey, HistorianValue>.Open(bs);
-            r = new Random(1);
-
-            for (int x = 0; x < pointCount; x++)
-            {
-                key.PointID = (ulong)r.Next();
-                key.Timestamp = (ulong)r.Next();
-                sts.Get(key, value);
-                if (value.Value1 != key.PointID)
-                    throw new Exception();
-            }
-
+            key.PointId = (ulong)r.Next();
+            key.Timestamp = (ulong)r.Next();
+            sts.Get(key, value);
+            if (value.Value1 != key.PointId)
+                throw new Exception();
         }
     }
 
+    #endregion
 }

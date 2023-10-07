@@ -25,12 +25,14 @@ using System;
 using Gemstone;
 using NUnit.Framework;
 
-namespace UnitTests;
+namespace SnapDB.UnitTests;
 
-[TestFixture()]
+[TestFixture]
 public class BitMathTest
 {
-    [Test()]
+    #region [ Methods ]
+
+    [Test]
     public void CountBitsSet()
     {
         Assert.AreEqual(0, BitMath.CountBitsSet(0));
@@ -50,7 +52,7 @@ public class BitMathTest
         Assert.AreEqual(64, BitMath.CountBitsSet((ulong)x));
     }
 
-    [Test()]
+    [Test]
     public void CountBitsCleared()
     {
         Assert.AreEqual(32 - 0, BitMath.CountBitsCleared(0));
@@ -70,7 +72,7 @@ public class BitMathTest
         Assert.AreEqual(64 - 64, BitMath.CountBitsCleared((ulong)x));
     }
 
-    [Test()]
+    [Test]
     public void IsPowerOfTwo()
     {
         Assert.AreEqual(false, BitMath.IsPowerOfTwo((uint)0));
@@ -84,84 +86,48 @@ public class BitMathTest
         Assert.AreEqual(true, BitMath.IsPowerOfTwo((ulong)1 << 63));
     }
 
-    [Test()]
+    [Test]
     public void CountLeadinZeros()
     {
-        Random r = new Random();
+        Random r = new();
 
         Assert.AreEqual(32, BitMath.CountLeadingZeros(0u));
         Assert.AreEqual(0, BitMath.CountLeadingZeros(uint.MaxValue));
 
         for (int k = 0; k < 10; k++)
-        {
-            for (int x = 0; x < 32; x++)
-            {
-                Assert.AreEqual(31 - x, BitMath.CountLeadingZeros(1u << x | Next(r, 1u << x)));
-            }
-        }
+        for (int x = 0; x < 32; x++)
+            Assert.AreEqual(31 - x, BitMath.CountLeadingZeros((1u << x) | Next(r, 1u << x)));
 
         Assert.AreEqual(64, BitMath.CountLeadingZeros(0ul));
         Assert.AreEqual(0, BitMath.CountLeadingZeros(ulong.MaxValue));
 
         for (int k = 0; k < 10; k++)
-        {
-            for (int x = 0; x < 63; x++)
-            {
-                Assert.AreEqual(63 - x, BitMath.CountLeadingZeros(1ul << x | Next(r, 1ul << x)));
-            }
-        }
+        for (int x = 0; x < 63; x++)
+            Assert.AreEqual(63 - x, BitMath.CountLeadingZeros((1ul << x) | Next(r, 1ul << x)));
     }
 
-    private static ulong Next(Random r, ulong maxValue)
-    {
-        return ((ulong)r.Next() << 32 | (uint)r.Next()) % maxValue;
-    }
-
-    private static uint Next(Random r, uint maxValue)
-    {
-        return (uint)r.Next() % maxValue;
-    }
-
-    [Test()]
+    [Test]
     public void CountTrailingZeros()
     {
-        Random r = new Random();
+        Random r = new();
 
         Assert.AreEqual(32, BitMath.CountTrailingZeros(0u));
         Assert.AreEqual(0, BitMath.CountTrailingZeros(uint.MaxValue));
 
         for (int k = 0; k < 10; k++)
-        {
-            for (int x = 0; x < 32; x++)
-            {
-                Assert.AreEqual(x, BitMath.CountTrailingZeros(1u << x | NextAbove(r, 1u << x)));
-            }
-        }
+        for (int x = 0; x < 32; x++)
+            Assert.AreEqual(x, BitMath.CountTrailingZeros((1u << x) | NextAbove(r, 1u << x)));
 
         Assert.AreEqual(64, BitMath.CountTrailingZeros(0ul));
         Assert.AreEqual(0, BitMath.CountTrailingZeros(ulong.MaxValue));
 
         for (int k = 0; k < 10; k++)
-        {
-            for (int x = 0; x < 63; x++)
-            {
-                Assert.AreEqual(x, BitMath.CountTrailingZeros(1ul << x | NextAbove(r, 1ul << x)));
-            }
-        }
-    }
-
-    private static ulong NextAbove(Random r, ulong maxValue)
-    {
-        return ((ulong)r.Next() << 32 | (uint)r.Next()) & ~(maxValue - 1);
-    }
-
-    private static uint NextAbove(Random r, uint maxValue)
-    {
-        return (uint)r.Next() & ~(maxValue - 1);
+        for (int x = 0; x < 63; x++)
+            Assert.AreEqual(x, BitMath.CountTrailingZeros((1ul << x) | NextAbove(r, 1ul << x)));
     }
 
 
-    [Test()]
+    [Test]
     public void RoundUpToNearestPowerOfTwo()
     {
         Assert.AreEqual(1u, BitMath.RoundUpToNearestPowerOfTwo(0));
@@ -180,7 +146,7 @@ public class BitMathTest
         Assert.AreEqual(1ul << 63, BitMath.RoundUpToNearestPowerOfTwo(ulong.MaxValue));
     }
 
-    [Test()]
+    [Test]
     public void RoundDownToNearestPowerOfTwo()
     {
         Assert.AreEqual(1u, BitMath.RoundDownToNearestPowerOfTwo(0u));
@@ -200,13 +166,37 @@ public class BitMathTest
         Assert.AreEqual(1ul << 63, BitMath.RoundDownToNearestPowerOfTwo(ulong.MaxValue));
     }
 
-    [Test()]
+    [Test]
     public void CreateBitMask()
     {
         for (int x = 0; x < 64; x++)
-        {
             Assert.AreEqual((1ul << x) - 1, BitMath.CreateBitMask(x));
-        }
         Assert.AreEqual(ulong.MaxValue, BitMath.CreateBitMask(64));
     }
+
+    #endregion
+
+    #region [ Static ]
+
+    private static ulong Next(Random r, ulong maxValue)
+    {
+        return (((ulong)r.Next() << 32) | (uint)r.Next()) % maxValue;
+    }
+
+    private static uint Next(Random r, uint maxValue)
+    {
+        return (uint)r.Next() % maxValue;
+    }
+
+    private static ulong NextAbove(Random r, ulong maxValue)
+    {
+        return (((ulong)r.Next() << 32) | (uint)r.Next()) & ~(maxValue - 1);
+    }
+
+    private static uint NextAbove(Random r, uint maxValue)
+    {
+        return (uint)r.Next() & ~(maxValue - 1);
+    }
+
+    #endregion
 }

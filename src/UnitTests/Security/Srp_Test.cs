@@ -21,66 +21,69 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using Org.BouncyCastle.Crypto.Digests;
-using SnapDB;
-using SnapDB.Security;
-using SnapDB.Security.Authentication;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using NUnit.Framework;
+using Org.BouncyCastle.Crypto.Digests;
+using SnapDB.IO;
+using SnapDB.Security;
+using SnapDB.Security.Authentication;
 
-namespace UnitTests.Security;
+namespace SnapDB.UnitTests.Security;
 
 [TestFixture]
-public class Srp_Test
+public class SrpTest
 {
+    #region [ Members ]
+
+    private readonly Stopwatch m_sw = new();
+
+    #endregion
+
+    #region [ Methods ]
+
     [Test]
-    public void TestDHKeyExchangeTime()
+    public void TestDhKeyExchangeTime()
     {
         SrpConstants c = SrpConstants.Lookup(SrpStrength.Bits1024);
-        c.g.ModPow(c.N, c.N);
+        c.G.ModPow(c.N, c.N);
 
-        DebugStopwatch sw = new DebugStopwatch();
+        DebugStopwatch sw = new();
         double time = sw.TimeEvent(() => Hash<Sha1Digest>.Compute(c.Nb));
-        System.Console.WriteLine(time);
-
-
-
+        Console.WriteLine(time);
     }
 
     [Test]
     public void Test()
     {
-        Stopwatch sw = new Stopwatch();
+        Stopwatch sw = new();
         sw.Start();
-        SrpServer srp = new SrpServer();
+        SrpServer srp = new();
         sw.Stop();
-        System.Console.WriteLine(sw.Elapsed.TotalMilliseconds);
+        Console.WriteLine(sw.Elapsed.TotalMilliseconds);
 
         sw.Restart();
         srp.Users.AddUser("user", "password");
         sw.Stop();
-        System.Console.WriteLine(sw.Elapsed.TotalMilliseconds);
+        Console.WriteLine(sw.Elapsed.TotalMilliseconds);
 
         sw.Restart();
         srp.Users.AddUser("user2", "password");
         sw.Stop();
-        System.Console.WriteLine(sw.Elapsed.TotalMilliseconds);
+        Console.WriteLine(sw.Elapsed.TotalMilliseconds);
     }
-
-    readonly Stopwatch m_sw = new Stopwatch();
 
     [Test]
     public void Test1()
     {
         m_sw.Reset();
 
-        NetworkStreamSimulator net = new NetworkStreamSimulator();
+        NetworkStreamSimulator net = new();
 
-        SrpServer sa = new SrpServer();
-        sa.Users.AddUser("user1", "password1", SrpStrength.Bits1024);
+        SrpServer sa = new();
+        sa.Users.AddUser("user1", "password1");
 
         ThreadPool.QueueUserWorkItem(Client1, net.ClientStream);
         SrpServerSession user = sa.AuthenticateAsServer(net.ServerStream);
@@ -91,27 +94,28 @@ public class Srp_Test
         Thread.Sleep(100);
     }
 
-    void Client1(object state)
-    {
-        Stream client = (Stream)state;
-        SrpClient sa = new SrpClient("user1", "password1");
-        m_sw.Start();
-        _ = sa.AuthenticateAsClient(client);
-        m_sw.Stop();
-        System.Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
-        m_sw.Restart();
-        bool success = sa.AuthenticateAsClient(client);
-        m_sw.Stop();
-        System.Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
-        if (!success)
-            throw new Exception();
-    }
-
     [Test]
     public void TestRepeat()
     {
         for (int x = 0; x < 5; x++)
             Test1();
-
     }
+
+    private void Client1(object state)
+    {
+        Stream client = (Stream)state;
+        SrpClient sa = new("user1", "password1");
+        m_sw.Start();
+        _ = sa.AuthenticateAsClient(client);
+        m_sw.Stop();
+        Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
+        m_sw.Restart();
+        bool success = sa.AuthenticateAsClient(client);
+        m_sw.Stop();
+        Console.WriteLine(m_sw.Elapsed.TotalMilliseconds);
+        if (!success)
+            throw new Exception();
+    }
+
+    #endregion
 }

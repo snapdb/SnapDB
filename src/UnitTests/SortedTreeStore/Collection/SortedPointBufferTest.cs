@@ -24,32 +24,35 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB.Snap.Collection;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using NUnit.Framework;
+using SnapDB.Snap.Collection;
+using SnapDB.UnitTests.Snap;
 
-namespace UnitTests.SortedTreeStore.Collection;
+namespace SnapDB.UnitTests.SortedTreeStore.Collection;
 
 [TestFixture]
 public class SortedPointBufferTest
 {
+    #region [ Methods ]
+
     [Test]
     public void Test()
     {
-        const int MaxCount = 1000;
-        Stopwatch sw = new Stopwatch();
-        SortedPointBuffer<HistorianKey, HistorianValue> buffer = new SortedPointBuffer<HistorianKey, HistorianValue>(MaxCount, true);
+        const int maxCount = 1000;
+        Stopwatch sw = new();
+        SortedPointBuffer<HistorianKey, HistorianValue> buffer = new(maxCount, true);
 
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
-        Random r = new Random(1);
+        HistorianKey key = new();
+        HistorianValue value = new();
+        Random r = new(1);
 
-        for (int x = 0; x < MaxCount; x++)
+        for (int x = 0; x < maxCount; x++)
         {
             key.Timestamp = (ulong)r.Next();
-            key.PointID = (ulong)x;
+            key.PointId = (ulong)x;
 
             buffer.TryEnqueue(key, value);
         }
@@ -58,13 +61,13 @@ public class SortedPointBufferTest
         buffer.IsReadingMode = true;
         sw.Stop();
 
-        System.Console.WriteLine(sw.ElapsedMilliseconds);
-        System.Console.WriteLine(MaxCount / sw.Elapsed.TotalSeconds / 1000000);
+        Console.WriteLine(sw.ElapsedMilliseconds);
+        Console.WriteLine(maxCount / sw.Elapsed.TotalSeconds / 1000000);
 
-        for (int x = 0; x < MaxCount; x++)
+        for (int x = 0; x < maxCount; x++)
         {
             buffer.ReadSorted(x, key, value);
-            System.Console.WriteLine(key.Timestamp.ToString() + "\t" + key.PointID.ToString());
+            Console.WriteLine(key.Timestamp + "\t" + key.PointId);
         }
     }
 
@@ -73,105 +76,104 @@ public class SortedPointBufferTest
     public void BenchmarkRandomData()
     {
         for (int x = 16; x < 1000 * 1000; x *= 2)
-        {
             BenchmarkRandomData(x);
-        }
     }
 
     public void BenchmarkRandomData(int pointCount)
     {
-        Stopwatch sw = new Stopwatch();
-        SortedPointBuffer<HistorianKey, HistorianValue> buffer = new SortedPointBuffer<HistorianKey, HistorianValue>(pointCount, true);
+        Stopwatch sw = new();
+        SortedPointBuffer<HistorianKey, HistorianValue> buffer = new(pointCount, true);
 
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
-        List<double> times = new List<double>();
+        List<double> times = new();
         for (int cnt = 0; cnt < 10; cnt++)
         {
-            Random r = new Random(1);
+            Random r = new(1);
             buffer.IsReadingMode = false;
             for (int x = 0; x < pointCount; x++)
             {
                 key.Timestamp = (ulong)r.Next();
-                key.PointID = (ulong)x;
+                key.PointId = (ulong)x;
 
                 buffer.TryEnqueue(key, value);
             }
+
             sw.Restart();
             buffer.IsReadingMode = true;
             sw.Stop();
             times.Add(sw.Elapsed.TotalSeconds);
         }
+
         times.Sort();
-        System.Console.WriteLine("{0} points {1}ms {2} Million/second ", pointCount, times[5] * 1000, pointCount / times[5] / 1000000);
+        Console.WriteLine("{0} points {1}ms {2} Million/second ", pointCount, times[5] * 1000, pointCount / times[5] / 1000000);
     }
 
     [Test]
     public void BenchmarkRandomDataRead()
     {
         for (int x = 16; x < 1000 * 1000; x *= 2)
-        {
             BenchmarkRandomDataRead(x);
-        }
     }
 
     public void BenchmarkRandomDataRead(int pointCount)
     {
-        Stopwatch sw = new Stopwatch();
-        SortedPointBuffer<HistorianKey, HistorianValue> buffer = new SortedPointBuffer<HistorianKey, HistorianValue>(pointCount, true);
+        Stopwatch sw = new();
+        SortedPointBuffer<HistorianKey, HistorianValue> buffer = new(pointCount, true);
 
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
-        List<double> times = new List<double>();
+        List<double> times = new();
         for (int cnt = 0; cnt < 10; cnt++)
         {
-            Random r = new Random(1);
+            Random r = new(1);
             buffer.IsReadingMode = false;
             for (int x = 0; x < pointCount; x++)
             {
                 key.Timestamp = (ulong)r.Next();
-                key.PointID = (ulong)x;
+                key.PointId = (ulong)x;
 
                 buffer.TryEnqueue(key, value);
             }
+
             buffer.IsReadingMode = true;
             sw.Restart();
             while (buffer.Read(key, value))
             {
             }
+
             sw.Stop();
             times.Add(sw.Elapsed.TotalSeconds);
         }
+
         times.Sort();
-        System.Console.WriteLine("{0} points {1}ms {2} Million/second ", pointCount, times[5] * 1000, pointCount / times[5] / 1000000);
+        Console.WriteLine("{0} points {1}ms {2} Million/second ", pointCount, times[5] * 1000, pointCount / times[5] / 1000000);
     }
 
     [Test]
     public void BenchmarkSortedData()
     {
         for (int x = 16; x < 1000 * 1000; x *= 2)
-        {
             BenchmarkSortedData(x);
-        }
     }
 
     public void BenchmarkSortedData(int pointCount)
     {
-        Stopwatch sw = new Stopwatch();
-        SortedPointBuffer<HistorianKey, HistorianValue> buffer = new SortedPointBuffer<HistorianKey, HistorianValue>(pointCount, true);
+        Stopwatch sw = new();
+        SortedPointBuffer<HistorianKey, HistorianValue> buffer = new(pointCount, true);
 
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
-        List<double> times = new List<double>();
+        List<double> times = new();
         for (int cnt = 0; cnt < 10; cnt++)
         {
             buffer.IsReadingMode = false;
             for (int x = 0; x < pointCount; x++)
             {
-                key.PointID = (ulong)x;
+                key.PointId = (ulong)x;
 
                 buffer.TryEnqueue(key, value);
             }
@@ -181,46 +183,50 @@ public class SortedPointBufferTest
             sw.Stop();
             times.Add(sw.Elapsed.TotalSeconds);
         }
+
         times.Sort();
-        System.Console.WriteLine("{0} points {1}ms {2} Million/second ", pointCount, times[5] * 1000, pointCount / times[5] / 1000000);
+        Console.WriteLine("{0} points {1}ms {2} Million/second ", pointCount, times[5] * 1000, pointCount / times[5] / 1000000);
     }
 
     [Test]
     public void BenchmarkSortedDataRead()
     {
         for (int x = 16; x < 1000 * 1000; x *= 2)
-        {
             BenchmarkSortedDataRead(x);
-        }
     }
 
     public void BenchmarkSortedDataRead(int pointCount)
     {
-        Stopwatch sw = new Stopwatch();
-        SortedPointBuffer<HistorianKey, HistorianValue> buffer = new SortedPointBuffer<HistorianKey, HistorianValue>(pointCount, true);
+        Stopwatch sw = new();
+        SortedPointBuffer<HistorianKey, HistorianValue> buffer = new(pointCount, true);
 
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
-        List<double> times = new List<double>();
+        List<double> times = new();
         for (int cnt = 0; cnt < 10; cnt++)
         {
             buffer.IsReadingMode = false;
             for (int x = 0; x < pointCount; x++)
             {
-                key.PointID = (ulong)x;
+                key.PointId = (ulong)x;
 
                 buffer.TryEnqueue(key, value);
             }
+
             buffer.IsReadingMode = true;
             sw.Restart();
             while (buffer.Read(key, value))
             {
             }
+
             sw.Stop();
             times.Add(sw.Elapsed.TotalSeconds);
         }
+
         times.Sort();
-        System.Console.WriteLine("{0} points {1}ms {2} Million/second ", pointCount, times[5] * 1000, pointCount / times[5] / 1000000);
+        Console.WriteLine("{0} points {1}ms {2} Million/second ", pointCount, times[5] * 1000, pointCount / times[5] / 1000000);
     }
+
+    #endregion
 }

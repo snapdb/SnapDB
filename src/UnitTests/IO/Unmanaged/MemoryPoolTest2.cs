@@ -25,30 +25,24 @@
 //******************************************************************************************************
 
 
-using NUnit.Framework;
-using SnapDB;
-using SnapDB.IO.Unmanaged;
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
+using SnapDB.IO.Unmanaged;
 
-namespace UnitTests.IO.Unmanaged;
+namespace SnapDB.UnitTests.IO.Unmanaged;
 
-[TestFixture()]
+[TestFixture]
 public class MemoryPoolTest
 {
-    private static List<int> lst;
+    #region [ Methods ]
 
-    public static void TestMemoryLeak()
-    {
-        Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
-    }
-
-    [Test()]
+    [Test]
     public void Test()
     {
-        MemoryPoolTest.TestMemoryLeak();
+        TestMemoryLeak();
 
-        EventHandler<CollectionEventArgs> del = new EventHandler<CollectionEventArgs>(BufferPool_RequestCollection);
+        EventHandler<CollectionEventArgs> del = BufferPool_RequestCollection;
         Globals.MemoryPool.RequestCollection += del;
 
         //Test1();
@@ -56,7 +50,18 @@ public class MemoryPoolTest
 
         Globals.MemoryPool.RequestCollection -= del;
 
-        MemoryPoolTest.TestMemoryLeak();
+        TestMemoryLeak();
+    }
+
+    #endregion
+
+    #region [ Static ]
+
+    private static List<int> s_lst;
+
+    public static void TestMemoryLeak()
+    {
+        Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
     }
 
     //static void Test1()
@@ -91,24 +96,24 @@ public class MemoryPoolTest
 
     private static unsafe void Test2()
     {
-        Random random = new Random();
+        Random random = new();
         int seed = random.Next();
 
-        List<int> lstkeep = new List<int>(1000);
-        List<int> lst = new List<int>(1000);
-        List<IntPtr> lstp = new List<IntPtr>(1000);
+        List<int> lstkeep = new(1000);
+        List<int> lst = new(1000);
+        List<nint> lstp = new(1000);
 
         for (int tryagain = 0; tryagain < 10; tryagain++)
         {
             random = new Random(seed);
             for (int x = 0; x < 1000; x++)
             {
-                Globals.MemoryPool.AllocatePage(out int index, out IntPtr ptr);
+                Globals.MemoryPool.AllocatePage(out int index, out nint ptr);
                 lst.Add(index);
                 lstp.Add(ptr);
             }
 
-            foreach (IntPtr ptr in lstp)
+            foreach (nint ptr in lstp)
             {
                 int* lp = (int*)ptr.ToPointer();
                 *lp++ = random.Next();
@@ -118,14 +123,18 @@ public class MemoryPoolTest
             }
 
             random = new Random(seed);
-            foreach (IntPtr ptr in lstp)
+            foreach (nint ptr in lstp)
             {
                 int* lp = (int*)ptr.ToPointer();
 
-                if (*lp++ != random.Next()) throw new Exception();
-                if (*lp++ != random.Next()) throw new Exception();
-                if (*lp++ != random.Next()) throw new Exception();
-                if (*lp++ != random.Next()) throw new Exception();
+                if (*lp++ != random.Next())
+                    throw new Exception();
+                if (*lp++ != random.Next())
+                    throw new Exception();
+                if (*lp++ != random.Next())
+                    throw new Exception();
+                if (*lp++ != random.Next())
+                    throw new Exception();
             }
 
             for (int x = 0; x < 1000; x += 2)
@@ -133,14 +142,13 @@ public class MemoryPoolTest
                 lstkeep.Add(lst[x]);
                 Globals.MemoryPool.ReleasePage(lst[x + 1]);
             }
+
             lst.Clear();
             lstp.Clear();
         }
 
         foreach (int x in lstkeep)
-        {
             Globals.MemoryPool.ReleasePage(x);
-        }
         lst.Clear();
         lst = null;
         if (Globals.MemoryPool.AllocatedBytes > 0)
@@ -149,15 +157,15 @@ public class MemoryPoolTest
 
     private static void BufferPool_RequestCollection(object sender, CollectionEventArgs eventArgs)
     {
-        if (lst is null)
+        if (s_lst is null)
             return;
         if (eventArgs.CollectionMode == MemoryPoolCollectionMode.Critical)
         {
-            int ItemsToRemove = lst.Count / 5;
-            while (lst.Count > ItemsToRemove)
+            int itemsToRemove = s_lst.Count / 5;
+            while (s_lst.Count > itemsToRemove)
             {
-                eventArgs.ReleasePage(lst[lst.Count - 1]);
-                lst.RemoveAt(lst.Count - 1);
+                eventArgs.ReleasePage(s_lst[s_lst.Count - 1]);
+                s_lst.RemoveAt(s_lst.Count - 1);
             }
             //for (int x = 0; x<lst.Count; x+=3)
             //{
@@ -168,4 +176,6 @@ public class MemoryPoolTest
         }
         //throw new NotImplementedException();
     }
+
+    #endregion
 }

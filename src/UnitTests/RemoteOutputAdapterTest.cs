@@ -21,11 +21,12 @@
 //
 //******************************************************************************************************
 
+using System.Threading;
 using NUnit.Framework;
 using SnapDB.Snap.Services;
-using System.Threading;
+using SnapDB.UnitTests.Snap;
 
-namespace UnitTests;
+namespace SnapDB.UnitTests;
 
 [TestFixture]
 internal class RemoteOutputAdapterTest
@@ -33,8 +34,8 @@ internal class RemoteOutputAdapterTest
     [Test]
     public void TestRemoteAdapter()
     {
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
         HistorianServerDatabaseConfig settings = new HistorianServerDatabaseConfig("PPA", @"c:\temp\historian\", true);
 
@@ -45,7 +46,7 @@ internal class RemoteOutputAdapterTest
             {
                 for (uint x = 0; x < 100000; x++)
                 {
-                    key.PointID = x;
+                    key.PointId = x;
                     queue.Enqueue(key, value);
                 }
                 Thread.Sleep(100);

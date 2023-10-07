@@ -24,17 +24,19 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB.Snap;
 using System;
 using System.Collections.Generic;
-using UnitTests.IO.Unmanaged;
+using NUnit.Framework;
+using SnapDB.Snap;
+using SnapDB.UnitTests.IO.Unmanaged;
 
-namespace UnitTests.SortedTreeStore;
+namespace SnapDB.UnitTests.SortedTreeStore;
 
 [TestFixture]
 public class CustomSortHelperTest
 {
+    #region [ Methods ]
+
     [Test]
     public void Test1()
     {
@@ -61,13 +63,11 @@ public class CustomSortHelperTest
 
     public void Test(int count)
     {
-        List<int> correctList = new List<int>();
-        Random r = new Random();
+        List<int> correctList = new();
+        Random r = new();
         for (int x = 0; x < count; x++)
-        {
             correctList.Add(r.Next(1000000000));
-        }
-        CustomSortHelper<int> items = new CustomSortHelper<int>(correctList, (x, y) => x.CompareTo(y) < 0);
+        CustomSortHelper<int> items = new(correctList, (x, y) => x.CompareTo(y) < 0);
         correctList.Sort();
         for (int x = 0; x < count; x++)
             if (correctList[x] != items[x])
@@ -76,13 +76,11 @@ public class CustomSortHelperTest
 
     public void TestWithRenumber(int count)
     {
-        List<int> correctList = new List<int>();
-        Random r = new Random();
+        List<int> correctList = new();
+        Random r = new();
         for (int x = 0; x < count; x++)
-        {
             correctList.Add(r.Next(10000000));
-        }
-        CustomSortHelper<int> items = new CustomSortHelper<int>(correctList, (x, y) => x.CompareTo(y) < 0);
+        CustomSortHelper<int> items = new(correctList, (x, y) => x.CompareTo(y) < 0);
         correctList.Sort();
 
         for (int i = 0; i < Math.Min(count, 100); i++)
@@ -96,8 +94,8 @@ public class CustomSortHelperTest
             for (int x = 0; x < count; x++)
                 if (correctList[x] != items[x])
                     throw new Exception();
-
         }
-
     }
+
+    #endregion
 }

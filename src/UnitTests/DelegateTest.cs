@@ -24,36 +24,41 @@
 using System;
 using NUnit.Framework;
 
-namespace UnitTests;
+namespace SnapDB.UnitTests;
 
 [TestFixture]
 public class DelegateTest
 {
+    #region [ Members ]
+
     public event Action MyEvent;
+
+    #endregion
+
+    #region [ Methods ]
 
     [Test]
     public void Test()
     {
         if (MyEvent is null)
-            System.Console.WriteLine("1: Null");
+            Console.WriteLine("1: Null");
         else
-            System.Console.WriteLine("1: " + MyEvent.GetType().ToString());
+            Console.WriteLine("1: " + MyEvent.GetType());
 
         MyEvent += Test;
 
         if (MyEvent is null)
-            System.Console.WriteLine("2: Null");
+            Console.WriteLine("2: Null");
         else
-            System.Console.WriteLine("2: " + MyEvent.GetType().ToString());
+            Console.WriteLine("2: " + MyEvent.GetType());
 
         MyEvent -= Test;
 
         if (MyEvent is null)
-            System.Console.WriteLine("3: Null");
+            Console.WriteLine("3: Null");
         else
-            System.Console.WriteLine("3: " + MyEvent.GetType().ToString());
-
+            Console.WriteLine("3: " + MyEvent.GetType());
     }
 
-
+    #endregion
 }

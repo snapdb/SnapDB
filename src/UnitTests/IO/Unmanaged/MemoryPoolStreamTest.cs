@@ -24,23 +24,25 @@
 //
 //******************************************************************************************************
 
+using System;
 using NUnit.Framework;
 using SnapDB.IO;
 using SnapDB.IO.Unmanaged;
-using System;
 
-namespace UnitTests.IO.Unmanaged;
+namespace SnapDB.UnitTests.IO.Unmanaged;
 
-[TestFixture()]
+[TestFixture]
 public class MemoryPoolStreamTest
 {
-    [Test()]
+    #region [ Methods ]
+
+    [Test]
     public void Test()
     {
         MemoryPoolTest.TestMemoryLeak();
 
         SelfTest();
-        MemoryPoolStream ms = new MemoryPoolStream();
+        MemoryPoolStream ms = new();
         BinaryStreamTest.Test(ms);
         Assert.IsTrue(true);
         ms.Dispose();
@@ -48,20 +50,22 @@ public class MemoryPoolStreamTest
         MemoryPoolTest.TestMemoryLeak();
     }
 
+    #endregion
+
+    #region [ Static ]
+
     private static void SelfTest()
     {
-        MemoryPoolStream ms1 = new MemoryPoolStream();
+        MemoryPoolStream ms1 = new();
         BinaryStreamBase ms = ms1.CreateBinaryStream();
-        Random rand = new Random();
+        Random rand = new();
         int seed = rand.Next();
         rand = new Random(seed);
         byte[] data = new byte[255];
         rand.NextBytes(data);
 
         while (ms.Position < 1000000)
-        {
             ms.Write(data, 0, rand.Next(256));
-        }
 
         byte[] data2 = new byte[255];
         rand = new Random(seed);
@@ -74,6 +78,7 @@ public class MemoryPoolStreamTest
             ms.ReadAll(data2, 0, length);
             Compare(data, data2, length);
         }
+
         ms.Dispose();
         ms1.Dispose();
     }
@@ -81,9 +86,9 @@ public class MemoryPoolStreamTest
     private static void Compare(byte[] a, byte[] b, int length)
     {
         for (int x = 0; x < length; x++)
-        {
             if (a[x] != b[x])
                 throw new Exception();
-        }
     }
+
+    #endregion
 }

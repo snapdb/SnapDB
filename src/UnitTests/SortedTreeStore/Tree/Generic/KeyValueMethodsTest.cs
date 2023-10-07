@@ -23,11 +23,13 @@
 
 using NUnit.Framework;
 
-namespace UnitTests.SortedTreeStore.Tree.Generic;
+namespace SnapDB.UnitTests.SortedTreeStore.Tree.Generic;
 
 [TestFixture]
-public unsafe class KeyValueMethodsTest
+public class KeyValueMethodsTest
 {
+    #region [ Methods ]
+
     [Test]
     public void Test1()
     {
@@ -57,4 +59,6 @@ public unsafe class KeyValueMethodsTest
         //Assert.AreEqual(0xAA00DD00u, key.Value);
         //Assert.AreEqual(0x00CC0011u, value.Value);
     }
+
+    #endregion
 }

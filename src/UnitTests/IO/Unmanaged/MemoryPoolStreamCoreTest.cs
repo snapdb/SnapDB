@@ -25,21 +25,22 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
-using SnapDB;
 using SnapDB.IO.Unmanaged;
 
-namespace UnitTests.IO.Unmanaged;
+namespace SnapDB.UnitTests.IO.Unmanaged;
 
 [TestFixture]
-class MemoryPoolStreamCoreTest
+internal class MemoryPoolStreamCoreTest
 {
-    [Test()]
+    #region [ Methods ]
+
+    [Test]
     public void TestAllocateAndDeallocate()
     {
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
-        using (MemoryPoolStreamCore ms = new MemoryPoolStreamCore())
+        using (MemoryPoolStreamCore ms = new())
         {
-            BlockArguments args = new BlockArguments();
+            BlockArguments args = new();
             ms.GetBlock(args);
             Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, Globals.MemoryPool.PageSize);
             ms.GetBlock(args);
@@ -48,27 +49,29 @@ class MemoryPoolStreamCoreTest
             ms.GetBlock(args);
             Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 2 * Globals.MemoryPool.PageSize);
         }
+
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
     }
 
-    [Test()]
+    [Test]
     public void TestConstructor()
     {
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
-        using (MemoryPoolStreamCore ms = new MemoryPoolStreamCore())
+        using (MemoryPoolStreamCore ms = new())
         {
             Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
         }
+
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
     }
 
-    [Test()]
+    [Test]
     public void TestAlignment()
     {
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
-        using (MemoryPoolStreamCore ms = new MemoryPoolStreamCore())
+        using (MemoryPoolStreamCore ms = new())
         {
-            BlockArguments args = new BlockArguments();
+            BlockArguments args = new();
             ms.ConfigureAlignment(41211, 4096);
             Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
             args.Position = 41211;
@@ -77,8 +80,9 @@ class MemoryPoolStreamCoreTest
             Assert.AreEqual(Globals.MemoryPool.AllocatedBytes - 41211 % 4096, args.Length);
             Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, Globals.MemoryPool.PageSize);
         }
+
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
     }
 
+    #endregion
 }
-

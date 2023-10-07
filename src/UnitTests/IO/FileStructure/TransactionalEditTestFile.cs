@@ -24,43 +24,39 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB;
-using SnapDB.IO.FileStructure;
 using System;
 using System.IO;
+using NUnit.Framework;
+using SnapDB.IO.FileStructure;
+using SnapDB.IO.FileStructure.Media;
 
-namespace UnitTests.IO.FileStructure;
+namespace SnapDB.UnitTests.IO.FileStructure;
 
-[TestFixture()]
+[TestFixture]
 public class TransactionalEditTestFile
 {
-    private static readonly int BlockSize = 4096;
-    private static readonly int BlockDataLength = BlockSize - FileStructureConstants.BlockFooterLength;
+    #region [ Methods ]
 
-
-    [Test()]
+    [Test]
     public void Test()
     {
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
 
-        string fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".tmp");
+        string fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".tmp");
         try
         {
-            using (DiskIo stream = DiskIo.CreateFile(fileName, Globals.MemoryPool, BlockSize))
-            {
-                FileHeaderBlock fat = stream.LastCommittedHeader;
-                //obtain a readonly copy of the file allocation table.
-                fat = stream.LastCommittedHeader;
-                TestCreateNewFile(stream, fat);
-                fat = stream.LastCommittedHeader;
-                TestOpenExistingFile(stream, fat);
-                fat = stream.LastCommittedHeader;
-                TestRollback(stream, fat);
-                fat = stream.LastCommittedHeader;
-                TestVerifyRollback(stream, fat);
-                Assert.IsTrue(true);
-            }
+            using DiskIo stream = DiskIo.CreateFile(fileName, Globals.MemoryPool, s_blockSize);
+            FileHeaderBlock fat = stream.LastCommittedHeader;
+            //obtain a readonly copy of the file allocation table.
+            fat = stream.LastCommittedHeader;
+            TestCreateNewFile(stream, fat);
+            fat = stream.LastCommittedHeader;
+            TestOpenExistingFile(stream, fat);
+            fat = stream.LastCommittedHeader;
+            TestRollback(stream, fat);
+            fat = stream.LastCommittedHeader;
+            TestVerifyRollback(stream, fat);
+            Assert.IsTrue(true);
         }
         finally
         {
@@ -70,12 +66,19 @@ public class TransactionalEditTestFile
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
     }
 
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly int s_blockSize = 4096;
+    private static readonly int s_blockDataLength = s_blockSize - FileStructureConstants.BlockFooterLength;
+
     private static void TestCreateNewFile(DiskIo stream, FileHeaderBlock fat)
     {
         SubFileName id1 = SubFileName.CreateRandom();
         SubFileName id2 = SubFileName.CreateRandom();
         SubFileName id3 = SubFileName.CreateRandom();
-        TransactionalEdit trans = new TransactionalEdit(stream);
+        TransactionalEdit trans = new(stream);
         //create 3 files
 
         SubFileStream fs1 = trans.CreateFile(id1);
@@ -86,10 +89,10 @@ public class TransactionalEditTestFile
         //write to the three files
         SubFileStreamTest.TestSingleByteWrite(fs1);
         SubFileStreamTest.TestCustomSizeWrite(fs2, 5);
-        SubFileStreamTest.TestCustomSizeWrite(fs3, BlockDataLength + 20);
+        SubFileStreamTest.TestCustomSizeWrite(fs3, s_blockDataLength + 20);
 
         //read from them and verify content.
-        SubFileStreamTest.TestCustomSizeRead(fs3, BlockDataLength + 20);
+        SubFileStreamTest.TestCustomSizeRead(fs3, s_blockDataLength + 20);
         SubFileStreamTest.TestCustomSizeRead(fs2, 5);
         SubFileStreamTest.TestSingleByteRead(fs1);
 
@@ -103,7 +106,7 @@ public class TransactionalEditTestFile
     private static void TestOpenExistingFile(DiskIo stream, FileHeaderBlock fat)
     {
         Guid id = Guid.NewGuid();
-        TransactionalEdit trans = new TransactionalEdit(stream);
+        TransactionalEdit trans = new(stream);
         //create 3 files
 
         SubFileStream fs1 = trans.OpenFile(0);
@@ -113,12 +116,12 @@ public class TransactionalEditTestFile
         //read from them and verify content.
         SubFileStreamTest.TestSingleByteRead(fs1);
         SubFileStreamTest.TestCustomSizeRead(fs2, 5);
-        SubFileStreamTest.TestCustomSizeRead(fs3, BlockDataLength + 20);
+        SubFileStreamTest.TestCustomSizeRead(fs3, s_blockDataLength + 20);
 
         //rewrite bad data.
         SubFileStreamTest.TestSingleByteWrite(fs2);
         SubFileStreamTest.TestCustomSizeWrite(fs3, 5);
-        SubFileStreamTest.TestCustomSizeWrite(fs1, BlockDataLength + 20);
+        SubFileStreamTest.TestCustomSizeWrite(fs1, s_blockDataLength + 20);
 
         fs1.Dispose();
         fs2.Dispose();
@@ -132,7 +135,7 @@ public class TransactionalEditTestFile
         SubFileName id1 = SubFileName.CreateRandom();
         SubFileName id2 = SubFileName.CreateRandom();
         SubFileName id3 = SubFileName.CreateRandom();
-        TransactionalEdit trans = new TransactionalEdit(stream);
+        TransactionalEdit trans = new(stream);
 
         //create 3 files additional files
         SubFileStream fs21 = trans.CreateFile(id1);
@@ -147,12 +150,12 @@ public class TransactionalEditTestFile
         //read from them and verify content.
         SubFileStreamTest.TestSingleByteRead(fs2);
         SubFileStreamTest.TestCustomSizeRead(fs3, 5);
-        SubFileStreamTest.TestCustomSizeRead(fs1, BlockDataLength + 20);
+        SubFileStreamTest.TestCustomSizeRead(fs1, s_blockDataLength + 20);
 
         //rewrite bad data.
         SubFileStreamTest.TestSingleByteWrite(fs3);
         SubFileStreamTest.TestCustomSizeWrite(fs1, 5);
-        SubFileStreamTest.TestCustomSizeWrite(fs2, BlockDataLength + 20);
+        SubFileStreamTest.TestCustomSizeWrite(fs2, s_blockDataLength + 20);
 
         fs1.Dispose();
         fs2.Dispose();
@@ -168,7 +171,7 @@ public class TransactionalEditTestFile
     private static void TestVerifyRollback(DiskIo stream, FileHeaderBlock fat)
     {
         Guid id = Guid.NewGuid();
-        TransactionalEdit trans = new TransactionalEdit(stream);
+        TransactionalEdit trans = new(stream);
 
         if (trans.Files.Count != 3)
             throw new Exception();
@@ -181,7 +184,7 @@ public class TransactionalEditTestFile
         //read from them and verify content.
         SubFileStreamTest.TestSingleByteRead(fs2);
         SubFileStreamTest.TestCustomSizeRead(fs3, 5);
-        SubFileStreamTest.TestCustomSizeRead(fs1, BlockDataLength + 20);
+        SubFileStreamTest.TestCustomSizeRead(fs1, s_blockDataLength + 20);
 
         fs1.Dispose();
         fs2.Dispose();
@@ -189,4 +192,6 @@ public class TransactionalEditTestFile
 
         trans.Dispose();
     }
+
+    #endregion
 }

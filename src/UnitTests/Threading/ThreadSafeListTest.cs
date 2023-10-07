@@ -21,24 +21,24 @@
 //
 //******************************************************************************************************
 
+using System.Linq;
 using NUnit.Framework;
 using SnapDB.Threading;
-using System.Linq;
 
-namespace UnitTests.Threading;
+namespace SnapDB.UnitTests.Threading;
 
 [TestFixture]
 internal class ThreadSafeListTest
 {
+    #region [ Methods ]
+
     [Test]
     public void Test()
     {
-        ThreadSafeList<int> ts = new ThreadSafeList<int>();
+        ThreadSafeList<int> ts = new();
 
         for (int x = 0; x < 10; x++)
-        {
             ts.Add(x);
-        }
 
         Assert.AreEqual(10, ts.Count());
         Assert.IsTrue(ts.Remove(5));
@@ -49,8 +49,11 @@ internal class ThreadSafeListTest
         foreach (int x in ts)
         {
             count++;
-            ts.ForEach((i) => ts.Remove(i));
+            ts.ForEach(i => ts.Remove(i));
         }
+
         Assert.AreEqual(1, count);
     }
+
+    #endregion
 }

@@ -24,108 +24,42 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB;
 using System;
 using System.Diagnostics;
-using UnitTests.IO.Unmanaged;
+using NUnit.Framework;
+using SnapDB.IO.FileStructure;
+using SnapDB.UnitTests.IO.Unmanaged;
 
-namespace UnitTests.IO.FileStructure;
+namespace SnapDB.UnitTests.IO.FileStructure;
 
-[TestFixture()]
+[TestFixture]
 public class IndexMapperTest
 {
-    private static readonly uint BlockSize;
-    private static readonly uint BlockDataLength;
-    private static readonly uint AddressesPerBlock;
-
-    static IndexMapperTest()
-    {
-        BlockSize = 256;
-        BlockDataLength = BlockSize - FileStructureConstants.BlockFooterLength;
-        AddressesPerBlock = BlockDataLength / 4; //rounds down
-    }
-
-    //[Test()]
-    //public void Test()
-    //{
-    //    Assert.AreEqual(Globals.BufferPool.AllocatedBytes, 0L);
-    //    //Class tested to approximately 1.7 million calculations per second at an inode depth of 4
-    //    //That's 4kb * 1.7 million/sec or 6.8GB/sec of data.
-    //    //TestSpeed();
-
-    //    TestMethod1();
-    //    Assert.IsTrue(true);
-    //    Assert.AreEqual(Globals.BufferPool.AllocatedBytes, 0L);
-    //}
-
-    [Test()]
-    public void Benchmark()
-    {
-        MemoryPoolTest.TestMemoryLeak();
-        Benchmark(0, "Direct\t");
-        Benchmark(AddressesPerBlock - 1, "Single\t");
-        Benchmark(AddressesPerBlock * AddressesPerBlock - 1, "Double\t");
-        Benchmark(AddressesPerBlock * AddressesPerBlock * AddressesPerBlock - 1, "Triple\t");
-        Benchmark(AddressesPerBlock * AddressesPerBlock * AddressesPerBlock * AddressesPerBlock - 1, "Last\t");
-        MemoryPoolTest.TestMemoryLeak();
-    }
-
-    public void Benchmark(uint page, string text)
-    {
-        Stopwatch sw = new Stopwatch();
-
-        IndexMapper map = new IndexMapper((int)BlockSize);
-
-        System.Console.WriteLine(text +
-                          StepTimer.Time(10, () =>
-                          {
-                              map.MapPosition(page);
-                              map.MapPosition(page);
-                              map.MapPosition(page);
-                              map.MapPosition(page);
-                              map.MapPosition(page);
-                              map.MapPosition(page);
-                              map.MapPosition(page);
-                              map.MapPosition(page);
-                              map.MapPosition(page);
-                              map.MapPosition(page);
-                          }));
-    }
-
-    [Test]
-    public static void TestMethod1()
-    {
-        MemoryPoolTest.TestMemoryLeak();
-        int blockSize = 128;
-        IndexMapper map = new IndexMapper(blockSize);
-        CheckValues check = new CheckValues(blockSize);
-
-        uint lastAddress = (uint)Math.Min(uint.MaxValue, check.BlocksPerPage * (long)check.BlocksPerPage * check.BlocksPerPage * check.BlocksPerPage - 1);
-
-        //this line is to shortcut so the test is less comprehensive.
-        for (uint x = 0; x <= lastAddress; x++)
-        {
-            map.MapPosition(x);
-            check.Check(map, x);
-        }
-        MemoryPoolTest.TestMemoryLeak();
-    }
+    #region [ Members ]
 
     private class CheckValues
     {
-        public int FirstRedirectOffset;
-        public int SecondRedirectOffset;
-        public int ThirdRedirectOffset;
-        public int FourthRedirectOffset;
-        public readonly int BlocksPerPage;
+        #region [ Members ]
 
         public int BaseVirtualAddressIndexValue;
+        public readonly int BlocksPerPage;
+        public int FirstRedirectOffset;
+        public int FourthRedirectOffset;
+        public int SecondRedirectOffset;
+        public int ThirdRedirectOffset;
+
+        #endregion
+
+        #region [ Constructors ]
 
         public CheckValues(int blockSize)
         {
             BlocksPerPage = (blockSize - FileStructureConstants.BlockFooterLength) / 4;
         }
+
+        #endregion
+
+        #region [ Methods ]
 
         public void Check(IndexMapper map, uint address)
         {
@@ -164,5 +98,98 @@ public class IndexMapperTest
                 }
             }
         }
+
+        #endregion
     }
+
+    #endregion
+
+    #region [ Constructors ]
+
+    static IndexMapperTest()
+    {
+        s_blockSize = 256;
+        s_blockDataLength = s_blockSize - FileStructureConstants.BlockFooterLength;
+        s_addressesPerBlock = s_blockDataLength / 4; //rounds down
+    }
+
+    #endregion
+
+    #region [ Methods ]
+
+    //[Test()]
+    //public void Test()
+    //{
+    //    Assert.AreEqual(Globals.BufferPool.AllocatedBytes, 0L);
+    //    //Class tested to approximately 1.7 million calculations per second at an inode depth of 4
+    //    //That's 4kb * 1.7 million/sec or 6.8GB/sec of data.
+    //    //TestSpeed();
+
+    //    TestMethod1();
+    //    Assert.IsTrue(true);
+    //    Assert.AreEqual(Globals.BufferPool.AllocatedBytes, 0L);
+    //}
+
+    [Test]
+    public void Benchmark()
+    {
+        MemoryPoolTest.TestMemoryLeak();
+        Benchmark(0, "Direct\t");
+        Benchmark(s_addressesPerBlock - 1, "Single\t");
+        Benchmark(s_addressesPerBlock * s_addressesPerBlock - 1, "Double\t");
+        Benchmark(s_addressesPerBlock * s_addressesPerBlock * s_addressesPerBlock - 1, "Triple\t");
+        Benchmark(s_addressesPerBlock * s_addressesPerBlock * s_addressesPerBlock * s_addressesPerBlock - 1, "Last\t");
+        MemoryPoolTest.TestMemoryLeak();
+    }
+
+    public void Benchmark(uint page, string text)
+    {
+        Stopwatch sw = new();
+
+        IndexMapper map = new((int)s_blockSize);
+
+        Console.WriteLine(text + StepTimer.Time(10, () =>
+        {
+            map.MapPosition(page);
+            map.MapPosition(page);
+            map.MapPosition(page);
+            map.MapPosition(page);
+            map.MapPosition(page);
+            map.MapPosition(page);
+            map.MapPosition(page);
+            map.MapPosition(page);
+            map.MapPosition(page);
+            map.MapPosition(page);
+        }));
+    }
+
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly uint s_blockSize;
+    private static readonly uint s_blockDataLength;
+    private static readonly uint s_addressesPerBlock;
+
+    [Test]
+    public static void TestMethod1()
+    {
+        MemoryPoolTest.TestMemoryLeak();
+        int blockSize = 128;
+        IndexMapper map = new(blockSize);
+        CheckValues check = new(blockSize);
+
+        uint lastAddress = (uint)Math.Min(uint.MaxValue, check.BlocksPerPage * (long)check.BlocksPerPage * check.BlocksPerPage * check.BlocksPerPage - 1);
+
+        //this line is to shortcut so the test is less comprehensive.
+        for (uint x = 0; x <= lastAddress; x++)
+        {
+            map.MapPosition(x);
+            check.Check(map, x);
+        }
+
+        MemoryPoolTest.TestMemoryLeak();
+    }
+
+    #endregion
 }

@@ -21,18 +21,21 @@
 //
 //******************************************************************************************************
 
+using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using SnapDB.IO.Unmanaged;
 using SnapDB.Snap;
 using SnapDB.Snap.Filters;
-using System;
-using System.Collections.Generic;
+using SnapDB.UnitTests.Snap;
 
-namespace UnitTests.SortedTreeStore.Filters;
+namespace SnapDB.UnitTests.SortedTreeStore.Filters;
 
 [TestFixture]
 public class TimestampFilterTest
 {
+    #region [ Methods ]
+
     [Test]
     public void TestFixedRange()
     {
@@ -42,17 +45,15 @@ public class TimestampFilterTest
         if (!pointId.GetType().FullName.Contains("FixedRange"))
             throw new Exception("Wrong type");
 
-        using (BinaryStream bs = new BinaryStream(allocatesOwnMemory: true))
-        {
-            bs.Write(pointId.FilterType);
-            pointId.Save(bs);
-            bs.Position = 0;
+        using BinaryStream bs = new(true);
+        bs.Write(pointId.FilterType);
+        pointId.Save(bs);
+        bs.Position = 0;
 
-            SeekFilterBase<HistorianKey> filter = Library.Filters.GetSeekFilter<HistorianKey>(bs.ReadGuid(), bs);
+        SeekFilterBase<HistorianKey> filter = Library.Filters.GetSeekFilter<HistorianKey>(bs.ReadGuid(), bs);
 
-            if (!filter.GetType().FullName.Contains("FixedRange"))
-                throw new Exception("Wrong type");
-        }
+        if (!filter.GetType().FullName.Contains("FixedRange"))
+            throw new Exception("Wrong type");
     }
 
     [Test]
@@ -64,17 +65,16 @@ public class TimestampFilterTest
         if (!pointId.GetType().FullName.Contains("IntervalRanges"))
             throw new Exception("Wrong type");
 
-        using (BinaryStream bs = new BinaryStream(allocatesOwnMemory: true))
-        {
-            bs.Write(pointId.FilterType);
-            pointId.Save(bs);
-            bs.Position = 0;
+        using BinaryStream bs = new(true);
+        bs.Write(pointId.FilterType);
+        pointId.Save(bs);
+        bs.Position = 0;
 
-            SeekFilterBase<HistorianKey> filter = Library.Filters.GetSeekFilter<HistorianKey>(bs.ReadGuid(), bs);
+        SeekFilterBase<HistorianKey> filter = Library.Filters.GetSeekFilter<HistorianKey>(bs.ReadGuid(), bs);
 
-            if (!filter.GetType().FullName.Contains("IntervalRanges"))
-                throw new Exception("Wrong type");
-        }
+        if (!filter.GetType().FullName.Contains("IntervalRanges"))
+            throw new Exception("Wrong type");
     }
 
+    #endregion
 }

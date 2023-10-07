@@ -24,19 +24,21 @@
 using Gemstone.IO;
 using NUnit.Framework;
 
-namespace UnitTests;
+namespace SnapDB.UnitTests;
 
 /// <summary>
-///This is a test class for WinApiTest and is intended
-///to contain all WinApiTest Unit Tests
-///</summary>
-[TestFixture()]
+/// This is a test class for WinApiTest and is intended
+/// to contain all WinApiTest Unit Tests
+/// </summary>
+[TestFixture]
 public class WinApiTest
 {
+    #region [ Methods ]
+
     /// <summary>
-    ///A test for GetAvailableFreeSpace
-    ///</summary>
-    [Test()]
+    /// A test for GetAvailableFreeSpace
+    /// </summary>
+    [Test]
     public void GetAvailableFreeSpaceTest()
     {
         long freeSpace = 0;
@@ -83,4 +85,6 @@ public class WinApiTest
         Assert.AreEqual(false, totalSize > 0);
         Assert.AreEqual(false, actual);
     }
+
+    #endregion
 }

@@ -23,14 +23,15 @@
 
 using System;
 using System.Collections.Generic;
+using SnapDB.UnitTests.Snap;
 
-namespace UnitTests.SortedTreeStore.Tree.Generic.CustomCompression;
+namespace SnapDB.UnitTests.SortedTreeStore.Tree.Generic.CustomCompression;
 
 internal class SequentialTest
  : TreeNodeRandomizerBase<HistorianKey, HistorianValue>
 {
-    private readonly SortedList<uint, uint> m_sortedItems = new SortedList<uint, uint>();
-    private readonly List<KeyValuePair<uint, uint>> m_items = new List<KeyValuePair<uint, uint>>();
+    private readonly SortedList<uint, uint> m_sortedItems = new();
+    private readonly List<KeyValuePair<uint, uint>> m_items = new();
 
     private int m_maxCount;
     private uint m_current = 0;
@@ -67,8 +68,8 @@ internal class SequentialTest
 internal class ReverseSequentialTest
     : TreeNodeRandomizerBase<HistorianKey, HistorianValue>
 {
-    private readonly SortedList<uint, uint> m_sortedItems = new SortedList<uint, uint>();
-    private readonly List<KeyValuePair<uint, uint>> m_items = new List<KeyValuePair<uint, uint>>();
+    private readonly SortedList<uint, uint> m_sortedItems = new();
+    private readonly List<KeyValuePair<uint, uint>> m_items = new();
 
     private int m_maxCount;
     private uint m_current = 0;
@@ -105,8 +106,8 @@ internal class ReverseSequentialTest
 internal class RandomTest
     : TreeNodeRandomizerBase<HistorianKey, HistorianValue>
 {
-    private readonly SortedList<ulong, ulong> m_sortedItems = new SortedList<ulong, ulong>();
-    private readonly List<KeyValuePair<ulong, ulong>> m_items = new List<KeyValuePair<ulong, ulong>>();
+    private readonly SortedList<ulong, ulong> m_sortedItems = new();
+    private readonly List<KeyValuePair<ulong, ulong>> m_items = new();
 
     private Random r;
 

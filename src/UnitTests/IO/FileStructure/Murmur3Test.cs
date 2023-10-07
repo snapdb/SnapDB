@@ -24,27 +24,31 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using NUnit.Framework;
+using SnapDB.IO.FileStructure;
+using SnapDB.IO.FileStructure.Media;
 
-namespace UnitTests.IO.FileStructure;
+namespace SnapDB.UnitTests.IO.FileStructure;
 
 [TestFixture]
 internal class Murmur3Test
 {
+    #region [ Methods ]
+
     [Test]
     public unsafe void TestIsSame()
     {
         byte[] data = new byte[4096];
-        Random r = new Random();
+        Random r = new();
 
         for (int x = 0; x < 100; x++)
         {
             r.NextBytes(data);
 
-            Murmur3Orig mm3 = new Murmur3Orig();
+            Murmur3Orig mm3 = new();
             byte[] checksum = mm3.ComputeHash(data);
             byte[] checksum2 = new byte[16];
 
@@ -64,11 +68,11 @@ internal class Murmur3Test
     public unsafe void Benchmark()
     {
         byte[] data = new byte[4096];
-        Random r = new Random(1);
+        Random r = new(1);
         r.NextBytes(data);
 
         //Prime the run
-        Murmur3Orig mm3 = new Murmur3Orig();
+        Murmur3Orig mm3 = new();
         for (int x = 0; x < 1000; x++)
             mm3.ComputeHash(data);
         fixed (byte* lp = data)
@@ -77,13 +81,13 @@ internal class Murmur3Test
                 Murmur3.ComputeHash(lp, data.Length, out ulong value1, out ulong value2);
 
             for (int x = 0; x < 1000; x++)
-                Footer.ComputeChecksum((IntPtr)lp, out long value3, out int value4, data.Length);
+                Footer.ComputeChecksum((nint)lp, out long value3, out int value4, data.Length);
         }
 
 
-        Stopwatch sw1 = new Stopwatch();
-        Stopwatch sw2 = new Stopwatch();
-        Stopwatch sw3 = new Stopwatch();
+        Stopwatch sw1 = new();
+        Stopwatch sw2 = new();
+        Stopwatch sw3 = new();
 
         sw1.Start();
         for (int x = 0; x < 10000; x++)
@@ -99,12 +103,14 @@ internal class Murmur3Test
 
             sw3.Start();
             for (int x = 0; x < 10000; x++)
-                Footer.ComputeChecksum((IntPtr)lp, out long value3, out int value4, data.Length);
+                Footer.ComputeChecksum((nint)lp, out long value3, out int value4, data.Length);
             sw3.Stop();
         }
 
-        System.Console.WriteLine("orig: " + (4096 * 10000 / sw1.Elapsed.TotalSeconds / 1024 / 1024).ToString("0 MB/S"));
-        System.Console.WriteLine("mine: " + (4096 * 10000 / sw2.Elapsed.TotalSeconds / 1024 / 1024).ToString("0 MB/S"));
-        System.Console.WriteLine("old: " + (4096 * 10000 / sw3.Elapsed.TotalSeconds / 1024 / 1024).ToString("0 MB/S"));
+        Console.WriteLine("orig: " + (4096 * 10000 / sw1.Elapsed.TotalSeconds / 1024 / 1024).ToString("0 MB/S"));
+        Console.WriteLine("mine: " + (4096 * 10000 / sw2.Elapsed.TotalSeconds / 1024 / 1024).ToString("0 MB/S"));
+        Console.WriteLine("old: " + (4096 * 10000 / sw3.Elapsed.TotalSeconds / 1024 / 1024).ToString("0 MB/S"));
     }
+
+    #endregion
 }

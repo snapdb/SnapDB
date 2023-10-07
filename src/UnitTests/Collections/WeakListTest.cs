@@ -24,24 +24,26 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
+using SnapDB.Collections;
 
-namespace UnitTests.Collections;
+namespace SnapDB.UnitTests.Collections;
 
 [TestFixture]
-class WeakListTest
+internal class WeakListTest
 {
+    #region [ Methods ]
+
     [Test]
     public void Test()
     {
-        Random rand = new Random(3);
+        Random rand = new(3);
 
-        List<string> list1 = new List<string>();
-        WeakList<string> list2 = new WeakList<string>();
+        List<string> list1 = new();
+        WeakList<string> list2 = new();
 
         for (int x = 0; x < 1000; x++)
         {
@@ -85,9 +87,5 @@ class WeakListTest
             throw new Exception();
     }
 
- 
-
-
-    
-
+    #endregion
 }

@@ -24,87 +24,87 @@
 //
 //******************************************************************************************************
 
+using System;
 using NUnit.Framework;
-using SnapDB;
 using SnapDB.IO.FileStructure;
 using SnapDB.IO.Unmanaged;
-using System;
 
-namespace UnitTests.IO.FileStructure;
+namespace SnapDB.UnitTests.IO.FileStructure;
 
-[TestFixture()]
+[TestFixture]
 public class TransactionServiceTest
 {
-    private static readonly int BlockSize = 4096;
+    #region [ Methods ]
 
-    [Test()]
+    [Test]
     public void Test()
     {
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
         //string file = Path.GetTempFileName();
         //System.IO.File.Delete(file);
-        try
+        //using (FileSystemSnapshotService service = FileSystemSnapshotService.CreateFile(file))
+        using TransactionalFileStructure service = TransactionalFileStructure.CreateInMemory(s_blockSize);
+        using (TransactionalEdit edit = service.BeginEdit())
         {
-            //using (FileSystemSnapshotService service = FileSystemSnapshotService.CreateFile(file))
-            using (TransactionalFileStructure service = TransactionalFileStructure.CreateInMemory(BlockSize))
+            SubFileStream fs = edit.CreateFile(SubFileName.CreateRandom());
+            BinaryStream bs = new(fs);
+            bs.Write((byte)1);
+            bs.Dispose();
+            fs.Dispose();
+            edit.CommitAndDispose();
+        }
+
+        {
+            ReadSnapshot read = service.Snapshot;
+            SubFileStream f1 = read.OpenFile(0);
+            BinaryStream bs1 = new(f1);
+            if (bs1.ReadUInt8() != 1)
+                throw new Exception();
+
+            using (TransactionalEdit edit = service.BeginEdit())
             {
-                using (TransactionalEdit edit = service.BeginEdit())
-                {
-                    SubFileStream fs = edit.CreateFile(SubFileName.CreateRandom());
-                    BinaryStream bs = new BinaryStream(fs);
-                    bs.Write((byte)1);
-                    bs.Dispose();
-                    fs.Dispose();
-                    edit.CommitAndDispose();
-                }
-                {
-                    ReadSnapshot read = service.Snapshot;
-                    SubFileStream f1 = read.OpenFile(0);
-                    BinaryStream bs1 = new BinaryStream(f1);
-                    if (bs1.ReadUInt8() != 1)
-                        throw new Exception();
+                SubFileStream f2 = edit.OpenFile(0);
+                BinaryStream bs2 = new(f2);
+                if (bs2.ReadUInt8() != 1)
+                    throw new Exception();
+                bs2.Write((byte)3);
+                bs2.Dispose();
+            } //rollback should be issued;
 
-                    using (TransactionalEdit edit = service.BeginEdit())
-                    {
-                        SubFileStream f2 = edit.OpenFile(0);
-                        BinaryStream bs2 = new BinaryStream(f2);
-                        if (bs2.ReadUInt8() != 1)
-                            throw new Exception();
-                        bs2.Write((byte)3);
-                        bs2.Dispose();
-                    } //rollback should be issued;
-                    if (bs1.ReadUInt8() != 0)
-                        throw new Exception();
-                    bs1.Dispose();
+            if (bs1.ReadUInt8() != 0)
+                throw new Exception();
+            bs1.Dispose();
 
-                    {
-                        ReadSnapshot read2 = service.Snapshot;
-                        SubFileStream f2 = read2.OpenFile(0);
-                        BinaryStream bs2 = new BinaryStream(f2);
-                        if (bs2.ReadUInt8() != 1)
-                            throw new Exception();
-                        if (bs2.ReadUInt8() != 0)
-                            throw new Exception();
-                        bs2.Dispose();
-                    }
-                }
-                using (TransactionalEdit edit = service.BeginEdit())
-                {
-                    SubFileStream f2 = edit.OpenFile(0);
-                    BinaryStream bs2 = new BinaryStream(f2);
-                    bs2.Write((byte)13);
-                    bs2.Write((byte)23);
-                    bs2.Dispose();
-                    edit.RollbackAndDispose();
-                } //rollback should be issued;
+            {
+                ReadSnapshot read2 = service.Snapshot;
+                SubFileStream f2 = read2.OpenFile(0);
+                BinaryStream bs2 = new(f2);
+                if (bs2.ReadUInt8() != 1)
+                    throw new Exception();
+                if (bs2.ReadUInt8() != 0)
+                    throw new Exception();
+                bs2.Dispose();
             }
         }
-        finally
+        using (TransactionalEdit edit = service.BeginEdit())
         {
-            //System.IO.File.Delete(file);
-        }
+            SubFileStream f2 = edit.OpenFile(0);
+            BinaryStream bs2 = new(f2);
+            bs2.Write((byte)13);
+            bs2.Write((byte)23);
+            bs2.Dispose();
+            edit.RollbackAndDispose();
+        } //rollback should be issued;
 
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
         Assert.IsTrue(true);
     }
+
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly int s_blockSize = 4096;
+
+    #endregion
 }

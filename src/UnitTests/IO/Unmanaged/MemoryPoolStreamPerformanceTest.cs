@@ -24,45 +24,44 @@
 //
 //******************************************************************************************************
 
+using System;
 using NUnit.Framework;
-using SnapDB;
 using SnapDB.IO.Unmanaged;
 
-namespace UnitTests.IO.Unmanaged;
+namespace SnapDB.UnitTests.IO.Unmanaged;
 
 [TestFixture]
 public class MemoryPoolStreamPerformanceTest
 {
+    #region [ Methods ]
+
     [Test]
     public void TestBlocksPerSecond()
     {
         //UnmanagedMemory.Memory.UseLargePages = true;
-        DebugStopwatch sw = new DebugStopwatch();
-        using (MemoryPoolStream ms = new MemoryPoolStream())
+        DebugStopwatch sw = new();
+        using MemoryPoolStream ms = new();
+        using BinaryStreamIoSessionBase io = ms.CreateIoSession();
+        BlockArguments args = new()
         {
-            using (BinaryStreamIoSessionBase io = ms.CreateIoSession())
+            Position = ms.BlockSize * 2000L - 1,
+            IsWriting = true
+        };
+
+        io.GetBlock(args);
+
+        double sec = sw.TimeEvent(() =>
+        {
+            for (int y = 0; y < 100; y++)
+            for (int x = 0; x < 2000; x++)
             {
-                BlockArguments args = new BlockArguments();
-                args.Position = ms.BlockSize * 2000L - 1;
-                args.IsWriting = true;
-
+                args.Position = (long)x * ms.BlockSize;
                 io.GetBlock(args);
-
-                double sec = sw.TimeEvent(() =>
-                    {
-                        for (int y = 0; y < 100; y++)
-                            for (int x = 0; x < 2000; x++)
-                            {
-                                args.Position = (long)x * ms.BlockSize;
-                                io.GetBlock(args);
-                            }
-                    });
-
-                System.Console.WriteLine("Get Blocks: " + (200000 / sec / 1000000).ToString("0.00 Million Per Second"));
             }
-        }
+        });
 
-
+        Console.WriteLine("Get Blocks: " + (200000 / sec / 1000000).ToString("0.00 Million Per Second"));
     }
-}
 
+    #endregion
+}

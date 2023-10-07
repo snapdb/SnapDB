@@ -26,13 +26,15 @@
 
 using NUnit.Framework;
 using SnapDB.Collections;
-using UnitTests.IO.Unmanaged;
+using SnapDB.UnitTests.IO.Unmanaged;
 
-namespace UnitTests.Collections;
+namespace SnapDB.UnitTests.Collections;
 
 [TestFixture]
 public class LargeArrayTest
 {
+    #region [ Methods ]
+
     [Test]
     public void TestLargeArray()
     {
@@ -61,13 +63,13 @@ public class LargeArrayTest
                 HelperFunctions.ExpectError(() => array[x] = x);
                 array.SetCapacity(array.Capacity + 1);
             }
+
             array[x] = x;
         }
 
         for (int x = 0; x < 250000; x++)
-        {
             Assert.AreEqual(array[x], x);
-        }
     }
 
+    #endregion
 }

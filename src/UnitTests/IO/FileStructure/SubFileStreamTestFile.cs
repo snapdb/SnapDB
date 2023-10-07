@@ -24,40 +24,37 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB;
-using SnapDB.IO.FileStructure;
 using System;
 using System.IO;
+using NUnit.Framework;
+using SnapDB.IO.FileStructure;
+using SnapDB.IO.FileStructure.Media;
 
-namespace UnitTests.IO.FileStructure;
+namespace SnapDB.UnitTests.IO.FileStructure;
 
 /// <summary>
 /// Provides a stream that converts the virtual addresses of the internal feature files to physical address
 /// Also provides a way to copy on write to support the versioning file system.
 /// </summary>
-[TestFixture()]
+[TestFixture]
 public class SubFileStreamTestFile
 {
-    private static readonly int BlockSize = 4096;
-    private static readonly int BlockDataLength = BlockSize - FileStructureConstants.BlockFooterLength;
+    #region [ Methods ]
 
-    [Test()]
+    [Test]
     public void Test()
     {
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
 
-        string fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".tmp");
+        string fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".tmp");
         try
         {
-            using (DiskIo stream = DiskIo.CreateFile(fileName, Globals.MemoryPool, BlockSize))
-            {
-                TestReadAndWrites(stream);
+            using DiskIo stream = DiskIo.CreateFile(fileName, Globals.MemoryPool, s_blockSize);
+            TestReadAndWrites(stream);
 
-                TestReadAndWritesWithCommit(stream);
-                TestReadAndWritesToDifferentFilesWithCommit(stream);
-                TestBinaryStream(stream);
-            }
+            TestReadAndWritesWithCommit(stream);
+            TestReadAndWritesToDifferentFilesWithCommit(stream);
+            TestBinaryStream(stream);
         }
         finally
         {
@@ -69,6 +66,13 @@ public class SubFileStreamTestFile
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
     }
 
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly int s_blockSize = 4096;
+    private static readonly int s_blockDataLength = s_blockSize - FileStructureConstants.BlockFooterLength;
+
     private static void TestBinaryStream(DiskIo stream)
     {
         FileHeaderBlock header = stream.LastCommittedHeader;
@@ -77,7 +81,7 @@ public class SubFileStreamTestFile
         header.CreateNewFile(SubFileName.CreateRandom());
         header.CreateNewFile(SubFileName.CreateRandom());
 
-        SubFileStream ds = new SubFileStream(stream, node, header, false);
+        SubFileStream ds = new(stream, node, header, false);
         BinaryStreamTest.Test(ds);
     }
 
@@ -89,15 +93,15 @@ public class SubFileStreamTestFile
         header.CreateNewFile(SubFileName.CreateRandom());
         header.CreateNewFile(SubFileName.CreateRandom());
 
-        SubFileStream ds = new SubFileStream(stream, node, header, false);
+        SubFileStream ds = new(stream, node, header, false);
         TestSingleByteWrite(ds);
         TestSingleByteRead(ds);
 
         TestCustomSizeWrite(ds, 5);
         TestCustomSizeRead(ds, 5);
 
-        TestCustomSizeWrite(ds, BlockDataLength + 20);
-        TestCustomSizeRead(ds, BlockDataLength + 20);
+        TestCustomSizeWrite(ds, s_blockDataLength + 20);
+        TestCustomSizeRead(ds, s_blockDataLength + 20);
         stream.CommitChanges(header);
     }
 
@@ -134,13 +138,13 @@ public class SubFileStreamTestFile
         header = stream.LastCommittedHeader.CloneEditable();
         node = header.Files[0];
         ds = new SubFileStream(stream, node, header, false);
-        TestCustomSizeWrite(ds, BlockDataLength + 20);
+        TestCustomSizeWrite(ds, s_blockDataLength + 20);
         stream.CommitChanges(header);
 
         header = stream.LastCommittedHeader;
         node = header.Files[0];
         ds = new SubFileStream(stream, node, header, true);
-        TestCustomSizeRead(ds, BlockDataLength + 20);
+        TestCustomSizeRead(ds, s_blockDataLength + 20);
 
         //check old versions of the file
         TestSingleByteRead(ds1);
@@ -159,7 +163,7 @@ public class SubFileStreamTestFile
         ds = new SubFileStream(stream, header.Files[1], header, false);
         TestCustomSizeWrite(ds, 5);
         ds = new SubFileStream(stream, header.Files[2], header, false);
-        TestCustomSizeWrite(ds, BlockDataLength + 20);
+        TestCustomSizeWrite(ds, s_blockDataLength + 20);
         stream.CommitChanges(header);
 
         header = stream.LastCommittedHeader;
@@ -168,7 +172,7 @@ public class SubFileStreamTestFile
         ds = new SubFileStream(stream, header.Files[1], header, true);
         TestCustomSizeRead(ds, 5);
         ds = new SubFileStream(stream, header.Files[2], header, true);
-        TestCustomSizeRead(ds, BlockDataLength + 20);
+        TestCustomSizeRead(ds, s_blockDataLength + 20);
     }
 
 
@@ -234,4 +238,6 @@ public class SubFileStreamTestFile
         //}
         //ds.Flush();
     }
+
+    #endregion
 }

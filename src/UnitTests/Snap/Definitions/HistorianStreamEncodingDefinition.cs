@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  HelperFunctions.cs - Gbtc
+//  HistorianStreamEncodingDefinition.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -16,46 +16,45 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  6/8/2012 - Steven E. Chisholm
+//  08/10/2013 - Steven E. Chisholm
 //       Generated original version of source code. 
 //       
-//  10/04/2023 - Lillian Gensolin
-//       Converted code to .NET core.
 //
 //******************************************************************************************************
 
 using System;
+using SnapDB.Snap;
+using SnapDB.Snap.Definitions;
+using SnapDB.Snap.Encoding;
+using SnapDB.UnitTests.Snap.Encoding;
 
-namespace SnapDB.UnitTests;
+namespace SnapDB.UnitTests.Snap.Definitions;
 
-/// <summary>
-/// Contains some random and useful functions.
-/// </summary>
-internal static class HelperFunctions
+public class HistorianStreamEncodingDefinition : PairEncodingDefinitionBase
 {
+    #region [ Properties ]
+
+    public override Type KeyTypeIfNotGeneric => typeof(HistorianKey);
+
+    public override EncodingDefinition Method => TypeGuid;
+
+    public override Type ValueTypeIfNotGeneric => typeof(HistorianValue);
+
+    #endregion
+
+    #region [ Methods ]
+
+    public override PairEncodingBase<TKey, TValue> Create<TKey, TValue>()
+    {
+        return (PairEncodingBase<TKey, TValue>)(object)new HistorianStreamEncoding();
+    }
+
+    #endregion
+
     #region [ Static ]
 
-    /// <summary>
-    /// Performs the given action action and throws an exception if the action
-    /// does not error. This is useful for debugging code and testing for exceptions.
-    /// </summary>
-    /// <param name="errorFunction">the action to perform</param>
-    public static void ExpectError(Action errorFunction)
-    {
-        bool success;
-        try
-        {
-            errorFunction.Invoke();
-            success = true;
-        }
-        catch
-        {
-            success = false;
-        }
-
-        if (success)
-            throw new Exception("This procedure should have thrown an error.");
-    }
+    // {0418B3A7-F631-47AF-BBFA-8B9BC0378328}
+    public static readonly EncodingDefinition TypeGuid = new(new Guid(0x0418b3a7, 0xf631, 0x47af, 0xbb, 0xfa, 0x8b, 0x9b, 0xc0, 0x37, 0x83, 0x28));
 
     #endregion
 }

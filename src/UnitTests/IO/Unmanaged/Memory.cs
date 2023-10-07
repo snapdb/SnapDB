@@ -27,60 +27,70 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
+using SnapDB.IO.Unmanaged;
 
-namespace UnitTests.IO.Unmanaged;
+namespace SnapDB.UnitTests.IO.Unmanaged;
 
-[TestFixture()]
+[TestFixture]
 public class MemoryTest
 {
-    [Test()]
+    #region [ Methods ]
+
+    [Test]
     public void Test()
     {
-        Memory block = new Memory(1);
-        if (block.Address == IntPtr.Zero)
+        Memory block = new(1);
+
+        if (block.Address == nint.Zero)
             throw new Exception();
+
         if (block.Size != 1)
             throw new Exception();
+
         block.Release();
-        if (block.Address != IntPtr.Zero)
+
+        if (block.Address != nint.Zero)
             throw new Exception();
+
         if (block.Size != 0)
             throw new Exception();
+
         block.Release();
 
-        ComputerInfo info = new ComputerInfo();
         GC.Collect();
         GC.WaitForPendingFinalizers();
 
-        long mem = (long)info.AvailablePhysicalMemory;
+        long mem = (long)MemoryPoolPageList.GetAvailablePhysicalMemory();
 
-        //Allocate 100MB
-        List<Memory> blocks = new List<Memory>();
+        // Allocate 100MB
+        List<Memory> blocks = new();
+
         for (int x = 0; x < 10; x++)
             blocks.Add(new Memory(10000000));
+
         GC.Collect();
         GC.WaitForPendingFinalizers();
-        long mem2 = (long)info.AvailablePhysicalMemory;
 
-        //Verify that it increased by more than 50MB
+        long mem2 = (long)MemoryPoolPageList.GetAvailablePhysicalMemory();
+
+        // Verify that it increased by more than 50MB
         if (mem2 > mem + 1000000 * 50)
-        {
             throw new Exception();
-        }
 
         //Release through collection
         blocks = null;
         GC.Collect();
         GC.WaitForPendingFinalizers();
-        //Verify that the difference between the start and the end is less than 50MB
-        long mem3 = (long)info.AvailablePhysicalMemory;
+
+        // Verify that the difference between the start and the end is less than 50MB
+        long mem3 = (long)MemoryPoolPageList.GetAvailablePhysicalMemory();
 
         if (Math.Abs(mem3 - mem) > 1000000 * 50)
-        {
             throw new Exception();
-        }
     }
+
+    #endregion
 }

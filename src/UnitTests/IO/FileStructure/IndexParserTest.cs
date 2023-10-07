@@ -25,30 +25,34 @@
 //******************************************************************************************************
 
 using NUnit.Framework;
-using SnapDB;
 using SnapDB.IO.FileStructure;
+using SnapDB.IO.FileStructure.Media;
 
-namespace UnitTests.IO.FileStructure;
+namespace SnapDB.UnitTests.IO.FileStructure;
 
-[TestFixture()]
+[TestFixture]
 public class IndexParserTest
 {
+    #region [ Methods ]
+
     //Note: Most of this code is tested in other test procedures.
-    [Test()]
+    [Test]
     public void Test()
     {
         int blockSize = 4096;
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
-        
+
         DiskIo stream = DiskIo.CreateMemoryFile(Globals.MemoryPool, blockSize);
         SubFileName name = SubFileName.CreateRandom();
-        SubFileHeader node = new SubFileHeader(1, name, false,false);
-        SubFileDiskIoSessionPool pool = new SubFileDiskIoSessionPool(stream, stream.LastCommittedHeader, node, true);
-        IndexParser parse = new IndexParser(pool);
+        SubFileHeader node = new(1, name, false, false);
+        SubFileDiskIoSessionPool pool = new(stream, stream.LastCommittedHeader, node, true);
+        IndexParser parse = new(pool);
 
         parse.SetPositionAndLookup(14312);
         pool.Dispose();
         Assert.IsTrue(true);
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
     }
+
+    #endregion
 }

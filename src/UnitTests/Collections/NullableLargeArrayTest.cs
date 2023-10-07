@@ -24,17 +24,19 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB.Collections;
 using System;
 using System.Linq;
-using UnitTests.IO.Unmanaged;
+using NUnit.Framework;
+using SnapDB.Collections;
+using SnapDB.UnitTests.IO.Unmanaged;
 
-namespace UnitTests.Collections;
+namespace SnapDB.UnitTests.Collections;
 
 [TestFixture]
 public class NullableLargeArrayTest
 {
+    #region [ Methods ]
+
     [Test]
     public void TestLargeArray()
     {
@@ -52,25 +54,22 @@ public class NullableLargeArrayTest
                 HelperFunctions.ExpectError(() => array[x] = x);
                 array.SetCapacity(array.Capacity + 1);
             }
+
             array[x] = x;
         }
 
         for (int x = 0; x < 250000; x++)
-        {
             Assert.AreEqual(array[x], x);
-        }
     }
 
 
     [Test]
     public void TestCount()
     {
-        NullableLargeArray<int> array = new NullableLargeArray<int>();
+        NullableLargeArray<int> array = new();
 
         for (int x = 0; x < 100000; x++)
-        {
             array.AddValue(x);
-        }
 
         for (int x = 0; x < 100000; x += 2)
         {
@@ -97,10 +96,8 @@ public class NullableLargeArrayTest
         }
 
         for (int x = 0; x < 100000; x += 2)
-        {
             if (array.TryGetValue(x, out i))
                 throw new Exception();
-        }
 
         if (array.Count() != 50000)
             throw new Exception();
@@ -118,18 +115,12 @@ public class NullableLargeArrayTest
 
 
         for (int x = 1; x < 100000; x += 2)
-        {
             array.OverwriteValue(x, -1);
-        }
 
         for (int x = 1; x < 100000; x += 2)
-        {
             if (array[x] != -1)
                 throw new Exception();
-        }
-
     }
 
-
-
+    #endregion
 }

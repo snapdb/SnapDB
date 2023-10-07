@@ -24,26 +24,29 @@
 //
 //******************************************************************************************************
 
+using System;
+using System.IO;
 using NUnit.Framework;
 using SnapDB.IO.FileStructure;
 using SnapDB.IO.Unmanaged;
-using System;
-using System.IO;
+using SnapDB.Snap.Storage;
 
-namespace UnitTests.IO.FileStructure;
+namespace SnapDB.UnitTests.IO.FileStructure;
 
 [TestFixture]
 public class SimplifiedFileWriterTest
 {
+    #region [ Methods ]
+
     [Test]
     public void Test1()
     {
         File.Delete(@"C:\Temp\fileTemp.~d2i");
         File.Delete(@"C:\Temp\fileTemp.d2i");
-        using (SimplifiedFileWriter writer = new SimplifiedFileWriter(@"C:\Temp\fileTemp.~d2i", @"C:\Temp\fileTemp.d2i", 4096, FileFlags.ManualRollover))
+        using (SimplifiedFileWriter writer = new(@"C:\Temp\fileTemp.~d2i", @"C:\Temp\fileTemp.d2i", 4096, FileFlags.ManualRollover))
         {
             using (ISupportsBinaryStream file = writer.CreateFile(SubFileName.CreateRandom()))
-            using (BinaryStream bs = new BinaryStream(file))
+            using (BinaryStream bs = new(file))
             {
                 bs.Write(1);
             }
@@ -55,7 +58,7 @@ public class SimplifiedFileWriterTest
         using (TransactionalFileStructure reader = TransactionalFileStructure.OpenFile(@"C:\Temp\fileTemp.d2i", true))
         {
             using (SubFileStream file = reader.Snapshot.OpenFile(0))
-            using (BinaryStream bs = new BinaryStream(file))
+            using (BinaryStream bs = new(file))
             {
                 if (bs.ReadInt32() != 1)
                     throw new Exception();
@@ -66,20 +69,18 @@ public class SimplifiedFileWriterTest
     [Test]
     public void TestOneFileBig()
     {
-        Random r = new Random(1);
+        Random r = new(1);
 
         File.Delete(@"C:\Temp\fileTemp.~d2i");
         File.Delete(@"C:\Temp\fileTemp.d2i");
-        using (SimplifiedFileWriter writer = new SimplifiedFileWriter(@"C:\Temp\fileTemp.~d2i", @"C:\Temp\fileTemp.d2i", 4096, FileFlags.ManualRollover))
+        using (SimplifiedFileWriter writer = new(@"C:\Temp\fileTemp.~d2i", @"C:\Temp\fileTemp.d2i", 4096, FileFlags.ManualRollover))
         {
             using (ISupportsBinaryStream file = writer.CreateFile(SubFileName.CreateRandom()))
-            using (BinaryStream bs = new BinaryStream(file))
+            using (BinaryStream bs = new(file))
             {
                 bs.Write((byte)1);
                 for (int x = 0; x < 100000; x++)
-                {
                     bs.Write(r.NextDouble());
-                }
             }
 
             writer.Commit();
@@ -89,17 +90,14 @@ public class SimplifiedFileWriterTest
         using (TransactionalFileStructure reader = TransactionalFileStructure.OpenFile(@"C:\Temp\fileTemp.d2i", true))
         {
             using (SubFileStream file = reader.Snapshot.OpenFile(0))
-            using (BinaryStream bs = new BinaryStream(file))
+            using (BinaryStream bs = new(file))
             {
                 if (bs.ReadUInt8() != 1)
                     throw new Exception();
 
                 for (int x = 0; x < 100000; x++)
-                {
                     if (bs.ReadDouble() != r.NextDouble())
                         throw new Exception();
-                }
-
             }
         }
     }
@@ -107,24 +105,21 @@ public class SimplifiedFileWriterTest
     [Test]
     public void TestMultipleFiles()
     {
-        Random r = new Random(1);
+        Random r = new(1);
 
         File.Delete(@"C:\Temp\fileTemp.~d2i");
         File.Delete(@"C:\Temp\fileTemp.d2i");
-        using (SimplifiedFileWriter writer = new SimplifiedFileWriter(@"C:\Temp\fileTemp.~d2i", @"C:\Temp\fileTemp.d2i", 4096, FileFlags.ManualRollover))
+        using (SimplifiedFileWriter writer = new(@"C:\Temp\fileTemp.~d2i", @"C:\Temp\fileTemp.d2i", 4096, FileFlags.ManualRollover))
         {
             for (int i = 0; i < 10; i++)
             {
-                using (ISupportsBinaryStream file = writer.CreateFile(SubFileName.CreateRandom()))
-                using (BinaryStream bs = new BinaryStream(file))
-                {
-                    bs.Write((byte)1);
-                    for (int x = 0; x < 100000; x++)
-                    {
-                        bs.Write(r.NextDouble());
-                    }
-                }
+                using ISupportsBinaryStream file = writer.CreateFile(SubFileName.CreateRandom());
+                using BinaryStream bs = new(file);
+                bs.Write((byte)1);
+                for (int x = 0; x < 100000; x++)
+                    bs.Write(r.NextDouble());
             }
+
             writer.Commit();
         }
 
@@ -133,23 +128,17 @@ public class SimplifiedFileWriterTest
         {
             for (int i = 0; i < 10; i++)
             {
-                using (SubFileStream file = reader.Snapshot.OpenFile(i))
-                using (BinaryStream bs = new BinaryStream(file))
-                {
-                    if (bs.ReadUInt8() != 1)
-                        throw new Exception();
+                using SubFileStream file = reader.Snapshot.OpenFile(i);
+                using BinaryStream bs = new(file);
+                if (bs.ReadUInt8() != 1)
+                    throw new Exception();
 
-                    for (int x = 0; x < 100000; x++)
-                    {
-                        if (bs.ReadDouble() != r.NextDouble())
-                            throw new Exception();
-                    }
-                }
+                for (int x = 0; x < 100000; x++)
+                    if (bs.ReadDouble() != r.NextDouble())
+                        throw new Exception();
             }
         }
-
     }
 
-
-
+    #endregion
 }

@@ -27,19 +27,20 @@
 using System;
 using System.IO;
 using NUnit.Framework;
-using SnapDB;
 using SnapDB.IO.FileStructure;
 
-namespace UnitTests.IO.FileStructure;
+namespace SnapDB.UnitTests.IO.FileStructure;
 
-[TestFixture()]
+[TestFixture]
 public class SubFileMetaDataTest
 {
-    [Test()]
+    #region [ Methods ]
+
+    [Test]
     public void Test()
     {
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
-        Random rand = new Random();
+        Random rand = new();
         ushort fileIdNumber = (ushort)rand.Next(int.MaxValue);
         SubFileName fileName = SubFileName.CreateRandom();
         int dataBlock1 = rand.Next(int.MaxValue);
@@ -48,35 +49,48 @@ public class SubFileMetaDataTest
         int tripleRedirect = rand.Next(int.MaxValue);
         int quadrupleRedirect = rand.Next(int.MaxValue);
 
-        SubFileHeader node = new SubFileHeader(fileIdNumber, fileName, isImmutable: false, isSimplified:false);
-        node.DirectBlock = (uint)dataBlock1;
-        node.SingleIndirectBlock = (uint)singleRedirect;
-        node.DoubleIndirectBlock = (uint)doubleRedirect;
-        node.TripleIndirectBlock = (uint)tripleRedirect;
-        node.QuadrupleIndirectBlock = (uint)quadrupleRedirect;
+        SubFileHeader node = new(fileIdNumber, fileName, false, false)
+        {
+            DirectBlock = (uint)dataBlock1,
+            SingleIndirectBlock = (uint)singleRedirect,
+            DoubleIndirectBlock = (uint)doubleRedirect,
+            TripleIndirectBlock = (uint)tripleRedirect,
+            QuadrupleIndirectBlock = (uint)quadrupleRedirect
+        };
         SubFileHeader node2 = SaveItem(node);
 
-        if (node2.FileIdNumber != fileIdNumber) throw new Exception();
-        if (node2.FileName != fileName) throw new Exception();
-        if (node2.DirectBlock != dataBlock1) throw new Exception();
-        if (node2.SingleIndirectBlock != singleRedirect) throw new Exception();
-        if (node2.DoubleIndirectBlock != doubleRedirect) throw new Exception();
-        if (node2.TripleIndirectBlock != tripleRedirect) throw new Exception();
-        if (node2.QuadrupleIndirectBlock != quadrupleRedirect) throw new Exception();
+        if (node2.FileIdNumber != fileIdNumber)
+            throw new Exception();
+        if (node2.FileName != fileName)
+            throw new Exception();
+        if (node2.DirectBlock != dataBlock1)
+            throw new Exception();
+        if (node2.SingleIndirectBlock != singleRedirect)
+            throw new Exception();
+        if (node2.DoubleIndirectBlock != doubleRedirect)
+            throw new Exception();
+        if (node2.TripleIndirectBlock != tripleRedirect)
+            throw new Exception();
+        if (node2.QuadrupleIndirectBlock != quadrupleRedirect)
+            throw new Exception();
         Assert.IsTrue(true);
 
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
     }
 
+    #endregion
+
+    #region [ Static ]
+
     private static SubFileHeader SaveItem(SubFileHeader node)
     {
         //Serialize the header
-        MemoryStream stream = new MemoryStream();
+        MemoryStream stream = new();
         node.Save(new BinaryWriter(stream));
 
         stream.Position = 0;
         //load the header
-        SubFileHeader node2 = new SubFileHeader(new BinaryReader(stream), isImmutable: true, isSimplified: false);
+        SubFileHeader node2 = new(new BinaryReader(stream), true, false);
 
         CheckEqual(node2, node);
 
@@ -86,9 +100,10 @@ public class SubFileMetaDataTest
         return node3;
     }
 
-    internal static void CheckEqual(SubFileHeader RO, SubFileHeader RW)
+    internal static void CheckEqual(SubFileHeader ro, SubFileHeader rw)
     {
-        if (!AreEqual(RO, RW)) throw new Exception();
+        if (!AreEqual(ro, rw))
+            throw new Exception();
     }
 
     /// <summary>
@@ -102,13 +117,22 @@ public class SubFileMetaDataTest
         if (a is null || b is null)
             return false;
 
-        if (b.FileIdNumber != a.FileIdNumber) return false;
-        if (b.FileName != a.FileName) return false;
-        if (b.DirectBlock != a.DirectBlock) return false;
-        if (b.SingleIndirectBlock != a.SingleIndirectBlock) return false;
-        if (b.DoubleIndirectBlock != a.DoubleIndirectBlock) return false;
-        if (b.TripleIndirectBlock != a.TripleIndirectBlock) return false;
-        if (b.QuadrupleIndirectBlock != a.QuadrupleIndirectBlock) return false;
+        if (b.FileIdNumber != a.FileIdNumber)
+            return false;
+        if (b.FileName != a.FileName)
+            return false;
+        if (b.DirectBlock != a.DirectBlock)
+            return false;
+        if (b.SingleIndirectBlock != a.SingleIndirectBlock)
+            return false;
+        if (b.DoubleIndirectBlock != a.DoubleIndirectBlock)
+            return false;
+        if (b.TripleIndirectBlock != a.TripleIndirectBlock)
+            return false;
+        if (b.QuadrupleIndirectBlock != a.QuadrupleIndirectBlock)
+            return false;
         return true;
     }
+
+    #endregion
 }

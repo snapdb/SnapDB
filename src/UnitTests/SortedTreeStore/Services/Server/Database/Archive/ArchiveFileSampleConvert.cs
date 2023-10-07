@@ -21,50 +21,55 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB.Snap.Storage;
-using SnapDB.Snap.Tree;
 using System;
 using System.IO;
+using NUnit.Framework;
+using SnapDB.Snap;
+using SnapDB.Snap.Storage;
+using SnapDB.Snap.Tree;
+using SnapDB.UnitTests.Snap;
 
-namespace UnitTests.SortedTreeStore.Services.Server.Database.Archive;
+namespace SnapDB.UnitTests.SortedTreeStore.Services.Server.Database.Archive;
 
 [TestFixture]
 public class ArchiveFileSampleConvert
 {
+    #region [ Methods ]
+
     [Test]
     public void WriteFile()
     {
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
         if (File.Exists("c:\\temp\\ArchiveTestFileBig.d2"))
             File.Delete("c:\\temp\\ArchiveTestFileBig.d2");
         //using (var af = ArchiveFile.CreateInMemory(CompressionMethod.TimeSeriesEncoded))
-        using (SortedTreeFile af = SortedTreeFile.CreateFile("c:\\temp\\ArchiveTestFileBig.d2"))
-        using (SortedTreeTable<HistorianKey, HistorianValue> af2 = af.OpenOrCreateTable<HistorianKey, HistorianValue>(EncodingDefinition.FixedSizeCombinedEncoding))
+        using SortedTreeFile af = SortedTreeFile.CreateFile("c:\\temp\\ArchiveTestFileBig.d2");
+        using SortedTreeTable<HistorianKey, HistorianValue> af2 = af.OpenOrCreateTable<HistorianKey, HistorianValue>(EncodingDefinition.FixedSizeCombinedEncoding);
+        Random r = new(3);
+
+        for (ulong v1 = 1; v1 < 36; v1++)
         {
-            Random r = new Random(3);
-
-            for (ulong v1 = 1; v1 < 36; v1++)
+            using (SortedTreeTableEditor<HistorianKey, HistorianValue> edit = af2.BeginEdit())
             {
-                using (SortedTreeTableEditor<HistorianKey, HistorianValue> edit = af2.BeginEdit())
+                for (ulong v2 = 1; v2 < 86000; v2++)
                 {
-                    for (ulong v2 = 1; v2 < 86000; v2++)
-                    {
-                        key.Timestamp = v1 * 2342523;
-                        key.PointID = v2;
-                        value.Value1 = (ulong)r.Next();
-                        value.Value3 = 0;
+                    key.Timestamp = v1 * 2342523;
+                    key.PointId = v2;
+                    value.Value1 = (ulong)r.Next();
+                    value.Value3 = 0;
 
-                        edit.AddPoint(key, value);
-                    }
-                    edit.Commit();
+                    edit.AddPoint(key, value);
                 }
-                af2.Count();
+
+                edit.Commit();
             }
+
             af2.Count();
         }
+
+        af2.Count();
     }
 
     //[Test]
@@ -127,26 +132,24 @@ public class ArchiveFileSampleConvert
     [Test]
     public void ReadFile()
     {
-        using (SortedTreeFile af = SortedTreeFile.OpenFile("c:\\temp\\ArchiveTestFileBig.d2", isReadOnly: true))
-        using (SortedTreeTable<HistorianKey, HistorianValue> af2 = af.OpenOrCreateTable<HistorianKey, HistorianValue>(EncodingDefinition.FixedSizeCombinedEncoding))
-        {
-            HistorianKey key = new HistorianKey();
-            HistorianValue value = new HistorianValue();
-            Random r = new Random(3);
+        using SortedTreeFile af = SortedTreeFile.OpenFile("c:\\temp\\ArchiveTestFileBig.d2", true);
+        using SortedTreeTable<HistorianKey, HistorianValue> af2 = af.OpenOrCreateTable<HistorianKey, HistorianValue>(EncodingDefinition.FixedSizeCombinedEncoding);
+        HistorianKey key = new();
+        HistorianValue value = new();
+        Random r = new(3);
 
-            SortedTreeScannerBase<HistorianKey, HistorianValue> scanner = af2.AcquireReadSnapshot().CreateReadSnapshot().GetTreeScanner();
-            scanner.SeekToStart();
-            for (ulong v1 = 1; v1 < 36; v1++)
-            {
-                for (ulong v2 = 1; v2 < 86000; v2++)
-                {
-                    Assert.IsTrue(scanner.Read(key, value));
-                    Assert.AreEqual(key.Timestamp, v1 * 2342523);
-                    Assert.AreEqual(key.PointID, v2);
-                    Assert.AreEqual(value.Value3, 0ul);
-                    Assert.AreEqual(value.Value1, (ulong)r.Next());
-                }
-            }
+        SortedTreeScannerBase<HistorianKey, HistorianValue> scanner = af2.AcquireReadSnapshot().CreateReadSnapshot().GetTreeScanner();
+        scanner.SeekToStart();
+        for (ulong v1 = 1; v1 < 36; v1++)
+        for (ulong v2 = 1; v2 < 86000; v2++)
+        {
+            Assert.IsTrue(scanner.Read(key, value));
+            Assert.AreEqual(key.Timestamp, v1 * 2342523);
+            Assert.AreEqual(key.PointId, v2);
+            Assert.AreEqual(value.Value3, 0ul);
+            Assert.AreEqual(value.Value1, (ulong)r.Next());
         }
     }
+
+    #endregion
 }

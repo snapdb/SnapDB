@@ -24,18 +24,24 @@
 //
 //******************************************************************************************************
 
+using System;
 using SnapDB.Snap;
 using SnapDB.Snap.Storage;
 using SnapDB.Snap.Tree;
-using System;
+using SnapDB.UnitTests.Snap;
 
-namespace UnitTests;
+namespace SnapDB.UnitTests;
 
-public class PointStreamSequentialPoints
-   : TreeStream<HistorianKey, HistorianValue>
+public class PointStreamSequentialPoints : TreeStream<HistorianKey, HistorianValue>
 {
-    private ulong m_start;
+    #region [ Members ]
+
     private int m_count;
+    private ulong m_start;
+
+    #endregion
+
+    #region [ Constructors ]
 
     public PointStreamSequentialPoints(int start, int count)
     {
@@ -43,42 +49,52 @@ public class PointStreamSequentialPoints
         m_count = count;
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     protected override bool ReadNext(HistorianKey key, HistorianValue value)
     {
         if (m_count <= 0)
         {
             key.Timestamp = 0;
-            key.PointID = 0;
+            key.PointId = 0;
             value.Value3 = 0;
             value.Value1 = 0;
             return false;
         }
+
         m_count--;
         key.Timestamp = 0;
-        key.PointID = m_start;
+        key.PointId = m_start;
         value.AsSingle = 60.251f;
         m_start++;
         return true;
     }
+
+    #endregion
 }
 
-public class PointStreamSequential
-    : TreeStream<HistorianKey, HistorianValue>
+public class PointStreamSequential : TreeStream<HistorianKey, HistorianValue>
 {
-    private ulong m_start;
+    #region [ Members ]
+
     private int m_count;
     private readonly Func<ulong, ulong> m_key1;
     private readonly Func<ulong, ulong> m_key2;
+    private ulong m_start;
     private readonly Func<ulong, ulong> m_value1;
     private readonly Func<ulong, ulong> m_value2;
 
-    public PointStreamSequential(int start, int count)
-        : this(start, count, x => 1 * x, x => 2 * x, x => 3 * x, x => 4 * x)
+    #endregion
+
+    #region [ Constructors ]
+
+    public PointStreamSequential(int start, int count) : this(start, count, x => 1 * x, x => 2 * x, x => 3 * x, x => 4 * x)
     {
     }
 
-    public PointStreamSequential(int start, int count, Func<ulong, ulong> key1, Func<ulong, ulong> key2,
-                                 Func<ulong, ulong> value1, Func<ulong, ulong> value2)
+    public PointStreamSequential(int start, int count, Func<ulong, ulong> key1, Func<ulong, ulong> key2, Func<ulong, ulong> value1, Func<ulong, ulong> value2)
     {
         m_start = (ulong)start;
         m_count = count;
@@ -88,28 +104,37 @@ public class PointStreamSequential
         m_value2 = value2;
     }
 
+    #endregion
+
+    #region [ Methods ]
+
     protected override bool ReadNext(HistorianKey key, HistorianValue value)
     {
         if (m_count <= 0)
         {
             key.Timestamp = 0;
-            key.PointID = 0;
+            key.PointId = 0;
             value.Value3 = 0;
             value.Value1 = 0;
             return false;
         }
+
         m_count--;
         key.Timestamp = m_key1(m_start);
-        key.PointID = m_key2(m_start);
+        key.PointId = m_key2(m_start);
         value.Value3 = m_value1(m_start);
         value.Value1 = m_value2(m_start);
         m_start++;
         return true;
     }
+
+    #endregion
 }
 
 public static class PointStreamHelpers
 {
+    #region [ Static ]
+
     //public static bool AreEqual(this IStream256 source, IStream256 destination)
     //{
     //    bool isValidA, isValidB;
@@ -157,12 +182,10 @@ public static class PointStreamHelpers
     //    return x;
     //}
 
-    public static long Count<TKey, TValue>(this TreeStream<TKey, TValue> stream)
-        where TKey : class, new()
-        where TValue : class, new()
+    public static long Count<TKey, TValue>(this TreeStream<TKey, TValue> stream) where TKey : class, new() where TValue : class, new()
     {
-        TKey key = new TKey();
-        TValue value = new TValue();
+        TKey key = new();
+        TValue value = new();
         long x = 0;
         while (stream.Read(key, value))
             x++;
@@ -171,11 +194,11 @@ public static class PointStreamHelpers
 
     public static long Count(this SortedTreeTable<HistorianKey, HistorianValue> stream)
     {
-        using (SortedTreeTableReadSnapshot<HistorianKey, HistorianValue> read = stream.BeginRead())
-        {
-            SortedTreeScannerBase<HistorianKey, HistorianValue> scan = read.GetTreeScanner();
-            scan.SeekToStart();
-            return scan.Count();
-        }
+        using SortedTreeTableReadSnapshot<HistorianKey, HistorianValue> read = stream.BeginRead();
+        SortedTreeScannerBase<HistorianKey, HistorianValue> scan = read.GetTreeScanner();
+        scan.SeekToStart();
+        return scan.Count();
     }
+
+    #endregion
 }

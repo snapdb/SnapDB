@@ -24,34 +24,40 @@
 //
 //******************************************************************************************************
 
-using Gemstone;
-using NUnit.Framework;
-using SnapDB;
-using SnapDB.IO.Unmanaged;
+using System;
 using System.Diagnostics;
 using System.Text;
-using UnitTests.IO.Unmanaged;
+using Gemstone;
+using NUnit.Framework;
+using SnapDB.IO.Unmanaged;
+using SnapDB.UnitTests.IO.Unmanaged;
 
-namespace UnitTests.IO;
+namespace SnapDB.UnitTests.IO;
 
 [TestFixture]
 public class BinaryStreamBenchmark
 {
+    #region [ Methods ]
+
     [Test]
     public void RunMemoryStreamTest()
     {
         MemoryPoolTest.TestMemoryLeak();
-        MemoryPoolStream ms = new MemoryPoolStream();
-        BinaryStream bs = new BinaryStream(ms);
+        MemoryPoolStream ms = new();
+        BinaryStream bs = new(ms);
         Run(bs, false);
         ms.Dispose();
         MemoryPoolTest.TestMemoryLeak();
     }
 
+    #endregion
+
+    #region [ Static ]
+
     public static void Run(BinaryStream bs, bool clipboard = true)
     {
         const int count = 100;
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         sb.AppendLine(RunInserts(count, bs));
         sb.AppendLine(RunSeeks(count, bs));
         sb.AppendLine(GetWritePointer(bs));
@@ -85,12 +91,12 @@ public class BinaryStreamBenchmark
 
         if (clipboard)
         {
-            Clipboard.SetText(sb.ToString());
-            MessageBox.Show(sb.ToString());
+            //Clipboard.SetText(sb.ToString());
+            //MessageBox.Show(sb.ToString());
         }
         else
         {
-            System.Console.WriteLine(sb.ToString());
+            Console.WriteLine(sb.ToString());
         }
     }
 
@@ -98,7 +104,7 @@ public class BinaryStreamBenchmark
     {
         const int insertBytes = 1;
         const int moveSize = 512;
-        Stopwatch sw1 = new Stopwatch();
+        Stopwatch sw1 = new();
         byte b = 10;
 
         for (int x2 = 0; x2 < thousands; x2++)
@@ -141,6 +147,7 @@ public class BinaryStreamBenchmark
                 bs.InsertBytes(insertBytes, moveSize);
             }
         }
+
         sw1.Stop();
 
         return "Inserts\t" + thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
@@ -148,43 +155,41 @@ public class BinaryStreamBenchmark
 
     public static unsafe string GetReadPointer(int thousands, BinaryStream bs)
     {
-        return "GetReadPointer\t" +
-               StepTimer.Time(10, () =>
-               {
-                   bs.GetReadPointer(40 * 1000000, 1);
-                   bs.GetReadPointer(80 * 1000000, 1);
-                   bs.GetReadPointer(120 * 1000000, 1);
-                   bs.GetReadPointer(50 * 1000000, 1);
-                   bs.GetReadPointer(90 * 1000000, 1);
-                   bs.GetReadPointer(130 * 1000000, 1);
-                   bs.GetReadPointer(60 * 1000000, 1);
-                   bs.GetReadPointer(100 * 1000000, 1);
-                   bs.GetReadPointer(140 * 1000000, 1);
-                   bs.GetReadPointer(110 * 1000000, 1);
-               });
+        return "GetReadPointer\t" + StepTimer.Time(10, () =>
+        {
+            bs.GetReadPointer(40 * 1000000, 1);
+            bs.GetReadPointer(80 * 1000000, 1);
+            bs.GetReadPointer(120 * 1000000, 1);
+            bs.GetReadPointer(50 * 1000000, 1);
+            bs.GetReadPointer(90 * 1000000, 1);
+            bs.GetReadPointer(130 * 1000000, 1);
+            bs.GetReadPointer(60 * 1000000, 1);
+            bs.GetReadPointer(100 * 1000000, 1);
+            bs.GetReadPointer(140 * 1000000, 1);
+            bs.GetReadPointer(110 * 1000000, 1);
+        });
     }
 
     public static unsafe string GetWritePointer(BinaryStream bs)
     {
-        return "GetWritePointer\t" +
-               StepTimer.Time(10, () =>
-               {
-                   bs.GetWritePointer(40 * 1000000, 1);
-                   bs.GetWritePointer(80 * 1000000, 1);
-                   bs.GetWritePointer(120 * 1000000, 1);
-                   bs.GetWritePointer(50 * 1000000, 1);
-                   bs.GetWritePointer(90 * 1000000, 1);
-                   bs.GetWritePointer(130 * 1000000, 1);
-                   bs.GetWritePointer(60 * 1000000, 1);
-                   bs.GetWritePointer(100 * 1000000, 1);
-                   bs.GetWritePointer(140 * 1000000, 1);
-                   bs.GetWritePointer(110 * 1000000, 1);
-               });
+        return "GetWritePointer\t" + StepTimer.Time(10, () =>
+        {
+            bs.GetWritePointer(40 * 1000000, 1);
+            bs.GetWritePointer(80 * 1000000, 1);
+            bs.GetWritePointer(120 * 1000000, 1);
+            bs.GetWritePointer(50 * 1000000, 1);
+            bs.GetWritePointer(90 * 1000000, 1);
+            bs.GetWritePointer(130 * 1000000, 1);
+            bs.GetWritePointer(60 * 1000000, 1);
+            bs.GetWritePointer(100 * 1000000, 1);
+            bs.GetWritePointer(140 * 1000000, 1);
+            bs.GetWritePointer(110 * 1000000, 1);
+        });
     }
 
     public static string RunSeeks(int thousands, BinaryStream bs)
     {
-        Stopwatch sw1 = new Stopwatch();
+        Stopwatch sw1 = new();
         byte b = 10;
 
         for (int x2 = 0; x2 < thousands; x2++)
@@ -227,6 +232,7 @@ public class BinaryStreamBenchmark
                 bs.Position = 9;
             }
         }
+
         sw1.Stop();
 
         return "Seeks\t" + thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
@@ -234,8 +240,8 @@ public class BinaryStreamBenchmark
 
     public static string RunULong(int thousands, BinaryStream bs)
     {
-        Stopwatch sw1 = new Stopwatch();
-        Stopwatch sw2 = new Stopwatch();
+        Stopwatch sw1 = new();
+        Stopwatch sw2 = new();
         ulong b = 10;
 
         for (int x2 = 0; x2 < thousands; x2++)
@@ -274,6 +280,7 @@ public class BinaryStreamBenchmark
                 bs.Write(b);
             }
         }
+
         sw1.Stop();
 
         sw2.Start();
@@ -294,15 +301,15 @@ public class BinaryStreamBenchmark
                 bs.ReadUInt64();
             }
         }
+
         sw2.Stop();
-        return "ULong\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" +
-               thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
+        return "ULong\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" + thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
     }
 
     public static string RunLong(int thousands, BinaryStream bs)
     {
-        Stopwatch sw1 = new Stopwatch();
-        Stopwatch sw2 = new Stopwatch();
+        Stopwatch sw1 = new();
+        Stopwatch sw2 = new();
         long b = 10;
 
         for (int x2 = 0; x2 < thousands; x2++)
@@ -341,6 +348,7 @@ public class BinaryStreamBenchmark
                 bs.Write(b);
             }
         }
+
         sw1.Stop();
 
         sw2.Start();
@@ -361,15 +369,15 @@ public class BinaryStreamBenchmark
                 bs.ReadInt64();
             }
         }
+
         sw2.Stop();
-        return "Long\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" +
-               thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
+        return "Long\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" + thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
     }
 
     public static string RunDouble(int thousands, BinaryStream bs)
     {
-        Stopwatch sw1 = new Stopwatch();
-        Stopwatch sw2 = new Stopwatch();
+        Stopwatch sw1 = new();
+        Stopwatch sw2 = new();
         double b = 10;
 
         for (int x2 = 0; x2 < thousands; x2++)
@@ -408,6 +416,7 @@ public class BinaryStreamBenchmark
                 bs.Write(b);
             }
         }
+
         sw1.Stop();
 
         sw2.Start();
@@ -428,15 +437,15 @@ public class BinaryStreamBenchmark
                 bs.ReadDouble();
             }
         }
+
         sw2.Stop();
-        return "Double\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" +
-               thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
+        return "Double\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" + thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
     }
 
     public static string Run7Bit64(int thousands, BinaryStream bs, ulong b)
     {
-        Stopwatch sw1 = new Stopwatch();
-        Stopwatch sw2 = new Stopwatch();
+        Stopwatch sw1 = new();
+        Stopwatch sw2 = new();
 
         for (int x2 = 0; x2 < thousands; x2++)
         {
@@ -474,6 +483,7 @@ public class BinaryStreamBenchmark
                 bs.Write7Bit(b);
             }
         }
+
         sw1.Stop();
 
         sw2.Start();
@@ -494,15 +504,15 @@ public class BinaryStreamBenchmark
                 bs.Read7BitUInt64();
             }
         }
+
         sw2.Stop();
-        return "7Bit64 " + Encoding7Bit.GetSize(b) + "\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" +
-               thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
+        return "7Bit64 " + Encoding7Bit.GetSize(b) + "\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" + thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
     }
 
     public static string Run7Bit32(int thousands, BinaryStream bs, uint b)
     {
-        Stopwatch sw1 = new Stopwatch();
-        Stopwatch sw2 = new Stopwatch();
+        Stopwatch sw1 = new();
+        Stopwatch sw2 = new();
 
         for (int x2 = 0; x2 < thousands; x2++)
         {
@@ -540,6 +550,7 @@ public class BinaryStreamBenchmark
                 bs.Write7Bit(b);
             }
         }
+
         sw1.Stop();
 
         sw2.Start();
@@ -560,15 +571,15 @@ public class BinaryStreamBenchmark
                 bs.Read7BitUInt32();
             }
         }
+
         sw2.Stop();
-        return "7Bit32 " + Encoding7Bit.GetSize(b) + "\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" +
-               thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
+        return "7Bit32 " + Encoding7Bit.GetSize(b) + "\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" + thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
     }
 
     public static string RunUInt(int thousands, BinaryStream bs)
     {
-        Stopwatch sw1 = new Stopwatch();
-        Stopwatch sw2 = new Stopwatch();
+        Stopwatch sw1 = new();
+        Stopwatch sw2 = new();
         uint b = 10;
 
         for (int x2 = 0; x2 < thousands; x2++)
@@ -607,6 +618,7 @@ public class BinaryStreamBenchmark
                 bs.Write(b);
             }
         }
+
         sw1.Stop();
 
         sw2.Start();
@@ -627,15 +639,15 @@ public class BinaryStreamBenchmark
                 bs.ReadUInt32();
             }
         }
+
         sw2.Stop();
-        return "UInt\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" +
-               thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
+        return "UInt\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" + thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
     }
 
     public static string RunInt(int thousands, BinaryStream bs)
     {
-        Stopwatch sw1 = new Stopwatch();
-        Stopwatch sw2 = new Stopwatch();
+        Stopwatch sw1 = new();
+        Stopwatch sw2 = new();
         int b = 10;
 
         for (int x2 = 0; x2 < thousands; x2++)
@@ -674,6 +686,7 @@ public class BinaryStreamBenchmark
                 bs.Write(b);
             }
         }
+
         sw1.Stop();
 
         sw2.Start();
@@ -694,15 +707,15 @@ public class BinaryStreamBenchmark
                 bs.ReadInt32();
             }
         }
+
         sw2.Stop();
-        return "Int\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" +
-               thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
+        return "Int\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" + thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
     }
 
     public static string RunSingle(int thousands, BinaryStream bs)
     {
-        Stopwatch sw1 = new Stopwatch();
-        Stopwatch sw2 = new Stopwatch();
+        Stopwatch sw1 = new();
+        Stopwatch sw2 = new();
         float b = 10;
 
         for (int x2 = 0; x2 < thousands; x2++)
@@ -741,6 +754,7 @@ public class BinaryStreamBenchmark
                 bs.Write(b);
             }
         }
+
         sw1.Stop();
 
         sw2.Start();
@@ -761,15 +775,15 @@ public class BinaryStreamBenchmark
                 bs.ReadSingle();
             }
         }
+
         sw2.Stop();
-        return "Single\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" +
-               thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
+        return "Single\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" + thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
     }
 
     public static string RunUShort(int thousands, BinaryStream bs)
     {
-        Stopwatch sw1 = new Stopwatch();
-        Stopwatch sw2 = new Stopwatch();
+        Stopwatch sw1 = new();
+        Stopwatch sw2 = new();
         ushort b = 10;
 
         for (int x2 = 0; x2 < thousands; x2++)
@@ -808,6 +822,7 @@ public class BinaryStreamBenchmark
                 bs.Write(b);
             }
         }
+
         sw1.Stop();
 
         sw2.Start();
@@ -828,15 +843,15 @@ public class BinaryStreamBenchmark
                 bs.ReadUInt16();
             }
         }
+
         sw2.Stop();
-        return "UShort\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" +
-               thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
+        return "UShort\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" + thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
     }
 
     public static string RunShort(int thousands, BinaryStream bs)
     {
-        Stopwatch sw1 = new Stopwatch();
-        Stopwatch sw2 = new Stopwatch();
+        Stopwatch sw1 = new();
+        Stopwatch sw2 = new();
         short b = 10;
 
         for (int x2 = 0; x2 < thousands; x2++)
@@ -875,6 +890,7 @@ public class BinaryStreamBenchmark
                 bs.Write(b);
             }
         }
+
         sw1.Stop();
 
         sw2.Start();
@@ -895,15 +911,15 @@ public class BinaryStreamBenchmark
                 bs.ReadInt16();
             }
         }
+
         sw2.Stop();
-        return "Short\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" +
-               thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
+        return "Short\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" + thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
     }
 
     public static string RunSByte(int thousands, BinaryStream bs)
     {
-        Stopwatch sw1 = new Stopwatch();
-        Stopwatch sw2 = new Stopwatch();
+        Stopwatch sw1 = new();
+        Stopwatch sw2 = new();
         sbyte b = 10;
 
         for (int x2 = 0; x2 < thousands; x2++)
@@ -942,6 +958,7 @@ public class BinaryStreamBenchmark
                 bs.Write(b);
             }
         }
+
         sw1.Stop();
 
         sw2.Start();
@@ -962,15 +979,15 @@ public class BinaryStreamBenchmark
                 bs.ReadInt8();
             }
         }
+
         sw2.Stop();
-        return "SByte\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" +
-               thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
+        return "SByte\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" + thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
     }
 
     public static string RunByte(int thousands, BinaryStream bs)
     {
-        Stopwatch sw1 = new Stopwatch();
-        Stopwatch sw2 = new Stopwatch();
+        Stopwatch sw1 = new();
+        Stopwatch sw2 = new();
         byte b = 10;
 
         for (int x2 = 0; x2 < thousands; x2++)
@@ -1009,6 +1026,7 @@ public class BinaryStreamBenchmark
                 bs.Write(b);
             }
         }
+
         sw1.Stop();
 
         sw2.Start();
@@ -1029,8 +1047,10 @@ public class BinaryStreamBenchmark
                 bs.ReadUInt8();
             }
         }
+
         sw2.Stop();
-        return "Byte\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" +
-               thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
+        return "Byte\t" + thousands * 1000 / sw2.Elapsed.TotalSeconds / 1000000 + "\t" + thousands * 1000 / sw1.Elapsed.TotalSeconds / 1000000;
     }
+
+    #endregion
 }

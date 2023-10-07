@@ -21,14 +21,18 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
 using System;
+using NUnit.Framework;
+using SnapDB.Snap.Storage;
+using SnapDB.Snap.Tree;
+using SnapDB.UnitTests.Snap;
 
-namespace UnitTests;
+namespace SnapDB.UnitTests;
 
 [TestFixture]
 public class DelMeTest
 {
+    #region [ Methods ]
 
     //[Test]
     //public void SlowReading()
@@ -85,25 +89,22 @@ public class DelMeTest
         DateTime start = DateTime.Parse("4/17/2013 10:38 AM");
         DateTime stop = DateTime.Parse("4/17/2013 10:38 AM");
 
-        HistorianKey key = new HistorianKey();
-        HistorianValue value = new HistorianValue();
+        HistorianKey key = new();
+        HistorianValue value = new();
 
-        using (SortedTreeFile file = SortedTreeFile.OpenFile(fileName, isReadOnly: true))
-        using (SortedTreeTable<HistorianKey, HistorianValue> table = file.OpenTable<HistorianKey, HistorianValue>())
-        using (SortedTreeTableReadSnapshot<HistorianKey, HistorianValue> snapshot = table.BeginRead())
+        using SortedTreeFile file = SortedTreeFile.OpenFile(fileName, true);
+        using SortedTreeTable<HistorianKey, HistorianValue> table = file.OpenTable<HistorianKey, HistorianValue>();
+        using SortedTreeTableReadSnapshot<HistorianKey, HistorianValue> snapshot = table.BeginRead();
+        SortedTreeScannerBase<HistorianKey, HistorianValue> scanner = snapshot.GetTreeScanner();
+        HistorianKey seekKey = new()
         {
-            SortedTreeScannerBase<HistorianKey, HistorianValue> scanner = snapshot.GetTreeScanner();
-            HistorianKey seekKey = new HistorianKey();
-            seekKey.TimestampAsDate = start;
-            seekKey.PointID = 3142023;
-            scanner.SeekToKey(seekKey);
-            while (scanner.Read(key,value) && key.TimestampAsDate <= stop)
-            {
-                Console.WriteLine("{0}, {1}, {2}",
-                    key.TimestampAsDate.ToString(), key.PointID, value.AsString);
-            }
-        }
+            TimestampAsDate = start,
+            PointId = 3142023
+        };
+        scanner.SeekToKey(seekKey);
+        while (scanner.Read(key, value) && key.TimestampAsDate <= stop)
+            Console.WriteLine("{0}, {1}, {2}", key.TimestampAsDate.ToString(), key.PointId, value.AsString);
     }
 
-
+    #endregion
 }

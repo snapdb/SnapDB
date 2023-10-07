@@ -25,14 +25,18 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace UnitTests;
+namespace SnapDB.UnitTests;
 
 [TestClass]
 public class Tests
 {
+    #region [ Methods ]
+
     [TestMethod]
     public void FunctionalityTests()
     {
         Assert.IsTrue(true);
     }
+
+    #endregion
 }

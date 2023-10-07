@@ -21,24 +21,34 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
 using System;
 using System.Diagnostics;
 using System.Runtime;
+using NUnit.Framework;
 
-namespace SnapDB;
+namespace SnapDB.UnitTests;
 
 public class DebugStopwatch
 {
-    private readonly Stopwatch sw;
+    #region [ Members ]
+
+    private readonly Stopwatch m_sw;
+
+    #endregion
+
+    #region [ Constructors ]
 
     public DebugStopwatch()
     {
         GCSettings.LatencyMode = GCLatencyMode.Batch;
-        sw = new Stopwatch();
+        m_sw = new Stopwatch();
     }
 
-    public void DoGC()
+    #endregion
+
+    #region [ Methods ]
+
+    public void DoGc()
     {
         GC.Collect();
         GC.WaitForPendingFinalizers();
@@ -51,35 +61,39 @@ public class DebugStopwatch
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }
-        sw.Restart();
+
+        m_sw.Restart();
     }
 
     public void Stop(double maximumTime)
     {
-        sw.Stop();
-        Assert.IsTrue(sw.Elapsed.TotalMilliseconds <= maximumTime);
+        m_sw.Stop();
+        Assert.IsTrue(m_sw.Elapsed.TotalMilliseconds <= maximumTime);
     }
 
     public void Stop(double minimumTime, double maximumTime)
     {
-        sw.Stop();
-        Assert.IsTrue(sw.Elapsed.TotalMilliseconds >= minimumTime);
-        Assert.IsTrue(sw.Elapsed.TotalMilliseconds <= maximumTime);
+        m_sw.Stop();
+        Assert.IsTrue(m_sw.Elapsed.TotalMilliseconds >= minimumTime);
+        Assert.IsTrue(m_sw.Elapsed.TotalMilliseconds <= maximumTime);
     }
 
     public double TimeEvent(Action function)
     {
-        sw.Reset();
+        m_sw.Reset();
         GC.Collect();
         function();
         int count = 0;
-        while (sw.Elapsed.TotalSeconds < .25)
+        while (m_sw.Elapsed.TotalSeconds < .25)
         {
-            sw.Start();
+            m_sw.Start();
             function();
-            sw.Stop();
+            m_sw.Stop();
             count++;
         }
-        return sw.Elapsed.TotalSeconds / count;
+
+        return m_sw.Elapsed.TotalSeconds / count;
     }
+
+    #endregion
 }

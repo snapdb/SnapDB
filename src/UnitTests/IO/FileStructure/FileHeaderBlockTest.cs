@@ -24,19 +24,20 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
-using SnapDB;
-using SnapDB.IO.FileStructure;
 using System;
 using System.Linq;
-using UnitTests.IO.Unmanaged;
+using NUnit.Framework;
+using SnapDB.IO.FileStructure;
+using SnapDB.UnitTests.IO.Unmanaged;
 
-namespace UnitTests.IO.FileStructure;
+namespace SnapDB.UnitTests.IO.FileStructure;
 
-[TestFixture()]
+[TestFixture]
 public class FileHeaderBlockTest
 {
-    [Test()]
+    #region [ Methods ]
+
+    [Test]
     public void Test()
     {
         MemoryPoolTest.TestMemoryLeak();
@@ -56,9 +57,13 @@ public class FileHeaderBlockTest
         MemoryPoolTest.TestMemoryLeak();
     }
 
-    private static void CheckEqual(FileHeaderBlock RO, FileHeaderBlock RW)
+    #endregion
+
+    #region [ Static ]
+
+    private static void CheckEqual(FileHeaderBlock ro, FileHeaderBlock rw)
     {
-        if (!AreEqual(RW, RO))
+        if (!AreEqual(rw, ro))
             throw new Exception();
     }
 
@@ -75,23 +80,33 @@ public class FileHeaderBlockTest
             return false;
         if (self is null)
             return false;
-        if (self.CanWrite != other.CanWrite) return false;
-        if (self.CanRead != other.CanRead) return false;
-        if (self.ArchiveId != other.ArchiveId) return false;
-        if (self.ArchiveType != other.ArchiveType) return false;
-        if (self.SnapshotSequenceNumber != other.SnapshotSequenceNumber) return false;
-        if (self.LastAllocatedBlock != other.LastAllocatedBlock) return false;
-        if (self.FileCount != other.FileCount) return false;
+        if (self.CanWrite != other.CanWrite)
+            return false;
+        if (self.CanRead != other.CanRead)
+            return false;
+        if (self.ArchiveId != other.ArchiveId)
+            return false;
+        if (self.ArchiveType != other.ArchiveType)
+            return false;
+        if (self.SnapshotSequenceNumber != other.SnapshotSequenceNumber)
+            return false;
+        if (self.LastAllocatedBlock != other.LastAllocatedBlock)
+            return false;
+        if (self.FileCount != other.FileCount)
+            return false;
 
         //compare files.
         if (self.Files is null)
         {
-            if (other.Files != null) return false;
+            if (other.Files != null)
+                return false;
         }
         else
         {
-            if (other.Files is null) return false;
-            if (self.Files.Count != other.Files.Count) return false;
+            if (other.Files is null)
+                return false;
+            if (self.Files.Count != other.Files.Count)
+                return false;
             for (int x = 0; x < self.Files.Count; x++)
             {
                 SubFileHeader subFile = self.Files[x];
@@ -99,16 +114,21 @@ public class FileHeaderBlockTest
 
                 if (subFile is null)
                 {
-                    if (subFileOther != null) return false;
+                    if (subFileOther != null)
+                        return false;
                 }
                 else
                 {
-                    if (subFileOther is null) return false;
-                    if (!SubFileMetaDataTest.AreEqual(subFile, subFileOther)) return false;
+                    if (subFileOther is null)
+                        return false;
+                    if (!SubFileMetaDataTest.AreEqual(subFile, subFileOther))
+                        return false;
                 }
             }
         }
 
         return self.GetBytes().SequenceEqual(other.GetBytes());
     }
+
+    #endregion
 }

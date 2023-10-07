@@ -24,28 +24,33 @@
 //
 //******************************************************************************************************
 
+using System;
+using System.Threading;
 using Gemstone.Diagnostics;
 using NUnit.Framework;
 using SnapDB.Threading;
-using System;
-using System.Threading;
 
-namespace UnitTests.Threading;
+namespace SnapDB.UnitTests.Threading;
 
 [TestFixture]
-public class SafeResetEventHelper_Test
+public class SafeResetEventHelperTest
 {
+    #region [ Methods ]
 
     [Test]
     public void Test()
     {
         Logger.Console.Verbose = VerboseLevel.All;
         bool state;
-        SafeManualResetEvent wait = new SafeManualResetEvent(true);
+        SafeManualResetEvent wait = new(true);
         wait.WaitOne();
         wait.Reset();
         state = false;
-        Run(() => { state = true; wait.Set(); }, 10);
+        Run(() =>
+        {
+            state = true;
+            wait.Set();
+        }, 10);
         wait.WaitOne();
         if (!state)
             throw new Exception("Did not wait");
@@ -54,7 +59,11 @@ public class SafeResetEventHelper_Test
         wait.Set();
         wait.WaitOne();
         wait.Reset();
-        Run(() => { state = true; wait.Dispose(); }, 10);
+        Run(() =>
+        {
+            state = true;
+            wait.Dispose();
+        }, 10);
         wait.WaitOne();
         wait = wait;
         wait.Reset();
@@ -63,7 +72,6 @@ public class SafeResetEventHelper_Test
         wait.Set();
         wait.WaitOne();
         wait.Reset();
-
     }
 
     [Test]
@@ -71,9 +79,13 @@ public class SafeResetEventHelper_Test
     {
         Logger.Console.Verbose = VerboseLevel.All;
         bool state;
-        SafeManualResetEvent wait = new SafeManualResetEvent(false);
+        SafeManualResetEvent wait = new(false);
         state = false;
-        Run(() => { state = true; wait.Set(); }, 10);
+        Run(() =>
+        {
+            state = true;
+            wait.Set();
+        }, 10);
         wait.WaitOne();
         if (!state)
             throw new Exception("Did not wait");
@@ -81,18 +93,19 @@ public class SafeResetEventHelper_Test
         wait.Dispose();
         wait.WaitOne();
         wait.Reset();
-
     }
 
-    void Run(Action action, int timeInMilliseconds)
+    private void Run(Action action, int timeInMilliseconds)
     {
         ThreadPool.QueueUserWorkItem(Run, Tuple.Create(action, timeInMilliseconds));
     }
 
-    void Run(object state)
+    private void Run(object state)
     {
         Tuple<Action, int> data = (Tuple<Action, int>)state;
         Thread.Sleep(data.Item2);
         data.Item1();
     }
+
+    #endregion
 }

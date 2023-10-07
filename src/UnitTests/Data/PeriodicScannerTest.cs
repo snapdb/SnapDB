@@ -21,10 +21,10 @@
 //
 //******************************************************************************************************
 
-using NUnit.Framework;
 using System;
+using NUnit.Framework;
 
-namespace UnitTests.Data;
+namespace SnapDB.UnitTests.Data;
 
 [TestFixture]
 public class PeriodicScannerTest

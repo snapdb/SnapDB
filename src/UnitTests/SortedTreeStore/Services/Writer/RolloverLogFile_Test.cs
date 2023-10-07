@@ -21,18 +21,20 @@
 //
 //******************************************************************************************************
 
-using Gemstone.Diagnostics;
-using NUnit.Framework;
-using SnapDB.Snap.Services.Writer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Gemstone.Diagnostics;
+using NUnit.Framework;
+using SnapDB.Snap.Services.Writer;
 
-namespace UnitTests.SortedTreeStore.Services.Writer;
+namespace SnapDB.UnitTests.SortedTreeStore.Services.Writer;
 
 [TestFixture]
-public class RolloverLogFile_Test
+public class RolloverLogFileTest
 {
+    #region [ Methods ]
+
     [Test]
     public void TestLongTerm()
     {
@@ -40,13 +42,13 @@ public class RolloverLogFile_Test
 
         string file = @"C:\Temp\LogFileTest.log";
 
-        List<Guid> source = new List<Guid>();
+        List<Guid> source = new();
         source.Add(Guid.NewGuid());
         Guid dest = Guid.NewGuid();
 
-        RolloverLogFile rolloverFile = new RolloverLogFile(file, source, dest);
+        RolloverLogFile rolloverFile = new(file, source, dest);
 
-        RolloverLogFile rolloverFile2 = new RolloverLogFile(file);
+        RolloverLogFile rolloverFile2 = new(file);
 
         Assert.AreEqual(rolloverFile.IsValid, rolloverFile2.IsValid);
         Assert.AreEqual(rolloverFile.DestinationFile, rolloverFile2.DestinationFile);
@@ -54,11 +56,7 @@ public class RolloverLogFile_Test
 
         if (!rolloverFile2.SourceFiles.SequenceEqual(rolloverFile.SourceFiles))
             throw new Exception("Expecting equals.");
-
-
-
     }
 
-
+    #endregion
 }
-
