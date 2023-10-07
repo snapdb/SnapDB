@@ -463,7 +463,7 @@ internal class MemoryPoolPageList : IDisposable
     }
 
     // Gets the total physical system memory.
-    private static ulong GetTotalPhysicalMemory()
+    internal static ulong GetTotalPhysicalMemory()
     {
         if (Common.IsPosixEnvironment)
         {
@@ -476,7 +476,7 @@ internal class MemoryPoolPageList : IDisposable
     }
 
     // Gets the available physical system memory.
-    private static ulong GetAvailablePhysicalMemory()
+    internal static ulong GetAvailablePhysicalMemory()
     {
         if (Common.IsPosixEnvironment)
         {

@@ -70,12 +70,12 @@ public class CertificateUserCredentials
     /// </returns>
     public bool Exists(IIdentity identity)
     {
-        if (identity is not WindowsIdentity i)
+        if (identity is not WindowsIdentity windowsIdentity)
             return false;
 
         lock (m_users)
         {
-            return m_users.ContainsKey(i.User?.Value ?? string.Empty);
+            return m_users.ContainsKey(windowsIdentity.User?.Value ?? string.Empty);
         }
     }
 

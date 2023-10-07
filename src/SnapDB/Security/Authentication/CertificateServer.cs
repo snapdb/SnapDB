@@ -47,9 +47,10 @@ public class CertificateServer
 
     #region [ Methods ]
 
-    public string AuthenticateAsServer(Stream stream)
+    public string? AuthenticateAsServer(Stream stream)
     {
         using NegotiateStream negotiateStream = new(stream, true);
+
         try
         {
             negotiateStream.AuthenticateAsServer();
@@ -60,7 +61,8 @@ public class CertificateServer
         }
 
         if (Users.Exists(negotiateStream.RemoteIdentity))
-            return "";
+            return ""; // TODO: JRC - this doesn't seem right - but class doesn't seemed to be referenced? Maybe it was never finished?
+
         return "";
     }
 

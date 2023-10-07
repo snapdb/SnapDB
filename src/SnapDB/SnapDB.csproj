@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Security\Authentication\CertificateClient.cs" />
+    <Compile Remove="Security\Authentication\CertificateServer.cs" />
+    <Compile Remove="Security\Authentication\CertificateUserCredential.cs" />
+    <Compile Remove="Security\Authentication\CertificateUserCredentials.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
     <PackageReference Include="Gemstone.Common" Version="1.0.100" />
     <PackageReference Include="Gemstone.Communication" Version="1.0.100" />

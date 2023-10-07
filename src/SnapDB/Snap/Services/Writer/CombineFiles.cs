@@ -187,11 +187,11 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
 
                     RolloverLogFile logFile = null;
 
-                    Action<Guid> createLog = x => { logFile = m_rolloverLog.Create(listIds, x); };
+                    void CreateLog(Guid x) { logFile = m_rolloverLog.Create(listIds, x); }
 
                     using (UnionReader<TKey, TValue> reader = new(list))
                     {
-                        SortedTreeTable<TKey, TValue> dest = m_createNextStageFile.CreateArchiveFile(startKey, endKey, size, reader, createLog);
+                        SortedTreeTable<TKey, TValue> dest = m_createNextStageFile.CreateArchiveFile(startKey, endKey, size, reader, CreateLog);
 
                         resource.Dispose();
 

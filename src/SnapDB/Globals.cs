@@ -25,6 +25,9 @@
 //******************************************************************************************************
 
 using SnapDB.IO.Unmanaged;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("SnapDB.UnitTests")]
 
 namespace SnapDB;
 

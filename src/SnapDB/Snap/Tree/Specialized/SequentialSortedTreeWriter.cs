@@ -56,31 +56,28 @@ public static class SequentialSortedTreeWriter<TKey, TValue> where TKey : SnapTy
         if (!(treeStream.IsAlwaysSequential && treeStream.NeverContainsDuplicates))
             throw new ArgumentException("Stream must guarantee sequential reads and that it never will contain a duplicate", nameof(treeStream));
 
-        SortedTreeHeader header = new();
-        header.TreeNodeType = treeNodeType;
-        header.BlockSize = blockSize;
-        header.RootNodeLevel = 0;
-        header.RootNodeIndexAddress = 1;
-        header.LastAllocatedBlock = 1;
+        SortedTreeHeader header = new() { TreeNodeType = treeNodeType, BlockSize = blockSize, RootNodeLevel = 0, RootNodeIndexAddress = 1,
+            LastAllocatedBlock = 1
+        };
 
-        Func<uint> getNextNewNodeIndex = () =>
+        uint GetNextNewNodeIndex()
         {
             header.LastAllocatedBlock++;
             return header.LastAllocatedBlock;
-        };
+        }
 
         SparseIndexWriter<TKey> indexer = new();
 
-        NodeWriter<TKey, TValue>.Create(treeNodeType, stream, header.BlockSize, header.RootNodeLevel, header.RootNodeIndexAddress, getNextNewNodeIndex, indexer, treeStream);
+        NodeWriter<TKey, TValue>.Create(treeNodeType, stream, header.BlockSize, header.RootNodeLevel, header.RootNodeIndexAddress, GetNextNewNodeIndex, indexer, treeStream);
 
         while (indexer.Count > 0)
         {
             indexer.SwitchToReading();
             header.RootNodeLevel++;
-            header.RootNodeIndexAddress = getNextNewNodeIndex();
+            header.RootNodeIndexAddress = GetNextNewNodeIndex();
 
             SparseIndexWriter<TKey> indexer2 = new();
-            NodeWriter<TKey, SnapUInt32>.Create(EncodingDefinition.FixedSizeCombinedEncoding, stream, header.BlockSize, header.RootNodeLevel, header.RootNodeIndexAddress, getNextNewNodeIndex, indexer2, indexer);
+            NodeWriter<TKey, SnapUInt32>.Create(EncodingDefinition.FixedSizeCombinedEncoding, stream, header.BlockSize, header.RootNodeLevel, header.RootNodeIndexAddress, GetNextNewNodeIndex, indexer2, indexer);
 
             indexer.Dispose();
             indexer = indexer2;

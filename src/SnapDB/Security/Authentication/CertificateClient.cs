@@ -56,6 +56,7 @@ public class CertificateClient
     public bool AuthenticateAsClient(Stream stream)
     {
         using NegotiateStream negotiateStream = new(stream, true);
+
         try
         {
             negotiateStream.AuthenticateAsClient(m_credentials, string.Empty);
