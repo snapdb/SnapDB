@@ -44,7 +44,7 @@ public class ScramUserCredentials
 
     #region [ Methods ]
 
-    public bool TryLookup(byte[] username, out ScramUserCredential user)
+    public bool TryLookup(byte[] username, out ScramUserCredential? user)
     {
         lock (m_users)
             return m_users.TryGetValue(new ReadonlyByteArray(username), out user);
@@ -53,6 +53,7 @@ public class ScramUserCredentials
     public void AddUser(string username, string password, int iterations = 4000, int saltSize = 32, HashMethod hashMethod = HashMethod.Sha256)
     {
         ScramUserCredential user = new(username, password, iterations, saltSize, hashMethod);
+
         lock (m_users)
             m_users.Add(user.UserBytes, user);
     }

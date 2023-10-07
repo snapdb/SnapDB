@@ -50,7 +50,7 @@ public class SrpUserCredential
     /// <summary>
     /// Session Resume Encryption Key
     /// </summary>
-    public readonly byte[] ServerEncryptionkey = SaltGenerator.Create(32);
+    public readonly byte[] ServerEncryptionKey = SaltGenerator.Create(32);
 
     /// <summary>
     /// Session Resume HMAC key
@@ -72,7 +72,7 @@ public class SrpUserCredential
     /// </summary>
     public readonly string UserName;
 
-    public readonly byte[] UsernameBytes;
+    public readonly byte[] UserNameBytes;
 
     /// <summary>
     /// The Srp server verification bytes. (Computed as g^x % N)
@@ -99,7 +99,7 @@ public class SrpUserCredential
     public SrpUserCredential(string username, byte[] verification, byte[] salt, int iterations, SrpStrength srpStrength)
     {
         UserName = username;
-        UsernameBytes = Encoding.UTF8.GetBytes(username);
+        UserNameBytes = Encoding.UTF8.GetBytes(username);
         Salt = salt;
         Verification = verification;
         Iterations = iterations;
@@ -119,7 +119,7 @@ public class SrpUserCredential
     {
         username = username.Normalize(NormalizationForm.FormKC);
         password = password.Normalize(NormalizationForm.FormKC);
-        UsernameBytes = Encoding.UTF8.GetBytes(username);
+        UserNameBytes = Encoding.UTF8.GetBytes(username);
 
         SrpConstants constants = SrpConstants.Lookup(strength);
         BigInteger n = constants.N;
@@ -129,13 +129,15 @@ public class SrpUserCredential
 
         Sha512Digest hash = new();
         byte[] output = new byte[hash.GetDigestSize()];
-        hash.BlockUpdate(UsernameBytes, 0, UsernameBytes.Length);
+
+        hash.BlockUpdate(UserNameBytes, 0, UserNameBytes.Length);
         hash.Update((byte)':');
         hash.BlockUpdate(hashPassword, 0, hashPassword.Length);
         hash.DoFinal(output, 0);
         hash.BlockUpdate(s, 0, s.Length);
         hash.BlockUpdate(output, 0, output.Length);
         hash.DoFinal(output, 0);
+
         BigInteger x = new BigInteger(1, output).Mod(n);
         BigInteger v = g.ModPow(x, n);
 

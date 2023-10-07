@@ -64,7 +64,7 @@ public class ScramUserCredential
     /// <param name="hashMethod">The hash method to use for authentication</param>
     /// <remarks>
     /// Setting a vary large Iterations will not effect how long it takes to negotiate a client on the server end. This is because
-    /// the server precomputes the hash results. The client can optionally also precomute the results so negotiation can take
+    /// the server precomputes the hash results. The client can optionally also precompute the results so negotiation can take
     /// milliseconds.
     /// </remarks>
     public ScramUserCredential(string username, string password, int iterations = 4000, int saltSize = 32, HashMethod hashMethod = HashMethod.Sha256)
@@ -98,18 +98,19 @@ public class ScramUserCredential
     public byte[] ComputeClientSignature(byte[] authMessage)
     {
         byte[] result = new byte[m_clientSignature.GetMacSize()];
-        if (Monitor.TryEnter(m_clientSignature))
-            try
-            {
-                m_clientSignature.BlockUpdate(authMessage, 0, authMessage.Length);
-                m_clientSignature.DoFinal(result, 0);
-            }
-            finally
-            {
-                Monitor.Exit(m_clientSignature);
-            }
-        else
+
+        if (!Monitor.TryEnter(m_clientSignature))
             return Hmac.Compute(Scram.CreateDigest(HashMethod), StoredKey, authMessage);
+        
+        try
+        {
+            m_clientSignature.BlockUpdate(authMessage, 0, authMessage.Length);
+            m_clientSignature.DoFinal(result, 0);
+        }
+        finally
+        {
+            Monitor.Exit(m_clientSignature);
+        }
 
         return result;
     }
@@ -117,18 +118,19 @@ public class ScramUserCredential
     public byte[] ComputeServerSignature(byte[] authMessage)
     {
         byte[] result = new byte[m_serverSignature.GetMacSize()];
-        if (Monitor.TryEnter(m_serverSignature))
-            try
-            {
-                m_serverSignature.BlockUpdate(authMessage, 0, authMessage.Length);
-                m_serverSignature.DoFinal(result, 0);
-            }
-            finally
-            {
-                Monitor.Exit(m_serverSignature);
-            }
-        else
+
+        if (!Monitor.TryEnter(m_serverSignature))
             return Hmac.Compute(Scram.CreateDigest(HashMethod), StoredKey, authMessage);
+
+        try
+        {
+            m_serverSignature.BlockUpdate(authMessage, 0, authMessage.Length);
+            m_serverSignature.DoFinal(result, 0);
+        }
+        finally
+        {
+            Monitor.Exit(m_serverSignature);
+        }
 
         return result;
     }
@@ -136,19 +138,21 @@ public class ScramUserCredential
     public byte[] ComputeStoredKey(byte[] clientKey)
     {
         byte[] result = new byte[m_computeStoredKey.GetDigestSize()];
-        if (Monitor.TryEnter(m_computeStoredKey))
-            try
-            {
-                m_computeStoredKey.BlockUpdate(clientKey, 0, clientKey.Length);
-                m_computeStoredKey.DoFinal(result, 0);
-                return result;
-            }
-            finally
-            {
-                Monitor.Exit(m_computeStoredKey);
-            }
 
-        return Hash.Compute(Scram.CreateDigest(HashMethod), clientKey);
+        if (!Monitor.TryEnter(m_computeStoredKey))
+            return Hash.Compute(Scram.CreateDigest(HashMethod), clientKey);
+        
+        try
+        {
+            m_computeStoredKey.BlockUpdate(clientKey, 0, clientKey.Length);
+            m_computeStoredKey.DoFinal(result, 0);
+        }
+        finally
+        {
+            Monitor.Exit(m_computeStoredKey);
+        }
+
+        return result;
     }
 
     public void Save()

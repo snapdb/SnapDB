@@ -104,16 +104,13 @@ public class IntegratedSecurityUserCredential
     public void Load(Stream stream)
     {
         byte version = stream.ReadNextByte();
-        switch (version)
-        {
-            case 1:
-                Username = stream.ReadString();
-                UserId = stream.ReadString();
-                UserToken = stream.ReadGuid();
-                return;
-            default:
-                throw new VersionNotFoundException("Unknown encoding method");
-        }
+
+        if (version != 1)
+            throw new VersionNotFoundException("Unknown encoding method");
+        
+        Username = stream.ReadString();
+        UserId = stream.ReadString();
+        UserToken = stream.ReadGuid();
     }
 
     #endregion

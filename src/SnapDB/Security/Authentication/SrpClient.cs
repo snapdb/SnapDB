@@ -40,19 +40,17 @@ public class SrpClient
 {
     #region [ Members ]
 
-    private Srp6Client m_client;
+    private Srp6Client m_client = default!;
 
     private readonly PbdkfCredentials m_credentials;
-    private IDigest m_hash;
-    private SrpConstants m_param;
-    private byte[] m_resumeTicket;
+    private IDigest m_hash = default!;
+    private SrpConstants m_param = default!;
+    private byte[]? m_resumeTicket;
 
-    /// <summary>
-    /// Session Resume Details
-    /// </summary>
-    private byte[] m_sessionSecret;
+    // Session Resume Details
+    private byte[]? m_sessionSecret;
 
-    //The SRP Mechanism
+    // The SRP Mechanism
     private int m_srpByteLength;
     private SrpStrength m_strength;
 
@@ -70,11 +68,13 @@ public class SrpClient
     {
         if (username is null)
             throw new ArgumentNullException(nameof(username));
+
         if (password is null)
-            throw new ArgumentNullException(nameof(username));
+            throw new ArgumentNullException(nameof(password));
 
 
         m_credentials = new PbdkfCredentials(username, password);
+
         if (m_credentials.UsernameBytes.Length > 1024)
             throw new ArgumentException("Username cannot consume more than 1024 bytes encoded as UTF8", nameof(username));
     }
@@ -83,16 +83,16 @@ public class SrpClient
 
     #region [ Methods ]
 
-    public bool AuthenticateAsClient(Stream stream, byte[] additionalChallenge = null)
+    public bool AuthenticateAsClient(Stream stream, byte[]? additionalChallenge = null)
     {
-        additionalChallenge ??= new byte[] { };
+        additionalChallenge ??= Array.Empty<byte>();
 
         stream.Write((short)m_credentials.UsernameBytes.Length);
         stream.Write(m_credentials.UsernameBytes);
 
         if (m_resumeTicket is not null)
         {
-            //resume
+            // resume
             stream.Write((byte)2);
             stream.Flush();
 
@@ -129,23 +129,25 @@ public class SrpClient
     {
         stream.Write((byte)16);
         byte[] aChallenge = SaltGenerator.Create(16);
+
         stream.Write(aChallenge);
-        stream.Write((short)m_resumeTicket.Length);
+        stream.Write((short)m_resumeTicket!.Length);
         stream.Write(m_resumeTicket);
         stream.Flush();
 
         if (stream.ReadBoolean())
         {
             SetHashMethod((HashMethod)stream.ReadNextByte());
-            byte[] bChallenge = stream.ReadBytes(stream.ReadNextByte());
 
-            byte[] clientProof = m_hash.ComputeHash(aChallenge, bChallenge, m_sessionSecret, additionalChallenge);
+            byte[] bChallenge = stream.ReadBytes(stream.ReadNextByte());
+            byte[] clientProof = m_hash.ComputeHash(aChallenge, bChallenge, m_sessionSecret!, additionalChallenge);
+
             stream.Write(clientProof);
             stream.Flush();
 
             if (stream.ReadBoolean())
             {
-                byte[] serverProof = m_hash.ComputeHash(bChallenge, aChallenge, m_sessionSecret, additionalChallenge);
+                byte[] serverProof = m_hash.ComputeHash(bChallenge, aChallenge, m_sessionSecret!, additionalChallenge);
                 byte[] serverProofCheck = stream.ReadBytes(m_hash.GetDigestSize());
 
                 return serverProof.SecureEquals(serverProofCheck);
@@ -154,9 +156,9 @@ public class SrpClient
 
         m_sessionSecret = null;
         m_resumeTicket = null;
+
         return Authenticate(stream, additionalChallenge);
     }
-
 
     private bool Authenticate(Stream stream, byte[] additionalChallenge)
     {
@@ -175,38 +177,36 @@ public class SrpClient
         stream.Write(pubABytes);
         stream.Flush();
 
-        //Read from Server: B
+        // Read from Server: B
         byte[] pubBBytes = stream.ReadBytes(m_srpByteLength);
         BigInteger pubB = new(1, pubBBytes);
 
-        //Calculate Session Key
+        // Calculate Session Key
         BigInteger s = m_client.CalculateSecret(m_hash, pubB);
         byte[] sBytes = s.ToPaddedArray(m_srpByteLength);
-
         byte[] clientProof = m_hash.ComputeHash(pubABytes, pubBBytes, sBytes, additionalChallenge);
+
         stream.Write(clientProof);
         stream.Flush();
 
         byte[] serverProof = m_hash.ComputeHash(pubBBytes, pubABytes, sBytes, additionalChallenge);
 
-        if (stream.ReadBoolean())
-        {
-            byte[] serverProofCheck = stream.ReadBytes(m_hash.GetDigestSize());
-            int ticketLength = stream.ReadInt16();
-            if (ticketLength < 0 || ticketLength > 10000)
-                return false;
-
-            if (serverProofCheck.SecureEquals(serverProof))
-            {
-                m_resumeTicket = stream.ReadBytes(ticketLength);
-                m_sessionSecret = m_hash.ComputeHash(pubABytes, sBytes, pubBBytes).Combine(m_hash.ComputeHash(pubBBytes, sBytes, pubABytes));
-                return true;
-            }
-
+        if (!stream.ReadBoolean())
             return false;
-        }
+        
+        byte[] serverProofCheck = stream.ReadBytes(m_hash.GetDigestSize());
+        int ticketLength = stream.ReadInt16();
+        
+        if (ticketLength is < 0 or > 10000)
+            return false;
 
-        return false;
+        if (!serverProofCheck.SecureEquals(serverProof))
+            return false;
+        
+        m_resumeTicket = stream.ReadBytes(ticketLength);
+        m_sessionSecret = m_hash.ComputeHash(pubABytes, sBytes, pubBBytes).Combine(m_hash.ComputeHash(pubBBytes, sBytes, pubABytes));
+        
+        return true;
     }
 
     #endregion

@@ -51,7 +51,7 @@ public class SrpServerSession
     /// <summary>
     /// The session secret that is used to generate keys.
     /// </summary>
-    public byte[] SessionSecret;
+    public byte[]? SessionSecret;
 
     private readonly SrpUserCredential m_user;
 
@@ -90,8 +90,7 @@ public class SrpServerSession
         return mode switch
         {
             1 => StandardAuthentication(hash, stream, additionalChallenge),
-            2 => //resume ticket
-                ResumeTicket(hash, stream, additionalChallenge),
+            2 => ResumeTicket(hash, stream, additionalChallenge),
             _ => false
         };
     }
@@ -132,11 +131,11 @@ public class SrpServerSession
         stream.Write(pubBBytes);
         stream.Flush();
 
-        //Read from client: A
+        // Read from client: A
         byte[] pubABytes = stream.ReadBytes(srpNumberLength);
         BigInteger pubA = new(1, pubABytes);
 
-        //Calculate Session Key
+        // Calculate Session Key
         BigInteger s = server.CalculateSecret(hash, pubA);
         byte[] sBytes = s.ToPaddedArray(srpNumberLength);
 
@@ -197,7 +196,8 @@ public class SrpServerSession
 
         byte[] a = stream.ReadBytes(stream.ReadNextByte());
         int ticketLength = stream.ReadInt16();
-        if (ticketLength < 0 || ticketLength > 10000)
+        
+        if (ticketLength is < 0 or > 10000)
             return false;
 
         byte[] ticket = stream.ReadBytes(ticketLength);
@@ -207,12 +207,13 @@ public class SrpServerSession
             stream.Write(true);
             stream.WriteByte((byte)SrpHashMethod);
             byte[] b = SaltGenerator.Create(16);
+
             stream.WriteByte(16);
             stream.Write(b);
             stream.Flush();
 
-            byte[] clientProofCheck = hash.ComputeHash(a, b, SessionSecret, additionalChallenge);
-            byte[] serverProof = hash.ComputeHash(b, a, SessionSecret, additionalChallenge);
+            byte[] clientProofCheck = hash.ComputeHash(a, b, SessionSecret!, additionalChallenge);
+            byte[] serverProof = hash.ComputeHash(b, a, SessionSecret!, additionalChallenge);
             byte[] clientProof = stream.ReadBytes(hash.GetDigestSize());
 
             if (clientProof.SecureEquals(clientProofCheck))
@@ -220,14 +221,17 @@ public class SrpServerSession
                 stream.Write(true);
                 stream.Write(serverProof);
                 stream.Flush();
+
                 return true;
             }
 
             stream.Write(false);
+
             return false;
         }
 
         stream.Write(false);
+
         return StandardAuthentication(hash, stream, additionalChallenge);
     }
 
@@ -241,6 +245,7 @@ public class SrpServerSession
         int len = sessionSecret.Length;
         int blockLen = (len + 15) & ~15; //Add 15, then round down. (Effectively rounds up to the nearest 128 bit boundary).
         byte[] dataToEncrypt = new byte[blockLen];
+        
         sessionSecret.CopyTo(dataToEncrypt, 0);
 
         //fill the remainder of the block with random bits
@@ -248,12 +253,13 @@ public class SrpServerSession
             SaltGenerator.Create(blockLen - len).CopyTo(dataToEncrypt, len);
 
         byte[] ticket = new byte[1 + 16 + 8 + 16 + 2 + blockLen + 32];
-
         using Aes aes = Aes.Create();
-        aes.Key = user.ServerEncryptionkey;
+
+        aes.Key = user.ServerEncryptionKey;
         aes.IV = initializationVector;
         aes.Mode = CipherMode.CBC;
         aes.Padding = PaddingMode.None;
+
         ICryptoTransform decrypt = aes.CreateEncryptor();
         byte[] encryptedData = decrypt.TransformFinalBlock(dataToEncrypt, 0, dataToEncrypt.Length);
 
@@ -281,7 +287,7 @@ public class SrpServerSession
     /// <returns>
     /// True if the ticket is authentic
     /// </returns>
-    private static unsafe bool TryLoadTicket(byte[] ticket, SrpUserCredential user, out byte[] sessionSecret)
+    private static unsafe bool TryLoadTicket(byte[]? ticket, SrpUserCredential user, out byte[]? sessionSecret)
     {
         sessionSecret = null;
 
@@ -302,14 +308,17 @@ public class SrpServerSession
         fixed (byte* lp = ticket)
         {
             BinaryStreamPointerWrapper stream = new(lp, ticket.Length);
+
             if (stream.ReadUInt8() != 1)
                 return false;
 
             int sessionKeyLength = stream.ReadUInt16();
-            if (sessionKeyLength < 0 || sessionKeyLength > 1024) //Max session key is 8192 SRP.
+
+            if (sessionKeyLength is < 0 or > 1024) //Max session key is 8192 SRP.
                 return false;
 
             int encryptedDataLength = (sessionKeyLength + 15) & ~15; //Add 15, then round down. (Effectively rounds up to the nearest 128 bit boundary).
+           
             if (ticket.Length != 1 + 2 + 16 + 8 + 16 + encryptedDataLength + 32)
                 return false;
 
@@ -318,28 +327,31 @@ public class SrpServerSession
 
             long maxTicketAge = DateTime.UtcNow.Ticks + TimeSpan.TicksPerMinute * 10; //Allows for time syncing issues that might move the server's time back by a few minutes.
             long minTicketAge = maxTicketAge - TimeSpan.TicksPerDay;
-
             long issueTime = stream.ReadInt64();
+
             if (issueTime < minTicketAge || issueTime > maxTicketAge)
                 return false;
 
             byte[] initializationVector = stream.ReadBytes(16);
 
-            //Verify the signature if everything else looks good.
-            //This is last because it is the most computationally complex.
-            //This limits denial of service attacks.
+            // Verify the signature if everything else looks good.
+            // This is last because it is the most computationally complex.
+            // This limits denial of service attacks.
             byte[] hmac = Hmac<Sha256Digest>.Compute(user.ServerHmacKey, ticket, 0, ticket.Length - 32);
+            
             if (!hmac.SecureEquals(ticket, ticket.Length - 32, 32))
                 return false;
 
             byte[] encryptedData = stream.ReadBytes(encryptedDataLength);
-
             using Aes aes = Aes.Create();
-            aes.Key = user.ServerEncryptionkey;
+
+            aes.Key = user.ServerEncryptionKey;
             aes.IV = initializationVector;
             aes.Mode = CipherMode.CBC;
             aes.Padding = PaddingMode.None;
+            
             ICryptoTransform decrypt = aes.CreateDecryptor();
+            
             sessionSecret = decrypt.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
 
             return true;

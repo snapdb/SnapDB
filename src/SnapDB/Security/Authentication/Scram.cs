@@ -53,7 +53,7 @@ internal static class Scram
             HashMethod.Sha256 => new Sha256Digest(),
             HashMethod.Sha384 => new Sha384Digest(),
             HashMethod.Sha512 => new Sha512Digest(),
-            _ => throw new InvalidEnumArgumentException("hashMethod", (int)hashMethod, typeof(HashMethod))
+            _ => throw new InvalidEnumArgumentException(nameof(hashMethod), (int)hashMethod, typeof(HashMethod))
         };
     }
 
@@ -61,24 +61,30 @@ internal static class Scram
     {
         if (a.Length != b.Length)
             throw new Exception();
+
         byte[] rv = new byte[a.Length];
+
         for (int x = 0; x < a.Length; x++)
             rv[x] = (byte)(a[x] ^ b[x]);
+
         return rv;
     }
 
     internal static byte[] ComputeAuthMessage(byte[] serverNonce, byte[] clientNonce, byte[] salt, byte[] username, int iterations, byte[] additionalChallenge)
     {
         byte[] data = new byte[serverNonce.Length + clientNonce.Length + salt.Length + username.Length + additionalChallenge.Length + 4];
+
         serverNonce.CopyTo(data, 0);
         clientNonce.CopyTo(data, serverNonce.Length);
         salt.CopyTo(data, serverNonce.Length + clientNonce.Length);
         username.CopyTo(data, serverNonce.Length + clientNonce.Length + salt.Length);
         additionalChallenge.CopyTo(data, serverNonce.Length + clientNonce.Length + salt.Length + username.Length);
-        data[data.Length - 4] = (byte)iterations;
-        data[data.Length - 3] = (byte)(iterations >> 8);
-        data[data.Length - 2] = (byte)(iterations >> 16);
-        data[data.Length - 1] = (byte)(iterations >> 24);
+
+        data[^4] = (byte)iterations;
+        data[^3] = (byte)(iterations >> 8);
+        data[^2] = (byte)(iterations >> 16);
+        data[^1] = (byte)(iterations >> 24);
+
         return data;
     }
 

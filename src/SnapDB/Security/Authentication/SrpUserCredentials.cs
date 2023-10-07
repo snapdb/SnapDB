@@ -68,6 +68,7 @@ public class SrpUserCredentials
     public void AddUser(string username, string password, SrpStrength strength = SrpStrength.Bits1024, int saltSize = 32, int iterations = 4000)
     {
         SrpUserCredential user = new(username, password, strength, saltSize, iterations);
+
         lock (m_users)
             m_users.Add(username, user);
     }
@@ -83,6 +84,7 @@ public class SrpUserCredentials
     public void AddUser(string username, byte[] verifier, byte[] passwordSalt, int iterations, SrpStrength strength)
     {
         SrpUserCredential user = new(username, passwordSalt, verifier, iterations, strength);
+
         lock (m_users)
             m_users.Add(username, user);
     }

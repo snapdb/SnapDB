@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  IUserToken.cs - Gbtc
+//  NullUserToken.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -27,23 +27,19 @@
 namespace SnapDB.Security.Authentication;
 
 /// <summary>
-/// An interface for token data that is associated with a user.
+/// An empty token that does not contain any data.
 /// </summary>
-public interface IUserToken
+public struct NullUserToken : IUserToken
 {
     #region [ Methods ]
 
-    /// <summary>
-    /// Saves the token to a stream
-    /// </summary>
-    /// <param name="stream">the stream to save to</param>
-    void Save(Stream stream);
+    public void Save(Stream stream)
+    {
+    }
 
-    /// <summary>
-    /// Loads the token from a stream
-    /// </summary>
-    /// <param name="stream">the stream to load from</param>
-    void Load(Stream stream);
+    public void Load(Stream stream)
+    {
+    }
 
     #endregion
 }

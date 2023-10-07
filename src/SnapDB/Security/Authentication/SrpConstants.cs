@@ -111,7 +111,8 @@ internal class SrpConstants
     public static SrpConstants Lookup(SrpStrength strength)
     {
         int bits = (int)strength;
-        if (!s_groupParameters.TryGetValue(bits, out SrpConstants value))
+
+        if (!s_groupParameters.TryGetValue(bits, out SrpConstants? value))
             throw new InvalidEnumArgumentException("strength");
 
         return value;
@@ -141,11 +142,16 @@ internal class SrpConstants
     private static byte[] ComputeHash(params byte[][] words)
     {
         Sha512Digest hash = new();
+
         hash.Reset();
+
         foreach (byte[] w in words)
             hash.BlockUpdate(w, 0, w.Length);
+
         byte[] rv = new byte[hash.GetDigestSize()];
+
         hash.DoFinal(rv, 0);
+
         return rv;
     }
 

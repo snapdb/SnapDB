@@ -79,15 +79,17 @@ public class IntegratedSecurityClient : DisposableLoggingClassBase
     /// for the connection to succeed.
     /// </param>
     /// <returns>
-    /// True if authentication succeded, false otherwise.
+    /// <c>true</c> if authentication succeeded; otherwise, <c>false</c>.
     /// </returns>
-    public bool TryAuthenticateAsClient(Stream stream, byte[] additionalChallenge = null)
+    public bool TryAuthenticateAsClient(Stream stream, byte[]? additionalChallenge = null)
     {
-        additionalChallenge ??= new byte[] { };
+        additionalChallenge ??= Array.Empty<byte>();
+
         if (additionalChallenge.Length > short.MaxValue)
             throw new ArgumentOutOfRangeException(nameof(additionalChallenge), "Must be less than 32767 bytes");
 
         using NegotiateStream negotiateStream = new(stream, true);
+
         try
         {
             negotiateStream.AuthenticateAsClient(m_credentials, string.Empty, ProtectionLevel.EncryptAndSign, TokenImpersonationLevel.Identification);
@@ -98,26 +100,25 @@ public class IntegratedSecurityClient : DisposableLoggingClassBase
             return false;
         }
 
-        //Exchange the challenge data.
-        //Since NegotiateStream is already a trusted stream
-        //Simply writing the raw is as secure as creating a challenge response
+        // Exchange the challenge data.
+        // Since NegotiateStream is already a trusted stream
+        // Simply writing the raw is as secure as creating a challenge response
         negotiateStream.Write((short)additionalChallenge.Length);
+        
         if (additionalChallenge.Length > 0)
             negotiateStream.Write(additionalChallenge);
+        
         negotiateStream.Flush();
 
         int len = negotiateStream.ReadInt16();
+        
         if (len < 0)
         {
             Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "Challenge Length is invalid: " + len);
             return false;
         }
 
-        byte[] remoteChallenge;
-        if (len == 0)
-            remoteChallenge = Array.Empty<byte>();
-        else
-            remoteChallenge = negotiateStream.ReadBytes(len);
+        byte[] remoteChallenge = len == 0 ? Array.Empty<byte>() : negotiateStream.ReadBytes(len);
 
         if (remoteChallenge.SecureEquals(additionalChallenge))
             return true;

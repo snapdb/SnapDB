@@ -65,9 +65,9 @@ public class SrpServer
     /// adding the thumbprint to the challenge will allow detecting man in the middle attacks.
     /// </param>
     /// <returns>A <see cref="SrpServerSession"/> representing the authenticated server session, or null if authentication fails.</returns>
-    public SrpServerSession AuthenticateAsServer(Stream stream, byte[] additionalChallenge = null)
+    public SrpServerSession? AuthenticateAsServer(Stream stream, byte[]? additionalChallenge = null)
     {
-        additionalChallenge ??= new byte[] { };
+        additionalChallenge ??= Array.Empty<byte>();
 
         // Header
         //  C => S
@@ -75,17 +75,16 @@ public class SrpServer
         //  byte[]  usernameBytes
 
         int len = stream.ReadInt16();
-        if (len < 0 || len > 1024)
+
+        if (len is < 0 or > 1024)
             return null;
 
         byte[] usernameBytes = stream.ReadBytes(len);
         string username = s_utf8.GetString(usernameBytes);
         SrpUserCredential user = Users.Lookup(username);
         SrpServerSession session = new(user);
-        if (session.TryAuthenticate(stream, additionalChallenge))
-            return session;
 
-        return null;
+        return session.TryAuthenticate(stream, additionalChallenge) ? session : null;
     }
 
     #endregion

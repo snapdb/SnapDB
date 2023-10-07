@@ -66,9 +66,9 @@ public class ScramServer
     /// adding the thumbprint to the challenge will allow detecting man in the middle attacks.
     /// </param>
     /// <returns>The authenticated stream.</returns>
-    public ScramServerSession AuthenticateAsServer(Stream stream, byte[] additionalChallenge = null)
+    public ScramServerSession? AuthenticateAsServer(Stream stream, byte[]? additionalChallenge = null)
     {
-        additionalChallenge ??= new byte[] { };
+        additionalChallenge ??= Array.Empty<byte>();
 
         byte[] usernameBytes = stream.ReadBytes();
         byte[] clientNonce = stream.ReadBytes();
@@ -91,16 +91,15 @@ public class ScramServer
         byte[] clientKeyVerify = Scram.Xor(clientProof, clientSignature);
         byte[] storedKeyVerify = user.ComputeStoredKey(clientKeyVerify);
 
-        if (storedKeyVerify.SecureEquals(user.StoredKey))
-        {
-            //Client holds the password
-            //Send ServerSignature
-            stream.WriteWithLength(serverSignature);
-            stream.Flush();
-            return new ScramServerSession(user.UserName);
-        }
+        if (!storedKeyVerify.SecureEquals(user.StoredKey))
+            return null;
+        
+        // Client holds the password
+        // Send ServerSignature
+        stream.WriteWithLength(serverSignature);
+        stream.Flush();
 
-        return null;
+        return new ScramServerSession(user.UserName);
     }
 
     #endregion

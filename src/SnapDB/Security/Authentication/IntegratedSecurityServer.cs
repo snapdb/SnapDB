@@ -66,21 +66,23 @@ public class IntegratedSecurityServer : DisposableLoggingClassBase
     /// <summary>
     /// Authenticates the client stream
     /// </summary>
-    /// <param name="stream">The stream to autenticate</param>
+    /// <param name="stream">The stream to authenticate</param>
     /// <param name="userToken">the user token associated with the identity match</param>
     /// <param name="additionalChallenge">
     /// Additional data that much match between the client and server
     /// for the connection to succeed.
     /// </param>
     /// <returns>true if successful authentication. False otherwise.</returns>
-    public bool TryAuthenticateAsServer(Stream stream, out Guid userToken, byte[] additionalChallenge = null)
+    public bool TryAuthenticateAsServer(Stream stream, out Guid userToken, byte[]? additionalChallenge = null)
     {
         userToken = Guid.Empty;
-        additionalChallenge ??= new byte[] { };
+        additionalChallenge ??= Array.Empty<byte>();
+
         if (additionalChallenge.Length > short.MaxValue)
             throw new ArgumentOutOfRangeException(nameof(additionalChallenge), "Must be less than 32767 bytes");
 
         using NegotiateStream negotiateStream = new(stream, true);
+
         try
         {
             negotiateStream.AuthenticateAsServer(CredentialCache.DefaultNetworkCredentials, ProtectionLevel.EncryptAndSign, TokenImpersonationLevel.Identification);
@@ -92,27 +94,27 @@ public class IntegratedSecurityServer : DisposableLoggingClassBase
         }
 
         negotiateStream.Write((short)additionalChallenge.Length);
+
         if (additionalChallenge.Length > 0)
             negotiateStream.Write(additionalChallenge);
+
         negotiateStream.Flush();
 
         int len = negotiateStream.ReadInt16();
+
         if (len < 0)
         {
             Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "Challenge Length is invalid: " + len);
             return false;
         }
 
-        byte[] remoteChallenge;
-        if (len == 0)
-            remoteChallenge = Array.Empty<byte>();
-        else
-            remoteChallenge = negotiateStream.ReadBytes(len);
+        byte[] remoteChallenge = len == 0 ? Array.Empty<byte>() : negotiateStream.ReadBytes(len);
 
         if (remoteChallenge.SecureEquals(additionalChallenge))
         {
             if (Users.TryGetToken(negotiateStream.RemoteIdentity, out userToken))
                 return true;
+            
             Log.Publish(MessageLevel.Info, "Security Login Failed", "Attempting an integrated security login failed", "User did not exist in the database: " + negotiateStream.RemoteIdentity);
             return false;
         }
@@ -138,14 +140,11 @@ public class IntegratedSecurityServer : DisposableLoggingClassBase
     public void Load(Stream stream)
     {
         byte version = stream.ReadNextByte();
-        switch (version)
-        {
-            case 1:
-                Users.Load(stream);
-                return;
-            default:
-                throw new VersionNotFoundException("Unknown encoding method");
-        }
+
+        if (version != 1)
+            throw new VersionNotFoundException("Unknown encoding method");
+        
+        Users.Load(stream);
     }
 
     #endregion

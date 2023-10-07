@@ -45,7 +45,7 @@ public class ScramClient
 
     private readonly NonceGenerator m_nonce = new(16);
     private readonly byte[] m_passwordBytes;
-    private byte[] m_salt;
+    private byte[]? m_salt;
     private byte[] m_saltedPassword;
     private byte[] m_serverKey;
     private HMac m_serverSignature;
@@ -71,9 +71,9 @@ public class ScramClient
 
     #region [ Methods ]
 
-    public bool AuthenticateAsClient(Stream stream, byte[] additionalChallenge = null)
+    public bool AuthenticateAsClient(Stream stream, byte[]? additionalChallenge = null)
     {
-        additionalChallenge ??= new byte[] { };
+        additionalChallenge ??= Array.Empty<byte>();
 
         byte[] clientNonce = m_nonce.Next();
         stream.WriteWithLength(m_usernameBytes);
@@ -95,6 +95,7 @@ public class ScramClient
 
         byte[] serverSignature = ComputeServerSignature(authMessage);
         byte[] serverSignatureVerify = stream.ReadBytes();
+
         return serverSignature.SecureEquals(serverSignatureVerify);
     }
 
@@ -130,6 +131,7 @@ public class ScramClient
 
         if (hasPasswordDataChanged)
             m_saltedPassword = Scram.GenerateSaltedPassword(m_passwordBytes, m_salt, m_iterations);
+
         if (hasPasswordDataChanged || hasHashMethodChanged)
         {
             m_serverKey = Scram.ComputeServerKey(m_hashMethod, m_saltedPassword);
@@ -146,6 +148,7 @@ public class ScramClient
     private byte[] ComputeClientSignature(byte[] authMessage)
     {
         byte[] result = new byte[m_clientSignature.GetMacSize()];
+
         lock (m_clientSignature)
         {
             m_clientSignature.BlockUpdate(authMessage, 0, authMessage.Length);
@@ -158,6 +161,7 @@ public class ScramClient
     private byte[] ComputeServerSignature(byte[] authMessage)
     {
         byte[] result = new byte[m_serverSignature.GetMacSize()];
+
         lock (m_serverSignature)
         {
             m_serverSignature.BlockUpdate(authMessage, 0, authMessage.Length);
