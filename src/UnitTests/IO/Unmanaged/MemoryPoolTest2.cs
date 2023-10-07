@@ -164,7 +164,7 @@ public class MemoryPoolTest
             int itemsToRemove = s_lst.Count / 5;
             while (s_lst.Count > itemsToRemove)
             {
-                eventArgs.ReleasePage(s_lst[s_lst.Count - 1]);
+                eventArgs.ReleasePage(s_lst[^1]);
                 s_lst.RemoveAt(s_lst.Count - 1);
             }
             //for (int x = 0; x<lst.Count; x+=3)

@@ -40,7 +40,7 @@ public class SecureStreamTest
 {
     #region [ Members ]
 
-    public NullToken T;
+    public NullUserToken T;
     private readonly Stopwatch m_sw = new();
 
     #endregion
@@ -54,7 +54,7 @@ public class SecureStreamTest
 
     //    var net = new NetworkStreamSimulator();
 
-    //    var sa = new SecureStreamServer<NullToken>();
+    //    var sa = new SecureStreamServer<NullUserToken>();
     //    sa.Srp.Users.AddUser("user1","password");
     //    ThreadPool.QueueUserWorkItem(Client1, net.ClientStream);
 
@@ -105,8 +105,8 @@ public class SecureStreamTest
         m_sw.Reset();
 
         NetworkStreamSimulator net = new();
-        SecureStreamServer<NullToken> sa = new();
-        sa.SetDefaultUser(true, new NullToken());
+        SecureStreamServer<NullUserToken> sa = new();
+        sa.SetDefaultUser(true, new NullUserToken());
         ThreadPool.QueueUserWorkItem(ClientDefault, net.ClientStream);
 
         // TODO: This should timeout to accomodate initialization failure
@@ -137,8 +137,8 @@ public class SecureStreamTest
 
         NetworkStreamSimulator net = new();
 
-        SecureStreamServer<NullToken> sa = new();
-        sa.SetDefaultUser(true, new NullToken());
+        SecureStreamServer<NullUserToken> sa = new();
+        sa.SetDefaultUser(true, new NullUserToken());
         ThreadPool.QueueUserWorkItem(ClientBenchmarkDefault, net.ClientStream);
 
         sa.TryAuthenticateAsServer(net.ServerStream, false, out Stream stream, out T);
@@ -159,8 +159,8 @@ public class SecureStreamTest
 
         NetworkStreamSimulator net = new();
 
-        SecureStreamServer<NullToken> sa = new();
-        sa.AddUserIntegratedSecurity("Zthe\\steven", new NullToken());
+        SecureStreamServer<NullUserToken> sa = new();
+        sa.AddUserIntegratedSecurity("Zthe\\steven", new NullUserToken());
         ThreadPool.QueueUserWorkItem(ClientBenchmarkIntegrated, net.ClientStream);
 
         Stream stream;
