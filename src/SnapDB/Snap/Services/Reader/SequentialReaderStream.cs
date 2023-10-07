@@ -45,7 +45,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
 
     private readonly bool m_keyMatchIsUniverse;
 
-    private readonly SeekFilterBase<TKey> m_keySeekFilter;
+    private readonly SeekFilterBase<TKey>? m_keySeekFilter;
     private readonly TKey m_nextArchiveStreamLowerBounds = new();
     private readonly bool m_ownsWorkerThreadSynchronization;
     private long m_pointCount;
@@ -63,11 +63,12 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
 
     #region [ Constructors ]
 
-    public SequentialReaderStream(ArchiveList<TKey, TValue> archiveList, SortedTreeEngineReaderOptions? readerOptions = null, SeekFilterBase<TKey> keySeekFilter = null, MatchFilterBase<TKey, TValue>? keyMatchFilter = null, WorkerThreadSynchronization workerThreadSynchronization = null)
+    public SequentialReaderStream(ArchiveList<TKey, TValue> archiveList, SortedTreeEngineReaderOptions? readerOptions = null, SeekFilterBase<TKey>? keySeekFilter = null, MatchFilterBase<TKey, TValue>? keyMatchFilter = null, WorkerThreadSynchronization? workerThreadSynchronization = null)
     {
         readerOptions ??= SortedTreeEngineReaderOptions.Default;
         keySeekFilter ??= new SeekFilterUniverse<TKey>();
         keyMatchFilter ??= new MatchFilterUniverse<TKey, TValue>();
+
         if (workerThreadSynchronization is null)
         {
             m_ownsWorkerThreadSynchronization = true;
@@ -94,27 +95,27 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
         {
             ArchiveTableSummary<TKey, TValue>? table = m_snapshot.Tables[x];
 
-            if (table is not null)
-            {
-                if (table.Contains(keySeekFilter.StartOfRange, keySeekFilter.EndOfRange))
-                    try
-                    {
-                        m_tablesOrigList.Add(new BufferedArchiveStream<TKey, TValue>(x, table));
-                    }
-                    catch (Exception ex)
-                    {
-                        //ToDo: Make sure firstkey.tostring doesn't ever throw an exception.
-                        StringBuilder sb = new();
-                        sb.AppendLine($"Archive ID {table.FileId}");
-                        sb.AppendLine($"First Key {table.FirstKey.ToString()}");
-                        sb.AppendLine($"Last Key {table.LastKey.ToString()}");
-                        sb.AppendLine($"File Size {table.SortedTreeTable.BaseFile.ArchiveSize}");
-                        sb.AppendLine($"File Name {table.SortedTreeTable.BaseFile.FilePath}");
-                        s_log.Publish(MessageLevel.Error, "Error while reading file", sb.ToString(), null, ex);
-                    }
-                else
-                    m_snapshot.Tables[x] = null;
-            }
+            if (table is null)
+                continue;
+            
+            if (table.Contains(keySeekFilter.StartOfRange, keySeekFilter.EndOfRange))
+                try
+                {
+                    m_tablesOrigList.Add(new BufferedArchiveStream<TKey, TValue>(x, table));
+                }
+                catch (Exception ex)
+                {
+                    //ToDo: Make sure firstkey.tostring doesn't ever throw an exception.
+                    StringBuilder sb = new();
+                    sb.AppendLine($"Archive ID {table.FileId}");
+                    sb.AppendLine($"First Key {table.FirstKey.ToString()}");
+                    sb.AppendLine($"Last Key {table.LastKey.ToString()}");
+                    sb.AppendLine($"File Size {table.SortedTreeTable.BaseFile.ArchiveSize}");
+                    sb.AppendLine($"File Name {table.SortedTreeTable.BaseFile.FilePath}");
+                    s_log.Publish(MessageLevel.Error, "Error while reading file", sb.ToString(), null, ex);
+                }
+            else
+                m_snapshot.Tables[x] = null;
         }
 
         m_sortedArchiveStreams = new CustomSortHelper<BufferedArchiveStream<TKey, TValue>>(m_tablesOrigList, IsLessThan);
@@ -442,9 +443,9 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
     /// <param name="item2">The second stream to compare.</param>
     /// <returns>
     /// A value indicating the relative order of the streams based on their cache keys:
-    ///   - Less than 0 if <paramref name="item1"/> is less than <paramref name="item2"/>.
-    ///   - Greater than 0 if <paramref name="item1"/> is greater than <paramref name="item2"/>.
-    ///   - 0 if <paramref name="item1"/> and <paramref name="item2"/> are equal or their caches are invalid.
+    /// - Less than 0 if <paramref name="item1"/> is less than <paramref name="item2"/>.
+    /// - Greater than 0 if <paramref name="item1"/> is greater than <paramref name="item2"/>.
+    /// - 0 if <paramref name="item1"/> and <paramref name="item2"/> are equal or their caches are invalid.
     /// </returns>
     /// <remarks>
     /// The <see cref="CompareStreams"/> method is used to compare two <see cref="BufferedArchiveStream{TKey,TValue}"/>
@@ -500,8 +501,11 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
     private void SeekAllArchiveStreamsForward(TKey key)
     {
         foreach (BufferedArchiveStream<TKey, TValue> table in m_sortedArchiveStreams.Items)
+        {
             if (table.CacheIsValid && table.CacheKey.IsLessThan(key))
                 table.SeekToKeyAndUpdateCacheValue(key);
+        }
+
         //Resorts the entire list.
         m_sortedArchiveStreams.Sort();
 
@@ -527,10 +531,12 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
     /// </summary>
     private void RemoveDuplicatesIfExists()
     {
-        if (m_sortedArchiveStreams.Items.Length > 1)
-            if (CompareStreams(m_sortedArchiveStreams[0], m_sortedArchiveStreams[1]) == 0 && m_sortedArchiveStreams[0].CacheIsValid)
-                //If a duplicate entry is found, advance the position of the duplicate entry
-                RemoveDuplicatesFromList();
+        if (m_sortedArchiveStreams.Items.Length <= 1)
+            return;
+
+        // If a duplicate entry is found, advance the position of the duplicate entry
+        if (CompareStreams(m_sortedArchiveStreams[0], m_sortedArchiveStreams[1]) == 0 && m_sortedArchiveStreams[0].CacheIsValid)
+            RemoveDuplicatesFromList();
     }
 
     /// <summary>
@@ -541,7 +547,9 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
     private void RemoveDuplicatesFromList()
     {
         int lastDuplicateIndex = -1;
+
         for (int index = 1; index < m_sortedArchiveStreams.Items.Length; index++)
+        {
             if (CompareStreams(m_sortedArchiveStreams[0], m_sortedArchiveStreams[index]) == 0)
             {
                 m_sortedArchiveStreams[index].SkipToNextKeyAndUpdateCachedValue();
@@ -551,6 +559,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
             {
                 break;
             }
+        }
 
         //Resorts the list in reverse order.
         for (int j = lastDuplicateIndex; j > 0; j--)
@@ -573,10 +582,12 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
             m_nextArchiveStreamLowerBounds.SetMax();
         m_nextArchiveStreamLowerBounds.CopyTo(m_readWhileUpperBounds);
 
-        //If there is a key seek filter. adjust this bounds if necessary
-        if (m_keySeekFilter is not null)
-            if (m_keySeekFilter.EndOfFrame.IsLessThan(m_readWhileUpperBounds))
-                m_keySeekFilter.EndOfFrame.CopyTo(m_readWhileUpperBounds);
+        // If there is a key seek filter. adjust this bounds if necessary
+        if (m_keySeekFilter is null)
+            return;
+        
+        if (m_keySeekFilter.EndOfFrame.IsLessThan(m_readWhileUpperBounds))
+            m_keySeekFilter.EndOfFrame.CopyTo(m_readWhileUpperBounds);
     }
 
     #endregion

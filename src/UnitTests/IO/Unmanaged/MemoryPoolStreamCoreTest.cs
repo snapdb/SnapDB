@@ -58,9 +58,7 @@ internal class MemoryPoolStreamCoreTest
     {
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
         using (MemoryPoolStreamCore ms = new())
-        {
             Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
-        }
 
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
     }

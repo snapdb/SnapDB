@@ -42,7 +42,7 @@ public class EventTimer : DisposableLoggingClassBase
     /// Occurs when the timer elapses.
     /// Event occurs on the ThreadPool
     /// </summary>
-    public event Action Elapsed;
+    public event Action? Elapsed;
 
     private readonly TimeSpan m_dayOffset;
     private bool m_isRunning;
@@ -212,9 +212,7 @@ public class EventTimer : DisposableLoggingClassBase
             try
             {
                 using (Logger.AppendStackMessages(m_message))
-                {
                     Elapsed();
-                }
             }
             catch (Exception ex)
             {

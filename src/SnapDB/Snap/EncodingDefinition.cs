@@ -56,13 +56,6 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
 
     #region [ Constructors ]
 
-    static EncodingDefinition()
-    {
-        FixedSizeIndividualGuid = new Guid(0x1dea326d, 0xa63a, 0x4f73, 0xb5, 0x1c, 0x7b, 0x31, 0x25, 0xc6, 0xda, 0x55);
-        FixedSizeCombinedEncoding = new EncodingDefinition(FixedSizeIndividualGuid);
-        FixedSizeIndividualEncoding = new EncodingDefinition(FixedSizeIndividualGuid, FixedSizeIndividualGuid);
-    }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="EncodingDefinition"/> class from a binary stream.
     /// </summary>
@@ -369,6 +362,13 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     /// The Guid associated with the individual encoding method of a FixedSize
     /// </summary>
     public static readonly Guid FixedSizeIndividualGuid;
+
+    static EncodingDefinition()
+    {
+        FixedSizeIndividualGuid = new Guid(0x1dea326d, 0xa63a, 0x4f73, 0xb5, 0x1c, 0x7b, 0x31, 0x25, 0xc6, 0xda, 0x55);
+        FixedSizeCombinedEncoding = new EncodingDefinition(FixedSizeIndividualGuid);
+        FixedSizeIndividualEncoding = new EncodingDefinition(FixedSizeIndividualGuid, FixedSizeIndividualGuid);
+    }
 
     #endregion
 }

@@ -32,8 +32,8 @@ internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey :
 {
     #region [ Members ]
 
-    private BufferedArchiveStream<TKey, TValue> m_firstTable;
-    private SortedTreeScannerBase<TKey, TValue> m_firstTableScanner;
+    private BufferedArchiveStream<TKey, TValue>? m_firstTable;
+    private SortedTreeScannerBase<TKey, TValue>? m_firstTableScanner;
 
     private readonly TKey m_nextArchiveStreamLowerBounds = new();
     private readonly TKey m_readWhileUpperBounds = new();
@@ -75,7 +75,7 @@ internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey :
         if (m_tablesOrigList is not null)
         {
             m_tablesOrigList.ForEach(x => x.Dispose());
-            m_tablesOrigList = null;
+            m_tablesOrigList = null!;
         }
 
         base.Dispose(disposing);
@@ -83,9 +83,12 @@ internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey :
 
     protected override bool ReadNext(TKey key, TValue value)
     {
-        if (m_firstTableScanner is not null)
-            if (m_firstTableScanner.ReadWhile(key, value, m_readWhileUpperBounds))
-                return true;
+        if (m_firstTableScanner is null)
+            return ReadCatchAll(key, value);
+        
+        if (m_firstTableScanner.ReadWhile(key, value, m_readWhileUpperBounds))
+            return true;
+
         return ReadCatchAll(key, value);
     }
 
@@ -102,29 +105,29 @@ internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey :
 
     private void ReadWhileFollowupActions()
     {
-        //There are certain followup requirements when a ReadWhile method returns false.
-        //Condition 1:
-        //  The end of the node has been reached. 
-        //Response: 
-        //  It returned false to allow for additional checks such as timeouts to occur.
-        //  Do Nothing.
+        // There are certain followup requirements when a ReadWhile method returns false.
+        // Condition 1:
+        //   The end of the node has been reached. 
+        // Response: 
+        //   It returned false to allow for additional checks such as timeouts to occur.
+        //   Do Nothing.
         //
-        //Condition 2:
-        //  The archive stream may no longer be in order and needs to be checked
-        //Response:
-        //  Resort the archive stream
+        // Condition 2:
+        //   The archive stream may no longer be in order and needs to be checked
+        // Response:
+        //   Resort the archive stream
         //
-        //Condition 3:
-        //  The end of the frame has been reached
-        //Response:
-        //  Advance to the next frame
-        //  Also test the edge case where the current point might be equal to the end of the frame
-        //      since this is an inclusive filter and ReadWhile is exclusive.
-        //      If it's part of the frame, return true after Advancing the frame and the point.
+        // Condition 3:
+        //   The end of the frame has been reached
+        // Response:
+        //   Advance to the next frame
+        //   Also test the edge case where the current point might be equal to the end of the frame
+        //       since this is an inclusive filter and ReadWhile is exclusive.
+        //       If it's part of the frame, return true after Advancing the frame and the point.
         //
 
-        //Update the cached values for the table so proper analysis can be done.
-        m_firstTable.UpdateCachedValue();
+        // Update the cached values for the table so proper analysis can be done.
+        m_firstTable!.UpdateCachedValue();
 
         //Check Condition 1
         if (m_firstTable.CacheIsValid && m_firstTable.CacheKey.IsLessThan(m_readWhileUpperBounds))
@@ -190,10 +193,13 @@ internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey :
     {
         if (!item1.CacheIsValid && !item2.CacheIsValid)
             return false;
+        
         if (!item1.CacheIsValid)
             return false;
+        
         if (!item2.CacheIsValid)
             return true;
+        
         return item1.CacheKey.IsLessThan(item2.CacheKey); // item1.CurrentKey.CompareTo(item2.CurrentKey);
     }
 
@@ -202,9 +208,9 @@ internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey :
     /// </summary>
     /// <returns>
     /// A value indicating the relative order of the streams based on their cache keys:
-    ///   - Less than 0 if <paramref name="item1"/> is less than <paramref name="item2"/>.
-    ///   - Greater than 0 if <paramref name="item1"/> is greater than <paramref name="item2"/>.
-    ///   - 0 if <paramref name="item1"/> and <paramref name="item2"/> are equal or their caches are invalid.
+    /// - Less than 0 if <paramref name="item1"/> is less than <paramref name="item2"/>.
+    /// - Greater than 0 if <paramref name="item1"/> is greater than <paramref name="item2"/>.
+    /// - 0 if <paramref name="item1"/> and <paramref name="item2"/> are equal or their caches are invalid.
     /// </returns>
     /// <remarks>
     /// The <see cref="CompareStreams"/> method is used to compare two <see cref="BufferedArchiveStream{TKey,TValue}"/>
@@ -232,9 +238,10 @@ internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey :
     {
         foreach (BufferedArchiveStream<TKey, TValue> table in m_sortedArchiveStreams.Items)
             table.SeekToKeyAndUpdateCacheValue(key);
+
         m_sortedArchiveStreams.Sort();
 
-        //Remove any duplicates
+        // Remove any duplicates
         RemoveDuplicatesIfExists();
 
         if (m_sortedArchiveStreams.Items.Length > 0)
@@ -256,21 +263,25 @@ internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey :
     /// </summary>
     private void RemoveDuplicatesIfExists()
     {
-        if (m_sortedArchiveStreams.Items.Length > 1)
-            if (CompareStreams(m_sortedArchiveStreams[0], m_sortedArchiveStreams[1]) == 0 && m_sortedArchiveStreams[0].CacheIsValid)
-                //If a duplicate entry is found, advance the position of the duplicate entry
-                RemoveDuplicatesFromList();
+        if (m_sortedArchiveStreams.Items.Length <= 1)
+            return;
+
+        // If a duplicate entry is found, advance the position of the duplicate entry
+        if (CompareStreams(m_sortedArchiveStreams[0], m_sortedArchiveStreams[1]) == 0 && m_sortedArchiveStreams[0].CacheIsValid)
+            RemoveDuplicatesFromList();
     }
 
     /// <summary>
     /// Call this function when the same point exists in multiple archive files. It will
     /// read past the duplicate point in all other archive files and then resort the tables.
-    /// Assums that the archiveStream's cached value is current.
+    /// Assumes that the archiveStream's cached value is current.
     /// </summary>
     private void RemoveDuplicatesFromList()
     {
         int lastDuplicateIndex = -1;
+
         for (int index = 1; index < m_sortedArchiveStreams.Items.Length; index++)
+        {
             if (CompareStreams(m_sortedArchiveStreams[0], m_sortedArchiveStreams[index]) == 0)
             {
                 m_sortedArchiveStreams[index].SkipToNextKeyAndUpdateCachedValue();
@@ -280,8 +291,9 @@ internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey :
             {
                 break;
             }
+        }
 
-        //Resorts the list in reverse order.
+        // Resorts the list in reverse order.
         for (int j = lastDuplicateIndex; j > 0; j--)
             m_sortedArchiveStreams.SortAssumingIncreased(j);
 
@@ -300,6 +312,7 @@ internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey :
             m_sortedArchiveStreams[1].CacheKey.CopyTo(m_nextArchiveStreamLowerBounds);
         else
             m_nextArchiveStreamLowerBounds.SetMax();
+
         m_nextArchiveStreamLowerBounds.CopyTo(m_readWhileUpperBounds);
     }
 

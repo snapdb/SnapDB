@@ -97,12 +97,12 @@ public class UnmanagedMemoryStreamCore : IDisposable
         public void AddNewPage(nint pagePointer)
         {
             EnsureCapacity();
-            
+
             int index = PageCount;
             int bigIndex = index >> ShiftBits;
             int smallIndex = index & Mask;
             m_pagePointer[bigIndex]![smallIndex] = pagePointer;
-     
+
             Thread.MemoryBarrier(); // Incrementing the page count must occur after the data is correct.
             PageCount++;
         }
@@ -211,7 +211,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     {
         if (IsDisposed)
             return;
-        
+
         try
         {
             if (!disposing)
@@ -311,7 +311,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
 
         if (args.FirstPosition >= m_firstValidPosition)
             return;
-        
+
         args.FirstPointer += (int)(m_firstValidPosition - args.FirstPosition);
         args.Length -= (int)(m_firstValidPosition - args.FirstPosition);
         args.FirstPosition = m_firstValidPosition;
@@ -377,7 +377,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
 
             if (!cloned)
                 return;
-            
+
             Thread.MemoryBarrier(); // Make sure that all of the settings are saved before assigning.
             m_settings = settings;
         }

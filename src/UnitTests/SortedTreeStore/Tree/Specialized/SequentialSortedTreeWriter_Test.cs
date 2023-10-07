@@ -150,11 +150,8 @@ public class SequentialSortedTreeWriterTest
         Stopwatch sw = new();
         sw.Start();
         using (BinaryStream bs = new(true))
-        {
             SequentialSortedTreeWriter<HistorianKey, HistorianValue>.Create(bs, 4096, HistorianFileEncodingDefinition.TypeGuid, points);
-            //SequentialSortedTreeWriter<HistorianKey, HistorianValue>.Create(bs, 4096, SortedTree.FixedSizeNode, points);
-        }
-
+        //SequentialSortedTreeWriter<HistorianKey, HistorianValue>.Create(bs, 4096, SortedTree.FixedSizeNode, points);
         sw.Stop();
 
         Console.WriteLine("Points {0}: {1}MPPS", pointCount, (pointCount / sw.Elapsed.TotalSeconds / 1000000).ToString("0.0"));

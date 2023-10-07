@@ -56,6 +56,7 @@ public class TransactionServiceTest
                 fs.Dispose();
                 edit.CommitAndDispose();
             }
+
             {
                 ReadSnapshot read = service.Snapshot;
                 SubFileStream f1 = read.OpenFile(0);

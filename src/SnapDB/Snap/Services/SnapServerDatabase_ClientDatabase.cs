@@ -184,9 +184,7 @@ public partial class SnapServerDatabase<TKey, TValue>
                 stream.Disposed += OnStreamDisposal;
 
                 lock (m_syncRoot)
-                {
                     m_openStreams.Add(stream);
-                }
             }
 
             return stream;
@@ -220,9 +218,7 @@ public partial class SnapServerDatabase<TKey, TValue>
         private void OnStreamDisposal(SequentialReaderStream<TKey, TValue> stream)
         {
             lock (m_syncRoot)
-            {
                 m_openStreams.Remove(stream);
-            }
         }
 
         #endregion

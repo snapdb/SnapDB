@@ -74,18 +74,14 @@ public static class StepTimer
 
     #endregion
 
-    #region [ Constructors ]
+    #region [ Static ]
+
+    private static readonly SortedList<string, RunCount> s_allStopwatches;
 
     static StepTimer()
     {
         s_allStopwatches = new SortedList<string, RunCount>();
     }
-
-    #endregion
-
-    #region [ Static ]
-
-    private static readonly SortedList<string, RunCount> s_allStopwatches;
 
     /// <summary>
     /// Starts a named timer and optionally forces garbage collection before starting.

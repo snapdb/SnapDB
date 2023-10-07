@@ -49,9 +49,7 @@ public class PageListTest
         Assert.AreEqual(0, Globals.MemoryPool.AllocatedBytes);
 
         using (PageList target = new(Globals.MemoryPool))
-        {
             target.Dispose();
-        }
 
         Assert.AreEqual(0, Globals.MemoryPool.AllocatedBytes);
         using (PageList target2 = new(Globals.MemoryPool))

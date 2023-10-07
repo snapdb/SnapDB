@@ -408,9 +408,7 @@ public class CompressionTest
             {
                 next = date + delta;
                 fixed (byte* lp = buffer)
-                {
                     *(int*)(lp + position) = next;
-                }
 
                 position += 4;
                 next = date;

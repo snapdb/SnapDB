@@ -289,6 +289,7 @@ public class SortedPointBuffer<TKey, TValue> : TreeStream<TKey, TValue> where TK
         int count = Count;
 
         for (int x = 0; x < count; x += 2)
+        {
             // Can't sort the last entry if not.
             if (x + 1 == count)
             {
@@ -304,6 +305,7 @@ public class SortedPointBuffer<TKey, TValue> : TreeStream<TKey, TValue> where TK
                 m_sortingBlocks1[x] = x + 1;
                 m_sortingBlocks1[x + 1] = x;
             }
+        }
 
         bool shouldSwap = false;
 
@@ -365,6 +367,7 @@ public class SortedPointBuffer<TKey, TValue> : TreeStream<TKey, TValue> where TK
                 }
 
             while (d < dEnd)
+            {
                 if (i1 == i1End)
                 {
                     dstIndex[d] = srcIndex[i2];
@@ -389,6 +392,7 @@ public class SortedPointBuffer<TKey, TValue> : TreeStream<TKey, TValue> where TK
                     d++;
                     i2++;
                 }
+            }
         }
     }
 

@@ -70,8 +70,10 @@ public class CustomSortHelperTest
         CustomSortHelper<int> items = new(correctList, (x, y) => x.CompareTo(y) < 0);
         correctList.Sort();
         for (int x = 0; x < count; x++)
+        {
             if (correctList[x] != items[x])
                 throw new Exception();
+        }
     }
 
     public void TestWithRenumber(int count)
@@ -92,8 +94,10 @@ public class CustomSortHelperTest
             items.SortAssumingIncreased(i);
 
             for (int x = 0; x < count; x++)
+            {
                 if (correctList[x] != items[x])
                     throw new Exception();
+            }
         }
     }
 

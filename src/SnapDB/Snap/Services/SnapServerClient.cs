@@ -154,9 +154,7 @@ public partial class SnapServer
         private void Unregister(ClientDatabaseBase client)
         {
             lock (m_syncRoot)
-            {
                 m_connectedDatabases.Remove(client.Info.DatabaseName.ToUpper());
-            }
         }
 
         #endregion

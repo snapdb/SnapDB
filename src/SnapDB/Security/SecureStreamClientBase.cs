@@ -48,19 +48,6 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
 
     #region [ Constructors ]
 
-    static SecureStreamClientBase()
-    {
-    #if !SQLCLR
-        try
-        {
-            s_tempCert = GenerateCertificate.CreateSelfSignedCertificate("CN=Local", 256, 1024);
-        }
-        catch
-        {
-        }
-    #endif
-    }
-
     protected internal SecureStreamClientBase() : base(MessageClass.Component)
     {
     }
@@ -286,6 +273,19 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
     #region [ Static ]
 
     private static readonly X509Certificate2 s_tempCert;
+
+    static SecureStreamClientBase()
+    {
+    #if !SQLCLR
+        try
+        {
+            s_tempCert = GenerateCertificate.CreateSelfSignedCertificate("CN=Local", 256, 1024);
+        }
+        catch
+        {
+        }
+    #endif
+    }
 
     #endregion
 }

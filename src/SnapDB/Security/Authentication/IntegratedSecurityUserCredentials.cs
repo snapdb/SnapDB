@@ -59,8 +59,10 @@ public class IntegratedSecurityUserCredentials
         token = Guid.Empty;
 
         WindowsIdentity i = identity as WindowsIdentity;
+
         if (i?.User is null)
             return false;
+
         lock (m_users)
         {
             if (m_users.TryGetValue(i.User.Value, out IntegratedSecurityUserCredential user))
@@ -90,10 +92,9 @@ public class IntegratedSecurityUserCredentials
     public void AddUser(string username, Guid userToken)
     {
         IntegratedSecurityUserCredential user = new(username, userToken);
+
         lock (m_users)
-        {
             m_users.Add(user.UserId, user);
-        }
     }
 
     /// <summary>
@@ -103,6 +104,7 @@ public class IntegratedSecurityUserCredentials
     public void Save(Stream stream)
     {
         stream.WriteByte(1);
+
         lock (m_users)
         {
             stream.Write(m_users.Count);
@@ -118,13 +120,16 @@ public class IntegratedSecurityUserCredentials
     public void Load(Stream stream)
     {
         byte version = stream.ReadNextByte();
+
         switch (version)
         {
             case 1:
                 lock (m_users)
                 {
                     int count = stream.ReadInt32();
+
                     m_users.Clear();
+
                     while (count > 0)
                     {
                         count--;

@@ -245,9 +245,7 @@ public class SubFileName : IComparable<SubFileName>, IEquatable<SubFileName>
         byte[] hash = SHA1.HashData(data);
 
         fixed (byte* ptr = hash)
-        {
             return new SubFileName(*(long*)ptr, *(long*)(ptr + 8), *(int*)(ptr + 16));
-        }
     }
 
     /// <summary>

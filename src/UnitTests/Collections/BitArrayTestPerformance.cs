@@ -75,8 +75,11 @@ public class BitArrayTestPerformance
 
         sw5.Start();
         for (int x = 0; x < count; x++)
+        {
             if (array.GetBitUnchecked(x))
                 throw new Exception();
+        }
+
         sw5.Stop();
 
         //for (int x = 0; x < count -1; x++)

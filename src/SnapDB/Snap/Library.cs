@@ -40,7 +40,32 @@ namespace SnapDB.Snap;
 /// </summary>
 public static class Library
 {
-    #region [ Constructors ]
+    #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(Library), MessageClass.Framework);
+
+    /// <summary>
+    /// Gets all of the encoding data.
+    /// </summary>
+    public static readonly EncodingLibrary Encodings;
+
+    /// <summary>
+    /// Gets all of the filters.
+    /// </summary>
+    public static readonly FilterLibrary Filters;
+
+    private static readonly object s_syncRoot;
+    private static readonly Dictionary<Guid, Type> s_typeLookup;
+    private static readonly Dictionary<Type, Guid> s_registeredType;
+
+    /// <summary>
+    /// The assembly must reference one of these assembly names in order to be scanned for matching types.
+    /// </summary>
+    private static readonly HashSet<string> s_filterAssemblyNames;
+
+    private static readonly HashSet<Assembly> s_loadedAssemblies;
+
+    private static readonly Dictionary<Tuple<Type, Type>, object> s_keyValueMethodsList;
 
     static Library()
     {
@@ -71,35 +96,6 @@ public static class Library
         }
     }
 
-    #endregion
-
-    #region [ Static ]
-
-    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(Library), MessageClass.Framework);
-
-    /// <summary>
-    /// Gets all of the encoding data.
-    /// </summary>
-    public static readonly EncodingLibrary Encodings;
-
-    /// <summary>
-    /// Gets all of the filters.
-    /// </summary>
-    public static readonly FilterLibrary Filters;
-
-    private static readonly object s_syncRoot;
-    private static readonly Dictionary<Guid, Type> s_typeLookup;
-    private static readonly Dictionary<Type, Guid> s_registeredType;
-
-    /// <summary>
-    /// The assembly must reference one of these assembly names in order to be scanned for matching types.
-    /// </summary>
-    private static readonly HashSet<string> s_filterAssemblyNames;
-
-    private static readonly HashSet<Assembly> s_loadedAssemblies;
-
-    private static readonly Dictionary<Tuple<Type, Type>, object> s_keyValueMethodsList;
-
     private static void CurrentDomainOnAssemblyLoad(object sender, AssemblyLoadEventArgs args)
     {
         lock (s_syncRoot)
@@ -127,6 +123,7 @@ public static class Library
         {
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (Assembly assembly in assemblies)
+            {
                 if (!s_loadedAssemblies.Contains(assembly))
                 {
                     s_loadedAssemblies.Add(assembly);
@@ -137,6 +134,7 @@ public static class Library
 
                         Module[] modules = assembly.GetModules(false);
                         foreach (Module module in modules)
+                        {
                             try
                             {
                                 Type[] types;
@@ -151,6 +149,7 @@ public static class Library
                                 }
 
                                 foreach (Type assemblyType in types)
+                                {
                                     try
                                     {
                                         if ((object)assemblyType is not null && !assemblyType.IsAbstract && !assemblyType.ContainsGenericParameters)
@@ -194,13 +193,16 @@ public static class Library
                                     {
                                         s_log.Publish(MessageLevel.Critical, "Static Constructor Error", null, null, ex);
                                     }
+                                }
                             }
                             catch (Exception ex)
                             {
                                 s_log.Publish(MessageLevel.Critical, "Static Constructor Error", null, null, ex);
                             }
+                        }
                     }
                 }
+            }
         }
         catch (Exception ex)
         {
@@ -216,9 +218,7 @@ public static class Library
     public static Type GetSortedTreeType(Guid id)
     {
         lock (s_syncRoot)
-        {
             return s_typeLookup[id];
-        }
     }
 
     /// <summary>

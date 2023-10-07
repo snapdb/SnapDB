@@ -92,7 +92,11 @@ public class WeakList<T> : IEnumerable<T> where T : class
             // Copies the snapshot.
             int capacity = Math.Max(itemCount * 2, 8);
 
-            Snapshot clone = new(capacity) { Items = new WeakReference[capacity], Size = 0 };
+            Snapshot clone = new(capacity)
+            {
+                Items = new WeakReference[capacity],
+                Size = 0
+            };
 
             foreach (WeakReference? reference in Items)
             {
@@ -329,9 +333,7 @@ public class WeakList<T> : IEnumerable<T> where T : class
     public void Remove(T item)
     {
         lock (m_syncRoot)
-        {
             m_data.Remove(item);
-        }
     }
 
     /// <summary>

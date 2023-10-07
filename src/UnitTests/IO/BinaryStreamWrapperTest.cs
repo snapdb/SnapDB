@@ -262,6 +262,7 @@ public class BinaryStreamWrapperTest
                 bs.Write(data, 0, data.Length);
 
                 while (rand.Next(4) < 2)
+                {
                     if (bs.Position > 100)
                     {
                         bs.Position -= 100;
@@ -275,9 +276,12 @@ public class BinaryStreamWrapperTest
                         bs.Position += 100;
 
                         for (int y = 0; y < insertCount; y++)
+                        {
                             if (data[y] != data2[y])
                                 throw new Exception();
+                        }
                     }
+                }
             }
 
             rand = new Random(seed);
@@ -288,114 +292,189 @@ public class BinaryStreamWrapperTest
             {
                 rand.NextBytes(data);
                 while (rand.Next(4) < 2)
+                {
                     if (bs.ReadUInt8() != *lp)
                         throw new Exception();
+                }
+
                 int skip = rand.Next(40) + 1;
                 bs.Position += skip;
                 bs.Position -= rand.Next(skip);
                 rand.NextBytes(data);
                 while (rand.Next(4) < 2)
+                {
                     if (bs.ReadInt8() != *(sbyte*)lp)
                         throw new Exception();
+                }
+
                 rand.NextBytes(data);
                 while (rand.Next(4) < 2)
+                {
                     if (bs.ReadInt16() != *(short*)lp)
                         throw new Exception();
+                }
+
                 rand.NextBytes(data);
                 while (rand.Next(4) < 2)
+                {
                     if (bs.ReadInt32() != *(int*)lp)
                         throw new Exception();
+                }
+
                 rand.NextBytes(data);
                 while (rand.Next(4) < 2)
+                {
                     if (bs.ReadInt64() != *(long*)lp)
                         throw new Exception();
+                }
+
                 rand.NextBytes(data);
                 while (rand.Next(4) < 2)
+                {
                     if (bs.ReadUInt16() != *(ushort*)lp)
                         throw new Exception();
+                }
+
                 rand.NextBytes(data);
                 while (rand.Next(4) < 2)
+                {
                     if (bs.ReadUInt32() != *(uint*)lp)
                         throw new Exception();
+                }
+
                 rand.NextBytes(data);
                 while (rand.Next(4) < 2)
+                {
                     if (bs.ReadUInt64() != *(ulong*)lp)
                         throw new Exception();
+                }
+
                 rand.NextBytes(data);
                 while (rand.Next(4) < 2)
+                {
                     if (bs.ReadDecimal() != NextDecimal(data, rand))
                         throw new Exception();
+                }
+
                 rand.NextBytes(data);
                 while (rand.Next(4) < 2)
+                {
                     if (bs.ReadGuid() != *(Guid*)lp)
                         throw new Exception();
+                }
+
                 rand.NextBytes(data);
                 while (rand.Next(4) < 2)
+                {
                     if (bs.ReadDateTime() != NextDate(data, rand))
                         throw new Exception();
+                }
+
                 rand.NextBytes(data);
                 while (rand.Next(4) < 2)
+                {
                     if (bs.ReadSingle() != NextSingle(data, rand))
                         throw new Exception();
+                }
+
                 rand.NextBytes(data);
                 while (rand.Next(4) < 2)
+                {
                     if (bs.ReadDouble() != NextDouble(data, rand))
                         throw new Exception();
+                }
+
                 rand.NextBytes(data);
                 bool b2 = *lp != 0;
                 while (rand.Next(4) < 2)
+                {
                     if (bs.ReadBoolean() != b2)
                         throw new Exception();
+                }
 
                 rand.NextBytes(data);
                 while (rand.Next(4) < 2)
+                {
                     if (bs.Read7BitUInt32() != *(uint*)lp)
                         throw new Exception();
+                }
+
                 data[3] = 0;
                 while (rand.Next(4) < 2)
+                {
                     if (bs.Read7BitUInt32() != *(uint*)lp)
                         throw new Exception();
+                }
+
                 data[2] = 0;
                 while (rand.Next(4) < 2)
+                {
                     if (bs.Read7BitUInt32() != *(uint*)lp)
                         throw new Exception();
+                }
+
                 data[1] = 0;
                 while (rand.Next(4) < 2)
+                {
                     if (bs.Read7BitUInt32() != *(uint*)lp)
                         throw new Exception();
+                }
 
                 rand.NextBytes(data);
                 while (rand.Next(4) < 2)
+                {
                     if (bs.Read7BitUInt64() != *(ulong*)lp)
                         throw new Exception();
+                }
+
                 data[7] = 0;
                 while (rand.Next(4) < 2)
+                {
                     if (bs.Read7BitUInt64() != *(ulong*)lp)
                         throw new Exception();
+                }
+
                 data[6] = 0;
                 while (rand.Next(4) < 2)
+                {
                     if (bs.Read7BitUInt64() != *(ulong*)lp)
                         throw new Exception();
+                }
+
                 data[5] = 0;
                 while (rand.Next(4) < 2)
+                {
                     if (bs.Read7BitUInt64() != *(ulong*)lp)
                         throw new Exception();
+                }
+
                 data[4] = 0;
                 while (rand.Next(4) < 2)
+                {
                     if (bs.Read7BitUInt64() != *(ulong*)lp)
                         throw new Exception();
+                }
+
                 data[3] = 0;
                 while (rand.Next(4) < 2)
+                {
                     if (bs.Read7BitUInt64() != *(ulong*)lp)
                         throw new Exception();
+                }
+
                 data[2] = 0;
                 while (rand.Next(4) < 2)
+                {
                     if (bs.Read7BitUInt64() != *(ulong*)lp)
                         throw new Exception();
+                }
+
                 data[1] = 0;
                 while (rand.Next(4) < 2)
+                {
                     if (bs.Read7BitUInt64() != *(ulong*)lp)
                         throw new Exception();
+                }
 
                 rand.NextBytes(data);
                 bs.ReadAll(data2, 0, 16);
@@ -403,10 +482,12 @@ public class BinaryStreamWrapperTest
                     throw new Exception();
 
                 while (rand.Next(4) < 2)
+                {
                     if (bs.Position > 100)
                     {
                         int insertCount = rand.Next(16);
                     }
+                }
             }
         }
     }

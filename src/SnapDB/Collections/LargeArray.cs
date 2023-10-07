@@ -149,8 +149,10 @@ public class LargeArray<T>
     public void Clear()
     {
         foreach (T[]? items in m_array)
+        {
             if (items is not null)
                 Array.Clear(items, 0, items.Length);
+        }
     }
 
     // Validates whether a given index is within the valid range of positions in the data structure.

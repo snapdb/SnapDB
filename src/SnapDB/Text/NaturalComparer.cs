@@ -92,8 +92,11 @@ public class NaturalComparer : Comparer<string>
         }
 
         for (int i = 0; i < x1.Length && i < y1.Length; i++)
+        {
             if (x1[i] != y1[i])
                 return PartCompare(x1[i], y1[i]);
+        }
+
         if (y1.Length > x1.Length)
             return 1;
 

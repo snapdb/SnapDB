@@ -36,11 +36,11 @@ internal class ArchiveListLog : DisposableLoggingClassBase
 {
     #region [ Members ]
 
-    private HashSet<Guid> m_allFilesToDelete = new();
+    private HashSet<Guid> m_allFilesToDelete;
 
     private readonly List<ArchiveListLogFile> m_files = new();
 
-    private ArchiveListLogFile m_pendingFile = new();
+    private ArchiveListLogFile m_pendingFile;
     private readonly ArchiveListLogSettings m_settings;
 
     private readonly object m_syncRoot;
@@ -54,7 +54,7 @@ internal class ArchiveListLog : DisposableLoggingClassBase
     /// Creates a log that monitors pending deletions.
     /// </summary>
     /// <param name="settings">Optional settings for the log. If none are specified, the default will not load the settings.</param>
-    public ArchiveListLog(ArchiveListLogSettings settings = null) : base(MessageClass.Framework)
+    public ArchiveListLog(ArchiveListLogSettings? settings = null) : base(MessageClass.Framework)
     {
         settings ??= new ArchiveListLogSettings();
 
@@ -65,13 +65,17 @@ internal class ArchiveListLog : DisposableLoggingClassBase
         m_pendingFile = new ArchiveListLogFile();
 
         if (m_settings.IsFileBacked)
+        {
             foreach (string file in Directory.GetFiles(m_settings.LogPath, m_settings.SearchPattern))
             {
                 ArchiveListLogFile logFile = new();
+
                 logFile.Load(file);
+
                 if (logFile.IsValid)
                     m_files.Add(logFile);
             }
+        }
 
         m_allFilesToDelete = new HashSet<Guid>(GetAllFilesToDelete());
     }
@@ -88,19 +92,22 @@ internal class ArchiveListLog : DisposableLoggingClassBase
     {
         lock (m_syncRoot)
         {
-            if (!m_disposed)
-                try
-                {
-                    // This will be done regardless of whether the object is finalized or disposed.
-                    if (disposing)
-                        SaveLogToDisk();
-                    // This will be done only when the object is disposed by calling Dispose().
-                }
-                finally
-                {
-                    m_disposed = true; // Prevent duplicate dispose.
-                    base.Dispose(disposing); // Call base class Dispose().
-                }
+            if (m_disposed)
+                return;
+            
+            try
+            {
+                // This will be done regardless of whether the object is finalized or disposed.
+                if (disposing)
+                    SaveLogToDisk();
+            
+                // This will be done only when the object is disposed by calling Dispose().
+            }
+            finally
+            {
+                m_disposed = true; // Prevent duplicate dispose.
+                base.Dispose(disposing); // Call base class Dispose().
+            }
         }
     }
 
@@ -117,13 +124,14 @@ internal class ArchiveListLog : DisposableLoggingClassBase
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
-            if (m_pendingFile.FilesToDelete.Count > 0)
-            {
-                string file = m_settings.GenerateNewFileName();
-                m_pendingFile.Save(file);
-                m_files.Add(m_pendingFile);
-                m_pendingFile = new ArchiveListLogFile();
-            }
+            if (m_pendingFile.FilesToDelete.Count <= 0)
+                return;
+            
+            string file = m_settings.GenerateNewFileName();
+            
+            m_pendingFile.Save(file);
+            m_files.Add(m_pendingFile);
+            m_pendingFile = new ArchiveListLogFile();
         }
     }
 
@@ -139,14 +147,16 @@ internal class ArchiveListLog : DisposableLoggingClassBase
 
             m_allFilesToDelete = null;
             m_pendingFile.RemoveDeletedFiles(allFiles);
+
             for (int x = m_files.Count - 1; x >= 0; x--)
             {
                 m_files[x].RemoveDeletedFiles(allFiles);
-                if (m_files[x].FilesToDelete.Count == 0)
-                {
-                    m_files[x].Delete();
-                    m_files.RemoveAt(x);
-                }
+
+                if (m_files[x].FilesToDelete.Count != 0)
+                    continue;
+
+                m_files[x].Delete();
+                m_files.RemoveAt(x);
             }
         }
     }
@@ -159,6 +169,7 @@ internal class ArchiveListLog : DisposableLoggingClassBase
     {
         if (!m_settings.IsFileBacked)
             return;
+
         lock (m_syncRoot)
         {
             if (m_disposed)
@@ -193,11 +204,16 @@ internal class ArchiveListLog : DisposableLoggingClassBase
     private HashSet<Guid> GetAllFilesToDelete()
     {
         HashSet<Guid> allFiles = new();
+
         if (m_pendingFile.IsValid)
             allFiles.UnionWith(m_pendingFile.FilesToDelete);
+
         foreach (ArchiveListLogFile file in m_files)
+        {
             if (file.IsValid)
                 allFiles.UnionWith(file.FilesToDelete);
+        }
+
         return allFiles;
     }
 

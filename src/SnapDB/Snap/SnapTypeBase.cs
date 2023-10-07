@@ -98,9 +98,7 @@ public abstract class SnapTypeBase
         byte[] data = new byte[Size];
         stream.Read(data, 0, data.Length);
         fixed (byte* lp = data)
-        {
             Read(lp);
-        }
     }
 
     /// <summary>
@@ -111,9 +109,7 @@ public abstract class SnapTypeBase
     {
         byte[] data = new byte[Size];
         fixed (byte* lp = data)
-        {
             Write(lp);
-        }
 
         stream.Write(data, 0, data.Length);
     }

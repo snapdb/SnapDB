@@ -64,9 +64,7 @@ public class FilterLibrary
     public void Register(MatchFilterDefinitionBase encoding)
     {
         lock (m_syncRoot)
-        {
             m_filters.Add(encoding.FilterType, encoding);
-        }
     }
 
     /// <summary>
@@ -76,9 +74,7 @@ public class FilterLibrary
     public void Register(SeekFilterDefinitionBase encoding)
     {
         lock (m_syncRoot)
-        {
             m_seekFilters.Add(encoding.FilterType, encoding);
-        }
     }
 
     /// <summary>

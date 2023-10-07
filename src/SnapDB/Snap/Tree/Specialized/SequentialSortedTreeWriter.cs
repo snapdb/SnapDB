@@ -56,7 +56,12 @@ public static class SequentialSortedTreeWriter<TKey, TValue> where TKey : SnapTy
         if (!(treeStream.IsAlwaysSequential && treeStream.NeverContainsDuplicates))
             throw new ArgumentException("Stream must guarantee sequential reads and that it never will contain a duplicate", nameof(treeStream));
 
-        SortedTreeHeader header = new() { TreeNodeType = treeNodeType, BlockSize = blockSize, RootNodeLevel = 0, RootNodeIndexAddress = 1,
+        SortedTreeHeader header = new()
+        {
+            TreeNodeType = treeNodeType,
+            BlockSize = blockSize,
+            RootNodeLevel = 0,
+            RootNodeIndexAddress = 1,
             LastAllocatedBlock = 1
         };
 

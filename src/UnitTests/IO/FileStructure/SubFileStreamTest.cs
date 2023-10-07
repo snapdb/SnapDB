@@ -180,8 +180,10 @@ public class SubFileStreamTest
         using BinaryStream bs = new(ds);
         bs.Position = 0;
         for (int x = 0; x < 10000; x++)
+        {
             if ((byte)x != bs.ReadUInt8())
                 throw new Exception();
+        }
     }
 
     internal static void TestCustomSizeWrite(SubFileStream ds, int length)
@@ -216,8 +218,10 @@ public class SubFileStreamTest
             bs.ReadAll(buffer2, 0, length);
 
             for (int i = 0; i < length; i++)
+            {
                 if (buffer[i] != buffer2[i])
                     throw new Exception();
+            }
         }
     }
 

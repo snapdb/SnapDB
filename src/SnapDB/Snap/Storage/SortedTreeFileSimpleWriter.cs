@@ -51,16 +51,14 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue> where TKey : SnapTy
     /// <param name="treeNodeType">The encoding definition for tree nodes.</param>
     /// <param name="treeStream">The tree stream containing data to be written to the archive.</param>
     /// <param name="flags">Optional flags associated with the archive.</param>
-    public static void Create(string pendingFileName, string completeFileName, int blockSize, Action<Guid> archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, params Guid[] flags)
+    public static void Create(string pendingFileName, string completeFileName, int blockSize, Action<Guid>? archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, params Guid[] flags)
     {
         using SimplifiedFileWriter writer = new(pendingFileName, completeFileName, blockSize, flags);
         archiveIdCallback?.Invoke(writer.ArchiveId);
 
         using (ISupportsBinaryStream file = writer.CreateFile(GetFileName()))
         using (BinaryStream bs = new(file))
-        {
             SequentialSortedTreeWriter<TKey, TValue>.Create(bs, blockSize - 32, treeNodeType, treeStream);
-        }
 
         writer.Commit();
     }
@@ -77,8 +75,10 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue> where TKey : SnapTy
     /// <param name="flags">Optional flags associated with the archive.</param>
     public static void CreateNonSequential(string pendingFileName, string completeFileName, int blockSize, Action<Guid> archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, params Guid[] flags)
     {
-        SortedPointBuffer<TKey, TValue> queue = new(100000, true);
-        queue.IsReadingMode = false;
+        SortedPointBuffer<TKey, TValue> queue = new(100000, true)
+        {
+            IsReadingMode = false
+        };
 
         TKey key = new();
         TValue value = new();

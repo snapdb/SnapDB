@@ -288,8 +288,10 @@ public sealed class BitArray
         Validate(index, length);
 
         for (int x = index; x < index + length; x++)
+        {
             if ((m_array[x >> BitsPerElementShift] & (1 << (x & BitsPerElementMask))) == 0)
                 return false;
+        }
 
         return true;
     }
@@ -305,8 +307,10 @@ public sealed class BitArray
         Validate(index, length);
 
         for (int x = index; x < index + length; x++)
+        {
             if ((m_array[x >> BitsPerElementShift] & (1 << (x & BitsPerElementMask))) != 0)
                 return false;
+        }
 
         return true;
     }
@@ -367,6 +371,7 @@ public sealed class BitArray
 
         // Iterate through the elements, starting from where the previous search left off.
         for (int x = m_lastFoundClearedIndex >> BitsPerElementShift; x < count; x++)
+        {
             // If the current element has at least one cleared bit (not all bits set to 1).
             if (m_array[x] != -1)
             {
@@ -383,6 +388,7 @@ public sealed class BitArray
                 // Return the position of the cleared bit within the bit array.
                 return position;
             }
+        }
 
         // If no cleared bit is found in the entire bit array, return -1.
         return -1;
@@ -399,6 +405,7 @@ public sealed class BitArray
 
         // Iterate through the elements, starting from where the previous search left off.
         for (int x = m_lastFoundSetIndex >> BitsPerElementShift; x < count; x++)
+        {
             // If the current element has at least one set bit, use this element.
             if (m_array[x] != 0)
             {
@@ -415,6 +422,7 @@ public sealed class BitArray
                 // Return the position of the set bit within the bit array.
                 return position;
             }
+        }
 
         // If no set bit is found in the entire bit array, return -1.
         return -1;
@@ -431,15 +439,19 @@ public sealed class BitArray
 
         // Iterate through the elements of the bit array.
         for (int x = 0; x < count; x++)
+        {
             // If all bits are cleared, this entire section can be skipped
             if (m_array[x] != 0)
             {
                 int end = Math.Min(x * BitsPerElement + BitsPerElement, Count);
 
                 for (int k = x * BitsPerElement; k < end; k++)
+                {
                     if (GetBitUnchecked(k))
                         yield return k;
+                }
             }
+        }
     }
 
     /// <summary>
@@ -453,15 +465,19 @@ public sealed class BitArray
 
         // Iterate through the elements of the bit array.
         for (int x = 0; x < count; x++)
+        {
             // If all bits are cleared, this entire section can be skipped.
             if (m_array[x] != -1)
             {
                 int end = Math.Min(x * BitsPerElement + BitsPerElement, Count);
 
                 for (int k = x * BitsPerElement; k < end; k++)
+                {
                     if (!GetBitUnchecked(k))
                         yield return k;
+                }
             }
+        }
     }
 
     // Validates that a given index is within the valid range in the bit array.

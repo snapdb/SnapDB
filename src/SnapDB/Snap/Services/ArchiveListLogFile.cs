@@ -53,11 +53,6 @@ internal class ArchiveListLogFile
 
     #region [ Constructors ]
 
-    static ArchiveListLogFile()
-    {
-        s_header = System.Text.Encoding.UTF8.GetBytes("openHistorian 2.0 Archive List Log");
-    }
-
     public ArchiveListLogFile()
     {
         IsValid = true;
@@ -90,8 +85,10 @@ internal class ArchiveListLogFile
     public void RemoveDeletedFiles(HashSet<Guid> allFiles)
     {
         for (int x = FilesToDelete.Count - 1; x >= 0; x--)
+        {
             if (!allFiles.Contains(FilesToDelete[x]))
                 FilesToDelete.RemoveAt(x);
+        }
     }
 
     /// <summary>
@@ -114,24 +111,28 @@ internal class ArchiveListLogFile
             }
 
             for (int x = 0; x < s_header.Length; x++)
+            {
                 if (data[x] != s_header[x])
                 {
                     s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Incorrect File Header");
                     return;
                 }
+            }
 
             byte[] hash = new byte[20];
             Array.Copy(data, data.Length - 20, hash, 0, 20);
             byte[] checksum = SHA1.HashData(data.AsSpan(0, data.Length - 20));
+            
             if (!hash.SequenceEqual(checksum))
             {
                 s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Hash sum failed.");
                 return;
             }
 
-            MemoryStream stream = new(data);
-
-            stream.Position = s_header.Length;
+            MemoryStream stream = new(data)
+            {
+                Position = s_header.Length
+            };
 
             int version = stream.ReadNextByte();
             switch (version)
@@ -201,6 +202,11 @@ internal class ArchiveListLogFile
     private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(ArchiveListLogFile), MessageClass.Framework);
 
     private static readonly byte[] s_header;
+
+    static ArchiveListLogFile()
+    {
+        s_header = System.Text.Encoding.UTF8.GetBytes("openHistorian 2.0 Archive List Log");
+    }
 
     #endregion
 }

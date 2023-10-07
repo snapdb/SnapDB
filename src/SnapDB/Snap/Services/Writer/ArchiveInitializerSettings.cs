@@ -299,8 +299,10 @@ public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSetting
             throw new Exception("Missing write paths.");
 
         foreach (string path in WritePath)
+        {
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
+        }
     }
 
     /// <summary>

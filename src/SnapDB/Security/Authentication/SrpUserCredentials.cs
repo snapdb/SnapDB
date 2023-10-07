@@ -54,9 +54,7 @@ public class SrpUserCredentials
     public SrpUserCredential Lookup(string username)
     {
         lock (m_users)
-        {
             return m_users[username];
-        }
     }
 
     /// <summary>
@@ -71,9 +69,7 @@ public class SrpUserCredentials
     {
         SrpUserCredential user = new(username, password, strength, saltSize, iterations);
         lock (m_users)
-        {
             m_users.Add(username, user);
-        }
     }
 
     /// <summary>
@@ -88,9 +84,7 @@ public class SrpUserCredentials
     {
         SrpUserCredential user = new(username, passwordSalt, verifier, iterations, strength);
         lock (m_users)
-        {
             m_users.Add(username, user);
-        }
     }
 
     #endregion

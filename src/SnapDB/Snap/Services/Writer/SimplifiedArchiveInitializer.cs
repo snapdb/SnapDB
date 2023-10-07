@@ -77,9 +77,7 @@ public class SimplifiedArchiveInitializer<TKey, TValue> where TKey : SnapTypeBas
         settings = settings.CloneReadonly();
         settings.Validate();
         using (m_lock.EnterWriteLock())
-        {
             Settings = settings;
-        }
     }
 
     /// <summary>
@@ -96,7 +94,7 @@ public class SimplifiedArchiveInitializer<TKey, TValue> where TKey : SnapTypeBas
     /// and data. It uses a pending file to write the data and then renames it to the final file. The archive file is opened and
     /// returned as a sorted tree table.
     /// </remarks>
-    public SortedTreeTable<TKey, TValue> CreateArchiveFile(TKey startKey, TKey endKey, long estimatedSize, TreeStream<TKey, TValue> data, Action<Guid> archiveIdCallback)
+    public SortedTreeTable<TKey, TValue> CreateArchiveFile(TKey startKey, TKey endKey, long estimatedSize, TreeStream<TKey, TValue> data, Action<Guid>? archiveIdCallback)
     {
         SimplifiedArchiveInitializerSettings settings = Settings;
 
@@ -131,7 +129,7 @@ public class SimplifiedArchiveInitializer<TKey, TValue> where TKey : SnapTypeBas
     /// <param name="endKey">The end key for the archive data range.</param>
     /// <returns>A unique archive file name.</returns>
     /// <remarks>
-    /// This method generates a unique archive file name based on the specified path, 
+    /// This method generates a unique archive file name based on the specified path,
     /// start key, end key, and includes a timestamp, a unique identifier, and the specified file extension.
     /// </remarks>
     private string CreateArchiveName(string path, TKey startKey, TKey endKey)

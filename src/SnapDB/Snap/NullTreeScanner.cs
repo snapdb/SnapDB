@@ -36,14 +36,6 @@ public class NullTreeScanner<TKey, TValue> : SeekableTreeStream<TKey, TValue> wh
     #region [ Constructors ]
 
     /// <summary>
-    /// Static constructor to initialize the static instance of the <see cref="NullTreeScanner{TKey, TValue}"/> class.
-    /// </summary>
-    static NullTreeScanner()
-    {
-        Instance = new NullTreeScanner<TKey, TValue>();
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="NullTreeScanner{TKey, TValue}"/> class.
     /// </summary>
     public NullTreeScanner()
@@ -77,6 +69,14 @@ public class NullTreeScanner<TKey, TValue> : SeekableTreeStream<TKey, TValue> wh
     #endregion
 
     #region [ Static ]
+
+    /// <summary>
+    /// Static constructor to initialize the static instance of the <see cref="NullTreeScanner{TKey, TValue}"/> class.
+    /// </summary>
+    static NullTreeScanner()
+    {
+        Instance = new NullTreeScanner<TKey, TValue>();
+    }
 
     /// <summary>
     /// Gets a static instance of the <see cref="NullTreeScanner{TKey, TValue}"/> class for convenience.

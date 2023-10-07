@@ -70,10 +70,24 @@ public class SnapSocketListener : DisposableLoggingClassBase
         m_authenticator = new SecureStreamServer<SocketUserPermissions>();
 
         if (settings.DefaultUserCanRead || settings.DefaultUserCanWrite || settings.DefaultUserIsAdmin)
-            m_authenticator.SetDefaultUser(true, new SocketUserPermissions { CanRead = settings.DefaultUserCanRead, CanWrite = settings.DefaultUserCanWrite, IsAdmin = settings.DefaultUserIsAdmin });
+        {
+            m_authenticator.SetDefaultUser(true, new SocketUserPermissions
+            {
+                CanRead = settings.DefaultUserCanRead,
+                CanWrite = settings.DefaultUserCanWrite,
+                IsAdmin = settings.DefaultUserIsAdmin
+            });
+        }
 
         foreach (string user in settings.Users)
-            m_authenticator.AddUserIntegratedSecurity(user, new SocketUserPermissions { CanRead = true, CanWrite = true, IsAdmin = true });
+        {
+            m_authenticator.AddUserIntegratedSecurity(user, new SocketUserPermissions
+            {
+                CanRead = true,
+                CanWrite = true,
+                IsAdmin = true
+            });
+        }
 
         m_isRunning = true;
 
@@ -138,7 +152,7 @@ public class SnapSocketListener : DisposableLoggingClassBase
     /// Processes the client
     /// </summary>
     /// <param name="state"></param>
-    private void ProcessDataRequests(object state)
+    private void ProcessDataRequests(object? state)
     {
         try
         {
@@ -160,9 +174,7 @@ public class SnapSocketListener : DisposableLoggingClassBase
             SnapNetworkServer networkServerProcessing;
 
             using (Logger.AppendStackMessages(Log.InitialStackMessages))
-            {
                 networkServerProcessing = new SnapNetworkServer(m_authenticator, client, m_server);
-            }
 
             lock (m_clients)
             {
@@ -188,9 +200,7 @@ public class SnapSocketListener : DisposableLoggingClassBase
                 // list of active clients. In the past, errors in ProcessClient have
                 // caused a leak here, so the try-finally should help protect against that
                 lock (m_clients)
-                {
                     m_clients.Remove(networkServerProcessing);
-                }
             }
         }
         catch (Exception ex)

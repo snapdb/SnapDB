@@ -180,9 +180,7 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
             }
 
             using (ArchiveListEditor<TKey, TValue> edit = m_list.AcquireEditLock())
-            {
                 edit.Add(table);
-            }
 
             m_pendingTables1.Add(table);
 
@@ -281,9 +279,7 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
         Log.Publish(MessageLevel.Info, "Stop() called", "Write is stopping");
 
         lock (m_syncRoot)
-        {
             m_stopped = true;
-        }
 
         m_rolloverTask.Dispose();
         Dispose();

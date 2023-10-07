@@ -104,17 +104,6 @@ public class IndexMapperTest
 
     #endregion
 
-    #region [ Constructors ]
-
-    static IndexMapperTest()
-    {
-        s_blockSize = 256;
-        s_blockDataLength = s_blockSize - FileStructureConstants.BlockFooterLength;
-        s_addressesPerBlock = s_blockDataLength / 4; //rounds down
-    }
-
-    #endregion
-
     #region [ Methods ]
 
     //[Test()]
@@ -170,6 +159,13 @@ public class IndexMapperTest
     private static readonly uint s_blockSize;
     private static readonly uint s_blockDataLength;
     private static readonly uint s_addressesPerBlock;
+
+    static IndexMapperTest()
+    {
+        s_blockSize = 256;
+        s_blockDataLength = s_blockSize - FileStructureConstants.BlockFooterLength;
+        s_addressesPerBlock = s_blockDataLength / 4; //rounds down
+    }
 
     [Test]
     public static void TestMethod1()

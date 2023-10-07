@@ -35,15 +35,27 @@ namespace SnapDB.UnitTests.Collections;
 [TestFixture]
 internal class WeakListTest
 {
+    #region [ Members ]
+
     private class Data
     {
+        #region [ Members ]
+
         public string Value;
+
+        #endregion
+
+        #region [ Constructors ]
 
         public Data(string value)
         {
             Value = value;
         }
+
+        #endregion
     }
+
+    #endregion
 
     #region [ Methods ]
 

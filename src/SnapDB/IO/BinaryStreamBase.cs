@@ -133,7 +133,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
     {
         if (m_disposed)
             return;
-        
+
         try
         {
             // This will be done regardless of whether the object is finalized or disposed.
@@ -431,9 +431,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
         if (BitConverter.IsLittleEndian)
         {
             fixed (byte* lp = m_buffer)
-            {
                 *(decimal*)lp = value;
-            }
         }
         else
         {
@@ -820,12 +818,8 @@ public abstract unsafe class BinaryStreamBase : IDisposable
         ReadAll(m_buffer, 0, 16);
 
         if (BitConverter.IsLittleEndian)
-        {
             fixed (byte* lp = m_buffer)
-            {
                 return *(decimal*)lp;
-            }
-        }
 
         decimal rv;
         byte* ptr = (byte*)&rv;
@@ -983,7 +977,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
 
         if (value.Length <= maxLength)
             return true;
-        
+
         value = null;
         return false;
     }

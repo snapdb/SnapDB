@@ -247,7 +247,9 @@ public partial class UnionTreeStream<TKey, TValue> : TreeStream<TKey, TValue> wh
             return;
 
         int lastDuplicateIndex = -1;
+
         for (int index = 1; index < m_sortedArchiveStreams.Items.Length; index++)
+        {
             if (CompareStreams(m_sortedArchiveStreams[0], m_sortedArchiveStreams[index]) == 0)
             {
                 m_sortedArchiveStreams[index].ReadToCache();
@@ -257,6 +259,7 @@ public partial class UnionTreeStream<TKey, TValue> : TreeStream<TKey, TValue> wh
             {
                 break;
             }
+        }
 
         //Resorts the list in reverse order.
         for (int j = lastDuplicateIndex; j > 0; j--)
@@ -275,6 +278,7 @@ public partial class UnionTreeStream<TKey, TValue> : TreeStream<TKey, TValue> wh
             m_sortedArchiveStreams[1].CacheKey.CopyTo(m_nextArchiveStreamLowerBounds);
         else
             m_nextArchiveStreamLowerBounds.SetMax();
+       
         m_nextArchiveStreamLowerBounds.CopyTo(m_readWhileUpperBounds);
     }
 

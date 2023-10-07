@@ -52,7 +52,7 @@ public class MemoryPoolStreamCore : IDisposable
 
         public bool AddingRequiresClone => m_pagePointer.Length * ElementsPerRow == PageCount;
 
-        public int PageCount { get; private set; } = 0;
+        public int PageCount { get; private set; }
 
         #endregion
 
@@ -221,7 +221,7 @@ public class MemoryPoolStreamCore : IDisposable
     {
         if (IsDisposed)
             return;
-        
+
         try
         {
             if (disposing && !m_pool.IsDisposed)
@@ -284,7 +284,7 @@ public class MemoryPoolStreamCore : IDisposable
     TryAgain:
 
         ReadBlock(position, out nint src, out int validLength);
-        
+
         if (validLength < length)
         {
             Memory.Copy(src, dest, validLength);
@@ -386,7 +386,7 @@ public class MemoryPoolStreamCore : IDisposable
         {
             bool cloned = false;
             Settings settings = m_settings;
-           
+
             if (settings.AddingRequiresClone)
             {
                 cloned = true;

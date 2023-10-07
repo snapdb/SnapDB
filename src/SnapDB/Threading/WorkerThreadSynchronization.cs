@@ -230,21 +230,24 @@ public class WorkerThreadSynchronization : DisposableLoggingClassBase
     {
         lock (m_syncRoot)
         {
-            if (m_isCallbackWaiting)
+            if (!m_isCallbackWaiting)
+                return;
+            
+            m_isCallbackWaiting = false;
+            
+            foreach (CallbackRequest callback in m_pendingCallbacks)
             {
-                m_isCallbackWaiting = false;
-                foreach (CallbackRequest callback in m_pendingCallbacks)
-                    try
-                    {
-                        callback.Run();
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Publish(MessageLevel.Error, "Unexpected error when invoking callbacks", null, null, ex);
-                    }
-
-                m_pendingCallbacks.Clear();
+                try
+                {
+                    callback.Run();
+                }
+                catch (Exception ex)
+                {
+                    Log.Publish(MessageLevel.Error, "Unexpected error when invoking callbacks", null, null, ex);
+                }
             }
+
+            m_pendingCallbacks.Clear();
         }
     }
 

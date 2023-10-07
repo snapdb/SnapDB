@@ -31,12 +31,6 @@ namespace SnapDB.IO.Unmanaged;
 /// </summary>
 public partial class MemoryPoolStream : MemoryPoolStreamCore, ISupportsBinaryStream
 {
-    #region [ Members ]
-
-    // The size of each page.
-
-    #endregion
-
     #region [ Constructors ]
 
     /// <summary>

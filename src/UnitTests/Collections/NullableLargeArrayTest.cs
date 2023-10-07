@@ -96,8 +96,10 @@ public class NullableLargeArrayTest
         }
 
         for (int x = 0; x < 100000; x += 2)
+        {
             if (array.TryGetValue(x, out i))
                 throw new Exception();
+        }
 
         if (array.Count() != 50000)
             throw new Exception();
@@ -118,8 +120,10 @@ public class NullableLargeArrayTest
             array.OverwriteValue(x, -1);
 
         for (int x = 1; x < 100000; x += 2)
+        {
             if (array[x] != -1)
                 throw new Exception();
+        }
     }
 
     #endregion

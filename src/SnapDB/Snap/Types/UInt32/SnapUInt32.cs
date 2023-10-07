@@ -146,7 +146,7 @@ public class SnapUInt32 : SnapTypeBase<SnapUInt32>
     /// </summary>
     /// <param name="right">The SnapUInt32 to compare with the current instance.</param>
     /// <returns>
-    ///   <c>true</c> if the current SnapUInt32 is less than the specified SnapUInt32; otherwise, <c>false</c>.
+    /// <c>true</c> if the current SnapUInt32 is less than the specified SnapUInt32; otherwise, <c>false</c>.
     /// </returns>
     public override bool IsLessThan(SnapUInt32 right)
     {
@@ -158,7 +158,7 @@ public class SnapUInt32 : SnapTypeBase<SnapUInt32>
     /// </summary>
     /// <param name="right">The SnapUInt32 to compare with the current instance.</param>
     /// <returns>
-    ///   <c>true</c> if the current SnapUInt32 is equal to the specified SnapUInt32; otherwise, <c>false</c>.
+    /// <c>true</c> if the current SnapUInt32 is equal to the specified SnapUInt32; otherwise, <c>false</c>.
     /// </returns>
     public override bool IsEqualTo(SnapUInt32 right)
     {
@@ -170,7 +170,7 @@ public class SnapUInt32 : SnapTypeBase<SnapUInt32>
     /// </summary>
     /// <param name="right">The SnapUInt32 to compare with the current instance.</param>
     /// <returns>
-    ///   <c>true</c> if the current SnapUInt32 is greater than the specified SnapUInt32; otherwise, <c>false</c>.
+    /// <c>true</c> if the current SnapUInt32 is greater than the specified SnapUInt32; otherwise, <c>false</c>.
     /// </returns>
     public override bool IsGreaterThan(SnapUInt32 right)
     {
@@ -182,7 +182,7 @@ public class SnapUInt32 : SnapTypeBase<SnapUInt32>
     /// </summary>
     /// <param name="right">The SnapUInt32 to compare with the current instance.</param>
     /// <returns>
-    ///   <c>true</c> if the current SnapUInt32 is greater than or equal to the specified SnapUInt32; otherwise, <c>false</c>.
+    /// <c>true</c> if the current SnapUInt32 is greater than or equal to the specified SnapUInt32; otherwise, <c>false</c>.
     /// </returns>
     public override bool IsGreaterThanOrEqualTo(SnapUInt32 right)
     {
@@ -195,7 +195,7 @@ public class SnapUInt32 : SnapTypeBase<SnapUInt32>
     /// <param name="lowerBounds">The lower bounds (inclusive).</param>
     /// <param name="upperBounds">The upper bounds (exclusive).</param>
     /// <returns>
-    ///   <c>true</c> if the current SnapUInt32 is between the specified lower and upper bounds; otherwise, <c>false</c>.
+    /// <c>true</c> if the current SnapUInt32 is between the specified lower and upper bounds; otherwise, <c>false</c>.
     /// </returns>
     public override bool IsBetween(SnapUInt32 lowerBounds, SnapUInt32 upperBounds)
     {

@@ -404,9 +404,7 @@ public unsafe class GenericEncodedNode<TKey, TValue> : SortedTreeNodeBase<TKey, 
     protected override int GetIndexOf(TKey key)
     {
         fixed (byte* buffer = m_buffer1)
-        {
             SeekTo(key, buffer);
-        }
 
         if (m_currentIndex == RecordCount) // Beyond the end of the list
             return ~RecordCount;

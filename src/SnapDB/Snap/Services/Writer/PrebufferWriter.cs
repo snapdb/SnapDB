@@ -253,9 +253,7 @@ public class PrebufferWriter<TKey, TValue> : DisposableLoggingClassBase where TK
         Log.Publish(MessageLevel.Info, "Stop() called", "Write is stopping");
 
         lock (m_syncRoot)
-        {
             m_stopped = true;
-        }
 
         m_rolloverTask.Dispose(); //This method block until the worker runs one last time
         Dispose();

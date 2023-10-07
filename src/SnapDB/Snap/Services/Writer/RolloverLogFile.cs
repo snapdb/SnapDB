@@ -64,11 +64,6 @@ public class RolloverLogFile
 
     #region [ Constructors ]
 
-    static RolloverLogFile()
-    {
-        s_header = System.Text.Encoding.UTF8.GetBytes("Historian 2.0 Rollover Log");
-    }
-
     /// <summary>
     /// Creates a new rollover log
     /// </summary>
@@ -113,24 +108,28 @@ public class RolloverLogFile
             }
 
             for (int x = 0; x < s_header.Length; x++)
+            {
                 if (data[x] != s_header[x])
                 {
                     s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Incorrect File Header", fileName);
                     return;
                 }
+            }
 
             byte[] hash = new byte[20];
             Array.Copy(data, data.Length - 20, hash, 0, 20);
             byte[] checksum = SHA1.HashData(data.AsSpan(0, data.Length - 20));
+            
             if (!hash.SequenceEqual(checksum))
             {
                 s_log.Publish(MessageLevel.Warning, "Failed to load file.", "Hash sum failed.", fileName);
                 return;
             }
 
-            MemoryStream stream = new(data);
-
-            stream.Position = s_header.Length;
+            MemoryStream stream = new(data)
+            {
+                Position = s_header.Length
+            };
 
             int version = stream.ReadNextByte();
             switch (version)
@@ -171,12 +170,17 @@ public class RolloverLogFile
     {
         using (ArchiveListEditor edit = list.AcquireEditLock())
         {
-            //If the destination file exists, the rollover is complete. Therefore remove any source file.
+            // If the destination file exists, the rollover is complete. Therefore remove any source file.
             if (edit.Contains(DestinationFile))
+            {
                 foreach (Guid source in SourceFiles)
+                {
                     if (edit.Contains(source))
                         edit.TryRemoveAndDelete(source);
-            //Otherwise, delete the destination file (which is allow the ~d2 cleanup to occur).
+                }
+            }
+
+            // Otherwise, delete the destination file (which is allow the ~d2 cleanup to occur).
         }
 
         Delete();
@@ -205,6 +209,11 @@ public class RolloverLogFile
     private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(RolloverLogFile), MessageClass.Framework);
 
     private static readonly byte[] s_header;
+
+    static RolloverLogFile()
+    {
+        s_header = System.Text.Encoding.UTF8.GetBytes("Historian 2.0 Rollover Log");
+    }
 
     #endregion
 }

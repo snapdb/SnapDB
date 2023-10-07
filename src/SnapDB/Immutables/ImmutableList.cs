@@ -166,7 +166,7 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     }
 
     /// <summary>Returns an enumerator that iterates through the collection.</summary>
-    /// <returns>A <see cref="System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.</returns>
+    /// <returns>A <see cref="IEnumerator{T}"/> that can be used to iterate through the collection.</returns>
     public IEnumerator<T> GetEnumerator()
     {
         return m_list.GetEnumerator();

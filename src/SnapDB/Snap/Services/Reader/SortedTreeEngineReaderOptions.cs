@@ -36,11 +36,6 @@ public class SortedTreeEngineReaderOptions
 {
     #region [ Constructors ]
 
-    static SortedTreeEngineReaderOptions()
-    {
-        Default = new SortedTreeEngineReaderOptions();
-    }
-
     /// <summary>
     /// Creates <see cref="SortedTreeEngineReaderOptions"/>.
     /// </summary>
@@ -121,6 +116,11 @@ public class SortedTreeEngineReaderOptions
     #endregion
 
     #region [ Static ]
+
+    static SortedTreeEngineReaderOptions()
+    {
+        Default = new SortedTreeEngineReaderOptions();
+    }
 
     /// <summary>
     /// Default options. Same as default constructor

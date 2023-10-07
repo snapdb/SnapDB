@@ -123,7 +123,12 @@ public abstract class SnapClient : DisposableLoggingClassBase
     /// <returns>A <see cref="SnapClient"/></returns>
     public static SnapClient Connect(string serverOrIp, int port)
     {
-        SnapNetworkClientSettings settings = new() { ServerNameOrIp = serverOrIp, NetworkPort = port };
+        SnapNetworkClientSettings settings = new()
+        {
+            ServerNameOrIp = serverOrIp,
+            NetworkPort = port
+        };
+
         return new SnapNetworkClient(settings);
     }
 

@@ -405,8 +405,8 @@ public class RemoteBinaryStream : BinaryStreamBase
                 m_sendLength += 9;
                 return;
             }
-            
         }
+
         base.Write7Bit(value);
     }
 

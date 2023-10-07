@@ -110,9 +110,7 @@ public class BinarySearchTest
         {
             byte[] box = new byte[1];
             do
-            {
                 provider.GetBytes(box);
-            }
             while (!(box[0] < n * (byte.MaxValue / n)));
 
             int k = box[0] % n;

@@ -67,14 +67,6 @@ internal sealed class CustomFileStream : IDisposable
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates a resource list that everyone shares.
-    /// </summary>
-    static CustomFileStream()
-    {
-        s_resourceList = new ResourceQueueCollection<int, byte[]>(blockSize => () => new byte[blockSize], 10, 20);
-    }
-
-    /// <summary>
     /// Creates a new CustomFileStream
     /// </summary>
     /// <param name="ioSize">The size of a buffer pool entry.</param>
@@ -106,7 +98,7 @@ internal sealed class CustomFileStream : IDisposable
 
         if (!File.Exists(fileName))
             return;
-        
+
         FileInfo fileInfo = new(fileName);
         m_length.Value = fileInfo.Length;
     }
@@ -370,9 +362,7 @@ internal sealed class CustomFileStream : IDisposable
                 FlushFileBuffers();
             else
                 using (m_isUsingStream.EnterReadLock())
-                {
                     m_stream!.Flush(false);
-                }
         }
         finally
         {
@@ -388,9 +378,7 @@ internal sealed class CustomFileStream : IDisposable
     public void FlushFileBuffers()
     {
         using (m_isUsingStream.EnterReadLock())
-        {
             m_stream?.Flush(true);
-        }
     }
 
     /// <summary>
@@ -476,6 +464,14 @@ internal sealed class CustomFileStream : IDisposable
     private static readonly ResourceQueueCollection<int, byte[]> s_resourceList;
 
     /// <summary>
+    /// Creates a resource list that everyone shares.
+    /// </summary>
+    static CustomFileStream()
+    {
+        s_resourceList = new ResourceQueueCollection<int, byte[]>(blockSize => () => new byte[blockSize], 10, 20);
+    }
+
+    /// <summary>
     /// Creates a file with the supplied name.
     /// </summary>
     /// <param name="fileName">The name of the file.</param>
@@ -501,9 +497,7 @@ internal sealed class CustomFileStream : IDisposable
     public static CustomFileStream OpenFile(string fileName, int ioBlockSize, out int fileStructureBlockSize, bool isReadOnly, bool isSharingEnabled)
     {
         using (FileStream fileStream = new(fileName, FileMode.Open, isReadOnly ? FileAccess.Read : FileAccess.ReadWrite, isSharingEnabled ? FileShare.Read : FileShare.None, 2048, true))
-        {
             fileStructureBlockSize = FileHeaderBlock.SearchForBlockSize(fileStream);
-        }
 
         return new CustomFileStream(ioBlockSize, fileStructureBlockSize, fileName, isReadOnly, isSharingEnabled);
     }

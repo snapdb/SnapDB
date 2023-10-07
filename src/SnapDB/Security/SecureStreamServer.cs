@@ -49,7 +49,12 @@ namespace SnapDB.Security;
 /// </summary>
 internal static class SecureStreamServerCertificate
 {
-    #region [ Constructors ]
+    #region [ Static ]
+
+    /// <summary>
+    /// A RSA-1024 SHA-256 certificate. It takes about 250ms to generate this certificate.
+    /// </summary>
+    internal static X509Certificate2 TempCertificate;
 
     static SecureStreamServerCertificate()
     {
@@ -57,15 +62,6 @@ internal static class SecureStreamServerCertificate
         TempCertificate = GenerateCertificate.CreateSelfSignedCertificate("CN=Local", 256, 1024);
     #endif
     }
-
-    #endregion
-
-    #region [ Static ]
-
-    /// <summary>
-    /// A RSA-1024 SHA-256 certificate. It takes about 250ms to generate this certificate.
-    /// </summary>
-    internal static X509Certificate2 TempCertificate;
 
     #endregion
 }
@@ -255,9 +251,7 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
                     if (TryResumeSession(stream2, certSignatures, out userToken))
                     {
                         lock (m_syncRoot)
-                        {
                             m_userTokens.TryGetValue(userToken, out token);
-                        }
 
                         secureStream = stream2;
                         return true;
@@ -283,9 +277,7 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
             //stream2.Write(secret);
             //stream2.Flush();
             lock (m_syncRoot)
-            {
                 m_userTokens.TryGetValue(userToken, out token);
-            }
 
             secureStream = stream2;
             return true;

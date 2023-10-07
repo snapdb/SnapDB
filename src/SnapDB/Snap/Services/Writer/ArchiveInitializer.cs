@@ -78,9 +78,7 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
         settings.Validate();
 
         using (m_lock.EnterWriteLock())
-        {
             Settings = settings;
-        }
     }
 
     /// <summary>

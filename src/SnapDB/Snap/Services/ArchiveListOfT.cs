@@ -150,6 +150,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
         List<string> attachedFiles = new();
 
         foreach (string path in paths)
+        {
             try
             {
                 void ExceptionHandler(Exception ex)
@@ -170,6 +171,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
             {
                 Log.Publish(MessageLevel.Error, "Unknown error occurred while attaching paths", "Path: " + path, null, ex);
             }
+        }
 
         LoadFiles(attachedFiles);
     }
@@ -186,10 +188,11 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
         List<SortedTreeTable<TKey, TValue>> loadedFiles = new();
 
         foreach (string file in archiveFiles)
+        {
             try
             {
                 SortedTreeFile sortedTreeFile = SortedTreeFile.OpenFile(file, true);
-                SortedTreeTable<TKey, TValue> table = sortedTreeFile.OpenTable<TKey, TValue>();
+                SortedTreeTable<TKey, TValue>? table = sortedTreeFile.OpenTable<TKey, TValue>();
 
                 if (table is null)
                 {
@@ -215,6 +218,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
             {
                 Log.Publish(MessageLevel.Warning, "Loading Files", "Skipping Failed File: " + file, null, ex);
             }
+        }
 
         using ArchiveListEditor<TKey, TValue> edit = AcquireEditLock();
 
@@ -225,6 +229,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
         }
 
         foreach (SortedTreeTable<TKey, TValue> file in loadedFiles)
+        {
             try
             {
                 edit.Add(file);
@@ -234,6 +239,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
                 Log.Publish(MessageLevel.Warning, "Attaching File", "File already attached: " + file.ArchiveId, file.BaseFile.FilePath, ex);
                 file.BaseFile.Dispose();
             }
+        }
     }
 
     /// <summary>
@@ -313,9 +319,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     public bool IsFileBeingUsed(SortedTreeTable<TKey, TValue> sortedTree)
     {
         lock (m_syncRoot)
-        {
             return InternalIsFileBeingUsed(sortedTree);
-        }
     }
 
     /// <summary>
@@ -478,9 +482,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
         List<ArchiveListSnapshot<TKey, TValue>> tablesInUse = new();
 
         lock (m_syncRoot)
-        {
             tablesInUse.AddRange(m_allSnapshots);
-        }
 
         tablesInUse.ForEach(snapshot => snapshot.Engine_BeginDropConnection());
         tablesInUse.ForEach(snapshot => snapshot.Engine_EndDropConnection());
@@ -493,9 +495,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     private void ReleaseClientResources(ArchiveListSnapshot<TKey, TValue> archiveLists)
     {
         lock (m_syncRoot)
-        {
             m_allSnapshots.Remove(archiveLists);
-        }
     }
 
     /// <summary>

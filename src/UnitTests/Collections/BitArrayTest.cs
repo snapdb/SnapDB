@@ -145,12 +145,16 @@ public class BitArrayTest
         BitArray array = new(false, 15);
 
         for (int x = 0; x < 15; x++)
+        {
             if (array[x])
                 throw new Exception();
+        }
 
         for (int x = 0; x < 15; x++)
+        {
             if (array.GetBitUnchecked(x))
                 throw new Exception();
+        }
 
         array[1] = true;
         if (array.TrySetBit(1))
@@ -210,13 +214,18 @@ public class BitArrayTest
     {
         BitArray array = new(true, count);
         for (int x = 0; x < count; x++)
+        {
             if (!array.GetBit(x))
                 throw new Exception("each bit should be set");
+        }
 
         array = new BitArray(false, count);
         for (int x = 0; x < count; x++)
+        {
             if (array.GetBit(x))
                 throw new Exception("each bit should be cleared");
+        }
+
         for (int x = 0; x < count; x++)
         {
             array.SetBit(x);
@@ -236,13 +245,18 @@ public class BitArrayTest
     {
         BitArray array = new(false, count);
         for (int x = 0; x < count; x++)
+        {
             if (array.GetBit(x))
                 throw new Exception("each bit should be cleared");
+        }
 
         array = new BitArray(true, count);
         for (int x = 0; x < count; x++)
+        {
             if (!array.GetBit(x))
                 throw new Exception("each bit should be set");
+        }
+
         for (int x = 0; x < count; x++)
         {
             array.ClearBit(x);
@@ -273,8 +287,10 @@ public class BitArrayTest
         }
 
         for (int x = 0; x < count; x++)
+        {
             if (tmp[x] != array.GetBit(x))
                 throw new Exception();
+        }
     }
 
     #endregion

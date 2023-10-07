@@ -38,12 +38,6 @@ public class SimplifiedFileWriterTest
 {
     #region [ Methods ]
 
-    static SimplifiedFileWriterTest()
-    {
-        if (!Directory.Exists(@"C:\Temp"))
-            Directory.CreateDirectory(@"C:\Temp");
-    }
-
     [Test]
     public void Test1()
     {
@@ -53,9 +47,7 @@ public class SimplifiedFileWriterTest
         {
             using (ISupportsBinaryStream file = writer.CreateFile(SubFileName.CreateRandom()))
             using (BinaryStream bs = new(file))
-            {
                 bs.Write(1);
-            }
 
             writer.Commit();
         }
@@ -102,8 +94,10 @@ public class SimplifiedFileWriterTest
                     throw new Exception();
 
                 for (int x = 0; x < 100000; x++)
+                {
                     if (bs.ReadDouble() != r.NextDouble())
                         throw new Exception();
+                }
             }
         }
     }
@@ -140,10 +134,22 @@ public class SimplifiedFileWriterTest
                     throw new Exception();
 
                 for (int x = 0; x < 100000; x++)
+                {
                     if (bs.ReadDouble() != r.NextDouble())
                         throw new Exception();
+                }
             }
         }
+    }
+
+    #endregion
+
+    #region [ Static ]
+
+    static SimplifiedFileWriterTest()
+    {
+        if (!Directory.Exists(@"C:\Temp"))
+            Directory.CreateDirectory(@"C:\Temp");
     }
 
     #endregion

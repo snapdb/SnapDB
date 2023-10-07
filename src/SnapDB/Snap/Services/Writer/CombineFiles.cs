@@ -172,10 +172,8 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
 
                     foreach (Guid fileId in listIds)
                     {
-                        ArchiveTableSummary<TKey, TValue> table = resource.TryGetFile(fileId);
-                        if (table is null)
-                            throw new Exception("File not found");
-
+                        ArchiveTableSummary<TKey, TValue> table = resource.TryGetFile(fileId) ?? throw new Exception("File not found");
+                        
                         if (!table.IsEmpty)
                         {
                             if (startKey.IsGreaterThan(table.FirstKey))
@@ -187,7 +185,10 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
 
                     RolloverLogFile logFile = null;
 
-                    void CreateLog(Guid x) { logFile = m_rolloverLog.Create(listIds, x); }
+                    void CreateLog(Guid x)
+                    {
+                        logFile = m_rolloverLog.Create(listIds, x);
+                    }
 
                     using (UnionReader<TKey, TValue> reader = new(list))
                     {
@@ -197,7 +198,7 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
 
                         using (ArchiveListEditor<TKey, TValue> edit = m_archiveList.AcquireEditLock())
                         {
-                            //Add the newly created file.
+                            // Add the newly created file.
                             edit.Add(dest);
 
                             foreach (ArchiveTableSummary<TKey, TValue> table in list)

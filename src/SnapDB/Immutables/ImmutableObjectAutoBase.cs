@@ -35,20 +35,6 @@ namespace SnapDB.Immutables;
 /// <typeparam name="T">Object type.</typeparam>
 public abstract class ImmutableObjectAutoBase<T> : ImmutableObjectBase<T> where T : ImmutableObjectAutoBase<T>
 {
-    #region [ Constructors ]
-
-    static ImmutableObjectAutoBase()
-    {
-        s_readonlyFields = new List<FieldInfo>();
-        Type newType = typeof(IImmutableObject);
-
-        foreach (FieldInfo field in typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-            if (newType.IsAssignableFrom(field.FieldType))
-                s_readonlyFields.Add(field);
-    }
-
-    #endregion
-
     #region [ Methods ]
 
     /// <summary>
@@ -81,6 +67,18 @@ public abstract class ImmutableObjectAutoBase<T> : ImmutableObjectBase<T> where 
 
     // ReSharper disable once StaticFieldInGenericType
     private static readonly List<FieldInfo> s_readonlyFields;
+
+    static ImmutableObjectAutoBase()
+    {
+        s_readonlyFields = new List<FieldInfo>();
+        Type newType = typeof(IImmutableObject);
+
+        foreach (FieldInfo field in typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+        {
+            if (newType.IsAssignableFrom(field.FieldType))
+                s_readonlyFields.Add(field);
+        }
+    }
 
     #endregion
 }

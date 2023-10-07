@@ -159,9 +159,7 @@ internal static class IntHelpers
     {
         // We only read aligned longs, so a simple casting is enough
         fixed (byte* ptr = &bb[pos])
-        {
             return *(ulong*)ptr;
-        }
     }
 
     #endregion

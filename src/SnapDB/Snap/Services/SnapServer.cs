@@ -94,11 +94,8 @@ public partial class SnapServer : DisposableLoggingClassBase
         if (settings is null)
             throw new ArgumentNullException(nameof(settings));
 
-        ServerSettings settings2 = settings.ToServerSettings();
-
-        if (settings2 is null)
-            throw new ArgumentNullException(nameof(settings), "The ToServerSettings method returned null");
-
+        ServerSettings settings2 = settings.ToServerSettings() ?? throw new ArgumentNullException(nameof(settings), "The ToServerSettings method returned null");
+        
         settings2.Validate();
 
         foreach (ServerDatabaseSettings db in settings2.Databases)
@@ -172,9 +169,7 @@ public partial class SnapServer : DisposableLoggingClassBase
         try
         {
             using (Logger.AppendStackMessages(Log.InitialStackMessages))
-            {
                 database = SnapServerDatabaseBase.CreateDatabase(databaseConfig);
-            }
         }
         catch (Exception ex)
         {
@@ -213,9 +208,7 @@ public partial class SnapServer : DisposableLoggingClassBase
             SnapSocketListener listener = new(socketSettings, this);
 
             lock (m_syncRoot)
-            {
                 m_sockets.Add(socketSettings.LocalEndPoint, listener);
-            }
         }
     }
 
@@ -318,9 +311,7 @@ public partial class SnapServer : DisposableLoggingClassBase
     private SnapServerDatabaseBase GetDatabase(string databaseName)
     {
         lock (m_syncRoot)
-        {
             return m_databases[databaseName.ToUpper()];
-        }
     }
 
     /// <summary>
@@ -339,9 +330,7 @@ public partial class SnapServer : DisposableLoggingClassBase
     private bool Contains(string databaseName)
     {
         lock (m_syncRoot)
-        {
             return m_databases.ContainsKey(databaseName.ToUpper());
-        }
     }
 
     /// <summary>
@@ -357,9 +346,7 @@ public partial class SnapServer : DisposableLoggingClassBase
     private List<DatabaseInfo> GetDatabaseInfo()
     {
         lock (m_syncRoot)
-        {
             return m_databases.Values.Select(database => database.Info).ToList();
-        }
     }
 
     /// <summary>
@@ -369,9 +356,7 @@ public partial class SnapServer : DisposableLoggingClassBase
     private void RegisterClient(Client client)
     {
         lock (m_syncRoot)
-        {
             m_clients.Add(client);
-        }
     }
 
     /// <summary>
@@ -380,9 +365,7 @@ public partial class SnapServer : DisposableLoggingClassBase
     private void UnRegisterClient(Client client)
     {
         lock (m_syncRoot)
-        {
             m_clients.Remove(client);
-        }
     }
 
     #endregion

@@ -94,9 +94,7 @@ public class ConcurrentIndexedDictionary<TKey, TValue> where TKey : notnull
         int index;
 
         lock (m_syncRoot)
-        {
             index = m_lookup[key];
-        }
 
         return this[index];
     }

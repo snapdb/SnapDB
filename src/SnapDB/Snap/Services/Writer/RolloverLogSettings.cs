@@ -74,6 +74,7 @@ public class RolloverLogSettings : SettingsBase<RolloverLogSettings>
         set
         {
             TestForEditable();
+
             if (string.IsNullOrWhiteSpace(value))
             {
                 m_logFilePrefix = string.Empty;
@@ -95,6 +96,7 @@ public class RolloverLogSettings : SettingsBase<RolloverLogSettings>
         set
         {
             TestForEditable();
+
             if (string.IsNullOrWhiteSpace(value))
             {
                 m_logPath = string.Empty;
@@ -109,15 +111,8 @@ public class RolloverLogSettings : SettingsBase<RolloverLogSettings>
     /// <summary>
     /// Gets the wildcard search string for a log file.
     /// </summary>
-    internal string SearchPattern
-    {
-        get
-        {
-            if (LogFilePrefix == string.Empty)
-                return "*" + LogFileExtension;
-            return LogFilePrefix + " *" + LogFileExtension;
-        }
-    }
+    internal string SearchPattern => 
+        LogFilePrefix == string.Empty ? "*" + LogFileExtension : LogFilePrefix + " *" + LogFileExtension;
 
     #endregion
 
@@ -178,10 +173,10 @@ public class RolloverLogSettings : SettingsBase<RolloverLogSettings>
     {
         if (!IsFileBacked)
             throw new Exception("Cannot generate a file name when the log is not a file backed log");
-        
+
         if (LogFilePrefix == string.Empty)
             return Path.Combine(LogPath, Guid.NewGuid() + LogFileExtension);
-        
+
         return Path.Combine(LogPath, LogFilePrefix + " " + Guid.NewGuid() + LogFileExtension);
     }
 

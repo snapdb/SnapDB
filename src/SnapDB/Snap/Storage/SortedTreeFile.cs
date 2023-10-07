@@ -70,6 +70,7 @@ public class SortedTreeFile : IDisposable
         {
             if (FilePath == string.Empty)
                 return string.Empty;
+            
             return Path.GetFileName(FilePath);
         }
     }
@@ -109,14 +110,15 @@ public class SortedTreeFile : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (!IsDisposed)
-        {
-            foreach (IDisposable d in m_openedFiles.Values)
-                d.Dispose();
-            m_openedFiles.Clear();
-            m_fileStructure.Dispose();
-            IsDisposed = true;
-        }
+        if (IsDisposed)
+            return;
+        
+        foreach (IDisposable d in m_openedFiles.Values)
+            d.Dispose();
+        
+        m_openedFiles.Clear();
+        m_fileStructure.Dispose();
+        IsDisposed = true;
     }
 
     /// <summary>
@@ -150,7 +152,7 @@ public class SortedTreeFile : IDisposable
     /// Every Key and Value have their uniquely mapped file, therefore a different file is opened if TKey and TValue are different.
     /// </remarks>
     /// <returns>null if table does not exist</returns>
-    public SortedTreeTable<TKey, TValue> OpenTable<TKey, TValue>() where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    public SortedTreeTable<TKey, TValue>? OpenTable<TKey, TValue>() where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         return OpenTable<TKey, TValue>(GetFileName<TKey, TValue>());
     }
@@ -165,7 +167,7 @@ public class SortedTreeFile : IDisposable
     /// Every Key and Value have their uniquely mapped file, therefore a different file is opened if TKey and TValue are different.
     /// </remarks>
     /// <returns>null if table does not exist</returns>
-    public SortedTreeTable<TKey, TValue> OpenTable<TKey, TValue>(string tableName) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    public SortedTreeTable<TKey, TValue>? OpenTable<TKey, TValue>(string tableName) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         return OpenTable<TKey, TValue>(GetFileName<TKey, TValue>(tableName));
     }
@@ -186,6 +188,7 @@ public class SortedTreeFile : IDisposable
             throw new ArgumentNullException(nameof(storageMethod));
 
         SubFileName fileName = GetFileName<TKey, TValue>(tableName);
+        
         return OpenOrCreateTable<TKey, TValue>(storageMethod, fileName, maxSortedTreeBlockSize);
     }
 
@@ -206,6 +209,7 @@ public class SortedTreeFile : IDisposable
             throw new ArgumentNullException(nameof(storageMethod));
 
         SubFileName fileName = GetFileName<TKey, TValue>();
+        
         return OpenOrCreateTable<TKey, TValue>(storageMethod, fileName, maxSortedTreeBlockSize);
     }
 
@@ -216,6 +220,7 @@ public class SortedTreeFile : IDisposable
     public void Delete()
     {
         Dispose();
+
         if (FilePath != string.Empty)
             File.Delete(FilePath);
     }
@@ -227,14 +232,15 @@ public class SortedTreeFile : IDisposable
     /// <typeparam name="TValue"></typeparam>
     /// <param name="fileName">the filename to open</param>
     /// <returns>null if table does not exist</returns>
-    private SortedTreeTable<TKey, TValue> OpenTable<TKey, TValue>(SubFileName fileName) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    private SortedTreeTable<TKey, TValue>? OpenTable<TKey, TValue>(SubFileName fileName) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
-        if (!m_openedFiles.ContainsKey(fileName))
-        {
-            if (!m_fileStructure.Snapshot.Header.ContainsSubFile(fileName))
-                return null;
-            m_openedFiles.Add(fileName, new SortedTreeTable<TKey, TValue>(m_fileStructure, fileName, this));
-        }
+        if (m_openedFiles.TryGetValue(fileName, out IDisposable? file))
+            return (SortedTreeTable<TKey, TValue>)file;
+        
+        if (!m_fileStructure.Snapshot.Header.ContainsSubFile(fileName))
+            return null;
+        
+        m_openedFiles.Add(fileName, new SortedTreeTable<TKey, TValue>(m_fileStructure, fileName, this));
 
         return (SortedTreeTable<TKey, TValue>)m_openedFiles[fileName];
     }
@@ -245,6 +251,7 @@ public class SortedTreeFile : IDisposable
         {
             if (!m_fileStructure.Snapshot.Header.ContainsSubFile(fileName))
                 CreateArchiveFile<TKey, TValue>(fileName, storageMethod, maxSortedTreeBlockSize);
+            
             m_openedFiles.Add(fileName, new SortedTreeTable<TKey, TValue>(m_fileStructure, fileName, this));
         }
 
@@ -277,6 +284,7 @@ public class SortedTreeFile : IDisposable
     {
         if (maxSortedTreeBlockSize < 1024)
             throw new ArgumentOutOfRangeException(nameof(maxSortedTreeBlockSize), "Must be greater than 1024");
+        
         if (storageMethod is null)
             throw new ArgumentNullException(nameof(storageMethod));
 
@@ -320,10 +328,11 @@ public class SortedTreeFile : IDisposable
     /// <param name="flags">Flags to write to the file</param>
     public static SortedTreeFile CreateInMemory(int blockSize = 4096, params Guid[] flags)
     {
-        SortedTreeFile file = new();
-        file.FilePath = string.Empty;
-        file.m_fileStructure = TransactionalFileStructure.CreateInMemory(blockSize, flags);
-        return file;
+        return new SortedTreeFile
+        {
+            FilePath = string.Empty,
+            m_fileStructure = TransactionalFileStructure.CreateInMemory(blockSize, flags)
+        };
     }
 
     /// <summary>
@@ -352,9 +361,11 @@ public class SortedTreeFile : IDisposable
     public static SortedTreeFile OpenFile(string file, bool isReadOnly)
     {
         SortedTreeFile af = new();
+
         file = Path.GetFullPath(file);
         af.FilePath = file;
         af.m_fileStructure = TransactionalFileStructure.OpenFile(file, isReadOnly);
+        
         if (af.m_fileStructure.Snapshot.Header.ArchiveType != FileType)
             throw new Exception("Archive type is unknown");
 

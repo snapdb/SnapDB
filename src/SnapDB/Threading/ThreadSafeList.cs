@@ -110,6 +110,7 @@ public partial class ThreadSafeList<T> : IEnumerable<T>
         lock (m_syncRoot)
         {
             for (int x = 0; x < m_list.Count; x++)
+            {
                 if (m_list.Values[x].Item.Equals(item))
                 {
                     itemToRemove = m_list.Values[x];
@@ -117,6 +118,7 @@ public partial class ThreadSafeList<T> : IEnumerable<T>
                     m_version++;
                     break;
                 }
+            }
         }
 
         if (itemToRemove is null)
@@ -124,6 +126,7 @@ public partial class ThreadSafeList<T> : IEnumerable<T>
 
         while (Interlocked.CompareExchange(ref itemToRemove.ReferencedCount, -1, 0) is not 0)
             wait.SpinOnce();
+
         return true;
     }
 
@@ -137,6 +140,7 @@ public partial class ThreadSafeList<T> : IEnumerable<T>
         lock (m_syncRoot)
         {
             for (int x = 0; x < m_list.Count; x++)
+            {
                 if (m_list.Values[x].Item.Equals(item))
                 {
                     itemToRemove = m_list.Values[x];
@@ -144,12 +148,10 @@ public partial class ThreadSafeList<T> : IEnumerable<T>
                     m_version++;
                     break;
                 }
+            }
         }
 
-        if (itemToRemove is null)
-            return false;
-
-        return true;
+        return itemToRemove is not null;
     }
 
     /// <summary>
@@ -161,11 +163,13 @@ public partial class ThreadSafeList<T> : IEnumerable<T>
         lock (m_syncRoot)
         {
             for (int x = 0; x < m_list.Count; x++)
+            {
                 if (condition(m_list.Values[x].Item))
                 {
                     m_list.RemoveAt(x);
                     m_version++;
                 }
+            }
         }
     }
 

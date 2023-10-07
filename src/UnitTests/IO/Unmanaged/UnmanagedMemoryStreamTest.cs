@@ -84,8 +84,10 @@ public class UnmanagedMemoryStreamTest
     private static void Compare(byte[] a, byte[] b, int length)
     {
         for (int x = 0; x < length; x++)
+        {
             if (a[x] != b[x])
                 throw new Exception();
+        }
     }
 
     #endregion

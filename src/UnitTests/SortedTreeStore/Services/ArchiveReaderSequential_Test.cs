@@ -57,9 +57,7 @@ public class ArchiveReaderSequentialTest
         AddData(master, 100, 100, 100);
         AddData(table1, 100, 100, 100);
         using (ArchiveListEditor<HistorianKey, HistorianValue> editor = list.AcquireEditLock())
-        {
             editor.Add(table1);
-        }
 
         using (SortedTreeTableReadSnapshot<HistorianKey, HistorianValue> masterRead = master.BeginRead())
         {
@@ -245,9 +243,7 @@ public class ArchiveReaderSequentialTest
         SortedTreeTable<HistorianKey, HistorianValue> table1 = CreateTable();
         AddData(table1, 100, 100, max);
         using (ArchiveListEditor<HistorianKey, HistorianValue> editor = list.AcquireEditLock())
-        {
             editor.Add(table1);
-        }
 
         SequentialReaderStream<HistorianKey, HistorianValue> sequencer = new(list);
 

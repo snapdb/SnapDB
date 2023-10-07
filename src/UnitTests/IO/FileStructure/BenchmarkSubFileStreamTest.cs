@@ -24,7 +24,6 @@
 //
 //******************************************************************************************************
 
-
 using NUnit.Framework;
 using SnapDB.IO.FileStructure;
 using SnapDB.IO.Unmanaged;
@@ -46,7 +45,7 @@ internal class BenchmarkSubFileStreamTest
         //string file = Path.GetTempFileName();
         //System.IO.File.Delete(file);
         //using (FileSystemSnapshotService service = FileSystemSnapshotService.CreateFile(file))
-        
+
         using (TransactionalFileStructure service = TransactionalFileStructure.CreateInMemory(blockSize))
         using (TransactionalEdit edit = service.BeginEdit())
         {
