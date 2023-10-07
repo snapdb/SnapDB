@@ -295,7 +295,9 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
         ssl = new SslStream(stream, false, UserCertificateValidationCallback, UserCertificateSelectionCallback, EncryptionPolicy.RequireEncryption);
         try
         {
-            ssl.AuthenticateAsServer(SecureStreamServerCertificate.TempCertificate, true, SslProtocols.Tls12, false);
+            var cert = SecureStreamServerCertificate.TempCertificate;
+
+            ssl.AuthenticateAsServer(cert, true, SslProtocols.Tls12, false);
         }
         catch (Exception ex)
         {

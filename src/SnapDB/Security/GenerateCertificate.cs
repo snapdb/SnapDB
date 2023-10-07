@@ -1,6 +1,4 @@
-﻿//  09/18/2023 - Lillian Gensolin
-//       Converted code to .NET core.
-//******************************************************************************************************
+﻿//******************************************************************************************************
 //  GenerateCertificate.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
@@ -26,15 +24,21 @@
 //
 //******************************************************************************************************
 
+//using System.Security.Cryptography.X509Certificates;
+
+using System.Runtime.ConstrainedExecution;
 using System.Security.Cryptography.X509Certificates;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Operators;
 using Org.BouncyCastle.Crypto.Prng;
 using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.X509;
+using X509Certificate = Org.BouncyCastle.X509.X509Certificate;
 
 namespace SnapDB.Security;
 
@@ -69,28 +73,21 @@ public static class GenerateCertificate
     /// </summary>
     public static void CreateSelfSignedCertificate(string subjectDirName, DateTime startDate, DateTime endDate, int signatureBits, int keyStrength, string password, string fileName)
     {
-        switch (signatureBits)
+        string signatureAlgorithm = signatureBits switch
         {
-            case 160:
-                break;
-            case 224:
-                break;
-            case 256:
-                break;
-            case 384:
-                break;
-            case 512:
-                break;
-            default:
-                throw new ArgumentException("Invalid signature bit size.", nameof(signatureBits));
-        }
+            160 => "SHA1withRSA",
+            224 => "SHA224withRSA",
+            256 => "SHA256withRSA",
+            384 => "SHA384withRSA",
+            512 => "SHA512withRSA",
+            _ => throw new ArgumentException("Invalid signature bit size.", nameof(signatureBits))
+        };
 
         // Generating Random Numbers
         CryptoApiRandomGenerator randomGenerator = new();
         SecureRandom random = new(randomGenerator);
 
         // Generate public/private keys.
-
         KeyGenerationParameters keyGenerationParameters = new(random, keyStrength);
         RsaKeyPairGenerator keyPairGenerator = new();
         keyPairGenerator.Init(keyGenerationParameters);
@@ -99,128 +96,101 @@ public static class GenerateCertificate
         // The Certificate Generator
         X509V3CertificateGenerator certificateGenerator = new();
         certificateGenerator.SetSerialNumber(BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(long.MaxValue), random));
-
-        // TODO: JRC - check to see what has changed here and if this is necessary
-        //certificateGenerator.SetSignatureAlgorithm(signatureAlgorithm);
-
         certificateGenerator.SetIssuerDN(new X509Name(subjectDirName));
         certificateGenerator.SetSubjectDN(new X509Name(subjectDirName));
         certificateGenerator.SetNotBefore(startDate);
         certificateGenerator.SetNotAfter(endDate);
         certificateGenerator.SetPublicKey(encryptionKeys.Public);
 
-        // -- commented out due to Bouncy Castle changes --
+        ISignatureFactory signatureFactory = new Asn1SignatureFactory(signatureAlgorithm, encryptionKeys.Private, random);
+
         // self-sign certificate
-        //Org.BouncyCastle.X509.X509Certificate certificate = certificateGenerator.Generate(encryptionKeys.Private, random);
+        X509Certificate selfSignedCert = certificateGenerator.Generate(signatureFactory);
 
-        // -- commented out due to Bouncy Castle changes --
-        //Pkcs12Store store = new Pkcs12Store();
-        //string friendlyName = certificate.SubjectDN.ToString();
-        //X509CertificateEntry certificateEntry = new X509CertificateEntry(certificate);
-        //store.SetCertificateEntry(friendlyName, certificateEntry);
-        //store.SetKeyEntry(friendlyName, new AsymmetricKeyEntry(encryptionKeys.Private), new[] { certificateEntry });
+        Pkcs12Store store = new Pkcs12StoreBuilder().Build();
+        string friendlyName = selfSignedCert.SubjectDN.ToString()!;
 
-        //MemoryStream stream = new();
-        //store.Save(stream, password.ToCharArray(), random);
+        X509CertificateEntry certificateEntry = new(selfSignedCert);
+        store.SetCertificateEntry(friendlyName, certificateEntry);
+        store.SetKeyEntry(friendlyName, new AsymmetricKeyEntry(encryptionKeys.Private), new[] { certificateEntry });
 
-        // -- commented out due to Bouncy Castle changes --
-        //Verify that the certificate is valid.
-        //_ = new X509Certificate2(stream.ToArray(), password, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
+        MemoryStream stream = new();
+        store.Save(stream, password.ToCharArray(), random);
 
-        // -- commented out due to Bouncy Castle changes --
+        // Verify that the certificate is valid.
+        X509Certificate2 certificate = new(stream.ToArray(), password, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
+
+        // Windows requires a PFX-formatted certificate
+        certificate = new X509Certificate2(certificate.Export(X509ContentType.Pfx, password), password, X509KeyStorageFlags.MachineKeySet);
+
         //Write the file.
-        //File.WriteAllBytes(fileName, stream.ToArray());
-
-        // -- commented out due to Bouncy Castle changes --
-        //File.WriteAllBytes(Path.ChangeExtension(fileName, ".cer"), certificate.GetEncoded());
+        File.WriteAllBytes(Path.ChangeExtension(fileName, ".cer"), certificate.Export(X509ContentType.Cert));
     }
-
 
     /// <summary>
     /// Creates a self signed certificate that can be used in SSL communications.
     /// </summary>
-    /// <param name="subjectDirName">A valid DirName formated string. Example: CN=ServerName</param>
-    /// <param name="signatureBits">Bitstrength of signature algorithm. Supported Lengths are 160,256, and 384 </param>
+    /// <param name="subjectDirName">A valid DirName formatted string. Example: CN=ServerName</param>
+    /// <param name="signatureBits">Bit strength of signature algorithm. Supported Lengths are 160,256, and 384 </param>
     /// <param name="keyStrength">RSA key strength. Typically a multiple of 1024.</param>
     /// <returns>
     /// An <see cref="X509Certificate2"/> object representing the self-signed certificate.
     /// </returns>
     public static X509Certificate2 CreateSelfSignedCertificate(string subjectDirName, int signatureBits, int keyStrength)
     {
-        switch (signatureBits)
+        DateTime startDate = DateTime.UtcNow.AddYears(-1);
+        DateTime endDate = DateTime.UtcNow.AddYears(100);
+
+        string signatureAlgorithm = signatureBits switch
         {
-            case 160:
-                break;
-            case 256:
-                break;
-            case 384:
-                break;
-            default:
-                throw new ArgumentException("Invalid signature bit size.", nameof(signatureBits));
-        }
+            160 => "SHA1withRSA",
+            224 => "SHA224withRSA",
+            256 => "SHA256withRSA",
+            384 => "SHA384withRSA",
+            512 => "SHA512withRSA",
+            _ => throw new ArgumentException("Invalid signature bit size.", nameof(signatureBits))
+        };
 
         // Generating Random Numbers
         CryptoApiRandomGenerator randomGenerator = new();
         SecureRandom random = new(randomGenerator);
 
         // Generate public/private keys.
-
         KeyGenerationParameters keyGenerationParameters = new(random, keyStrength);
         RsaKeyPairGenerator keyPairGenerator = new();
         keyPairGenerator.Init(keyGenerationParameters);
         keyPairGenerator.GenerateKeyPair();
+        AsymmetricCipherKeyPair encryptionKeys = keyPairGenerator.GenerateKeyPair();
 
-        // TODO: JRC - check to see what has changed here and if this is necessary (see above for the same)
+        // The Certificate Generator
+        X509V3CertificateGenerator certificateGenerator = new();
+        certificateGenerator.SetSerialNumber(BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(long.MaxValue), random));
+        certificateGenerator.SetIssuerDN(new X509Name(subjectDirName));
+        certificateGenerator.SetSubjectDN(new X509Name(subjectDirName));
+        certificateGenerator.SetNotBefore(startDate);
+        certificateGenerator.SetNotAfter(endDate);
+        certificateGenerator.SetPublicKey(encryptionKeys.Public);
 
-        //// The Certificate Generator
-        //X509V3CertificateGenerator certificateGenerator = new X509V3CertificateGenerator();
-        //certificateGenerator.SetSerialNumber(BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(Int64.MaxValue), random));
-        //certificateGenerator.SetSignatureAlgorithm(signatureAlgorithm);
-        //certificateGenerator.SetIssuerDN(new X509Name(subjectDirName));
-        //certificateGenerator.SetSubjectDN(new X509Name(subjectDirName));
-        //certificateGenerator.SetNotBefore(startDate);
-        //certificateGenerator.SetNotAfter(endDate);
-        //certificateGenerator.SetPublicKey(encryptionKeys.Public);
+        ISignatureFactory signatureFactory = new Asn1SignatureFactory(signatureAlgorithm, encryptionKeys.Private, random);
 
-        //// selfsign certificate
-        //Org.BouncyCastle.X509.X509Certificate certificate = certificateGenerator.Generate(encryptionKeys.Private, random);
+        // self-sign certificate
+        X509Certificate selfSignedCert = certificateGenerator.Generate(signatureFactory);
 
-        //Pkcs12Store store = new Pkcs12Store();
-        //string friendlyName = certificate.SubjectDN.ToString();
-        //X509CertificateEntry certificateEntry = new X509CertificateEntry(certificate);
-        //store.SetCertificateEntry(friendlyName, certificateEntry);
-        //store.SetKeyEntry(friendlyName, new AsymmetricKeyEntry(encryptionKeys.Private), new[] { certificateEntry });
+        Pkcs12Store store = new Pkcs12StoreBuilder().Build();
+        string friendlyName = selfSignedCert.SubjectDN.ToString()!;
 
-        //MemoryStream stream = new();
-        //store.Save(stream, "".ToCharArray(), random);
+        X509CertificateEntry certificateEntry = new(selfSignedCert);
+        store.SetCertificateEntry(friendlyName, certificateEntry);
+        store.SetKeyEntry(friendlyName, new AsymmetricKeyEntry(encryptionKeys.Private), new[] { certificateEntry });
+
+        MemoryStream stream = new();
+        store.Save(stream, "".ToCharArray(), random);
 
         //Verify that the certificate is valid.
-        //X509Certificate2 convertedCertificate = new(stream.ToArray(), "", X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
+        X509Certificate2 convertedCertificate = new(stream.ToArray(), "", X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
 
-        //return convertedCertificate;
-
-        return null;
+        return convertedCertificate;
     }
 
     #endregion
-
-    //private static bool addCertToStore(X509Certificate2 cert, StoreName st, StoreLocation sl)
-    //{
-    //    bool bRet = false;
-
-    //    try
-    //    {
-    //        X509Store store = new X509Store(st, sl);
-    //        store.Open(OpenFlags.ReadWrite);
-    //        store.Add(cert);
-
-    //        store.Close();
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        System.Console.WriteLine(ex.ToString());
-    //    }
-
-    //    return bRet;
-    //}
 }

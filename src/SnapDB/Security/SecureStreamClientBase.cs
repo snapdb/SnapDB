@@ -276,15 +276,19 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
 
     static SecureStreamClientBase()
     {
-    #if !SQLCLR
+#if !SQLCLR
+#if !DEBUG
         try
+#endif
         {
             s_tempCert = GenerateCertificate.CreateSelfSignedCertificate("CN=Local", 256, 1024);
         }
+#if !DEBUG
         catch
         {
         }
-    #endif
+#endif
+#endif
     }
 
     #endregion
