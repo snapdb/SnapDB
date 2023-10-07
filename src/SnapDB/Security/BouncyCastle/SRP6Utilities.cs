@@ -24,6 +24,7 @@ using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities;
 
+// ReSharper disable once CheckNamespace
 namespace Org.BouncyCastle.Crypto.Agreement.Srp;
 
 internal static class Srp6Utilities
@@ -103,6 +104,7 @@ internal static class Srp6Utilities
     private static byte[] GetPadded(BigInteger n, int length)
     {
         byte[] bs = BigIntegers.AsUnsignedByteArray(n);
+
         if (bs.Length < length)
         {
             byte[] tmp = new byte[length];

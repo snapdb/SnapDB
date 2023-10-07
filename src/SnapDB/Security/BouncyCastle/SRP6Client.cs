@@ -24,6 +24,7 @@ using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
 using SnapDB.Security.Authentication;
 
+// ReSharper disable once CheckNamespace
 namespace Org.BouncyCastle.Crypto.Agreement.Srp;
 
 /**

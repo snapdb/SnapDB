@@ -24,6 +24,7 @@ using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
 using SnapDB.Security.Authentication;
 
+// ReSharper disable once CheckNamespace
 namespace Org.BouncyCastle.Crypto.Agreement.Srp;
 
 /**
@@ -51,7 +52,7 @@ internal class Srp6Server
     #region [ Constructors ]
 
     /**
-    * Initialises the server to accept a new client authentication attempt
+    * Initializes the server to accept a new client authentication attempt
     * @param N The safe prime associated with the client's verifier
     * @param g The group parameter associated with the client's verifier
     * @param v The client's verifier
