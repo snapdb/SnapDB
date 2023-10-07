@@ -175,7 +175,7 @@ public class FixedSizeNodeTestInt
     #region [ Methods ]
 
     [Test]
-    public void TestSequently()
+    public void TestSequentially()
     {
         SortedTreeNodeBase<SnapInt32, SnapInt32> tree = Library.CreateTreeNode<SnapInt32, SnapInt32>(EncodingDefinition.FixedSizeCombinedEncoding, 0);
 
@@ -183,7 +183,7 @@ public class FixedSizeNodeTestInt
     }
 
     [Test]
-    public void TestReverseSequently()
+    public void TestReverseSequentially()
     {
         SortedTreeNodeBase<SnapInt32, SnapInt32> tree = Library.CreateTreeNode<SnapInt32, SnapInt32>(EncodingDefinition.FixedSizeCombinedEncoding, 0);
 
@@ -199,7 +199,7 @@ public class FixedSizeNodeTestInt
     }
 
     [Test]
-    public void BenchmarkSequently()
+    public void BenchmarkSequentially()
     {
         SortedTreeNodeBase<SnapInt32, SnapInt32> tree = Library.CreateTreeNode<SnapInt32, SnapInt32>(EncodingDefinition.FixedSizeCombinedEncoding, 0);
 
@@ -207,7 +207,7 @@ public class FixedSizeNodeTestInt
     }
 
     [Test]
-    public void BenchmarkReverseSequently()
+    public void BenchmarkReverseSequentially()
     {
         SortedTreeNodeBase<SnapInt32, SnapInt32> tree = Library.CreateTreeNode<SnapInt32, SnapInt32>(EncodingDefinition.FixedSizeCombinedEncoding, 0);
 
@@ -233,7 +233,7 @@ public class FixedSizeNodeTestInt
     #endregion
 
     //        [Test]
-    //        public void TestReverseSequently()
+    //        public void TestReverseSequentially()
     //        {
 
     //            uint rootKey = 0;

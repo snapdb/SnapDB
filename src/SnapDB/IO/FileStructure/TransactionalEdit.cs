@@ -204,8 +204,10 @@ public sealed class TransactionalEdit : IDisposable
             throw new ObjectDisposedException(GetType().FullName);
 
         foreach (SubFileStream? file in m_openedFiles)
+        {
             if (file is not null && !file.IsDisposed)
                 throw new Exception("Not all files have been properly disposed.");
+        }
 
         try
         {
@@ -233,8 +235,10 @@ public sealed class TransactionalEdit : IDisposable
             throw new ObjectDisposedException(GetType().FullName);
 
         foreach (SubFileStream? file in m_openedFiles)
+        {
             if (file is not null && !file.IsDisposed)
                 file.Dispose();
+        }
 
         try
         {

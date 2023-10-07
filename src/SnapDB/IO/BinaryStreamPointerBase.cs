@@ -160,7 +160,7 @@ public abstract unsafe class BinaryStreamPointerBase : BinaryStreamBase
     /// </summary>
     /// <param name="position"></param>
     /// <param name="length">The number of bytes valid for the writing.</param>
-    /// <remarks>This method will throw an exeption if the provided length cannot be provided.</remarks>
+    /// <remarks>This method will throw an exception if the provided length cannot be provided.</remarks>
     public byte* GetWritePointer(long position, int length)
     {
         Position = position;

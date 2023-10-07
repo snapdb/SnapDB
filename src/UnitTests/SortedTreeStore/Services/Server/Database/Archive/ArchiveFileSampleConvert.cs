@@ -36,14 +36,18 @@ public class ArchiveFileSampleConvert
 {
     #region [ Methods ]
 
+    // NOTE: Write test must happen before read. ReSharper will run tests in alphabetical order,
+    // so ensure test names reflect this needed order.
+
     [Test]
-    public void WriteFile()
+    public void StepA_WriteFile()
     {
         HistorianKey key = new();
         HistorianValue value = new();
 
         if (File.Exists("c:\\temp\\ArchiveTestFileBig.d2"))
             File.Delete("c:\\temp\\ArchiveTestFileBig.d2");
+
         //using (var af = ArchiveFile.CreateInMemory(CompressionMethod.TimeSeriesEncoded))
         using SortedTreeFile af = SortedTreeFile.CreateFile("c:\\temp\\ArchiveTestFileBig.d2");
         using SortedTreeTable<HistorianKey, HistorianValue> af2 = af.OpenOrCreateTable<HistorianKey, HistorianValue>(EncodingDefinition.FixedSizeCombinedEncoding);
@@ -130,7 +134,7 @@ public class ArchiveFileSampleConvert
     //}
 
     [Test]
-    public void ReadFile()
+    public void StepB_ReadFile()
     {
         using SortedTreeFile af = SortedTreeFile.OpenFile("c:\\temp\\ArchiveTestFileBig.d2", true);
         using SortedTreeTable<HistorianKey, HistorianValue> af2 = af.OpenOrCreateTable<HistorianKey, HistorianValue>(EncodingDefinition.FixedSizeCombinedEncoding);

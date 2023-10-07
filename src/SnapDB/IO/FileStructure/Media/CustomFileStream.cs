@@ -104,6 +104,9 @@ internal sealed class CustomFileStream : IDisposable
         m_bufferQueue = s_resourceList.GetResourceQueue(ioSize);
         m_syncRoot = new object();
 
+        if (!File.Exists(fileName))
+            return;
+        
         FileInfo fileInfo = new(fileName);
         m_length.Value = fileInfo.Length;
     }
@@ -481,6 +484,8 @@ internal sealed class CustomFileStream : IDisposable
     /// <returns>A new <see cref="CustomFileStream"/> instance representing the specified file.</returns>
     public static CustomFileStream CreateFile(string fileName, int ioBlockSize, int fileStructureBlockSize)
     {
+        // Exclusive opening to prevent duplicate opening.
+        using FileStream _ = new(fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 2048, true);
         return new CustomFileStream(ioBlockSize, fileStructureBlockSize, fileName, false, false);
     }
 

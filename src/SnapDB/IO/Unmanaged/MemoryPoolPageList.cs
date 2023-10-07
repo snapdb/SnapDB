@@ -31,6 +31,7 @@ using Gemstone;
 using Gemstone.Console;
 using Gemstone.Diagnostics;
 using Gemstone.Units;
+using JetBrains.Annotations;
 using SnapDB.Collections;
 using SnapDB.Threading;
 
@@ -50,19 +51,20 @@ internal class MemoryPoolPageList : IDisposable
     // ReSharper disable InconsistentNaming
     // ReSharper disable NotAccessedField.Local
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    [NoReorder]
     private class MEMORYSTATUSEX
     {
         #region [ Members ]
 
         public uint dwLength;
         public uint dwMemoryLoad;
-        public ulong ullAvailExtendedVirtual;
-        public ulong ullAvailPageFile;
-        public ulong ullAvailPhys;
-        public ulong ullAvailVirtual;
-        public ulong ullTotalPageFile;
         public ulong ullTotalPhys;
+        public ulong ullAvailPhys;
+        public ulong ullTotalPageFile;
+        public ulong ullAvailPageFile;
         public ulong ullTotalVirtual;
+        public ulong ullAvailVirtual;
+        public ulong ullAvailExtendedVirtual;
 
         #endregion
 

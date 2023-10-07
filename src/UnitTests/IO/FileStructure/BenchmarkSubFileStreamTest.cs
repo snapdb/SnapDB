@@ -42,24 +42,28 @@ internal class BenchmarkSubFileStreamTest
     {
         const int blockSize = 256;
         MemoryPoolTest.TestMemoryLeak();
+
         //string file = Path.GetTempFileName();
         //System.IO.File.Delete(file);
         //using (FileSystemSnapshotService service = FileSystemSnapshotService.CreateFile(file))
-        using TransactionalFileStructure service = TransactionalFileStructure.CreateInMemory(blockSize);
-        using TransactionalEdit edit = service.BeginEdit();
-        SubFileStream fs = edit.CreateFile(SubFileName.Empty);
-        BinaryStream bs = new(fs);
+        
+        using (TransactionalFileStructure service = TransactionalFileStructure.CreateInMemory(blockSize))
+        using (TransactionalEdit edit = service.BeginEdit())
+        {
+            SubFileStream fs = edit.CreateFile(SubFileName.Empty);
+            BinaryStream bs = new(fs);
 
-        for (int x = 0; x < 20000000; x++)
-            bs.Write(1L);
+            for (int x = 0; x < 20000000; x++)
+                bs.Write(1L);
 
-        bs.Position = 0;
+            bs.Position = 0;
 
-        BinaryStreamBenchmark.Run(bs, false);
+            BinaryStreamBenchmark.Run(bs, false);
 
-        bs.Dispose();
-        fs.Dispose();
-        edit.CommitAndDispose();
+            bs.Dispose();
+            fs.Dispose();
+            edit.CommitAndDispose();
+        }
 
         MemoryPoolTest.TestMemoryLeak();
     }

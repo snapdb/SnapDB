@@ -38,6 +38,12 @@ public class SimplifiedFileWriterTest
 {
     #region [ Methods ]
 
+    static SimplifiedFileWriterTest()
+    {
+        if (!Directory.Exists(@"C:\Temp"))
+            Directory.CreateDirectory(@"C:\Temp");
+    }
+
     [Test]
     public void Test1()
     {

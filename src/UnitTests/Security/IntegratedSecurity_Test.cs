@@ -31,7 +31,8 @@ using SnapDB.Security.Authentication;
 
 namespace SnapDB.UnitTests.Security;
 
-[TestFixture]
+// TODO: These tests will not execute until Gemstone implements UserInfo and possibly authentication
+//[TestFixture]
 public class IntegratedSecurityTest
 {
     #region [ Members ]
@@ -42,7 +43,7 @@ public class IntegratedSecurityTest
 
     #region [ Methods ]
 
-    [Test]
+    // TODO: Disabled [Test]
     public void Test1()
     {
         m_sw.Reset();
@@ -50,7 +51,7 @@ public class IntegratedSecurityTest
         NetworkStreamSimulator net = new();
 
         IntegratedSecurityServer sa = new();
-        sa.Users.AddUser("zthe\\steven");
+        sa.Users.AddUser("GPA\\rcarroll");
 
         ThreadPool.QueueUserWorkItem(Client1, net.ClientStream);
         bool user = sa.TryAuthenticateAsServer(net.ServerStream, out Guid token);
@@ -61,7 +62,7 @@ public class IntegratedSecurityTest
         Thread.Sleep(100);
     }
 
-    [Test]
+    // TODO: Disabled [Test]
     public void TestRepeat()
     {
         for (int x = 0; x < 5; x++)

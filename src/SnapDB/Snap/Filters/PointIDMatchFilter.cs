@@ -46,13 +46,13 @@ public partial class PointIdMatchFilter
     /// <param name="pointId">Point ID to include in the filter.</param>
     public static MatchFilterBase<TKey, TValue> CreateFromPointId<TKey, TValue>(ulong pointId) where TKey : TimestampPointIdBase<TKey>, new()
     {
-        if (pointId < 8 * 1024 * 64) // 64KB of space, 524288
-            return new BitArrayFilter<TKey, TValue>(new[] { pointId }, pointId);
-
-        if (pointId <= uint.MaxValue)
-            return new UIntHashSet<TKey, TValue>(new[] { pointId }, pointId);
-
-        return new ULongHashSet<TKey, TValue>(new[] { pointId }, pointId);
+        return pointId switch
+        {
+            // 64KB of space, 524288
+            < 8 * 1024 * 64 => new BitArrayFilter<TKey, TValue>(new[] { pointId }, pointId),
+            <= uint.MaxValue => new UIntHashSet<TKey, TValue>(new[] { pointId }, pointId),
+            _ => new ULongHashSet<TKey, TValue>(new[] { pointId }, pointId)
+        };
     }
 
     /// <summary>
@@ -68,22 +68,19 @@ public partial class PointIdMatchFilter
     /// </remarks>
     public static MatchFilterBase<TKey, TValue> CreateFromList<TKey, TValue>(IEnumerable<ulong> listOfPointIDs) where TKey : TimestampPointIdBase<TKey>, new()
     {
-        MatchFilterBase<TKey, TValue> filter;
         ulong maxValue = 0;
+        ulong[] pointIDs = listOfPointIDs as ulong[] ?? listOfPointIDs.ToArray();
 
-        if (listOfPointIDs.Any())
-            maxValue = listOfPointIDs.Max();
+        if (pointIDs.Any())
+            maxValue = pointIDs.Max();
 
-        if (maxValue < 8 * 1024 * 64) // 64KB of space, 524288
-            filter = new BitArrayFilter<TKey, TValue>(listOfPointIDs, maxValue);
-
-        if (maxValue <= uint.MaxValue)
-            filter = new UIntHashSet<TKey, TValue>(listOfPointIDs, maxValue);
-
-        else
-            filter = new ULongHashSet<TKey, TValue>(listOfPointIDs, maxValue);
-
-        return filter;
+        return maxValue switch
+        {
+            // 64KB of space, 524288
+            < 8 * 1024 * 64 => new BitArrayFilter<TKey, TValue>(pointIDs, maxValue),
+            <= uint.MaxValue => new UIntHashSet<TKey, TValue>(pointIDs, maxValue),
+            _ => new ULongHashSet<TKey, TValue>(pointIDs, maxValue)
+        };
     }
 
     /// <summary>
@@ -101,7 +98,7 @@ public partial class PointIdMatchFilter
     /// The match filter is deserialized from the binary stream based on its version and data format.
     /// </remarks>
     [MethodImpl(MethodImplOptions.NoOptimization)]
-    private static MatchFilterBase<TKey, TValue> CreateFromStream<TKey, TValue>(BinaryStreamBase stream) where TKey : TimestampPointIdBase<TKey>, new()
+    private static MatchFilterBase<TKey, TValue>? CreateFromStream<TKey, TValue>(BinaryStreamBase stream) where TKey : TimestampPointIdBase<TKey>, new()
     {
         MatchFilterBase<TKey, TValue> filter;
         byte version = stream.ReadUInt8();
@@ -119,7 +116,6 @@ public partial class PointIdMatchFilter
 
                 if (maxValue < 8 * 1024 * 64) // 64KB of space, 524288
                     filter = new BitArrayFilter<TKey, TValue>(stream, count, maxValue);
-
                 else
                     filter = new UIntHashSet<TKey, TValue>(stream, count, maxValue);
 

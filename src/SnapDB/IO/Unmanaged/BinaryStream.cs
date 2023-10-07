@@ -144,6 +144,7 @@ public unsafe class BinaryStream : BinaryStreamPointerBase
     {
         // If the object has not been disposed yet
         if (!m_disposed)
+        {
             // This will be done regardless of whether the object is finalized or disposed.
             try
             {
@@ -171,6 +172,7 @@ public unsafe class BinaryStream : BinaryStreamPointerBase
                 BaseStream = null;
                 m_disposed = true;
             }
+        }
 
         base.Dispose(disposing);
     }

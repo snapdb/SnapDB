@@ -338,7 +338,6 @@ internal unsafe class DiskIoSession : IDisposable
             Pointer = (byte*)m_args.FirstPointer;
             CachedLookups++;
         }
-
         else
         {
             m_args.Position = position;

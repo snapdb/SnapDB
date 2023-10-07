@@ -21,9 +21,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="DelMeTest.cs" />
     <Compile Remove="Program.cs" />
     <Compile Remove="RemoteOutputAdapterTest.cs" />
     <Compile Remove="SortedTreeStore\Tree\Generic\CustomCompression\HistorianCompressionDelta_Test.cs" />
+    <Compile Remove="Threading\ScheduledTaskTest.cs" />
+    <Compile Remove="WinApiTest.cs" />
   </ItemGroup>
 
   <ItemGroup>

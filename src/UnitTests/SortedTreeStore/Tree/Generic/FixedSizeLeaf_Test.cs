@@ -164,7 +164,7 @@ internal class RandomTest : TreeNodeRandomizerBase<SnapUInt32, SnapUInt32>
 }
 
 [TestFixture]
-public class FixedSizeNodeTest
+public class FixedSizeLeafNodeTest
 {
     #region [ Members ]
 
@@ -175,7 +175,7 @@ public class FixedSizeNodeTest
     #region [ Methods ]
 
     [Test]
-    public void TestSequently()
+    public void TestSequentially()
     {
         SortedTreeNodeBase<SnapUInt32, SnapUInt32> tree = Library.CreateTreeNode<SnapUInt32, SnapUInt32>(EncodingDefinition.FixedSizeCombinedEncoding, 0);
 
@@ -183,7 +183,7 @@ public class FixedSizeNodeTest
     }
 
     [Test]
-    public void TestReverseSequently()
+    public void TestReverseSequentially()
     {
         SortedTreeNodeBase<SnapUInt32, SnapUInt32> tree = Library.CreateTreeNode<SnapUInt32, SnapUInt32>(EncodingDefinition.FixedSizeCombinedEncoding, 0);
 
@@ -199,7 +199,7 @@ public class FixedSizeNodeTest
     }
 
     [Test]
-    public void BenchmarkSequently()
+    public void BenchmarkSequentially()
     {
         SortedTreeNodeBase<SnapUInt32, SnapUInt32> tree = Library.CreateTreeNode<SnapUInt32, SnapUInt32>(EncodingDefinition.FixedSizeCombinedEncoding, 0);
 
@@ -207,7 +207,7 @@ public class FixedSizeNodeTest
     }
 
     [Test]
-    public void BenchmarkReverseSequently()
+    public void BenchmarkReverseSequentially()
     {
         SortedTreeNodeBase<SnapUInt32, SnapUInt32> tree = Library.CreateTreeNode<SnapUInt32, SnapUInt32>(EncodingDefinition.FixedSizeCombinedEncoding, 0);
 

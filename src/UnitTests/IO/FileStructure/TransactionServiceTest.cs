@@ -40,64 +40,68 @@ public class TransactionServiceTest
     public void Test()
     {
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
+
         //string file = Path.GetTempFileName();
         //System.IO.File.Delete(file);
         //using (FileSystemSnapshotService service = FileSystemSnapshotService.CreateFile(file))
-        using TransactionalFileStructure service = TransactionalFileStructure.CreateInMemory(s_blockSize);
-        using (TransactionalEdit edit = service.BeginEdit())
-        {
-            SubFileStream fs = edit.CreateFile(SubFileName.CreateRandom());
-            BinaryStream bs = new(fs);
-            bs.Write((byte)1);
-            bs.Dispose();
-            fs.Dispose();
-            edit.CommitAndDispose();
-        }
 
+        using (TransactionalFileStructure service = TransactionalFileStructure.CreateInMemory(s_blockSize))
         {
-            ReadSnapshot read = service.Snapshot;
-            SubFileStream f1 = read.OpenFile(0);
-            BinaryStream bs1 = new(f1);
-            if (bs1.ReadUInt8() != 1)
-                throw new Exception();
+            using (TransactionalEdit edit = service.BeginEdit())
+            {
+                SubFileStream fs = edit.CreateFile(SubFileName.CreateRandom());
+                BinaryStream bs = new(fs);
+                bs.Write((byte)1);
+                bs.Dispose();
+                fs.Dispose();
+                edit.CommitAndDispose();
+            }
+            {
+                ReadSnapshot read = service.Snapshot;
+                SubFileStream f1 = read.OpenFile(0);
+                BinaryStream bs1 = new(f1);
+                if (bs1.ReadUInt8() != 1)
+                    throw new Exception();
 
+                using (TransactionalEdit edit = service.BeginEdit())
+                {
+                    SubFileStream f2 = edit.OpenFile(0);
+                    BinaryStream bs2 = new(f2);
+                    if (bs2.ReadUInt8() != 1)
+                        throw new Exception();
+                    bs2.Write((byte)3);
+                    bs2.Dispose();
+                } //rollback should be issued;
+
+                if (bs1.ReadUInt8() != 0)
+                    throw new Exception();
+                bs1.Dispose();
+
+                {
+                    ReadSnapshot read2 = service.Snapshot;
+                    SubFileStream f2 = read2.OpenFile(0);
+                    BinaryStream bs2 = new(f2);
+                    if (bs2.ReadUInt8() != 1)
+                        throw new Exception();
+                    if (bs2.ReadUInt8() != 0)
+                        throw new Exception();
+                    bs2.Dispose();
+                }
+            }
             using (TransactionalEdit edit = service.BeginEdit())
             {
                 SubFileStream f2 = edit.OpenFile(0);
                 BinaryStream bs2 = new(f2);
-                if (bs2.ReadUInt8() != 1)
-                    throw new Exception();
-                bs2.Write((byte)3);
+                bs2.Write((byte)13);
+                bs2.Write((byte)23);
                 bs2.Dispose();
+                edit.RollbackAndDispose();
             } //rollback should be issued;
-
-            if (bs1.ReadUInt8() != 0)
-                throw new Exception();
-            bs1.Dispose();
-
-            {
-                ReadSnapshot read2 = service.Snapshot;
-                SubFileStream f2 = read2.OpenFile(0);
-                BinaryStream bs2 = new(f2);
-                if (bs2.ReadUInt8() != 1)
-                    throw new Exception();
-                if (bs2.ReadUInt8() != 0)
-                    throw new Exception();
-                bs2.Dispose();
-            }
         }
-        using (TransactionalEdit edit = service.BeginEdit())
-        {
-            SubFileStream f2 = edit.OpenFile(0);
-            BinaryStream bs2 = new(f2);
-            bs2.Write((byte)13);
-            bs2.Write((byte)23);
-            bs2.Dispose();
-            edit.RollbackAndDispose();
-        } //rollback should be issued;
 
         Assert.AreEqual(Globals.MemoryPool.AllocatedBytes, 0L);
-        Assert.IsTrue(true);
+
+        //Assert.IsTrue(true);
     }
 
     #endregion

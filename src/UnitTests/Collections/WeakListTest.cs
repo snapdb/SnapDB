@@ -35,6 +35,16 @@ namespace SnapDB.UnitTests.Collections;
 [TestFixture]
 internal class WeakListTest
 {
+    private class Data
+    {
+        public string Value;
+
+        public Data(string value)
+        {
+            Value = value;
+        }
+    }
+
     #region [ Methods ]
 
     [Test]
@@ -42,12 +52,12 @@ internal class WeakListTest
     {
         Random rand = new(3);
 
-        List<string> list1 = new();
-        WeakList<string> list2 = new();
+        List<Data> list1 = new();
+        WeakList<Data> list2 = new();
 
         for (int x = 0; x < 1000; x++)
         {
-            string str = x.ToString();
+            Data str = new(x.ToString());
             list1.Add(str);
             list2.Add(str);
 
@@ -57,8 +67,8 @@ internal class WeakListTest
 
         for (int x = 1000; x < 2000; x++)
         {
-            string str = x.ToString();
-            string removeItem = list1[rand.Next(list1.Count)];
+            Data str = new(x.ToString());
+            Data removeItem = list1[rand.Next(list1.Count)];
             list1.Remove(removeItem);
             list2.Remove(removeItem);
 
@@ -81,9 +91,8 @@ internal class WeakListTest
                 throw new Exception("Lists are not the same.");
         }
 
-
         list2.Clear();
-        foreach (string data in list2)
+        foreach (Data data in list2)
             throw new Exception();
     }
 
