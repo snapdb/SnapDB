@@ -157,10 +157,8 @@ public unsafe class NodeHeader<TKey> where TKey : SnapTypeBase<TKey>, new()
     public int HeaderSize => OffsetOfLowerBounds + KeySize * 2;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="NodeHeader{TKey}"/> class.
+    /// Gets the number of remaining bytes in the current data block.
     /// </summary>
-    /// <param name="level">The level of the node within the B-tree structure.</param>
-    /// <param name="blockSize">The size, in bytes, of the node block.</param>
     public ushort RemainingBytes => (ushort)(BlockSize - ValidBytes);
 
     /// <summary>

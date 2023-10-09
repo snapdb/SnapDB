@@ -105,7 +105,7 @@ public sealed class SparseIndexWriter<TKey> : TreeStream<TKey, SnapUInt32> where
     /// Adds the following node pointer to the sparse index.
     /// </summary>
     /// <param name="leftPointer">The pointer to the left element, Only used to prime the list.</param>
-    /// <param name="nodeKey">the first key in the <see cref="pointer"/>. Only uses the key portion of the TKeyValue</param>
+    /// <param name="nodeKey">the first key in the <paramref name="pointer"/>. Only uses the key portion of the TKeyValue</param>
     /// <param name="pointer">the index of the later node</param>
     /// <remarks>
     /// This class will add the new node data to the parent node,

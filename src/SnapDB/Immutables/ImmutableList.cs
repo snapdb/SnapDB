@@ -179,7 +179,7 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
         return ((IEnumerable)m_list).GetEnumerator();
     }
 
-    /// <summary>Adds an item to the <see cref=ICollection"/>.</summary>
+    /// <summary>Adds an item to the <see cref="ICollection"/>.</summary>
     /// <param name="item">The object to add to the <see cref="ICollection"/>.</param>
     /// <exception cref="NotSupportedException">The <see cref="ICollection"/> is read-only.</exception>
     public void Add(T? item)

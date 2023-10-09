@@ -26,29 +26,62 @@
 
 namespace SnapDB.Snap.Tree;
 
+/// <summary>
+/// Helper class for inserting key-value pairs into a tree stream.
+/// </summary>
+/// <typeparam name="TKey">The type of the keys in the tree stream.</typeparam>
+/// <typeparam name="TValue">The type of the values in the tree stream.</typeparam>
 public class InsertStreamHelper<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
 
     /// <summary>
-    /// Determines if Key1 and Value1 are the current keys.
-    /// Otherwise Key1 and Value2 are.
+    /// Gets or sets a value indicating whether the current operation involves Key-Value Pair 1 (KVP1).
     /// </summary>
     public bool IsKvp1;
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the stream is still sequential.
+    /// </summary>
     public bool IsStillSequential;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the current state is valid.
+    /// </summary>
     public bool IsValid;
+
+    /// <summary>
+    /// Gets or sets the first key.
+    /// </summary>
     public TKey Key1;
+
+    /// <summary>
+    /// Gets or sets the second key.
+    /// </summary>
     public TKey Key2;
 
+    /// <summary>
+    /// Gets or sets the tree stream for insertion.
+    /// </summary>
     public TreeStream<TKey, TValue> Stream;
+
+    /// <summary>
+    /// Gets or sets the first value.
+    /// </summary>
     public TValue Value1;
+
+    /// <summary>
+    /// Gets or sets the second value.
+    /// </summary>
     public TValue Value2;
 
     #endregion
 
     #region [ Constructors ]
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="InsertStreamHelper{TKey, TValue}"/> class.
+    /// </summary>
     public InsertStreamHelper(TreeStream<TKey, TValue> stream)
     {
         Stream = stream;
@@ -75,18 +108,33 @@ public class InsertStreamHelper<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
 
     #region [ Properties ]
 
+    /// <summary>
+    /// Gets the current key.
+    /// </summary>
     public TKey Key => IsKvp1 ? Key1 : Key2;
 
+    /// <summary>
+    /// Gets the previous key.
+    /// </summary>
     public TKey PrevKey => IsKvp1 ? Key2 : Key1;
 
+    /// <summary>
+    /// Gets the previous value.
+    /// </summary>
     public TValue PrevValue => IsKvp1 ? Value2 : Value1;
 
+    /// <summary>
+    /// Gets the current value.
+    /// </summary>
     public TValue Value => IsKvp1 ? Value1 : Value2;
 
     #endregion
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Advances to the next key-value pair.
+    /// </summary>
     public void Next()
     {
         if (IsKvp1)
@@ -103,6 +151,9 @@ public class InsertStreamHelper<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
         }
     }
 
+    /// <summary>
+    /// Advances to the next key-value pair without checking for sequential order.
+    /// </summary>
     public void NextDoNotCheckSequential()
     {
         if (IsKvp1)

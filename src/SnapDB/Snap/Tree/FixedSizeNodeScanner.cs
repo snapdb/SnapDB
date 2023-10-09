@@ -171,7 +171,7 @@ public class FixedSizeNodeScanner<TKey, TValue> : SortedTreeScannerBase<TKey, TV
     }
 
     /// <summary>
-    /// Using <see cref="SortedTreeScannerBase{TKey,TValue}.Pointer"/> to advance to the search location of the provided <see cref="key"/>.
+    /// Using <see cref="SortedTreeScannerBase{TKey,TValue}.Pointer"/> to advance to the search location of the provided <paramref name="key"/>.
     /// </summary>
     /// <param name="key">The key to advance to.</param>
     protected override unsafe void FindKey(TKey key)

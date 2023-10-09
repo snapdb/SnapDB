@@ -656,7 +656,7 @@
             Returns an enumerator that iterates through the non-null elements of this collection.
             </summary>
       <returns>
-            A <see cref="!:System.Collections.Generic.IEnumerator`1" /> that can be used to iterate through the collection.
+            An <see cref="T:System.Collections.IEnumerator" /> that can be used to iterate through the collection.
             </returns>
     </member>
     <member name="M:SnapDB.Collections.NullableLargeArray`1.GetValue(System.Int32)">
@@ -862,7 +862,7 @@
             Returns an enumerator that iterates through the collection.
             </summary>
       <returns>
-            A <see cref="!:System.Collections.Generic.IEnumerator`1" /> that can be used to iterate through the collection.
+            An <see cref="T:System.Collections.IEnumerator" /> that can be used to iterate through the collection.
             </returns>
     </member>
     <member name="M:SnapDB.Collections.WeakList`1.Remove(`0)">
@@ -1009,16 +1009,30 @@
       </param>
     </member>
     <member name="M:SnapDB.Immutables.ImmutableList`1.Add(`0)">
-      <summary>Adds an item to the <see cref="!:System.Collections.Generic.ICollection`1" />.</summary>
-      <param name="item">The object to add to the <see cref="!:System.Collections.Generic.ICollection`1" />.</param>
-      <exception cref="T:System.NotSupportedException">The <see cref="!:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
+      <summary>
+        <markup>
+          <include item="SMCMissingTag">
+            <parameter>summary</parameter>
+            <parameter>M:SnapDB.Immutables.ImmutableList`1.Add(`0)</parameter>
+          </include>
+        </markup>
+      </summary>
+      <param name="item">
+        <markup>
+          <include item="SMCMissingParamTag">
+            <parameter>param</parameter>
+            <parameter>item</parameter>
+            <parameter>M:SnapDB.Immutables.ImmutableList`1.Add(`0)</parameter>
+          </include>
+        </markup>
+      </param>
     </member>
     <member name="M:SnapDB.Immutables.ImmutableList`1.AddRange(System.Collections.Generic.IEnumerable{`0})">
       <summary>
-            Adds the elements of the specified collection to the end of the <see cref="!:System.Collections.Generic.List`1" />.
+            Adds the elements of the specified collection to the end of the <see cref="T:System.Collections.Generic.List`1" />.
             </summary>
       <param name="collection">
-            The collection whose elements should be added to the end of the <see cref="!:System.Collections.Generic.List`1" />.
+            The collection whose elements should be added to the end of the <see cref="T:System.Collections.Generic.List`1" />.
             The collection itself cannot be <c>null</c>, but it can contain elements that are <c>null</c>.
             </param>
     </member>
@@ -1034,45 +1048,45 @@
     </member>
     <member name="M:SnapDB.Immutables.ImmutableList`1.Contains(`0)">
       <summary>
-            Determines whether the <see cref="!:System.Collections.Generic.ICollection`1" /> contains a specific value.
+            Determines whether the <see cref="T:System.Collections.ICollection" /> contains a specific value.
             </summary>
-      <param name="item">The object to locate in the <see cref="!:System.Collections.Generic.ICollection`1" />.</param>
+      <param name="item">The object to locate in the <see cref="T:System.Collections.ICollection" />.</param>
       <returns>
-        <c>true</c> if <paramref name="item" /> is found in the <see cref="!:System.Collections.Generic.ICollection`1" />; otherwise, <c>false</c>.</returns>
+        <c>true</c> if <paramref name="item" /> is found in the <see cref="T:System.Collections.ICollection" />; otherwise, <c>false</c>.</returns>
     </member>
     <member name="M:SnapDB.Immutables.ImmutableList`1.CopyTo(`0[],System.Int32)">
       <summary>
-            Copies the elements of the <see cref="!:System.Collections.Generic.ICollection`1" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
+            Copies the elements of the <see cref="T:System.Collections.ICollection" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
             </summary>
       <param name="array">
-            The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="!:System.Collections.Generic.ICollection`1" />.
+            The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.ICollection" />.
             The <see cref="T:System.Array" /> must have zero-based indexing.
             </param>
       <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
     </member>
     <member name="P:SnapDB.Immutables.ImmutableList`1.Count">
       <summary>
-            Gets the number of elements contained in the <see cref="!:System.Collections.Generic.ICollection`1" />.
+            Gets the number of elements contained in the <see cref="T:System.Collections.ICollection" />.
             </summary>
-      <returns>The number of elements contained in the <see cref="!:System.Collections.Generic.ICollection`1" />.</returns>
+      <returns>The number of elements contained in the <see cref="T:System.Collections.ICollection" />.</returns>
     </member>
     <member name="M:SnapDB.Immutables.ImmutableList`1.GetEnumerator">
       <summary>Returns an enumerator that iterates through the collection.</summary>
-      <returns>A <see cref="!:System.Collections.Generic.IEnumerator`1" /> that can be used to iterate through the collection.</returns>
+      <returns>A <see cref="T:System.Collections.Generic.IEnumerator`1" /> that can be used to iterate through the collection.</returns>
     </member>
     <member name="M:SnapDB.Immutables.ImmutableList`1.IndexOf(`0)">
       <summary>
-            Determines the index of a specific item in the <see cref="!:System.Collections.Generic.IList`1" />.
+            Determines the index of a specific item in the <see cref="T:System.Collections.IList" />.
             </summary>
-      <param name="item">The object to locate in the <see cref="!:System.Collections.Generic.IList`1" />.</param>
+      <param name="item">The object to locate in the <see cref="T:System.Collections.IList" />.</param>
       <returns>The index of <paramref name="item" /> if found in the list; otherwise, -1.</returns>
     </member>
     <member name="M:SnapDB.Immutables.ImmutableList`1.Insert(System.Int32,`0)">
       <summary>
-            Inserts an item to the <see cref="!:System.Collections.Generic.IList`1" /> at the specified index.
+            Inserts an item to the <see cref="T:System.Collections.IList" /> at the specified index.
             </summary>
       <param name="index">The zero-based index at which <paramref name="item" /> should be inserted.</param>
-      <param name="item">The object to insert into the <see cref="!:System.Collections.Generic.IList`1" />.</param>
+      <param name="item">The object to insert into the <see cref="T:System.Collections.IList" />.</param>
     </member>
     <member name="P:SnapDB.Immutables.ImmutableList`1.Item(System.Int32)">
       <summary>
@@ -1083,17 +1097,17 @@
     </member>
     <member name="M:SnapDB.Immutables.ImmutableList`1.Remove(`0)">
       <summary>
-            Removes the first occurrence of a specific object from the <see cref="!:System.Collections.Generic.ICollection`1" />.
+            Removes the first occurrence of a specific object from the <see cref="T:System.Collections.ICollection" />.
             </summary>
-      <param name="item">The object to remove from the <see cref="!:System.Collections.Generic.ICollection`1" />.</param>
+      <param name="item">The object to remove from the <see cref="T:System.Collections.ICollection" />.</param>
       <returns>
-        <c>true</c> if <paramref name="item" /> was successfully removed from the <see cref="!:System.Collections.Generic.ICollection`1" />;
-            otherwise, <c>false</c>. This method also returns false if <paramref name="item" /> is not found in the original <see cref="!:System.Collections.Generic.ICollection`1" />.
+        <c>true</c> if <paramref name="item" /> was successfully removed from the <see cref="T:System.Collections.ICollection" />;
+            otherwise, <c>false</c>. This method also returns false if <paramref name="item" /> is not found in the original <see cref="T:System.Collections.ICollection" />.
             </returns>
     </member>
     <member name="M:SnapDB.Immutables.ImmutableList`1.RemoveAt(System.Int32)">
       <summary>
-            Removes the <see cref="!:System.Collections.Generic.IList`1" /> item at the specified index.
+            Removes the <see cref="T:System.Collections.IList" /> item at the specified index.
             </summary>
       <param name="index">The zero-based index of the item to remove.</param>
     </member>
@@ -1808,7 +1822,7 @@
           </include>
         </markup>
       </returns>
-      <remarks>This method will throw an exeption if the provided length cannot be provided.</remarks>
+      <remarks>This method will throw an exception if the provided length cannot be provided.</remarks>
     </member>
     <member name="F:SnapDB.IO.BinaryStreamPointerBase.LastPosition">
       <summary>
@@ -2683,30 +2697,10 @@
     </member>
     <member name="M:SnapDB.IO.FileStructure.SimplifiedFileWriter.CreateFile(SnapDB.IO.FileStructure.SubFileName)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.IO.FileStructure.SimplifiedFileWriter.CreateFile(SnapDB.IO.FileStructure.SubFileName)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="fileName">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>fileName</parameter>
-            <parameter>M:SnapDB.IO.FileStructure.SimplifiedFileWriter.CreateFile(SnapDB.IO.FileStructure.SubFileName)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.IO.FileStructure.SimplifiedFileWriter.CreateFile(SnapDB.IO.FileStructure.SubFileName)</parameter>
-          </include>
-        </markup>
-      </returns>
+            Creates a new file with the specified file name and returns a stream for writing data into the file.
+            </summary>
+      <param name="fileName">The name of the file to create.</param>
+      <returns>The <see cref="T:SnapDB.IO.Unmanaged.ISupportsBinaryStream" /> representing the newly created file.</returns>
     </member>
     <member name="M:SnapDB.IO.FileStructure.SimplifiedFileWriter.Dispose">
       <summary>
@@ -3675,13 +3669,9 @@
     </member>
     <member name="M:SnapDB.IO.Unmanaged.MemoryPool.Finalize">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.IO.Unmanaged.MemoryPool.Finalize</parameter>
-          </include>
-        </markup>
-      </summary>
+            Finalizes an instance of the <see cref="T:SnapDB.IO.Unmanaged.MemoryPool" /> class.
+            This finalizer logs an informational message when called.
+            </summary>
     </member>
     <member name="P:SnapDB.IO.Unmanaged.MemoryPool.IsDisposed">
       <summary>
@@ -4267,8 +4257,8 @@
       <summary>
             Creates a self signed certificate that can be used in SSL communications.
             </summary>
-      <param name="subjectDirName">A valid DirName formated string. Example: CN=ServerName</param>
-      <param name="signatureBits">Bitstrength of signature algorithm. Supported Lengths are 160,256, and 384 </param>
+      <param name="subjectDirName">A valid DirName formatted string. Example: CN=ServerName</param>
+      <param name="signatureBits">Bit strength of signature algorithm. Supported Lengths are 160,256, and 384 </param>
       <param name="keyStrength">RSA key strength. Typically a multiple of 1024.</param>
       <returns>
             An <see cref="T:System.Security.Cryptography.X509Certificates.X509Certificate2" /> object representing the self-signed certificate.
@@ -4286,95 +4276,29 @@
     </member>
     <member name="T:SnapDB.Security.Hash">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Security.Hash</parameter>
-          </include>
-        </markup>
-      </summary>
+            Provides utility methods for hashing data using various hash algorithms.
+            </summary>
     </member>
     <member name="M:SnapDB.Security.Hash.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[])">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Hash.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="hash">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>hash</parameter>
-            <parameter>M:SnapDB.Security.Hash.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="data">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>data</parameter>
-            <parameter>M:SnapDB.Security.Hash.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.Hash.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </returns>
+            Computes a hash of the specified data using the given hash algorithm.
+            </summary>
+      <param name="hash">The hash algorithm to use.</param>
+      <param name="data">The data to hash.</param>
+      <returns>The computed hash as a byte array.</returns>
     </member>
     <member name="T:SnapDB.Security.Hash`1">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Security.Hash`1</parameter>
-          </include>
-        </markup>
-      </summary>
-      <typeparam name="T">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>typeparam</parameter>
-            <parameter>T</parameter>
-            <parameter>T:SnapDB.Security.Hash`1</parameter>
-          </include>
-        </markup>
-      </typeparam>
+            Provides utility methods for hashing data using a specific hash algorithm of type <typeparamref name="T" />.
+            </summary>
+      <typeparam name="T">The type of hash algorithm to use, which must implement the IDigest interface and have a default constructor.</typeparam>
     </member>
     <member name="M:SnapDB.Security.Hash`1.Compute(System.Byte[])">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Hash`1.Compute(System.Byte[])</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="data">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>data</parameter>
-            <parameter>M:SnapDB.Security.Hash`1.Compute(System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.Hash`1.Compute(System.Byte[])</parameter>
-          </include>
-        </markup>
-      </returns>
+            Computes a hash of the specified data using the specified hash algorithm of type <typeparamref name="T" />.
+            </summary>
+      <param name="data">The data to hash.</param>
+      <returns>The computed hash as a byte array.</returns>
     </member>
     <member name="T:SnapDB.Security.HashMethod">
       <summary>
@@ -4403,95 +4327,25 @@
     </member>
     <member name="T:SnapDB.Security.Hmac">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Security.Hmac</parameter>
-          </include>
-        </markup>
-      </summary>
+            Provides utility methods for computing Hash-based Message Authentication Code (HMAC) values using various hash algorithms.
+            </summary>
     </member>
     <member name="M:SnapDB.Security.Hmac.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[],System.Byte[])">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Hmac.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[],System.Byte[])</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="hash">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>hash</parameter>
-            <parameter>M:SnapDB.Security.Hmac.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[],System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Security.Hmac.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[],System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="data">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>data</parameter>
-            <parameter>M:SnapDB.Security.Hmac.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[],System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.Hmac.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[],System.Byte[])</parameter>
-          </include>
-        </markup>
-      </returns>
+            Computes an HMAC using the specified hash algorithm and key for the entire input data.
+            </summary>
+      <param name="hash">The hash algorithm to use for the HMAC.</param>
+      <param name="key">The secret key for the HMAC computation.</param>
+      <param name="data">The input data to compute the HMAC over.</param>
+      <returns>The computed HMAC as a byte array.</returns>
     </member>
     <member name="M:SnapDB.Security.Hmac.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[],System.Byte[],System.Int32,System.Int32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Hmac.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[],System.Byte[],System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="hash">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>hash</parameter>
-            <parameter>M:SnapDB.Security.Hmac.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[],System.Byte[],System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Security.Hmac.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[],System.Byte[],System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="data">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>data</parameter>
-            <parameter>M:SnapDB.Security.Hmac.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[],System.Byte[],System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Computes an HMAC using the specified hash algorithm and key for the entire input data.
+            </summary>
+      <param name="hash">The hash algorithm to use for the HMAC.</param>
+      <param name="key">The secret key for the HMAC computation.</param>
+      <param name="data">The input data to compute the HMAC over.</param>
       <param name="position">
         <markup>
           <include item="SMCMissingParamTag">
@@ -4510,127 +4364,70 @@
           </include>
         </markup>
       </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.Hmac.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[],System.Byte[],System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </returns>
+      <returns>The computed HMAC as a byte array.</returns>
     </member>
     <member name="T:SnapDB.Security.Hmac`1">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Security.Hmac`1</parameter>
-          </include>
-        </markup>
-      </summary>
-      <typeparam name="T">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>typeparam</parameter>
-            <parameter>T</parameter>
-            <parameter>T:SnapDB.Security.Hmac`1</parameter>
-          </include>
-        </markup>
-      </typeparam>
+            Provides utility methods for computing Hash-based Message Authentication Code (HMAC) values using a specific hash algorithm of type <typeparamref name="T" />.
+            </summary>
+      <typeparam name="T">The type of hash algorithm to use, which must implement the IDigest interface and have a default constructor.</typeparam>
     </member>
     <member name="M:SnapDB.Security.Hmac`1.Compute(System.Byte[],System.Byte[])">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Hmac`1.Compute(System.Byte[],System.Byte[])</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Security.Hmac`1.Compute(System.Byte[],System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="data">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>data</parameter>
-            <parameter>M:SnapDB.Security.Hmac`1.Compute(System.Byte[],System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.Hmac`1.Compute(System.Byte[],System.Byte[])</parameter>
-          </include>
-        </markup>
-      </returns>
+            Computes an HMAC using the specified secret key for the entire input data.
+            </summary>
+      <param name="key">The secret key for the HMAC computation.</param>
+      <param name="data">The input data to compute the HMAC over.</param>
+      <returns>The computed HMAC as a byte array.</returns>
     </member>
     <member name="M:SnapDB.Security.Hmac`1.Compute(System.Byte[],System.Byte[],System.Int32,System.Int32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Hmac`1.Compute(System.Byte[],System.Byte[],System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Security.Hmac`1.Compute(System.Byte[],System.Byte[],System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="data">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>data</parameter>
-            <parameter>M:SnapDB.Security.Hmac`1.Compute(System.Byte[],System.Byte[],System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="position">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>position</parameter>
-            <parameter>M:SnapDB.Security.Hmac`1.Compute(System.Byte[],System.Byte[],System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="length">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>length</parameter>
-            <parameter>M:SnapDB.Security.Hmac`1.Compute(System.Byte[],System.Byte[],System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.Hmac`1.Compute(System.Byte[],System.Byte[],System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </returns>
+            Computes an HMAC using the specified secret key, input data, and a specified range within the input data.
+            </summary>
+      <param name="key">The secret key for the HMAC computation.</param>
+      <param name="data">The input data to compute the HMAC over.</param>
+      <param name="position">The starting position in the input data.</param>
+      <param name="length">The length of the input data to include in the HMAC computation.</param>
+      <returns>The computed HMAC as a byte array.</returns>
     </member>
     <member name="T:SnapDB.Security.HmacMethod">
       <summary>
-            A series of HMAC implementations supported by .NET
+            A series of HMAC implementations supported by .NET.
+            </summary>
+    </member>
+    <member name="F:SnapDB.Security.HmacMethod.Md5">
+      <summary>
+            Produces a 128-bit hash value.
+            </summary>
+    </member>
+    <member name="F:SnapDB.Security.HmacMethod.TripleDes">
+      <summary>
+            Symmetric-key block cipher.
+            </summary>
+    </member>
+    <member name="F:SnapDB.Security.HmacMethod.Ripemd160">
+      <summary>
+            160-bit has represented as a 40-digit hexadecimal.
+            </summary>
+    </member>
+    <member name="F:SnapDB.Security.HmacMethod.Sha1">
+      <summary>
+            Hash function producing a 160-bit hash value as a 40-digit hexadecimal.
+            </summary>
+    </member>
+    <member name="F:SnapDB.Security.HmacMethod.Sha256">
+      <summary>
+            Computed with eight 32-bit words.
+            </summary>
+    </member>
+    <member name="F:SnapDB.Security.HmacMethod.Sha384">
+      <summary>
+            Truncated version of SHA-512.
+            </summary>
+    </member>
+    <member name="F:SnapDB.Security.HmacMethod.Sha512">
+      <summary>
+            Computed with eight 64-bit words.
             </summary>
     </member>
     <member name="T:SnapDB.Security.NonceGenerator">
@@ -4697,21 +4494,11 @@
     </member>
     <member name="M:SnapDB.Security.Pbkdf2.GetBytes(System.Int32)">
       <summary>
-            When overridden in a derived class, returns pseudo-random key bytes.
+            Generates an array of random bytes with the specified length.
             </summary>
-      <param name="cb">The number of pseudo-random key bytes to generate. </param>
-      <param name="length">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>length</parameter>
-            <parameter>M:SnapDB.Security.Pbkdf2.GetBytes(System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-            A byte array filled with pseudo-random key bytes.
-            </returns>
+      <param name="length">The desired length of the generated byte array.</param>
+      <returns>An array of random bytes with the specified length.</returns>
+      <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <paramref name="length" /> is not a positive value.</exception>
     </member>
     <member name="M:SnapDB.Security.Pbkdf2.Reset">
       <summary>
@@ -4725,120 +4512,42 @@
     </member>
     <member name="M:SnapDB.Security.ReadonlyByteArray.#ctor(System.Byte[])">
       <summary>
-        <markup>
-          <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Security.ReadonlyByteArray</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="array">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>array</parameter>
-            <parameter>M:SnapDB.Security.ReadonlyByteArray.#ctor(System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
+            Initializes a new instance of the <see cref="T:SnapDB.Security.ReadonlyByteArray" /> struct with the specified byte array.
+            </summary>
+      <param name="array">The byte array to wrap.</param>
     </member>
     <member name="M:SnapDB.Security.ReadonlyByteArray.CompareTo(SnapDB.Security.ReadonlyByteArray)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.ReadonlyByteArray.CompareTo(SnapDB.Security.ReadonlyByteArray)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="other">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>other</parameter>
-            <parameter>M:SnapDB.Security.ReadonlyByteArray.CompareTo(SnapDB.Security.ReadonlyByteArray)</parameter>
-          </include>
-        </markup>
-      </param>
+            Compares this <see cref="T:SnapDB.Security.ReadonlyByteArray" /> instance with another instance for ordering.
+            </summary>
+      <param name="other">The <see cref="T:SnapDB.Security.ReadonlyByteArray" /> to compare with this instance.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.ReadonlyByteArray.CompareTo(SnapDB.Security.ReadonlyByteArray)</parameter>
-          </include>
-        </markup>
-      </returns>
+            A negative value if this instance is less than <paramref name="other" />,
+            a positive value if this instance is greater than <paramref name="other" />,
+            or zero if they are equal.
+            </returns>
     </member>
     <member name="M:SnapDB.Security.ReadonlyByteArray.Equals(SnapDB.Security.ReadonlyByteArray)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.ReadonlyByteArray.Equals(SnapDB.Security.ReadonlyByteArray)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="other">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>other</parameter>
-            <parameter>M:SnapDB.Security.ReadonlyByteArray.Equals(SnapDB.Security.ReadonlyByteArray)</parameter>
-          </include>
-        </markup>
-      </param>
+            Determines whether this <see cref="T:SnapDB.Security.ReadonlyByteArray" /> instance is equal to another instance.
+            </summary>
+      <param name="other">The <see cref="T:SnapDB.Security.ReadonlyByteArray" /> to compare with this instance.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.ReadonlyByteArray.Equals(SnapDB.Security.ReadonlyByteArray)</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if the instances are equal; otherwise, <c>false</c>.</returns>
     </member>
     <member name="M:SnapDB.Security.ReadonlyByteArray.Equals(System.Object)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.ReadonlyByteArray.Equals(System.Object)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="other">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>other</parameter>
-            <parameter>M:SnapDB.Security.ReadonlyByteArray.Equals(System.Object)</parameter>
-          </include>
-        </markup>
-      </param>
+            Determines whether this <see cref="T:SnapDB.Security.ReadonlyByteArray" /> instance is equal to another object.
+            </summary>
+      <param name="other">The object to compare with this instance.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.ReadonlyByteArray.Equals(System.Object)</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if the objects are equal; otherwise, <c>false</c>.</returns>
     </member>
     <member name="M:SnapDB.Security.ReadonlyByteArray.GetHashCode">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.ReadonlyByteArray.GetHashCode</parameter>
-          </include>
-        </markup>
-      </summary>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.ReadonlyByteArray.GetHashCode</parameter>
-          </include>
-        </markup>
-      </returns>
+            Returns the hash code for this <see cref="T:SnapDB.Security.ReadonlyByteArray" /> instance.
+            </summary>
+      <returns>The hash code.</returns>
     </member>
     <member name="T:SnapDB.Security.SaltGenerator">
       <summary>
@@ -4856,13 +4565,8 @@
     </member>
     <member name="T:SnapDB.Security.SecureStream">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Security.SecureStream</parameter>
-          </include>
-        </markup>
-      </summary>
+            Provides utility methods for secure communication using SSL/TLS streams.
+            </summary>
     </member>
     <member name="M:SnapDB.Security.SecureStream.#ctor">
       <summary>
@@ -4880,12 +4584,9 @@
     </member>
     <member name="M:SnapDB.Security.SecureStreamClientBase.#ctor">
       <summary>
-        <markup>
-          <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Security.SecureStreamClientBase</parameter>
-          </include>
-        </markup>
-      </summary>
+            Initializes a new instance of the <see cref="T:SnapDB.Security.SecureStreamClientBase" /> class.
+            This constructor is protected and internally accessible within the component's message class.
+            </summary>
     </member>
     <member name="M:SnapDB.Security.SecureStreamClientBase.Authenticate(System.IO.Stream,System.Boolean)">
       <summary>
@@ -4901,39 +4602,12 @@
     </member>
     <member name="M:SnapDB.Security.SecureStreamClientBase.InternalTryAuthenticate(System.IO.Stream,System.Byte[])">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.SecureStreamClientBase.InternalTryAuthenticate(System.IO.Stream,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Security.SecureStreamClientBase.InternalTryAuthenticate(System.IO.Stream,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="certSignatures">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>certSignatures</parameter>
-            <parameter>M:SnapDB.Security.SecureStreamClientBase.InternalTryAuthenticate(System.IO.Stream,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
+            Attempts to authenticate a network stream with the provided certificate signatures.
+            </summary>
+      <param name="stream">The network stream to authenticate.</param>
+      <param name="certSignatures">The certificate signatures used for authentication.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.SecureStreamClientBase.InternalTryAuthenticate(System.IO.Stream,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if authentication was successful; otherwise, <c>false</c>.</returns>
     </member>
     <member name="M:SnapDB.Security.SecureStreamClientBase.TryAuthenticate(System.IO.Stream,System.Boolean)">
       <summary>
@@ -4945,20 +4619,16 @@
     </member>
     <member name="M:SnapDB.Security.SecureStreamClientBase.TryAuthenticate(System.IO.Stream,System.Boolean,System.IO.Stream@)">
       <summary>
-            Attempts to authenticate the supplied stream.
+            Attempts to authenticate the supplied network stream, optionally using SSL/TLS encryption.
             </summary>
-      <param name="stream">The stream to authenticate</param>
+      <param name="stream">The stream to authenticate.</param>
       <param name="useSsl">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>useSsl</parameter>
-            <parameter>M:SnapDB.Security.SecureStreamClientBase.TryAuthenticate(System.IO.Stream,System.Boolean,System.IO.Stream@)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="secureStream">the secure stream if the authentication was successful.</param>
-      <returns>true if successful</returns>
+        <c>true</c> if SSL is to be used; otherwise, <c>false</c>.</param>
+      <param name="secureStream">
+            When successful, contains the authenticated and optionally encrypted stream.</param>
+      <returns>
+        <c>true</c> if authentication is successful and if SSL/TLS encryption is used and successful; otherwise, <c>false</c>.
+            </returns>
     </member>
     <member name="T:SnapDB.Security.SecureStreamClientDefault">
       <summary>
@@ -5097,37 +4767,17 @@
     </member>
     <member name="T:SnapDB.Security.SecurityExtensions">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Security.SecurityExtensions</parameter>
-          </include>
-        </markup>
-      </summary>
+            Provides extension methods for enhancing security-related operations.
+            </summary>
     </member>
     <member name="M:SnapDB.Security.SecurityExtensions.SecureEquals(System.Byte[],System.Byte[])">
       <summary>
-            Does a time constant comparison of the two byte arrays.
+            Compares two byte arrays securely, preventing timing attacks.
             </summary>
-      <param name="a">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>a</parameter>
-            <parameter>M:SnapDB.Security.SecurityExtensions.SecureEquals(System.Byte[],System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="b">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>b</parameter>
-            <parameter>M:SnapDB.Security.SecurityExtensions.SecureEquals(System.Byte[],System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>true if both arrays are equal</returns>
+      <param name="a">The first byte array to compare.</param>
+      <param name="b">The second byte array to compare.</param>
+      <returns>
+        <c>true</c> if both arrays are equal; otherwise, false.</returns>
       <remarks>
             If a or b is <c>null</c>, function returns immediately with a <c>false</c>.
             Certain cryptographic attacks can occur by comparing the amount of time it
@@ -5139,11 +4789,12 @@
       <summary>
             Does a time constant comparison of the two byte arrays.
             </summary>
-      <param name="a"></param>
-      <param name="b"></param>
-      <param name="bPosition">the start position of <see cref="!:b" /></param>
-      <param name="bLength">the length of <see cref="!:b" /> to read past <see cref="!:bPosition" /></param>
-      <returns>true if both arrays are equal</returns>
+      <param name="a">The first byte array to compare.</param>
+      <param name="b">The second byte array to compare.</param>
+      <param name="bPosition">The start position of the <paramref name="b" /> byte array.</param>
+      <param name="bLength">The length of the portion to compare in <paramref name="b" />.</param>
+      <returns>
+        <c>true</c> if both arrays are equal; otherwise, <c>false</c>.</returns>
       <remarks>
             If a or b is <c>null</c>, function returns immediately with a <c>false</c>.
             Certain cryptographic attacks can occur by comparing the amount of time it
@@ -5153,261 +4804,17 @@
     </member>
     <member name="M:SnapDB.Security.SecurityExtensions.SecureEquals(System.Guid,System.Guid)">
       <summary>
-            Does a time constant comparison of the two GUIDs.
+            Does a secure time constant comparison of the two GUIDs.
             </summary>
-      <param name="a">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>a</parameter>
-            <parameter>M:SnapDB.Security.SecurityExtensions.SecureEquals(System.Guid,System.Guid)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="b">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>b</parameter>
-            <parameter>M:SnapDB.Security.SecurityExtensions.SecureEquals(System.Guid,System.Guid)</parameter>
-          </include>
-        </markup>
-      </param>
+      <param name="a">The first GUID to compare.</param>
+      <param name="b">The second GUID to compare.</param>
       <returns>
-        <c>true</c> if both GUIDs are equal</returns>
+        <c>true</c> if both GUIDs are equal; otherwise, false.</returns>
       <remarks>
             Certain cryptographic attacks can occur by comparing the amount of time it
             takes to do certain operations. Comparing two byte arrays is one example.
             Therefore this method should take constant time to do a comparison of two GUIDs.
             </remarks>
-    </member>
-    <member name="T:SnapDB.Security.Authentication.CertificateClient">
-      <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Security.Authentication.CertificateClient</parameter>
-          </include>
-        </markup>
-      </summary>
-    </member>
-    <member name="M:SnapDB.Security.Authentication.CertificateClient.#ctor">
-      <summary>
-        <markup>
-          <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Security.Authentication.CertificateClient</parameter>
-          </include>
-        </markup>
-      </summary>
-    </member>
-    <member name="M:SnapDB.Security.Authentication.CertificateClient.#ctor(System.String,System.String,System.String)">
-      <summary>
-        <markup>
-          <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Security.Authentication.CertificateClient</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="username">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>username</parameter>
-            <parameter>M:SnapDB.Security.Authentication.CertificateClient.#ctor(System.String,System.String,System.String)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="password">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>password</parameter>
-            <parameter>M:SnapDB.Security.Authentication.CertificateClient.#ctor(System.String,System.String,System.String)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="domain">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>domain</parameter>
-            <parameter>M:SnapDB.Security.Authentication.CertificateClient.#ctor(System.String,System.String,System.String)</parameter>
-          </include>
-        </markup>
-      </param>
-    </member>
-    <member name="M:SnapDB.Security.Authentication.CertificateClient.AuthenticateAsClient(System.IO.Stream)">
-      <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.CertificateClient.AuthenticateAsClient(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Security.Authentication.CertificateClient.AuthenticateAsClient(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.Authentication.CertificateClient.AuthenticateAsClient(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </returns>
-    </member>
-    <member name="T:SnapDB.Security.Authentication.CertificateServer">
-      <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Security.Authentication.CertificateServer</parameter>
-          </include>
-        </markup>
-      </summary>
-    </member>
-    <member name="M:SnapDB.Security.Authentication.CertificateServer.#ctor">
-      <summary>
-        <markup>
-          <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Security.Authentication.CertificateServer</parameter>
-          </include>
-        </markup>
-      </summary>
-    </member>
-    <member name="M:SnapDB.Security.Authentication.CertificateServer.AuthenticateAsServer(System.IO.Stream)">
-      <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.CertificateServer.AuthenticateAsServer(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Security.Authentication.CertificateServer.AuthenticateAsServer(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.Authentication.CertificateServer.AuthenticateAsServer(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </returns>
-    </member>
-    <member name="F:SnapDB.Security.Authentication.CertificateServer.Users">
-      <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Security.Authentication.CertificateServer.Users</parameter>
-          </include>
-        </markup>
-      </summary>
-    </member>
-    <member name="T:SnapDB.Security.Authentication.CertificateUserCredential">
-      <summary>
-            An individual server side user credential.
-            </summary>
-    </member>
-    <member name="M:SnapDB.Security.Authentication.CertificateUserCredential.#ctor(System.String)">
-      <summary>
-            Creates user credentials.
-            </summary>
-      <param name="username">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>username</parameter>
-            <parameter>M:SnapDB.Security.Authentication.CertificateUserCredential.#ctor(System.String)</parameter>
-          </include>
-        </markup>
-      </param>
-    </member>
-    <member name="M:SnapDB.Security.Authentication.CertificateUserCredential.Load">
-      <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.CertificateUserCredential.Load</parameter>
-          </include>
-        </markup>
-      </summary>
-    </member>
-    <member name="M:SnapDB.Security.Authentication.CertificateUserCredential.Save">
-      <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.CertificateUserCredential.Save</parameter>
-          </include>
-        </markup>
-      </summary>
-    </member>
-    <member name="F:SnapDB.Security.Authentication.CertificateUserCredential.UserId">
-      <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Security.Authentication.CertificateUserCredential.UserId</parameter>
-          </include>
-        </markup>
-      </summary>
-    </member>
-    <member name="T:SnapDB.Security.Authentication.CertificateUserCredentials">
-      <summary>
-            Provides simple password based authentication that uses Secure Remote Password.
-            </summary>
-      <remarks>
-            It is safe to store the user's credential on the server. This is a zero knowledge
-            password proof, meaning if this database is compromised, a brute force attack
-            is the only way to reveal the password.
-            </remarks>
-    </member>
-    <member name="M:SnapDB.Security.Authentication.CertificateUserCredentials.#ctor">
-      <summary>
-        <markup>
-          <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Security.Authentication.CertificateUserCredentials</parameter>
-          </include>
-        </markup>
-      </summary>
-    </member>
-    <member name="M:SnapDB.Security.Authentication.CertificateUserCredentials.AddUser(System.String)">
-      <summary>
-            Adds the specified user to the credentials database.
-            </summary>
-      <param name="username">The username of the user to add.</param>
-    </member>
-    <member name="M:SnapDB.Security.Authentication.CertificateUserCredentials.Exists(System.Security.Principal.IIdentity)">
-      <summary>
-            Gets if the user exists in the database
-            </summary>
-      <param name="identity">The <see cref="T:System.Security.Principal.IIdentity" /> to check for existence.</param>
-      <returns>
-        <c>true</c> if a user with the specified <see cref="T:System.Security.Principal.IIdentity" /> exists; otherwise, <c>false</c>.
-            </returns>
-    </member>
-    <member name="M:SnapDB.Security.Authentication.CertificateUserCredentials.Lookup(System.String)">
-      <summary>
-            Looks up the username from the database.
-            </summary>
-      <param name="username">The username to look up.</param>
-      <returns>The <see cref="T:SnapDB.Security.Authentication.CertificateUserCredential" /> associated with the specified username.</returns>
     </member>
     <member name="T:SnapDB.Security.Authentication.IntegratedSecurityClient">
       <summary>
@@ -5439,7 +4846,7 @@
             for the connection to succeed.
             </param>
       <returns>
-            True if authentication succeded, false otherwise.
+        <c>true</c> if authentication succeeded; otherwise, <c>false</c>.
             </returns>
     </member>
     <member name="T:SnapDB.Security.Authentication.IntegratedSecurityServer">
@@ -5486,7 +4893,7 @@
       <summary>
             Authenticates the client stream
             </summary>
-      <param name="stream">The stream to autenticate</param>
+      <param name="stream">The stream to authenticate</param>
       <param name="userToken">the user token associated with the identity match</param>
       <param name="additionalChallenge">
             Additional data that much match between the client and server
@@ -5693,48 +5100,22 @@
             </summary>
       <param name="stream">the stream to save to</param>
     </member>
-    <member name="T:SnapDB.Security.Authentication.NullToken">
+    <member name="T:SnapDB.Security.Authentication.NullUserToken">
       <summary>
             An empty token that does not contain any data.
             </summary>
     </member>
-    <member name="M:SnapDB.Security.Authentication.NullToken.Load(System.IO.Stream)">
+    <member name="M:SnapDB.Security.Authentication.NullUserToken.Load(System.IO.Stream)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.NullToken.Load(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Security.Authentication.NullToken.Load(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </param>
+            Loads the stream specified when called.
+            </summary>
+      <param name="stream">The specified stream to load.</param>
     </member>
-    <member name="M:SnapDB.Security.Authentication.NullToken.Save(System.IO.Stream)">
+    <member name="M:SnapDB.Security.Authentication.NullUserToken.Save(System.IO.Stream)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.NullToken.Save(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Security.Authentication.NullToken.Save(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </param>
+            Saves the specified stream when called.
+            </summary>
+      <param name="stream">The specified stream to save.</param>
     </member>
     <member name="T:SnapDB.Security.Authentication.ScramClient">
       <summary>
@@ -5766,39 +5147,11 @@
     </member>
     <member name="M:SnapDB.Security.Authentication.ScramClient.AuthenticateAsClient(System.IO.Stream,System.Byte[])">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramClient.AuthenticateAsClient(System.IO.Stream,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramClient.AuthenticateAsClient(System.IO.Stream,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="additionalChallenge">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>additionalChallenge</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramClient.AuthenticateAsClient(System.IO.Stream,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramClient.AuthenticateAsClient(System.IO.Stream,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </returns>
+            Authenticates the client to the server using SCRAM-SHA-256 or SCRAM-SHA-1 mechanism.
+            </summary>
+      <param name="stream">The stream used for communication with the server.</param>
+      <param name="additionalChallenge">Optional additional challenge data to include in the authentication process.</param>
+      <returns>True if authentication is successful, otherwise false.</returns>
     </member>
     <member name="T:SnapDB.Security.Authentication.ScramServer">
       <summary>
@@ -5845,222 +5198,100 @@
     </member>
     <member name="M:SnapDB.Security.Authentication.ScramServerSession.#ctor(System.String)">
       <summary>
-        <markup>
-          <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Security.Authentication.ScramServerSession</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="username">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>username</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramServerSession.#ctor(System.String)</parameter>
-          </include>
-        </markup>
-      </param>
+            Initializes a new instance of the <see cref="T:SnapDB.Security.Authentication.ScramServerSession" /> class with the specified username.
+            </summary>
+      <param name="username">The username associated with the server session.</param>
     </member>
     <member name="F:SnapDB.Security.Authentication.ScramServerSession.Username">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Security.Authentication.ScramServerSession.Username</parameter>
-          </include>
-        </markup>
-      </summary>
+            The username to be used.
+            </summary>
     </member>
     <member name="T:SnapDB.Security.Authentication.ScramUserCredential">
       <summary>
-            An individual server side user credential
+            An individual server side user credential.
             </summary>
     </member>
     <member name="M:SnapDB.Security.Authentication.ScramUserCredential.#ctor(System.String,System.String,System.Int32,System.Int32,SnapDB.Security.HashMethod)">
       <summary>
             Adds the following user information to the server's user database
             </summary>
-      <param name="username">the username. Cannot be more than 100 characters</param>
-      <param name="password">the password. Cannot be more than 1024 characters</param>
-      <param name="iterations">The number of iterations. On 2014 technology, 2000 iterations takes about 10ms to compute</param>
+      <param name="username">The username. Cannot be more than 100 characters.</param>
+      <param name="password">The password. Cannot be more than 1024 characters.</param>
+      <param name="iterations">The number of iterations.</param>
       <param name="saltSize">The size of the salt. Defaults to 32 bytes.</param>
-      <param name="hashMethod">The hash method to use for authentication</param>
+      <param name="hashMethod">The hash method to use for authentication.</param>
       <remarks>
-            Setting a vary large Iterations will not effect how long it takes to negotiate a client on the server end. This is because
-            the server precomputes the hash results. The client can optionally also precomute the results so negotiation can take
+            Setting a large number of iterations will not impact how long it takes to negotiate a client on the server end. This is because
+            the server precomputes the hash results. The client can optionally also precompute the results so negotiation can take
             milliseconds.
             </remarks>
     </member>
     <member name="M:SnapDB.Security.Authentication.ScramUserCredential.ComputeClientSignature(System.Byte[])">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredential.ComputeClientSignature(System.Byte[])</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="authMessage">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>authMessage</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredential.ComputeClientSignature(System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredential.ComputeClientSignature(System.Byte[])</parameter>
-          </include>
-        </markup>
-      </returns>
+            Computes the client's signature as part of the SCRAM (Salted Challenge Response Authentication Mechanism) authentication process.
+            </summary>
+      <param name="authMessage">The authentication message to be used for signature computation.</param>
+      <returns>The computed client signature as a byte array.</returns>
     </member>
     <member name="M:SnapDB.Security.Authentication.ScramUserCredential.ComputeServerSignature(System.Byte[])">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredential.ComputeServerSignature(System.Byte[])</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="authMessage">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>authMessage</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredential.ComputeServerSignature(System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredential.ComputeServerSignature(System.Byte[])</parameter>
-          </include>
-        </markup>
-      </returns>
+            Computes the server's signature as part of the SCRAM (Salted Challenge Response Authentication Mechanism) authentication process.
+            </summary>
+      <param name="authMessage">The authentication message to be used for signature computation.</param>
+      <returns>The computed server signature as a byte array.</returns>
     </member>
     <member name="M:SnapDB.Security.Authentication.ScramUserCredential.ComputeStoredKey(System.Byte[])">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredential.ComputeStoredKey(System.Byte[])</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="clientKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>clientKey</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredential.ComputeStoredKey(System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredential.ComputeStoredKey(System.Byte[])</parameter>
-          </include>
-        </markup>
-      </returns>
+            Computes the stored key as part of the SCRAM (Salted Challenge Response Authentication Mechanism) authentication process.
+            </summary>
+      <param name="clientKey">The client key to be used for stored key computation.</param>
+      <returns>The computed stored key as a byte array.</returns>
     </member>
     <member name="F:SnapDB.Security.Authentication.ScramUserCredential.HashMethod">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Security.Authentication.ScramUserCredential.HashMethod</parameter>
-          </include>
-        </markup>
-      </summary>
+            The <see cref="F:SnapDB.Security.Authentication.ScramUserCredential.HashMethod" /> used for authentication protocols.
+            </summary>
     </member>
     <member name="F:SnapDB.Security.Authentication.ScramUserCredential.Iterations">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Security.Authentication.ScramUserCredential.Iterations</parameter>
-          </include>
-        </markup>
-      </summary>
+            The number of iterations to go through for authentication protocols.
+            </summary>
     </member>
     <member name="M:SnapDB.Security.Authentication.ScramUserCredential.Load">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredential.Load</parameter>
-          </include>
-        </markup>
-      </summary>
+            Loads the object's state or data from a persistent storage or file.
+            </summary>
     </member>
     <member name="F:SnapDB.Security.Authentication.ScramUserCredential.Salt">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Security.Authentication.ScramUserCredential.Salt</parameter>
-          </include>
-        </markup>
-      </summary>
+            A random value that is used as part of the authentication process of type byte[].
+            </summary>
     </member>
     <member name="M:SnapDB.Security.Authentication.ScramUserCredential.Save">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredential.Save</parameter>
-          </include>
-        </markup>
-      </summary>
+            Saves the current state or data of the object to a persistent storage or file.
+            </summary>
     </member>
     <member name="F:SnapDB.Security.Authentication.ScramUserCredential.ServerKey">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Security.Authentication.ScramUserCredential.ServerKey</parameter>
-          </include>
-        </markup>
-      </summary>
+            Cryptographic key used by the server to verify the integrity of the client's authentication response.
+            </summary>
     </member>
     <member name="F:SnapDB.Security.Authentication.ScramUserCredential.StoredKey">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Security.Authentication.ScramUserCredential.StoredKey</parameter>
-          </include>
-        </markup>
-      </summary>
+            Used on the server side to perform password-based key derivation, allowing the server to independently verify the client's response.
+            </summary>
     </member>
     <member name="F:SnapDB.Security.Authentication.ScramUserCredential.UserBytes">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Security.Authentication.ScramUserCredential.UserBytes</parameter>
-          </include>
-        </markup>
-      </summary>
+            Stored user bytes that are read-only.
+            </summary>
     </member>
     <member name="F:SnapDB.Security.Authentication.ScramUserCredential.UserName">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Security.Authentication.ScramUserCredential.UserName</parameter>
-          </include>
-        </markup>
-      </summary>
+            The chosen username, which cannot be more than 100 characters.
+            </summary>
     </member>
     <member name="T:SnapDB.Security.Authentication.ScramUserCredentials">
       <summary>
@@ -6083,94 +5314,22 @@
     </member>
     <member name="M:SnapDB.Security.Authentication.ScramUserCredentials.AddUser(System.String,System.String,System.Int32,System.Int32,SnapDB.Security.HashMethod)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredentials.AddUser(System.String,System.String,System.Int32,System.Int32,SnapDB.Security.HashMethod)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="username">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>username</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredentials.AddUser(System.String,System.String,System.Int32,System.Int32,SnapDB.Security.HashMethod)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="password">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>password</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredentials.AddUser(System.String,System.String,System.Int32,System.Int32,SnapDB.Security.HashMethod)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="iterations">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>iterations</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredentials.AddUser(System.String,System.String,System.Int32,System.Int32,SnapDB.Security.HashMethod)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="saltSize">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>saltSize</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredentials.AddUser(System.String,System.String,System.Int32,System.Int32,SnapDB.Security.HashMethod)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="hashMethod">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>hashMethod</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredentials.AddUser(System.String,System.String,System.Int32,System.Int32,SnapDB.Security.HashMethod)</parameter>
-          </include>
-        </markup>
-      </param>
+            Adds a new user credential with the specified username and password.
+            </summary>
+      <param name="username">The username of the new user credential.</param>
+      <param name="password">The password associated with the new user credential.</param>
+      <param name="iterations">The number of iterations for key derivation (optional, default is 4000).</param>
+      <param name="saltSize">The size of the salt in bytes for key derivation (optional, default is 32).</param>
+      <param name="hashMethod">The hash method used for key derivation (optional, default is SHA-256).</param>
     </member>
     <member name="M:SnapDB.Security.Authentication.ScramUserCredentials.TryLookup(System.Byte[],SnapDB.Security.Authentication.ScramUserCredential@)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredentials.TryLookup(System.Byte[],SnapDB.Security.Authentication.ScramUserCredential@)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="username">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>username</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredentials.TryLookup(System.Byte[],SnapDB.Security.Authentication.ScramUserCredential@)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="user">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>user</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredentials.TryLookup(System.Byte[],SnapDB.Security.Authentication.ScramUserCredential@)</parameter>
-          </include>
-        </markup>
-      </param>
+            Attempts to look up a user credential by their username.
+            </summary>
+      <param name="username">The username of the user credential to look up.</param>
+      <param name="user">When this method returns, contains the user credential if found; otherwise, <c>null</c>.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.Authentication.ScramUserCredentials.TryLookup(System.Byte[],SnapDB.Security.Authentication.ScramUserCredential@)</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if the user credential was found; otherwise, <c>false</c>.</returns>
     </member>
     <member name="T:SnapDB.Security.Authentication.SrpClient">
       <summary>
@@ -6187,39 +5346,12 @@
     </member>
     <member name="M:SnapDB.Security.Authentication.SrpClient.AuthenticateAsClient(System.IO.Stream,System.Byte[])">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.SrpClient.AuthenticateAsClient(System.IO.Stream,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Security.Authentication.SrpClient.AuthenticateAsClient(System.IO.Stream,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="additionalChallenge">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>additionalChallenge</parameter>
-            <parameter>M:SnapDB.Security.Authentication.SrpClient.AuthenticateAsClient(System.IO.Stream,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </param>
+            Authenticates the client session with the server using the provided network stream and optional additional challenge.
+            </summary>
+      <param name="stream">The network stream used for communication with the server.</param>
+      <param name="additionalChallenge">An optional additional challenge to include in the authentication process (default is <c>null</c>).</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Security.Authentication.SrpClient.AuthenticateAsClient(System.IO.Stream,System.Byte[])</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if authentication succeeds; otherwise, <c>false</c>.</returns>
     </member>
     <member name="T:SnapDB.Security.Authentication.SrpServer">
       <summary>
@@ -6317,58 +5449,18 @@
     </member>
     <member name="T:SnapDB.Security.Authentication.SrpUserCredential">
       <summary>
-            An individual server side user credential
+            An individual server side user credential.
             </summary>
     </member>
     <member name="M:SnapDB.Security.Authentication.SrpUserCredential.#ctor(System.String,System.Byte[],System.Byte[],System.Int32,SnapDB.Security.Authentication.SrpStrength)">
       <summary>
-            Creates user credentials
+            Creates user credentials.
             </summary>
-      <param name="username">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>username</parameter>
-            <parameter>M:SnapDB.Security.Authentication.SrpUserCredential.#ctor(System.String,System.Byte[],System.Byte[],System.Int32,SnapDB.Security.Authentication.SrpStrength)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="salt">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>salt</parameter>
-            <parameter>M:SnapDB.Security.Authentication.SrpUserCredential.#ctor(System.String,System.Byte[],System.Byte[],System.Int32,SnapDB.Security.Authentication.SrpStrength)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="verification">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>verification</parameter>
-            <parameter>M:SnapDB.Security.Authentication.SrpUserCredential.#ctor(System.String,System.Byte[],System.Byte[],System.Int32,SnapDB.Security.Authentication.SrpStrength)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="iterations">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>iterations</parameter>
-            <parameter>M:SnapDB.Security.Authentication.SrpUserCredential.#ctor(System.String,System.Byte[],System.Byte[],System.Int32,SnapDB.Security.Authentication.SrpStrength)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="srpStrength">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>srpStrength</parameter>
-            <parameter>M:SnapDB.Security.Authentication.SrpUserCredential.#ctor(System.String,System.Byte[],System.Byte[],System.Int32,SnapDB.Security.Authentication.SrpStrength)</parameter>
-          </include>
-        </markup>
-      </param>
+      <param name="username">The username associated with the user.</param>
+      <param name="verification">The user's password verification value.</param>
+      <param name="salt">The salt value used for password hashing.</param>
+      <param name="iterations">The number of iterations used in the password hashing process.</param>
+      <param name="srpStrength">The strength of the SRP protocol.</param>
     </member>
     <member name="M:SnapDB.Security.Authentication.SrpUserCredential.#ctor(System.String,System.String,SnapDB.Security.Authentication.SrpStrength,System.Int32,System.Int32)">
       <summary>
@@ -6382,47 +5474,37 @@
     </member>
     <member name="F:SnapDB.Security.Authentication.SrpUserCredential.Iterations">
       <summary>
-            The number of SHA512 iterations using PBKDF2
+            The number of SHA512 iterations using PBKDF2.
             </summary>
     </member>
     <member name="M:SnapDB.Security.Authentication.SrpUserCredential.Load">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.SrpUserCredential.Load</parameter>
-          </include>
-        </markup>
-      </summary>
+            Loads the object's state or data from a persistent storage or file.
+            </summary>
     </member>
     <member name="F:SnapDB.Security.Authentication.SrpUserCredential.Salt">
       <summary>
-            The salt used to compute the password bytes (x)
+            The salt used to compute the password bytes (x).
             </summary>
     </member>
     <member name="M:SnapDB.Security.Authentication.SrpUserCredential.Save">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Security.Authentication.SrpUserCredential.Save</parameter>
-          </include>
-        </markup>
-      </summary>
+            Saves the current state or data of the object to a persistent storage or file.
+            </summary>
     </member>
-    <member name="F:SnapDB.Security.Authentication.SrpUserCredential.ServerEncryptionkey">
+    <member name="F:SnapDB.Security.Authentication.SrpUserCredential.ServerEncryptionKey">
       <summary>
-            Session Resume Encryption Key
+            Session Resume Encryption Key.
             </summary>
     </member>
     <member name="F:SnapDB.Security.Authentication.SrpUserCredential.ServerHmacKey">
       <summary>
-            Session Resume HMAC key
+            Session Resume HMAC key.
             </summary>
     </member>
     <member name="F:SnapDB.Security.Authentication.SrpUserCredential.ServerKeyName">
       <summary>
-            Session Resume Key Name
+            Session Resume Key Name.
             </summary>
     </member>
     <member name="F:SnapDB.Security.Authentication.SrpUserCredential.SrpStrength">
@@ -6432,18 +5514,13 @@
     </member>
     <member name="F:SnapDB.Security.Authentication.SrpUserCredential.UserName">
       <summary>
-            The normalized name of the user
+            The normalized name of the user.
             </summary>
     </member>
-    <member name="F:SnapDB.Security.Authentication.SrpUserCredential.UsernameBytes">
+    <member name="F:SnapDB.Security.Authentication.SrpUserCredential.UserNameBytes">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Security.Authentication.SrpUserCredential.UsernameBytes</parameter>
-          </include>
-        </markup>
-      </summary>
+            Username data in bytes.
+            </summary>
     </member>
     <member name="F:SnapDB.Security.Authentication.SrpUserCredential.Verification">
       <summary>
@@ -6644,7 +5721,8 @@
     </member>
     <member name="M:SnapDB.Snap.DistinctTreeStream`2.EndOfStreamReached">
       <summary>
-            Occurs when the end of the stream has been reached. The default behavior is to call <see cref="M:SnapDB.Snap.TreeStream`2.Dispose" /></summary>
+            Occurs when the end of the stream has been reached. The default behavior is to call Dispose.
+            </summary>
     </member>
     <member name="P:SnapDB.Snap.DistinctTreeStream`2.IsAlwaysSequential">
       <summary>
@@ -7073,7 +6151,8 @@
     </member>
     <member name="T:SnapDB.Snap.SnapTypeBase`1">
       <summary>
-            The interface that is required to use as a value in <see cref="!:SortedTree" /></summary>
+            The interface that is required to use as a value in the sorted tree.
+            </summary>
       <typeparam name="T">A class that has a default constructor</typeparam>
       <remarks>
             It is highly recommended to override many of the base class methods as many of these methods are slow.
@@ -7142,7 +6221,15 @@
       <summary>
             Copies the source to the destination
             </summary>
-      <param name="destination"></param>
+      <param name="destination">
+        <markup>
+          <include item="SMCMissingParamTag">
+            <parameter>param</parameter>
+            <parameter>destination</parameter>
+            <parameter>M:SnapDB.Snap.SnapTypeBase`1.CopyTo(`0)</parameter>
+          </include>
+        </markup>
+      </param>
     </member>
     <member name="M:SnapDB.Snap.SnapTypeBase`1.CreateValueMethods">
       <summary>
@@ -7231,10 +6318,6 @@
             Provides custom methods for working with SnapTypeBase-derived types.
             </summary>
       <typeparam name="T">The SnapTypeBase-derived type.</typeparam>
-      <typeparam name="T">The SnapTypeBase-derived type.</typeparam>
-      <typeparam name="T">The SnapTypeBase-derived type.</typeparam>
-      <typeparam name="T">The SnapTypeBase-derived type.</typeparam>
-      <typeparam name="T">The SnapTypeBase-derived type.</typeparam>
     </member>
     <member name="M:SnapDB.Snap.SnapTypeCustomMethods`1.#ctor">
       <summary>
@@ -7307,33 +6390,18 @@
     </member>
     <member name="F:SnapDB.Snap.SnapTypeCustomMethods`1.LastFoundIndex">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.SnapTypeCustomMethods`1.LastFoundIndex</parameter>
-          </include>
-        </markup>
-      </summary>
+            The last found index.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.SnapTypeCustomMethods`1.TempKey">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.SnapTypeCustomMethods`1.TempKey</parameter>
-          </include>
-        </markup>
-      </summary>
+            A temporary key instance of type <typeparamref name="T" />.
+            </summary>
     </member>
     <member name="T:SnapDB.Snap.Stats">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Snap.Stats</parameter>
-          </include>
-        </markup>
-      </summary>
+            Provides statistical information related to various operations.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Stats.ChecksumCount">
       <summary>
@@ -7343,63 +6411,33 @@
     </member>
     <member name="M:SnapDB.Snap.Stats.Clear">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Stats.Clear</parameter>
-          </include>
-        </markup>
-      </summary>
+            Clears all statistical counters.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Stats.LookupKeys">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Stats.LookupKeys</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets or sets the count of lookup keys used.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Stats.PointsReturned">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Stats.PointsReturned</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets or sets the count of points returned.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Stats.PointsScanned">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Stats.PointsScanned</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets or sets the count of points scanned.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Stats.QueriesExecuted">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Stats.QueriesExecuted</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets or sets the count of queries executed.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Stats.SeeksRequested">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Stats.SeeksRequested</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets or sets the count of seeks requested.
+            </summary>
     </member>
     <member name="T:SnapDB.Snap.TreeStream`2">
       <summary>
@@ -7431,7 +6469,8 @@
     </member>
     <member name="M:SnapDB.Snap.TreeStream`2.EndOfStreamReached">
       <summary>
-            Occurs when the end of the stream has been reached. The default behavior is to call <see cref="M:SnapDB.Snap.TreeStream`2.Dispose" /></summary>
+            Occurs when the end of the stream has been reached. The default behavior is to call Dispose.
+            </summary>
     </member>
     <member name="P:SnapDB.Snap.TreeStream`2.Eos">
       <summary>
@@ -7517,7 +6556,7 @@
         </markup>
       </param>
       <exception cref="T:System.ObjectDisposedException">
-            Thrown if <see cref="!:value" /> is <see cref="!:Boolean.False" /> and this class
+            Thrown if <paramref name="value" /> is <c>false</c> and this class
             has already been disposed.
             </exception>
     </member>
@@ -7589,7 +6628,7 @@
     </member>
     <member name="M:SnapDB.Snap.Collection.SortedPointBuffer`2.#ctor(System.Int32,System.Action{`0,`0})">
       <summary>
-            Creates a <see cref="T:SnapDB.Snap.Collection.SortedPointBuffer`2" /> that can hold only exactly the specified <see cref="!:capacity" />
+            Creates a <see cref="T:SnapDB.Snap.Collection.SortedPointBuffer`2" /> that can hold only exactly the specified <paramref name="capacity" />
             using the specified duplicate handler.
             </summary>
       <param name="capacity">The maximum number of items that can be stored in this class.</param>
@@ -7597,9 +6636,9 @@
     </member>
     <member name="M:SnapDB.Snap.Collection.SortedPointBuffer`2.#ctor(System.Int32,System.Boolean)">
       <summary>
-            Creates a <see cref="T:SnapDB.Snap.Collection.SortedPointBuffer`2" /> that can hold only exactly the specified <see cref="!:capacity" />.
+            Creates a <see cref="T:SnapDB.Snap.Collection.SortedPointBuffer`2" /> that can hold only exactly the specified <paramref name="capacity" />.
             </summary>
-      <param name="capacity">The maximum number of items that can be stored in this class</param>
+      <param name="capacity">The maximum number of items that can be stored in this class.</param>
       <param name="removeDuplicates">specifies if the point buffer should remove duplicate key values upon reading.</param>
     </member>
     <member name="P:SnapDB.Snap.Collection.SortedPointBuffer`2.Count">
@@ -8193,13 +7232,8 @@
     </member>
     <member name="T:SnapDB.Snap.Filters.PointIdMatchFilter">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Snap.Filters.PointIdMatchFilter</parameter>
-          </include>
-        </markup>
-      </summary>
+            Partial class for creating and managing match filters based on point IDs.
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Filters.PointIdMatchFilter.#ctor">
       <summary>
@@ -8227,33 +7261,10 @@
       <summary>
             Creates a filter from the provided <paramref name="pointId" />.
             </summary>
-      <param name="pointId">Point ID to include in the filter.</param>
-      <typeparam name="TKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>typeparam</parameter>
-            <parameter>TKey</parameter>
-            <parameter>M:SnapDB.Snap.Filters.PointIdMatchFilter.CreateFromPointId``2(System.UInt64)</parameter>
-          </include>
-        </markup>
-      </typeparam>
-      <typeparam name="TValue">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>typeparam</parameter>
-            <parameter>TValue</parameter>
-            <parameter>M:SnapDB.Snap.Filters.PointIdMatchFilter.CreateFromPointId``2(System.UInt64)</parameter>
-          </include>
-        </markup>
-      </typeparam>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Filters.PointIdMatchFilter.CreateFromPointId``2(System.UInt64)</parameter>
-          </include>
-        </markup>
-      </returns>
+      <param name="pointId">The point ID to create the filter for.</param>
+      <typeparam name="TKey">The key type of the match filter.</typeparam>
+      <typeparam name="TValue">The value type of the match filter.</typeparam>
+      <returns>A match filter based on the specified point ID.</returns>
     </member>
     <member name="T:SnapDB.Snap.Filters.PointIdMatchFilterBitArray">
       <summary>
@@ -8337,48 +7348,12 @@
     </member>
     <member name="M:SnapDB.Snap.Filters.PointIdMatchFilterDefinition.Create``2(SnapDB.IO.BinaryStreamBase)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Filters.PointIdMatchFilterDefinition.Create``2(SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Filters.PointIdMatchFilterDefinition.Create``2(SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </param>
-      <typeparam name="TKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>typeparam</parameter>
-            <parameter>TKey</parameter>
-            <parameter>M:SnapDB.Snap.Filters.PointIdMatchFilterDefinition.Create``2(SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </typeparam>
-      <typeparam name="TValue">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>typeparam</parameter>
-            <parameter>TValue</parameter>
-            <parameter>M:SnapDB.Snap.Filters.PointIdMatchFilterDefinition.Create``2(SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </typeparam>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Filters.PointIdMatchFilterDefinition.Create``2(SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </returns>
+            Creates a match filter from a binary stream.
+            </summary>
+      <param name="stream">The binary stream containing match filter data.</param>
+      <typeparam name="TKey">The key type of the match filter.</typeparam>
+      <typeparam name="TValue">The value type of the match filter.</typeparam>
+      <returns>A match filter created from the binary stream data.</returns>
     </member>
     <member name="F:SnapDB.Snap.Filters.PointIdMatchFilterDefinition.FilterGuid">
       <summary>
@@ -9666,22 +8641,9 @@
     </member>
     <member name="M:SnapDB.Snap.Services.ServerDatabaseSettings.Load(System.IO.Stream)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Services.ServerDatabaseSettings.Load(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Services.ServerDatabaseSettings.Load(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </param>
+            Loads the configuration from a stream.
+            </summary>
+      <param name="stream">The stream from which the configuration will be loaded.</param>
     </member>
     <member name="P:SnapDB.Snap.Services.ServerDatabaseSettings.RolloverLog">
       <summary>
@@ -9690,22 +8652,9 @@
     </member>
     <member name="M:SnapDB.Snap.Services.ServerDatabaseSettings.Save(System.IO.Stream)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Services.ServerDatabaseSettings.Save(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Services.ServerDatabaseSettings.Save(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </param>
+            Saves the configuration to a stream.
+            </summary>
+      <param name="stream">The stream where the configuration will be saved.</param>
     </member>
     <member name="P:SnapDB.Snap.Services.ServerDatabaseSettings.StreamingEncodingMethods">
       <summary>
@@ -9719,13 +8668,8 @@
     </member>
     <member name="M:SnapDB.Snap.Services.ServerDatabaseSettings.Validate">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Services.ServerDatabaseSettings.Validate</parameter>
-          </include>
-        </markup>
-      </summary>
+            Validates the configuration.
+            </summary>
     </member>
     <member name="P:SnapDB.Snap.Services.ServerDatabaseSettings.ValueType">
       <summary>
@@ -9825,12 +8769,8 @@
     </member>
     <member name="M:SnapDB.Snap.Services.SnapClient.#ctor">
       <summary>
-        <markup>
-          <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Snap.Services.SnapClient</parameter>
-          </include>
-        </markup>
-      </summary>
+            Initializes a new instance of the <see cref="T:SnapDB.Snap.Services.SnapClient" /> class.
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Services.SnapClient.Connect(SnapDB.Snap.Services.SnapServer)">
       <summary>
@@ -9986,21 +8926,13 @@
       <summary>
             Adds a database to the server
             </summary>
-      <param name="databaseConfig">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>databaseConfig</parameter>
-            <parameter>M:SnapDB.Snap.Services.SnapServer.AddDatabase(SnapDB.Snap.Services.ServerDatabaseSettings)</parameter>
-          </include>
-        </markup>
-      </param>
+      <param name="databaseConfig">The configuration settings for the database.</param>
     </member>
     <member name="M:SnapDB.Snap.Services.SnapServer.AddSocketListener(SnapDB.Snap.Services.Net.SnapSocketListenerSettings)">
       <summary>
-            Adds the socket interface to the database
+            Adds the socket interface to the database.
             </summary>
-      <param name="socketSettings">the config data for the socket listener</param>
+      <param name="socketSettings">The config data for the socket listener.</param>
     </member>
     <member name="M:SnapDB.Snap.Services.SnapServer.Dispose(System.Boolean)">
       <summary>
@@ -10019,29 +8951,13 @@
       <summary>
             Unloads the database name.
             </summary>
-      <param name="database">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>database</parameter>
-            <parameter>M:SnapDB.Snap.Services.SnapServer.RemoveDatabase(System.String)</parameter>
-          </include>
-        </markup>
-      </param>
+      <param name="database">The name of the database to be removed.</param>
     </member>
     <member name="M:SnapDB.Snap.Services.SnapServer.UnloadSocket(System.Net.IPEndPoint)">
       <summary>
             Unloads the specified socket interface.
             </summary>
-      <param name="socketEndpoint">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>socketEndpoint</parameter>
-            <parameter>M:SnapDB.Snap.Services.SnapServer.UnloadSocket(System.Net.IPEndPoint)</parameter>
-          </include>
-        </markup>
-      </param>
+      <param name="socketEndpoint">The endpoint of the socket listener.</param>
     </member>
     <member name="T:SnapDB.Snap.Services.SnapServerDatabase`2">
       <summary>
@@ -11304,27 +10220,11 @@
             Creates a new <see cref="T:SnapDB.Snap.Storage.SortedTreeTable`2" /> based on the settings passed to this class.
             Once created, it is up to he caller to make sure that this class is properly disposed of.
             </summary>
+      <param name="startKey">The key to start at.</param>
+      <param name="endKey">The key to end at.</param>
       <param name="estimatedSize">
             An optional estimated size (in bytes) for the archive file. Use a negative value to indicate no specific estimation.
             </param>
-      <param name="startKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>startKey</parameter>
-            <parameter>M:SnapDB.Snap.Services.Writer.ArchiveInitializer`2.CreateArchiveFile(`0,`0,System.Int64)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="endKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>endKey</parameter>
-            <parameter>M:SnapDB.Snap.Services.Writer.ArchiveInitializer`2.CreateArchiveFile(`0,`0,System.Int64)</parameter>
-          </include>
-        </markup>
-      </param>
       <returns>
             A new instance of <see cref="T:SnapDB.Snap.Storage.SortedTreeTable`2" /> for archiving data within the specified key range.
             </returns>
@@ -12158,22 +11058,9 @@
     </member>
     <member name="M:SnapDB.Snap.Services.Writer.SimplifiedArchiveInitializerSettings.Save(System.IO.Stream)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Services.Writer.SimplifiedArchiveInitializerSettings.Save(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Services.Writer.SimplifiedArchiveInitializerSettings.Save(System.IO.Stream)</parameter>
-          </include>
-        </markup>
-      </param>
+            Saves the configuration settings of the SnapServer to a stream.
+            </summary>
+      <param name="stream">The stream to which the configuration will be saved.</param>
     </member>
     <member name="M:SnapDB.Snap.Services.Writer.SimplifiedArchiveInitializerSettings.Validate">
       <summary>
@@ -13160,7 +12047,7 @@
     </member>
     <member name="M:SnapDB.Snap.Tree.FixedSizeNodeScanner`2.FindKey(`0)">
       <summary>
-            Using <see cref="P:SnapDB.Snap.Tree.SortedTreeScannerBase`2.Pointer" /> to advance to the search location of the provided <see cref="!:key" />.
+            Using <see cref="P:SnapDB.Snap.Tree.SortedTreeScannerBase`2.Pointer" /> to advance to the search location of the provided <paramref name="key" />.
             </summary>
       <param name="key">The key to advance to.</param>
     </member>
@@ -13554,40 +12441,15 @@
     </member>
     <member name="T:SnapDB.Snap.Tree.InsertStreamHelper`2">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Snap.Tree.InsertStreamHelper`2</parameter>
-          </include>
-        </markup>
-      </summary>
-      <typeparam name="TKey">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>typeparam</parameter>
-            <parameter>TKey</parameter>
-            <parameter>T:SnapDB.Snap.Tree.InsertStreamHelper`2</parameter>
-          </include>
-        </markup>
-      </typeparam>
-      <typeparam name="TValue">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>typeparam</parameter>
-            <parameter>TValue</parameter>
-            <parameter>T:SnapDB.Snap.Tree.InsertStreamHelper`2</parameter>
-          </include>
-        </markup>
-      </typeparam>
+            Helper class for inserting key-value pairs into a tree stream.
+            </summary>
+      <typeparam name="TKey">The type of the keys in the tree stream.</typeparam>
+      <typeparam name="TValue">The type of the values in the tree stream.</typeparam>
     </member>
     <member name="M:SnapDB.Snap.Tree.InsertStreamHelper`2.#ctor(SnapDB.Snap.TreeStream{`0,`1})">
       <summary>
-        <markup>
-          <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Snap.Tree.InsertStreamHelper`2</parameter>
-          </include>
-        </markup>
-      </summary>
+            Initializes a new instance of the <see cref="T:SnapDB.Snap.Tree.InsertStreamHelper`2" /> class.
+            </summary>
       <param name="stream">
         <markup>
           <include item="SMCMissingParamTag">
@@ -13600,139 +12462,73 @@
     </member>
     <member name="F:SnapDB.Snap.Tree.InsertStreamHelper`2.IsKvp1">
       <summary>
-            Determines if Key1 and Value1 are the current keys.
-            Otherwise Key1 and Value2 are.
+            Gets or sets a value indicating whether the current operation involves Key-Value Pair 1 (KVP1).
             </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.InsertStreamHelper`2.IsStillSequential">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.InsertStreamHelper`2.IsStillSequential</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets or sets a value indicating whether the stream is still sequential.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.InsertStreamHelper`2.IsValid">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.InsertStreamHelper`2.IsValid</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets or sets a value indicating whether the current state is valid.
+            </summary>
     </member>
     <member name="P:SnapDB.Snap.Tree.InsertStreamHelper`2.Key">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>P:SnapDB.Snap.Tree.InsertStreamHelper`2.Key</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets the current key.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.InsertStreamHelper`2.Key1">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.InsertStreamHelper`2.Key1</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets or sets the first key.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.InsertStreamHelper`2.Key2">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.InsertStreamHelper`2.Key2</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets or sets the second key.
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Tree.InsertStreamHelper`2.Next">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.InsertStreamHelper`2.Next</parameter>
-          </include>
-        </markup>
-      </summary>
+            Advances to the next key-value pair.
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Tree.InsertStreamHelper`2.NextDoNotCheckSequential">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Tree.InsertStreamHelper`2.NextDoNotCheckSequential</parameter>
-          </include>
-        </markup>
-      </summary>
+            Advances to the next key-value pair without checking for sequential order.
+            </summary>
     </member>
     <member name="P:SnapDB.Snap.Tree.InsertStreamHelper`2.PrevKey">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>P:SnapDB.Snap.Tree.InsertStreamHelper`2.PrevKey</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets the previous key.
+            </summary>
     </member>
     <member name="P:SnapDB.Snap.Tree.InsertStreamHelper`2.PrevValue">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>P:SnapDB.Snap.Tree.InsertStreamHelper`2.PrevValue</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets the previous value.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.InsertStreamHelper`2.Stream">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.InsertStreamHelper`2.Stream</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets or sets the tree stream for insertion.
+            </summary>
     </member>
     <member name="P:SnapDB.Snap.Tree.InsertStreamHelper`2.Value">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>P:SnapDB.Snap.Tree.InsertStreamHelper`2.Value</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets the current value.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.InsertStreamHelper`2.Value1">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.InsertStreamHelper`2.Value1</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets or sets the first value.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Tree.InsertStreamHelper`2.Value2">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.InsertStreamHelper`2.Value2</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets or sets the second value.
+            </summary>
     </member>
     <member name="T:SnapDB.Snap.Tree.KeyValueMethods">
       <summary>
@@ -14534,8 +13330,8 @@
       <summary>
             Base class for reading from any implementation of a sorted trees.
             </summary>
-      <typeparam name="TKey"></typeparam>
-      <typeparam name="TValue"></typeparam>
+      <typeparam name="TKey">The key type to use in the <see cref="T:SnapDB.Snap.Tree.SortedTreeScannerBase`2" />.</typeparam>
+      <typeparam name="TValue">The value type to use in the <see cref="T:SnapDB.Snap.Tree.SortedTreeScannerBase`2" />.</typeparam>
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.#ctor(System.Byte,System.Int32,SnapDB.IO.BinaryStreamPointerBase,System.Func{`0,System.Byte,System.UInt32})">
       <summary>
@@ -14548,19 +13344,14 @@
     </member>
     <member name="F:SnapDB.Snap.Tree.SortedTreeScannerBase`2.BlockSize">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Tree.SortedTreeScannerBase`2.BlockSize</parameter>
-          </include>
-        </markup>
-      </summary>
+            Represents the size of the block within the node.
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.FindKey(`0)">
       <summary>
-            Using <see cref="P:SnapDB.Snap.Tree.SortedTreeScannerBase`2.Pointer" /> advance to the search location of the provided <see cref="!:key" />.
+            Using <see cref="P:SnapDB.Snap.Tree.SortedTreeScannerBase`2.Pointer" /> advance to the search location of the provided <paramref name="key" />.
             </summary>
-      <param name="key">the key to advance to.</param>
+      <param name="key">The key to advance to.</param>
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.FindLeafNodeAddress(`0)">
       <summary>
@@ -14608,7 +13399,8 @@
       <param name="key">The key to read into.</param>
       <param name="value">The value to read into.</param>
       <param name="filter">The filter to apply during reading.</param>
-      <returns>True if the read key and value pass the filter; otherwise, false.</returns>
+      <returns>
+        <c>true</c> if the read key and value pass the filter; otherwise, <c>false</c>.</returns>
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.InternalReadWhile(`0,`1,`0)">
       <summary>
@@ -14617,7 +13409,8 @@
       <param name="key">The key to read into.</param>
       <param name="value">The value to read into.</param>
       <param name="upperBounds">The upper bounds for key comparison.</param>
-      <returns>True if the read key and value meet the condition; otherwise, false.</returns>
+      <returns>
+        <c>true</c> if the read key and value meet the condition; otherwise, <c>false</c>.</returns>
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.InternalReadWhile(`0,`1,`0,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})">
       <summary>
@@ -14627,11 +13420,12 @@
       <param name="value">The value to read into.</param>
       <param name="upperBounds">The upper bounds for key comparison.</param>
       <param name="filter">The filter to apply during reading.</param>
-      <returns>True if the read key and value pass the filter and meet the condition; otherwise, false.</returns>
+      <returns>
+        <c>true</c> if the read key and value pass the filter and meet the condition; otherwise, <c>false</c>.</returns>
     </member>
     <member name="P:SnapDB.Snap.Tree.SortedTreeScannerBase`2.IsAlwaysSequential">
       <summary>
-            Gets if the stream is always in sequential order. Do not return true unless it is guaranteed that
+            Gets if the stream is always in sequential order. Do not return <c>true</c> unless it is guaranteed that
             the data read from this stream is sequential.
             </summary>
     </member>
@@ -14681,8 +13475,7 @@
       <param name="key">the key to write the results to</param>
       <param name="value">the value to write the results to</param>
       <returns>
-            True if a point is found.
-            False if the end of the stream has been encountered.
+        <c>true</c> if a point is found; otherwise, the end of the stream has been encountered and <c>false</c> is returned.
             </returns>
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.PeekCatchAll(`0,`1)">
@@ -14707,37 +13500,19 @@
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.ReadBackwardish(`0,`1)">
       <summary>
+            Reads the key-value pair backwardish (in reverse order) from the tree node.
+            </summary>
+      <param name="key">The key to read.</param>
+      <param name="value">The value to read.</param>
+      <returns>
+        <c>true</c> if there are more records to read; otherwise, <c>false</c>.
+            </returns>
+      <remarks>
             Note: This method will read each leaf node in reverse order. However, each leaf itself will be sorted
             ascending, only when moving from leaf node to leave node will this occur in reverse order.
             Note: This functionality should be used only to inspect the contests of a file, and not be
             used to attempt supporting reverse readings of files.
-            </summary>
-      <param name="key">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key</parameter>
-            <parameter>M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.ReadBackwardish(`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.ReadBackwardish(`0,`1)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.ReadBackwardish(`0,`1)</parameter>
-          </include>
-        </markup>
-      </returns>
+            </remarks>
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.ReadCatchAll(`0,`1)">
       <summary>
@@ -14802,17 +13577,16 @@
             but stops short of returning the point that is equal to
             the provided key.
             </summary>
-      <param name="key">Where to store the key</param>
-      <param name="value">Where to store the value</param>
+      <param name="key">Where to store the key.</param>
+      <param name="value">Where to store the value.</param>
       <param name="upperBounds">
-            the test condition. Will return <c>false</c> if the returned point would have
-            exceedd this value
+            The test condition. Will return <c>false</c> if the returned point would have
+            exceeded this value.
             </param>
       <returns>
-            Returns <c>true</c> if the point returned is valid.
-            Returns <c>false</c> if:
-            The point read is greater than or equal to <paramref name="upperBounds" />.
-            The end of the stream is reached.
+            Returns <c>true</c> if the point returned is valid; otherwise, <c>false</c> if:
+            The point read is greater than or equal to <paramref name="upperBounds" /> or 
+            The end of the stream is reached or 
             The end of the current node has been reached.
             </returns>
     </member>
@@ -14828,12 +13602,11 @@
             the test condition. Will return <c>false</c> if the returned point would have
             exceedd this value
             </param>
-      <param name="filter">the filter to apply to the reading.</param>
+      <param name="filter">The filter to apply to the reading.</param>
       <returns>
-            Returns true if the point returned is valid.
-            Returns <c>false</c> if:
-            The point read is greater than or equal to <paramref name="upperBounds" />.
-            The end of the stream is reached.
+            Returns <c>true</c> if the point returned is valid; otherwise, <c>false</c> if:
+            The point read is greater than or equal to <paramref name="upperBounds" /> or  
+            The end of the stream is reached or 
             The end of the current node has been reached.
             </returns>
     </member>
@@ -14845,7 +13618,8 @@
       <param name="key">The key to read into.</param>
       <param name="value">The value to read into.</param>
       <param name="upperBounds">The upper bounds for key comparison.</param>
-      <returns>True if there are more records matching the condition; otherwise, false.</returns>
+      <returns>
+        <c>true</c> if there are more records matching the condition; otherwise, <c>false</c>.</returns>
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.ReadWhileCatchAll(`0,`1,`0,SnapDB.Snap.Filters.MatchFilterBase{`0,`1})">
       <summary>
@@ -14856,7 +13630,8 @@
       <param name="value">The value to read into.</param>
       <param name="upperBounds">The upper bounds for key comparison.</param>
       <param name="filter">An optional filter to apply to matching records.</param>
-      <returns>True if there are more records matching the condition; otherwise, false.</returns>
+      <returns>
+        <c>true</c> if there are more records matching the condition; otherwise, <c>false</c>.</returns>
     </member>
     <member name="P:SnapDB.Snap.Tree.SortedTreeScannerBase`2.RecordCount">
       <summary>
@@ -14873,7 +13648,7 @@
       <summary>
             Seeks the stream to the first value greater than or equal to <paramref name="key" />.
             </summary>
-      <param name="key">the key to seek to.</param>
+      <param name="key">The key to seek to.</param>
     </member>
     <member name="M:SnapDB.Snap.Tree.SortedTreeScannerBase`2.SeekToStart">
       <summary>
@@ -15191,10 +13966,8 @@
     </member>
     <member name="P:SnapDB.Snap.Tree.Specialized.NodeHeader`1.RemainingBytes">
       <summary>
-            Initializes a new instance of the <see cref="T:SnapDB.Snap.Tree.Specialized.NodeHeader`1" /> class.
+            Gets the number of remaining bytes in the current data block.
             </summary>
-      <param name="level">The level of the node within the B-tree structure.</param>
-      <param name="blockSize">The size, in bytes, of the node block.</param>
     </member>
     <member name="F:SnapDB.Snap.Tree.Specialized.NodeHeader`1.RightSiblingNodeIndex">
       <summary>
@@ -15317,7 +14090,7 @@
             Adds the following node pointer to the sparse index.
             </summary>
       <param name="leftPointer">The pointer to the left element, Only used to prime the list.</param>
-      <param name="nodeKey">the first key in the <see cref="!:pointer" />. Only uses the key portion of the TKeyValue</param>
+      <param name="nodeKey">the first key in the <paramref name="pointer" />. Only uses the key portion of the TKeyValue</param>
       <param name="pointer">the index of the later node</param>
       <remarks>
             This class will add the new node data to the parent node,
@@ -15391,49 +14164,12 @@
     </member>
     <member name="M:SnapDB.Snap.Types.SnapCustomMethodsInt32.BinarySearch(System.Byte*,SnapDB.Snap.Types.SnapInt32,System.Int32,System.Int32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapCustomMethodsInt32.BinarySearch(System.Byte*,SnapDB.Snap.Types.SnapInt32,System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="pointer">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>pointer</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapCustomMethodsInt32.BinarySearch(System.Byte*,SnapDB.Snap.Types.SnapInt32,System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="key2">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key2</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapCustomMethodsInt32.BinarySearch(System.Byte*,SnapDB.Snap.Types.SnapInt32,System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="recordCount">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>recordCount</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapCustomMethodsInt32.BinarySearch(System.Byte*,SnapDB.Snap.Types.SnapInt32,System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="keyValueSize">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>keyValueSize</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapCustomMethodsInt32.BinarySearch(System.Byte*,SnapDB.Snap.Types.SnapInt32,System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Performs a binary search within a memory block that is being pointed to.
+            </summary>
+      <param name="pointer">The pointer to the memory block where the search will be performed.</param>
+      <param name="key2">The key to be compared to.</param>
+      <param name="recordCount">The number of records in the memory block.</param>
+      <param name="keyValueSize">The size of each key value pair in bytes.</param>
       <returns>
         <markup>
           <include item="SMCMissingTag">
@@ -15445,13 +14181,8 @@
     </member>
     <member name="T:SnapDB.Snap.Types.SnapCustomMethodsUInt32">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Snap.Types.SnapCustomMethodsUInt32</parameter>
-          </include>
-        </markup>
-      </summary>
+            Provides custom methods for working with SnapDB data of type SnapUInt32 (unsigned 32-bit integer).
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapCustomMethodsUInt32.#ctor">
       <summary>
@@ -15464,57 +14195,15 @@
     </member>
     <member name="M:SnapDB.Snap.Types.SnapCustomMethodsUInt32.BinarySearch(System.Byte*,SnapDB.Snap.Types.SnapUInt32,System.Int32,System.Int32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapCustomMethodsUInt32.BinarySearch(System.Byte*,SnapDB.Snap.Types.SnapUInt32,System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="pointer">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>pointer</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapCustomMethodsUInt32.BinarySearch(System.Byte*,SnapDB.Snap.Types.SnapUInt32,System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="key2">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>key2</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapCustomMethodsUInt32.BinarySearch(System.Byte*,SnapDB.Snap.Types.SnapUInt32,System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="recordCount">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>recordCount</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapCustomMethodsUInt32.BinarySearch(System.Byte*,SnapDB.Snap.Types.SnapUInt32,System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="keyValueSize">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>keyValueSize</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapCustomMethodsUInt32.BinarySearch(System.Byte*,SnapDB.Snap.Types.SnapUInt32,System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Performs a binary search for a specified key within a memory pointer containing SnapUInt32 values.
+            </summary>
+      <param name="pointer">A pointer to the memory stream containing the SnapUInt32 values.</param>
+      <param name="key2">The SnapUInt32 key to search for.</param>
+      <param name="recordCount">The total number of SnapUInt32 records in the memory stream.</param>
+      <param name="keyValueSize">The size (in bytes) of each SnapUInt32 record.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapCustomMethodsUInt32.BinarySearch(System.Byte*,SnapDB.Snap.Types.SnapUInt32,System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </returns>
+            The index of the found key if it exists, or a bitwise complement of the index where the key should be inserted if not found.
+            </returns>
     </member>
     <member name="T:SnapDB.Snap.Types.SnapInt32">
       <summary>
@@ -15534,86 +14223,28 @@
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.Clear">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.Clear</parameter>
-          </include>
-        </markup>
-      </summary>
+            Clears the value of this SnapInt32, setting it to 0.
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.CompareTo(SnapDB.Snap.Types.SnapInt32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.CompareTo(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="other">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>other</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.CompareTo(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.CompareTo(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </returns>
+            Compares this SnapInt32 to another SnapInt32 and returns an integer that indicates their relative values.
+            </summary>
+      <param name="other">The SnapInt32 to compare with.</param>
+      <returns>A signed integer that indicates the relative values of this instance and the other SnapInt32.</returns>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.CompareTo(System.Byte*)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.CompareTo(System.Byte*)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.CompareTo(System.Byte*)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.CompareTo(System.Byte*)</parameter>
-          </include>
-        </markup>
-      </returns>
+            Compares this SnapInt32 to a memory stream and returns an integer that indicates their relative values.
+            </summary>
+      <param name="stream">A pointer to the memory stream to compare with.</param>
+      <returns>A signed integer that indicates the relative values of this instance and the memory stream.</returns>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.CopyTo(SnapDB.Snap.Types.SnapInt32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.CopyTo(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="destination">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>destination</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.CopyTo(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Copies the value of this SnapInt32 to the specified destination SnapInt32.
+            </summary>
+      <param name="destination">The destination SnapInt32 to copy to.</param>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.CreateValueMethods">
       <summary>
@@ -15635,225 +14266,76 @@
     </member>
     <member name="P:SnapDB.Snap.Types.SnapInt32.GenericTypeGuid">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>P:SnapDB.Snap.Types.SnapInt32.GenericTypeGuid</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets the globally unique identifier (GUID) representing the SnapInt32 data type.
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.IsBetween(SnapDB.Snap.Types.SnapInt32,SnapDB.Snap.Types.SnapInt32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsBetween(SnapDB.Snap.Types.SnapInt32,SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="lowerBounds">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>lowerBounds</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsBetween(SnapDB.Snap.Types.SnapInt32,SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="upperBounds">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>upperBounds</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsBetween(SnapDB.Snap.Types.SnapInt32,SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Determines whether this SnapInt32 is between the specified lower and upper bounds (inclusive).
+            </summary>
+      <param name="lowerBounds">The lower bounds SnapInt32 to compare to.</param>
+      <param name="upperBounds">The upper bounds SnapInt32 to compare to.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsBetween(SnapDB.Snap.Types.SnapInt32,SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if this SnapInt32 is between the specified lower and upper bounds; otherwise, <c>false</c>.</returns>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.IsEqualTo(SnapDB.Snap.Types.SnapInt32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsEqualTo(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="right">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>right</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsEqualTo(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Determines whether this SnapInt32 is equal to the specified SnapInt32.
+            </summary>
+      <param name="right">The SnapInt32 to compare to.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsEqualTo(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if this SnapInt32 is equal to the specified SnapInt32; otherwise, <c>false</c>.</returns>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.IsGreaterThan(SnapDB.Snap.Types.SnapInt32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsGreaterThan(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="right">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>right</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsGreaterThan(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Determines whether this SnapInt32 is greater than the specified SnapInt32.
+            </summary>
+      <param name="right">The SnapInt32 to compare to.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsGreaterThan(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if this SnapInt32 is greater than the specified SnapInt32; otherwise, <c>false</c>.</returns>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.IsGreaterThanOrEqualTo(SnapDB.Snap.Types.SnapInt32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsGreaterThanOrEqualTo(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="right">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>right</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsGreaterThanOrEqualTo(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Determines whether this SnapInt32 is greater than or equal to the specified SnapInt32.
+            </summary>
+      <param name="right">The SnapInt32 to compare to.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsGreaterThanOrEqualTo(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if this SnapInt32 is greater than or equal to the specified SnapInt32; otherwise, <c>false</c>.</returns>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.IsLessThan(SnapDB.Snap.Types.SnapInt32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsLessThan(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="right">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>right</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsLessThan(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Determines whether this SnapInt32 is less than the specified SnapInt32.
+            </summary>
+      <param name="right">The SnapInt32 to compare to.</param>
       <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.IsLessThan(SnapDB.Snap.Types.SnapInt32)</parameter>
-          </include>
-        </markup>
-      </returns>
+        <c>true</c> if this SnapInt32 is less than the specified SnapInt32; otherwise, <c>false</c>.</returns>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.Read(SnapDB.IO.BinaryStreamBase)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.Read(SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.Read(SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </param>
+            Reads the value of this SnapInt32 from a binary stream.
+            </summary>
+      <param name="stream">The binary stream from which to read the value.</param>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.Read(System.Byte*)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.Read(System.Byte*)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.Read(System.Byte*)</parameter>
-          </include>
-        </markup>
-      </param>
+            Reads the value of this SnapInt32 from a memory stream.
+            </summary>
+      <param name="stream">A pointer to the memory stream from which to read the value.</param>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.SetMax">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.SetMax</parameter>
-          </include>
-        </markup>
-      </summary>
+            Sets the value of this SnapInt32 to the maximum possible value.
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.SetMin">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.SetMin</parameter>
-          </include>
-        </markup>
-      </summary>
+            Sets the value of this SnapInt32 to the minimum possible value.
+            </summary>
     </member>
     <member name="P:SnapDB.Snap.Types.SnapInt32.Size">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>P:SnapDB.Snap.Types.SnapInt32.Size</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets the size of the SnapInt32 data type in bytes.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Types.SnapInt32.Value">
       <summary>
@@ -15862,78 +14344,31 @@
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.Write(SnapDB.IO.BinaryStreamBase)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.Write(SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.Write(SnapDB.IO.BinaryStreamBase)</parameter>
-          </include>
-        </markup>
-      </param>
+            Writes the value of this SnapInt32 to a binary stream.
+            </summary>
+      <param name="stream">The binary stream to which to write the value.</param>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.Write(System.Byte*)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.Write(System.Byte*)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.Write(System.Byte*)</parameter>
-          </include>
-        </markup>
-      </param>
+            Writes the value of this SnapInt32 to a memory stream.
+            </summary>
+      <param name="stream">A pointer to the memory stream to which to write the value.</param>
     </member>
     <member name="T:SnapDB.Snap.Types.SnapUInt32">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Snap.Types.SnapUInt32</parameter>
-          </include>
-        </markup>
-      </summary>
+            Represents an unsigned 32-bit integer in a SnapDB database.
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapUInt32.#ctor">
       <summary>
-        <markup>
-          <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Snap.Types.SnapUInt32</parameter>
-          </include>
-        </markup>
-      </summary>
+            Initializes a new instance of the SnapUInt32 class.
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapUInt32.#ctor(System.UInt32)">
       <summary>
-        <markup>
-          <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Snap.Types.SnapUInt32</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="value">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>value</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapUInt32.#ctor(System.UInt32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Initializes a new instance of the SnapUInt32 class with a specified value.
+            </summary>
+      <param name="value">The initial value of the SnapUInt32 that will be specified.</param>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapUInt32.Clear">
       <summary>
@@ -15942,76 +14377,23 @@
     </member>
     <member name="M:SnapDB.Snap.Types.SnapUInt32.CompareTo(SnapDB.Snap.Types.SnapUInt32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapUInt32.CompareTo(SnapDB.Snap.Types.SnapUInt32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="other">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>other</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapUInt32.CompareTo(SnapDB.Snap.Types.SnapUInt32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapUInt32.CompareTo(SnapDB.Snap.Types.SnapUInt32)</parameter>
-          </include>
-        </markup>
-      </returns>
+            Compares this SnapUInt32 to another SnapUInt32 which then returns a value indicating their relative order.
+            </summary>
+      <param name="other">The SnapUInt32 being compared to.</param>
+      <returns>A signed integer that indicates the relative order of the SnapUInt32 values.</returns>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapUInt32.CompareTo(System.Byte*)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapUInt32.CompareTo(System.Byte*)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="stream">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>stream</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapUInt32.CompareTo(System.Byte*)</parameter>
-          </include>
-        </markup>
-      </param>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapUInt32.CompareTo(System.Byte*)</parameter>
-          </include>
-        </markup>
-      </returns>
+            Compares this SnapUInt32 to a memory stream and returns a value indicating their relative order.
+            </summary>
+      <param name="stream">A pointer to the memory stream comtaining the SnapUInt32 value to compare to.</param>
+      <returns>A signed integer that indicates the relative order of the SnapUInt32 value in the memory stream.</returns>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapUInt32.CopyTo(SnapDB.Snap.Types.SnapUInt32)">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapUInt32.CopyTo(SnapDB.Snap.Types.SnapUInt32)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="destination">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>destination</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapUInt32.CopyTo(SnapDB.Snap.Types.SnapUInt32)</parameter>
-          </include>
-        </markup>
-      </param>
+            Copies the SnapUInt32 value to the specified destination SnapUInt32.
+            </summary>
+      <param name="destination">The SnapUInt32 instance to which the value is copied.</param>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapUInt32.CreateValueMethods">
       <summary>
@@ -16021,13 +14403,8 @@
     </member>
     <member name="P:SnapDB.Snap.Types.SnapUInt32.GenericTypeGuid">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>P:SnapDB.Snap.Types.SnapUInt32.GenericTypeGuid</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets the GUID for the SnapUInt32 type.
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapUInt32.IsBetween(SnapDB.Snap.Types.SnapUInt32,SnapDB.Snap.Types.SnapUInt32)">
       <summary>
@@ -16094,33 +14471,18 @@
     </member>
     <member name="M:SnapDB.Snap.Types.SnapUInt32.SetMin">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapUInt32.SetMin</parameter>
-          </include>
-        </markup>
-      </summary>
+            Sets the value of this SnapUInt32 to the minimum possible value.
+            </summary>
     </member>
     <member name="P:SnapDB.Snap.Types.SnapUInt32.Size">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>P:SnapDB.Snap.Types.SnapUInt32.Size</parameter>
-          </include>
-        </markup>
-      </summary>
+            Gets the size, in bytes, of the SnapUInt32 data type.
+            </summary>
     </member>
     <member name="F:SnapDB.Snap.Types.SnapUInt32.Value">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>F:SnapDB.Snap.Types.SnapUInt32.Value</parameter>
-          </include>
-        </markup>
-      </summary>
+            The value of the SnapUInt32.
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapUInt32.Write(SnapDB.IO.BinaryStreamBase)">
       <summary>
@@ -16458,7 +14820,7 @@
             Provides a way to raise events on another thread. The events
             will be raised on the thread that constructed this class.
             </summary>
-      <typeparam name="T"></typeparam>
+      <typeparam name="T">The type of EventArgs.</typeparam>
       <remarks>
             This is useful when needing to process data on a certain thread. On instance is
             when preparing data that needs to then be processed on the UI thread. Just construct
@@ -16473,13 +14835,8 @@
     </member>
     <member name="E:SnapDB.Threading.SynchronousEvent`1.CustomEvent">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>E:SnapDB.Threading.SynchronousEvent`1.CustomEvent</parameter>
-          </include>
-        </markup>
-      </summary>
+            Occurs when a custom event of type <typeparamref name="T" /> is triggered.
+            </summary>
     </member>
     <member name="M:SnapDB.Threading.SynchronousEvent`1.Dispose">
       <summary>
@@ -16524,7 +14881,7 @@
             Returns an enumerator that iterates through the collection.
             </summary>
       <returns>
-            A <see cref="!:System.Collections.Generic.IEnumerator`1" /> that can be used to
+            An <see cref="T:System.Collections.IEnumerator" /> that can be used to
             iterate through the collection.
             </returns>
     </member>

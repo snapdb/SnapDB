@@ -28,20 +28,31 @@ using SnapDB.IO;
 
 namespace SnapDB.Snap.Types;
 
+/// <summary>
+/// Represents an unsigned 32-bit integer in a SnapDB database.
+/// </summary>
 public class SnapUInt32 : SnapTypeBase<SnapUInt32>
 {
     #region [ Members ]
-
+    /// <summary>
+    /// The value of the SnapUInt32.
+    /// </summary>
     public uint Value;
 
     #endregion
 
     #region [ Constructors ]
-
+    /// <summary>
+    /// Initializes a new instance of the SnapUInt32 class.
+    /// </summary>
     public SnapUInt32()
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the SnapUInt32 class with a specified value.
+    /// </summary>
+    /// <param name="value">The initial value of the SnapUInt32 that will be specified.</param>
     public SnapUInt32(uint value)
     {
         Value = value;
@@ -50,32 +61,54 @@ public class SnapUInt32 : SnapTypeBase<SnapUInt32>
     #endregion
 
     #region [ Properties ]
-
+    /// <summary>
+    /// Gets the GUID for the SnapUInt32 type.
+    /// </summary>
     public override Guid GenericTypeGuid =>
         // {03F4BD3A-D9CF-4358-B175-A9D38BE6715A}
         new(0x03f4bd3a, 0xd9cf, 0x4358, 0xb1, 0x75, 0xa9, 0xd3, 0x8b, 0xe6, 0x71, 0x5a);
 
+    /// <summary>
+    /// Gets the size, in bytes, of the SnapUInt32 data type.
+    /// </summary>
     public override int Size => 4;
 
     #endregion
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Copies the SnapUInt32 value to the specified destination SnapUInt32.
+    /// </summary>
+    /// <param name="destination">The SnapUInt32 instance to which the value is copied.</param>
     public override void CopyTo(SnapUInt32 destination)
     {
         destination.Value = Value;
     }
 
+    /// <summary>
+    /// Compares this SnapUInt32 to another SnapUInt32 which then returns a value indicating their relative order.
+    /// </summary>
+    /// <param name="other">The SnapUInt32 being compared to.</param>
+    /// <returns>A signed integer that indicates the relative order of the SnapUInt32 values.</returns>
     public override int CompareTo(SnapUInt32 other)
     {
         return Value.CompareTo(other.Value);
     }
 
+    /// <summary>
+    /// Compares this SnapUInt32 to a memory stream and returns a value indicating their relative order.
+    /// </summary>
+    /// <param name="stream">A pointer to the memory stream comtaining the SnapUInt32 value to compare to.</param>
+    /// <returns>A signed integer that indicates the relative order of the SnapUInt32 value in the memory stream.</returns>
     public override unsafe int CompareTo(byte* stream)
     {
         return Value.CompareTo(*(uint*)stream);
     }
 
+    /// <summary>
+    /// Sets the value of this SnapUInt32 to the minimum possible value.
+    /// </summary>
     public override void SetMin()
     {
         Value = uint.MinValue;

@@ -2,14 +2,24 @@
             Helper extensions for <span class="noLink">IDigest</span> types.
             </td></tr><tr><td><a href="T_SnapDB_Security_GenerateCertificate.htm">GenerateCertificate</a></td><td>
             Generates <a href="https://learn.microsoft.com/dotnet/api/system.security.cryptography.x509certificates.x509certificate2" target="_blank" rel="noopener noreferrer">X509Certificate2</a>s.
-            </td></tr><tr><td><a href="T_SnapDB_Security_Hash.htm">Hash</a></td><td> </td></tr><tr><td><a href="T_SnapDB_Security_Hash_1.htm">Hash<span id="LST4316AFDA_0" data-languageSpecificText="cs=&lt;|vb=(Of |cpp=&lt;|nu=(|fs=&lt;'"></span>T<span id="LST4316AFDA_1" data-languageSpecificText="cs=&gt;|vb=)|cpp=&gt;|nu=)|fs=&gt;"></span></a></td><td> </td></tr><tr><td><a href="T_SnapDB_Security_Hmac.htm">Hmac</a></td><td> </td></tr><tr><td><a href="T_SnapDB_Security_Hmac_1.htm">Hmac<span id="LST4316AFDA_2" data-languageSpecificText="cs=&lt;|vb=(Of |cpp=&lt;|nu=(|fs=&lt;'"></span>T<span id="LST4316AFDA_3" data-languageSpecificText="cs=&gt;|vb=)|cpp=&gt;|nu=)|fs=&gt;"></span></a></td><td> </td></tr><tr><td><a href="T_SnapDB_Security_NonceGenerator.htm">NonceGenerator</a></td><td>
+            </td></tr><tr><td><a href="T_SnapDB_Security_Hash.htm">Hash</a></td><td>
+            Provides utility methods for hashing data using various hash algorithms.
+            </td></tr><tr><td><a href="T_SnapDB_Security_Hash_1.htm">Hash<span id="LST4316AFDA_0" data-languageSpecificText="cs=&lt;|vb=(Of |cpp=&lt;|nu=(|fs=&lt;'"></span>T<span id="LST4316AFDA_1" data-languageSpecificText="cs=&gt;|vb=)|cpp=&gt;|nu=)|fs=&gt;"></span></a></td><td>
+            Provides utility methods for hashing data using a specific hash algorithm of type <span class="parameter">T</span>.
+            </td></tr><tr><td><a href="T_SnapDB_Security_Hmac.htm">Hmac</a></td><td>
+            Provides utility methods for computing Hash-based Message Authentication Code (HMAC) values using various hash algorithms.
+            </td></tr><tr><td><a href="T_SnapDB_Security_Hmac_1.htm">Hmac<span id="LST4316AFDA_2" data-languageSpecificText="cs=&lt;|vb=(Of |cpp=&lt;|nu=(|fs=&lt;'"></span>T<span id="LST4316AFDA_3" data-languageSpecificText="cs=&gt;|vb=)|cpp=&gt;|nu=)|fs=&gt;"></span></a></td><td>
+            Provides utility methods for computing Hash-based Message Authentication Code (HMAC) values using a specific hash algorithm of type <span class="parameter">T</span>.
+            </td></tr><tr><td><a href="T_SnapDB_Security_NonceGenerator.htm">NonceGenerator</a></td><td>
             Used to generate Nonce values.
             </td></tr><tr><td><a href="T_SnapDB_Security_Pbkdf2.htm">Pbkdf2</a></td><td>
             Implements a generic PBKDF2 <a href="https://learn.microsoft.com/dotnet/api/system.security.cryptography.derivebytes" target="_blank" rel="noopener noreferrer">DeriveBytes</a> that will work from a custom cryptographic transform.
             <a href="https://learn.microsoft.com/dotnet/api/system.security.cryptography.rfc2898derivebytes" target="_blank" rel="noopener noreferrer">Rfc2898DeriveBytes</a> only implements a SHA-1 underlying hash function.
             </td></tr><tr><td><a href="T_SnapDB_Security_SaltGenerator.htm">SaltGenerator</a></td><td>
             Generates salt values.
-            </td></tr><tr><td><a href="T_SnapDB_Security_SecureStream.htm">SecureStream</a></td><td> </td></tr><tr><td><a href="T_SnapDB_Security_SecureStreamClientBase.htm">SecureStreamClientBase</a></td><td>
+            </td></tr><tr><td><a href="T_SnapDB_Security_SecureStream.htm">SecureStream</a></td><td>
+            Provides utility methods for secure communication using SSL/TLS streams.
+            </td></tr><tr><td><a href="T_SnapDB_Security_SecureStreamClientBase.htm">SecureStreamClientBase</a></td><td>
             Creates a secure stream that connects to a server.
             </td></tr><tr><td><a href="T_SnapDB_Security_SecureStreamClientDefault.htm">SecureStreamClientDefault</a></td><td>
             Creates a secure stream that connects via the default credential
@@ -18,12 +28,14 @@
             </td></tr><tr><td><a href="T_SnapDB_Security_SecureStreamServer_1.htm">SecureStreamServer<span id="LST4316AFDA_4" data-languageSpecificText="cs=&lt;|vb=(Of |cpp=&lt;|nu=(|fs=&lt;'"></span>T<span id="LST4316AFDA_5" data-languageSpecificText="cs=&gt;|vb=)|cpp=&gt;|nu=)|fs=&gt;"></span></a></td><td>
             A server host that manages a secure stream connection.
             This class is thread safe and can negotiate streams simultaneous.
-            </td></tr><tr><td><a href="T_SnapDB_Security_SecurityExtensions.htm">SecurityExtensions</a></td><td> </td></tr></table></div><h2 class="quickLinkHeader"><span class="icon toggleSection" tabindex="0"><i class="fa fa-angle-down"></i></span>Structures</h2><div id="IDKCASection"><table id="structureList" class="table is-hoverable"><tr><td><a href="T_SnapDB_Security_ReadonlyByteArray.htm">ReadonlyByteArray</a></td><td>
+            </td></tr><tr><td><a href="T_SnapDB_Security_SecurityExtensions.htm">SecurityExtensions</a></td><td>
+            Provides extension methods for enhancing security-related operations.
+            </td></tr></table></div><h2 class="quickLinkHeader"><span class="icon toggleSection" tabindex="0"><i class="fa fa-angle-down"></i></span>Structures</h2><div id="IDKCASection"><table id="structureList" class="table is-hoverable"><tr><td><a href="T_SnapDB_Security_ReadonlyByteArray.htm">ReadonlyByteArray</a></td><td>
             Provides a way for byte arrays to be added to sorted lists and dictionaries.
             </td></tr></table></div><h2 class="quickLinkHeader"><span class="icon toggleSection" tabindex="0"><i class="fa fa-angle-down"></i></span>Enumerations</h2><div id="IDDCASection"><table id="enumerationList" class="table is-hoverable"><tr><td><a href="T_SnapDB_Security_HashMethod.htm">HashMethod</a></td><td>
             The hash and hmac method that will be used for authentication protocols.
             </td></tr><tr><td><a href="T_SnapDB_Security_HmacMethod.htm">HmacMethod</a></td><td>
-            A series of HMAC implementations supported by .NET
+            A series of HMAC implementations supported by .NET.
             </td></tr></table></div></div><div id="InThisArticleColumn" class="column is-hidden-mobile"><nav class="menu sticky is-hidden"><p class="menu-label"><strong>In This Article</strong></p><ul id="InThisArticleMenu" class="menu-list"><li><a class="quickLink">Classes</a></li><li><a class="quickLink">Structures</a></li><li><a class="quickLink">Enumerations</a></li></ul></nav></div></div></div><footer id="PageFooter" class="footer border-top py-3 fixedFooter"><div class="columns"><div class="column"><span class="site-footer-credits">
 <a href="https://snapdb.github.io/SnapDB/" target="_self">Documentation Home</a> <br /><br />
 Generated by <a href="https://github.com/EWSoftware/SHFB" target="_blank">Sandcastle Help File Builder</a>

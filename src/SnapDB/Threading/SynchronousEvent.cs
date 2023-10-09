@@ -32,7 +32,7 @@ namespace SnapDB.Threading;
 /// Provides a way to raise events on another thread. The events
 /// will be raised on the thread that constructed this class.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">The type of EventArgs.</typeparam>
 /// <remarks>
 /// This is useful when needing to process data on a certain thread. On instance is
 /// when preparing data that needs to then be processed on the UI thread. Just construct
@@ -43,6 +43,9 @@ public class SynchronousEvent<T> : IDisposable where T : EventArgs
 {
     #region [ Members ]
 
+    /// <summary>
+    /// Occurs when a custom event of type <typeparamref name="T"/> is triggered.
+    /// </summary>
     public event EventHandler<T> CustomEvent;
 
     private readonly AsyncOperation m_asyncEventHelper;

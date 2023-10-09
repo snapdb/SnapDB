@@ -26,10 +26,22 @@
 
 namespace SnapDB.Snap.Types;
 
+/// <summary>
+/// Provides custom methods for working with SnapDB data of type SnapUInt32 (unsigned 32-bit integer).
+/// </summary>
 public class SnapCustomMethodsUInt32 : SnapTypeCustomMethods<SnapUInt32>
 {
     #region [ Methods ]
-
+    /// <summary>
+    /// Performs a binary search for a specified key within a memory pointer containing SnapUInt32 values.
+    /// </summary>
+    /// <param name="pointer">A pointer to the memory stream containing the SnapUInt32 values.</param>
+    /// <param name="key2">The SnapUInt32 key to search for.</param>
+    /// <param name="recordCount">The total number of SnapUInt32 records in the memory stream.</param>
+    /// <param name="keyValueSize">The size (in bytes) of each SnapUInt32 record.</param>
+    /// <returns>
+    /// The index of the found key if it exists, or a bitwise complement of the index where the key should be inserted if not found.
+    /// </returns>
     public override unsafe int BinarySearch(byte* pointer, SnapUInt32 key2, int recordCount, int keyValueSize)
     {
         int lastFoundIndex = LastFoundIndex;

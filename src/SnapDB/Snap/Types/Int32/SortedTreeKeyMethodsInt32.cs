@@ -26,10 +26,20 @@
 
 namespace SnapDB.Snap.Types;
 
+/// <summary>
+/// Provides custom methods and algorithms for performing operations on SnapInt32 values.
+/// </summary>
 public class SnapCustomMethodsInt32 : SnapTypeCustomMethods<SnapInt32>
 {
     #region [ Methods ]
-
+    /// <summary>
+    /// Performs a binary search within a memory block that is being pointed to.
+    /// </summary>
+    /// <param name="pointer">The pointer to the memory block where the search will be performed.</param>
+    /// <param name="key2">The key to be compared to.</param>
+    /// <param name="recordCount">The number of records in the memory block.</param>
+    /// <param name="keyValueSize">The size of each key value pair in bytes.</param>
+    /// <returns></returns>
     public override unsafe int BinarySearch(byte* pointer, SnapInt32 key2, int recordCount, int keyValueSize)
     {
         int lastFoundIndex = LastFoundIndex;

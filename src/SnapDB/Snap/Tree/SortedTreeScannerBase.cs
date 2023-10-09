@@ -32,8 +32,8 @@ namespace SnapDB.Snap.Tree;
 /// <summary>
 /// Base class for reading from any implementation of a sorted trees.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TKey">The key type to use in the <see cref="SortedTreeScannerBase{TKey, TValue}"/>.</typeparam>
+/// <typeparam name="TValue">The value type to use in the <see cref="SortedTreeScannerBase{TKey, TValue}"/>.</typeparam>
 public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeStream<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
@@ -47,6 +47,11 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     private const int OffsetOfValidBytes = OffsetOfRecordCount + sizeof(ushort);
 
     private const int OffsetOfVersion = 0;
+
+
+    /// <summary>
+    /// Represents the size of the block within the node.
+    /// </summary>
     protected readonly int BlockSize;
 
     /// <summary>
@@ -130,7 +135,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     #region [ Properties ]
 
     /// <summary>
-    /// Gets if the stream is always in sequential order. Do not return true unless it is guaranteed that
+    /// Gets if the stream is always in sequential order. Do not return <c>true</c> unless it is guaranteed that
     /// the data read from this stream is sequential.
     /// </summary>
     public override bool IsAlwaysSequential => true;
@@ -201,7 +206,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     /// <summary>
     /// Seeks the stream to the first value greater than or equal to <paramref name="key"/>.
     /// </summary>
-    /// <param name="key">the key to seek to.</param>
+    /// <param name="key">The key to seek to.</param>
     public override void SeekToKey(TKey key)
     {
         LoadNode(FindLeafNodeAddress(key));
@@ -214,13 +219,12 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     /// <param name="key">the key to write the results to</param>
     /// <param name="value">the value to write the results to</param>
     /// <returns>
-    /// True if a point is found.
-    /// False if the end of the stream has been encountered.
+    /// <c>true</c> if a point is found; otherwise, the end of the stream has been encountered and <c>false</c> is returned.
     /// </returns>
     public bool Peek(TKey key, TValue value)
     {
         if (Stream.PointerVersion == PointerVersion)
-            //A light weight function that can be called quickly since 99% of the time, this logic statement will return successfully.
+            // A light weight function that can be called quickly since 99% of the time, this logic statement will return successfully.
             if (IndexOfNextKeyValue < RecordCount)
             {
                 InternalPeek(key, value);
@@ -235,17 +239,16 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     /// but stops short of returning the point that is equal to
     /// the provided key.
     /// </summary>
-    /// <param name="key">Where to store the key</param>
-    /// <param name="value">Where to store the value</param>
+    /// <param name="key">Where to store the key.</param>
+    /// <param name="value">Where to store the value.</param>
     /// <param name="upperBounds">
-    /// the test condition. Will return <c>false</c> if the returned point would have
-    /// exceedd this value
+    /// The test condition. Will return <c>false</c> if the returned point would have
+    /// exceeded this value.
     /// </param>
     /// <returns>
-    /// Returns <c>true</c> if the point returned is valid.
-    /// Returns <c>false</c> if:
-    /// The point read is greater than or equal to <paramref name="upperBounds"/>.
-    /// The end of the stream is reached.
+    /// Returns <c>true</c> if the point returned is valid; otherwise, <c>false</c> if:
+    /// The point read is greater than or equal to <paramref name="upperBounds"/> or 
+    /// The end of the stream is reached or 
     /// The end of the current node has been reached.
     /// </returns>
     public virtual bool ReadWhile(TKey key, TValue value, TKey upperBounds)
@@ -278,12 +281,11 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     /// the test condition. Will return <c>false</c> if the returned point would have
     /// exceedd this value
     /// </param>
-    /// <param name="filter">the filter to apply to the reading.</param>
+    /// <param name="filter">The filter to apply to the reading.</param>
     /// <returns>
-    /// Returns true if the point returned is valid.
-    /// Returns <c>false</c> if:
-    /// The point read is greater than or equal to <paramref name="upperBounds"/>.
-    /// The end of the stream is reached.
+    /// Returns <c>true</c> if the point returned is valid; otherwise, <c>false</c> if:
+    /// The point read is greater than or equal to <paramref name="upperBounds"/> or  
+    /// The end of the stream is reached or 
     /// The end of the current node has been reached.
     /// </returns>
     public virtual bool ReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue>? filter)
@@ -299,13 +301,19 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     }
 
     /// <summary>
+    /// Reads the key-value pair backwardish (in reverse order) from the tree node.
+    /// </summary>
+    /// <param name="key">The key to read.</param>
+    /// <param name="value">The value to read.</param>
+    /// <returns>
+    ///   <c>true</c> if there are more records to read; otherwise, <c>false</c>.
+    /// </returns>
+    /// <remarks>
     /// Note: This method will read each leaf node in reverse order. However, each leaf itself will be sorted
     /// ascending, only when moving from leaf node to leave node will this occur in reverse order.
     /// Note: This functionality should be used only to inspect the contests of a file, and not be
     /// used to attempt supporting reverse readings of files.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <param name="value"></param>
+    /// </remarks>
     public bool ReadBackwardish(TKey key, TValue value)
     {
         // If there are no more records in the current node.
@@ -352,7 +360,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     /// <param name="key">The key to read into.</param>
     /// <param name="value">The value to read into.</param>
     /// <param name="filter">The filter to apply during reading.</param>
-    /// <returns>True if the read key and value pass the filter; otherwise, false.</returns>
+    /// <returns><c>true</c> if the read key and value pass the filter; otherwise, <c>false</c>.</returns>
     protected abstract bool InternalRead(TKey key, TValue value, MatchFilterBase<TKey, TValue>? filter);
 
     /// <summary>
@@ -361,7 +369,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     /// <param name="key">The key to read into.</param>
     /// <param name="value">The value to read into.</param>
     /// <param name="upperBounds">The upper bounds for key comparison.</param>
-    /// <returns>True if the read key and value meet the condition; otherwise, false.</returns>
+    /// <returns><c>true</c> if the read key and value meet the condition; otherwise, <c>false</c>.</returns>
     protected abstract bool InternalReadWhile(TKey key, TValue value, TKey upperBounds);
 
     /// <summary>
@@ -371,13 +379,13 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     /// <param name="value">The value to read into.</param>
     /// <param name="upperBounds">The upper bounds for key comparison.</param>
     /// <param name="filter">The filter to apply during reading.</param>
-    /// <returns>True if the read key and value pass the filter and meet the condition; otherwise, false.</returns>
+    /// <returns><c>true</c> if the read key and value pass the filter and meet the condition; otherwise, <c>false</c>.</returns>
     protected abstract bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue>? filter);
 
     /// <summary>
-    /// Using <see cref="Pointer"/> advance to the search location of the provided <see cref="key"/>.
+    /// Using <see cref="Pointer"/> advance to the search location of the provided <paramref name="key"/>.
     /// </summary>
-    /// <param name="key">the key to advance to.</param>
+    /// <param name="key">The key to advance to.</param>
     protected abstract void FindKey(TKey key);
 
     /// <summary>
@@ -415,6 +423,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
                 key.Clear();
                 value.Clear();
                 Dispose();
+
                 return false;
             }
 
@@ -436,7 +445,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     /// <param name="key">The key to read into.</param>
     /// <param name="value">The value to read into.</param>
     /// <param name="upperBounds">The upper bounds for key comparison.</param>
-    /// <returns>True if there are more records matching the condition; otherwise, false.</returns>
+    /// <returns><c>true</c> if there are more records matching the condition; otherwise, <c>false</c>.</returns>
     protected bool ReadWhileCatchAll(TKey key, TValue value, TKey upperBounds)
     {
         // If there are no more records in the current node.
@@ -475,7 +484,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     /// <param name="value">The value to read into.</param>
     /// <param name="upperBounds">The upper bounds for key comparison.</param>
     /// <param name="filter">An optional filter to apply to matching records.</param>
-    /// <returns>True if there are more records matching the condition; otherwise, false.</returns>
+    /// <returns><c>true</c> if there are more records matching the condition; otherwise, <c>false</c>.</returns>
     protected bool ReadWhileCatchAll(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue>? filter)
     {
         // If there are no more records in the current node.
@@ -487,6 +496,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
                 key.Clear();
                 value.Clear();
                 Dispose();
+
                 return false;
             }
 
@@ -555,7 +565,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     /// </summary>
     /// <param name="index">The node index.</param>
     /// <exception cref="ArgumentNullException">
-    /// occurs when <see cref="index"/>
+    /// occurs when <paramref name="index"/>
     /// is equal to uint.MaxValue.
     /// </exception>
     private void LoadNode(uint index)

@@ -36,8 +36,14 @@ namespace SnapDB.Snap;
 public class SnapTypeCustomMethods<T> where T : SnapTypeBase<T>, new()
 {
     #region [ Members ]
-
+    /// <summary>
+    /// The last found index.
+    /// </summary>
     protected int LastFoundIndex;
+
+    /// <summary>
+    /// A temporary key instance of type <typeparamref name="T"/>.
+    /// </summary>
     protected T TempKey = new();
 
     #endregion
@@ -59,7 +65,7 @@ public class SnapTypeCustomMethods<T> where T : SnapTypeBase<T>, new()
     {
         if (LastFoundIndex == recordCount - 1)
         {
-            if (key.CompareTo(pointer + keyValueSize * LastFoundIndex) > 0) //Key > CompareKey
+            if (key.CompareTo(pointer + keyValueSize * LastFoundIndex) > 0) // Key > CompareKey
             {
                 LastFoundIndex++;
                 return ~recordCount;

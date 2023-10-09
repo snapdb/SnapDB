@@ -55,6 +55,8 @@ public static class Hmac
     /// <param name="hash">The hash algorithm to use for the HMAC.</param>
     /// <param name="key">The secret key for the HMAC computation.</param>
     /// <param name="data">The input data to compute the HMAC over.</param>
+    /// <param name="position">The starting position in the data array.</param>
+    /// <param name="length">The length of data to use for HMAC computation.</param>
     /// <returns>The computed HMAC as a byte array.</returns>
     public static byte[] Compute(IDigest hash, byte[] key, byte[] data, int position, int length)
     {
@@ -64,6 +66,7 @@ public static class Hmac
         byte[] result = new byte[hmac.GetMacSize()];
         hmac.BlockUpdate(data, position, length);
         hmac.DoFinal(result, 0);
+
         return result;
     }
 

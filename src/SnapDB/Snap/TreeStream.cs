@@ -107,7 +107,7 @@ public abstract class TreeStream<TKey, TValue> : IDisposable where TKey : class,
     }
 
     /// <summary>
-    /// Occurs when the end of the stream has been reached. The default behavior is to call <see cref="Dispose"/>
+    /// Occurs when the end of the stream has been reached. The default behavior is to call Dispose.
     /// </summary>
     protected virtual void EndOfStreamReached()
     {
@@ -118,7 +118,7 @@ public abstract class TreeStream<TKey, TValue> : IDisposable where TKey : class,
     /// Allow rolling back the EOS
     /// </summary>
     /// <exception cref="ObjectDisposedException">
-    /// Thrown if <see cref="value"/> is <see cref="Boolean.False"/> and this class
+    /// Thrown if <paramref name="value"/> is <c>false</c> and this class
     /// has already been disposed.
     /// </exception>
     protected void SetEos(bool value)

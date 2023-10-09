@@ -26,6 +26,9 @@
 
 namespace SnapDB.Snap;
 
+/// <summary>
+/// Provides statistical information related to various operations.
+/// </summary>
 public static class Stats
 {
     #region [ Static ]
@@ -36,12 +39,34 @@ public static class Stats
     /// </summary>
     public static long ChecksumCount;
 
+    /// <summary>
+    /// Gets or sets the count of lookup keys used.
+    /// </summary>
     public static long LookupKeys;
+
+    /// <summary>
+    /// Gets or sets the count of points returned.
+    /// </summary>
     public static long PointsReturned;
+
+    /// <summary>
+    /// Gets or sets the count of points scanned.
+    /// </summary>
     public static long PointsScanned;
+
+    /// <summary>
+    /// Gets or sets the count of queries executed.
+    /// </summary>
     public static long QueriesExecuted;
+
+    /// <summary>
+    /// Gets or sets the count of seeks requested.
+    /// </summary>
     public static long SeeksRequested;
 
+    /// <summary>
+    /// Clears all statistical counters.
+    /// </summary>
     public static void Clear()
     {
         LookupKeys = 0;
