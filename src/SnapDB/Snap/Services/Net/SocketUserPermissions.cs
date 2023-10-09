@@ -62,9 +62,9 @@ public struct SocketUserPermissions : IUserToken
     #region [ Methods ]
 
     /// <summary>
-    /// Saves the token to a stream
+    /// Saves the token to a stream.
     /// </summary>
-    /// <param name="stream">the stream to save to</param>
+    /// <param name="stream">The stream to save to.</param>
     public void Save(Stream stream)
     {
         stream.WriteByte(1);
@@ -76,7 +76,7 @@ public struct SocketUserPermissions : IUserToken
     /// <summary>
     /// Loads the token from a stream
     /// </summary>
-    /// <param name="stream">the stream to load from</param>
+    /// <param name="stream">The stream to load from.</param>
     public void Load(Stream stream)
     {
         byte version = stream.ReadNextByte();
@@ -87,6 +87,7 @@ public struct SocketUserPermissions : IUserToken
                 CanRead = stream.ReadBoolean();
                 IsAdmin = stream.ReadBoolean();
                 break;
+
             default:
                 throw new VersionNotFoundException("Could not interpret version");
         }

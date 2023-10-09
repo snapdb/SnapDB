@@ -31,8 +31,9 @@ using SnapDB.Snap.Types;
 namespace SnapDB.Snap.Tree.Specialized;
 
 /// <summary>
-/// Contains information on how to parse the index nodes of the SortedTree
+/// Contains information on how to parse the index nodes of the SortedTree.
 /// </summary>
+/// <typeparam name="TKey">The key type.</typeparam>
 public sealed class SparseIndexWriter<TKey> : TreeStream<TKey, SnapUInt32> where TKey : SnapTypeBase<TKey>, new()
 {
     #region [ Members ]

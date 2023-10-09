@@ -34,8 +34,8 @@ namespace SnapDB.Snap.Services.Net;
 /// <summary>
 /// A socket based client that extends connecting to a database.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TKey">The key type.</typeparam>
+/// <typeparam name="TValue">The value type.</typeparam>
 public class StreamingClientDatabase<TKey, TValue> : ClientDatabaseBase<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
@@ -92,8 +92,8 @@ public class StreamingClientDatabase<TKey, TValue> : ClientDatabaseBase<TKey, TV
         /// <summary>
         /// Writes to the encoded stream.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+        /// <param name="key">The key to write.</param>
+        /// <param name="value">The value to write.</param>
         public void Write(TKey key, TValue value)
         {
             m_encodingMode.Encode(m_stream, key, value);
@@ -162,7 +162,7 @@ public class StreamingClientDatabase<TKey, TValue> : ClientDatabaseBase<TKey, TV
         /// Advances the stream to the next value.
         /// If before the beginning of the stream, advances to the first value
         /// </summary>
-        /// <returns>True if the advance was successful. False if the end of the stream was reached.</returns>
+        /// <returns><c>true</c> if the advance was successful; otherwise, <c>false</c> if the end of the stream was reached.</returns>
         protected override bool ReadNext(TKey key, TValue value)
         {
             if (!m_completed && m_encodingMethod.TryDecode(m_stream, key, value))
@@ -219,9 +219,9 @@ public class StreamingClientDatabase<TKey, TValue> : ClientDatabaseBase<TKey, TV
     /// <summary>
     /// Creates a streaming wrapper around a database.
     /// </summary>
-    /// <param name="stream"></param>
-    /// <param name="onDispose"></param>
-    /// <param name="info"></param>
+    /// <param name="stream">The remote binary stream used for communication.</param>
+    /// <param name="onDispose">The action to perform when the database is disposed.</param>
+    /// <param name="info">The database information.</param>
     public StreamingClientDatabase(RemoteBinaryStream stream, Action onDispose, DatabaseInfo info)
     {
         Info = info;

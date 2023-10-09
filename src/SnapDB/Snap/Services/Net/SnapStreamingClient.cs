@@ -183,7 +183,7 @@ public class SnapStreamingClient : SnapClient
     /// </summary>
     /// <param name="stream">The config to use for the client</param>
     /// <param name="credentials">Authenticates using the supplied user credentials.</param>
-    /// <param name="useSsl">specifies if a ssl connection is desired.</param>
+    /// <param name="useSsl">Specifies if an SSL connection is desired.</param>
     protected void Initialize(Stream stream, SecureStreamClientBase credentials, bool useSsl)
     {
         m_credentials = credentials ?? throw new ArgumentNullException(nameof(credentials));

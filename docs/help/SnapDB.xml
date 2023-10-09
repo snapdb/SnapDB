@@ -1009,23 +1009,9 @@
       </param>
     </member>
     <member name="M:SnapDB.Immutables.ImmutableList`1.Add(`0)">
-      <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Immutables.ImmutableList`1.Add(`0)</parameter>
-          </include>
-        </markup>
-      </summary>
-      <param name="item">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>item</parameter>
-            <parameter>M:SnapDB.Immutables.ImmutableList`1.Add(`0)</parameter>
-          </include>
-        </markup>
-      </param>
+      <summary>Adds an item to the <see cref="T:System.Collections.ICollection" />.</summary>
+      <param name="item">The object to add to the <see cref="T:System.Collections.ICollection" />.</param>
+      <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.ICollection" /> is read-only.</exception>
     </member>
     <member name="M:SnapDB.Immutables.ImmutableList`1.AddRange(System.Collections.Generic.IEnumerable{`0})">
       <summary>
@@ -4346,24 +4332,8 @@
       <param name="hash">The hash algorithm to use for the HMAC.</param>
       <param name="key">The secret key for the HMAC computation.</param>
       <param name="data">The input data to compute the HMAC over.</param>
-      <param name="position">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>position</parameter>
-            <parameter>M:SnapDB.Security.Hmac.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[],System.Byte[],System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
-      <param name="length">
-        <markup>
-          <include item="SMCMissingParamTag">
-            <parameter>param</parameter>
-            <parameter>length</parameter>
-            <parameter>M:SnapDB.Security.Hmac.Compute(Org.BouncyCastle.Crypto.IDigest,System.Byte[],System.Byte[],System.Int32,System.Int32)</parameter>
-          </include>
-        </markup>
-      </param>
+      <param name="position">The starting position in the data array.</param>
+      <param name="length">The length of data to use for HMAC computation.</param>
       <returns>The computed HMAC as a byte array.</returns>
     </member>
     <member name="T:SnapDB.Security.Hmac`1">
@@ -14145,13 +14115,8 @@
     </member>
     <member name="T:SnapDB.Snap.Types.SnapCustomMethodsInt32">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>T:SnapDB.Snap.Types.SnapCustomMethodsInt32</parameter>
-          </include>
-        </markup>
-      </summary>
+            Provides custom methods and algorithms for performing operations on SnapInt32 values.
+            </summary>
     </member>
     <member name="M:SnapDB.Snap.Types.SnapCustomMethodsInt32.#ctor">
       <summary>
@@ -14248,21 +14213,9 @@
     </member>
     <member name="M:SnapDB.Snap.Types.SnapInt32.CreateValueMethods">
       <summary>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>summary</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.CreateValueMethods</parameter>
-          </include>
-        </markup>
-      </summary>
-      <returns>
-        <markup>
-          <include item="SMCMissingTag">
-            <parameter>returns</parameter>
-            <parameter>M:SnapDB.Snap.Types.SnapInt32.CreateValueMethods</parameter>
-          </include>
-        </markup>
-      </returns>
+            Creates and returns custom methods for SnapInt32 values.
+            </summary>
+      <returns>A <see cref="T:SnapDB.Snap.SnapTypeCustomMethods`1" /> instance for SnapInt32.</returns>
     </member>
     <member name="P:SnapDB.Snap.Types.SnapInt32.GenericTypeGuid">
       <summary>

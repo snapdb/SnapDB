@@ -41,10 +41,12 @@ public static class SequentialSortedTreeWriter<TKey, TValue> where TKey : SnapTy
     /// <summary>
     /// Writes the supplied stream to the binary stream.
     /// </summary>
-    /// <param name="stream"></param>
-    /// <param name="blockSize"></param>
-    /// <param name="treeNodeType"></param>
-    /// <param name="treeStream"></param>
+    /// <param name="stream">The stream to store the sorted tree structure.</param>
+    /// <param name="blockSize">The size of each block in the stream.</param>
+    /// <param name="treeNodeType">The encoding definition for tree node data.</param>
+    /// <param name="treeStream">The tree stream to initialize the sorted tree structure.</param>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="stream"/>, <paramref name="treeStream"/>, or <paramref name="treeNodeType"/> is null.</exception>
+    /// <exception cref="ArgumentException">Thrown if <paramref name="treeStream"/> does not guarantee sequential reads or contains duplicates.</exception>
     public static void Create(BinaryStreamPointerBase stream, int blockSize, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream)
     {
         if (stream is null)

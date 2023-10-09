@@ -160,8 +160,12 @@ public class SnapStreamingServer : DisposableLoggingClassBase
     }
 
     /// <summary>
-    /// Creates a <see cref="SnapStreamingServer"/>
+    /// Creates a <see cref="SnapStreamingServer"/>.
     /// </summary>
+    /// <param name="authentication">The SecureStreamServer for handling authentication.</param>
+    /// <param name="stream">The stream for communication.</param>
+    /// <param name="server">The SnapServer associated with this streaming server.</param>
+    /// <param name="requireSsl">Flag indicating whether SSL is required for communication.</param>
     protected void Initialize(SecureStreamServer<SocketUserPermissions> authentication, Stream stream, SnapServer server, bool requireSsl)
     {
         RequireSsl = requireSsl;
