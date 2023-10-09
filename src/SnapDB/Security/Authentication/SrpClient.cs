@@ -82,7 +82,12 @@ public class SrpClient
     #endregion
 
     #region [ Methods ]
-
+    /// <summary>
+    /// Authenticates the client session with the server using the provided network stream and optional additional challenge.
+    /// </summary>
+    /// <param name="stream">The network stream used for communication with the server.</param>
+    /// <param name="additionalChallenge">An optional additional challenge to include in the authentication process (default is <c>null</c>).</param>
+    /// <returns><c>true</c> if authentication succeeds; otherwise, <c>false</c>.</returns>
     public bool AuthenticateAsClient(Stream stream, byte[]? additionalChallenge = null)
     {
         additionalChallenge ??= Array.Empty<byte>();

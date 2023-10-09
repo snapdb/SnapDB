@@ -139,6 +139,8 @@ public class SimplifiedFileWriter : IDisposable
         }
     }
 
+    /// <summary>
+    /// Creates a new file with the specified file name and returns a stream for writing data into the file.
     /// </summary>
     /// <param name="fileName">The name of the file to create.</param>
     /// <returns>The <see cref="ISupportsBinaryStream"/> representing the newly created file.</returns>

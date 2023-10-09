@@ -33,10 +33,18 @@ public struct NullUserToken : IUserToken
 {
     #region [ Methods ]
 
+    /// <summary>
+    /// Saves the specified stream when called.
+    /// </summary>
+    /// <param name="stream">The specified stream to save.</param>
     public void Save(Stream stream)
     {
     }
 
+    /// <summary>
+    /// Loads the stream specified when called.
+    /// </summary>
+    /// <param name="stream">The specified stream to load.</param>
     public void Load(Stream stream)
     {
     }

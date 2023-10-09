@@ -36,6 +36,9 @@ using static SnapDB.Snap.Filters.PointIdMatchFilterBitArray;
 
 namespace SnapDB.Snap.Filters;
 
+/// <summary>
+/// Partial class for creating and managing match filters based on point IDs.
+/// </summary>
 public partial class PointIdMatchFilter
 {
     #region [ Static ]
@@ -43,7 +46,10 @@ public partial class PointIdMatchFilter
     /// <summary>
     /// Creates a filter from the provided <paramref name="pointId"/>.
     /// </summary>
-    /// <param name="pointId">Point ID to include in the filter.</param>
+    /// <typeparam name="TKey">The key type of the match filter.</typeparam>
+    /// <typeparam name="TValue">The value type of the match filter.</typeparam>
+    /// <param name="pointId">The point ID to create the filter for.</param>
+    /// <returns>A match filter based on the specified point ID.</returns>
     public static MatchFilterBase<TKey, TValue> CreateFromPointId<TKey, TValue>(ulong pointId) where TKey : TimestampPointIdBase<TKey>, new()
     {
         return pointId switch

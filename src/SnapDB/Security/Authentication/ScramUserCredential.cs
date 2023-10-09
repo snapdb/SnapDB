@@ -32,18 +32,45 @@ using Org.BouncyCastle.Crypto.Parameters;
 namespace SnapDB.Security.Authentication;
 
 /// <summary>
-/// An individual server side user credential
+/// An individual server side user credential.
 /// </summary>
 public class ScramUserCredential
 {
     #region [ Members ]
 
+    /// <summary>
+    /// The <see cref="HashMethod"/> used for authentication protocols.
+    /// </summary>
     public HashMethod HashMethod;
+
+    /// <summary>
+    /// The number of iterations to go through for authentication protocols.
+    /// </summary>
     public int Iterations;
+
+    /// <summary>
+    /// A random value that is used as part of the authentication process of type byte[].
+    /// </summary>
     public byte[] Salt;
+
+    /// <summary>
+    /// Cryptographic key used by the server to verify the integrity of the client's authentication response.
+    /// </summary>
     public byte[] ServerKey;
+
+    /// <summary>
+    /// Used on the server side to perform password-based key derivation, allowing the server to independently verify the client's response.
+    /// </summary>
     public byte[] StoredKey;
+
+    /// <summary>
+    /// Stored user bytes that are read-only.
+    /// </summary>
     public ReadonlyByteArray UserBytes;
+
+    /// <summary>
+    /// The chosen username, which cannot be more than 100 characters.
+    /// </summary>
     public string UserName;
 
     private readonly HMac m_clientSignature;
@@ -57,13 +84,13 @@ public class ScramUserCredential
     /// <summary>
     /// Adds the following user information to the server's user database
     /// </summary>
-    /// <param name="username">the username. Cannot be more than 100 characters</param>
-    /// <param name="password">the password. Cannot be more than 1024 characters</param>
-    /// <param name="iterations">The number of iterations. On 2014 technology, 2000 iterations takes about 10ms to compute</param>
+    /// <param name="username">The username. Cannot be more than 100 characters.</param>
+    /// <param name="password">The password. Cannot be more than 1024 characters.</param>
+    /// <param name="iterations">The number of iterations.</param>
     /// <param name="saltSize">The size of the salt. Defaults to 32 bytes.</param>
-    /// <param name="hashMethod">The hash method to use for authentication</param>
+    /// <param name="hashMethod">The hash method to use for authentication.</param>
     /// <remarks>
-    /// Setting a vary large Iterations will not effect how long it takes to negotiate a client on the server end. This is because
+    /// Setting a large number of iterations will not impact how long it takes to negotiate a client on the server end. This is because
     /// the server precomputes the hash results. The client can optionally also precompute the results so negotiation can take
     /// milliseconds.
     /// </remarks>
@@ -95,6 +122,11 @@ public class ScramUserCredential
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Computes the client's signature as part of the SCRAM (Salted Challenge Response Authentication Mechanism) authentication process.
+    /// </summary>
+    /// <param name="authMessage">The authentication message to be used for signature computation.</param>
+    /// <returns>The computed client signature as a byte array.</returns>
     public byte[] ComputeClientSignature(byte[] authMessage)
     {
         byte[] result = new byte[m_clientSignature.GetMacSize()];
@@ -107,6 +139,7 @@ public class ScramUserCredential
             m_clientSignature.BlockUpdate(authMessage, 0, authMessage.Length);
             m_clientSignature.DoFinal(result, 0);
         }
+
         finally
         {
             Monitor.Exit(m_clientSignature);
@@ -115,6 +148,11 @@ public class ScramUserCredential
         return result;
     }
 
+    /// <summary>
+    /// Computes the server's signature as part of the SCRAM (Salted Challenge Response Authentication Mechanism) authentication process.
+    /// </summary>
+    /// <param name="authMessage">The authentication message to be used for signature computation.</param>
+    /// <returns>The computed server signature as a byte array.</returns>
     public byte[] ComputeServerSignature(byte[] authMessage)
     {
         byte[] result = new byte[m_serverSignature.GetMacSize()];
@@ -135,6 +173,11 @@ public class ScramUserCredential
         return result;
     }
 
+    /// <summary>
+    /// Computes the stored key as part of the SCRAM (Salted Challenge Response Authentication Mechanism) authentication process.
+    /// </summary>
+    /// <param name="clientKey">The client key to be used for stored key computation.</param>
+    /// <returns>The computed stored key as a byte array.</returns>
     public byte[] ComputeStoredKey(byte[] clientKey)
     {
         byte[] result = new byte[m_computeStoredKey.GetDigestSize()];
@@ -147,6 +190,7 @@ public class ScramUserCredential
             m_computeStoredKey.BlockUpdate(clientKey, 0, clientKey.Length);
             m_computeStoredKey.DoFinal(result, 0);
         }
+
         finally
         {
             Monitor.Exit(m_computeStoredKey);
@@ -155,10 +199,16 @@ public class ScramUserCredential
         return result;
     }
 
+    /// <summary>
+    /// Saves the current state or data of the object to a persistent storage or file.
+    /// </summary>
     public void Save()
     {
     }
 
+    /// <summary>
+    /// Loads the object's state or data from a persistent storage or file.
+    /// </summary>
     public void Load()
     {
     }

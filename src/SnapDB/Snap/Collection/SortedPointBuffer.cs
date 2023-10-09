@@ -101,9 +101,9 @@ public class SortedPointBuffer<TKey, TValue> : TreeStream<TKey, TValue> where TK
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates a <see cref="SortedPointBuffer{TKey,TValue}"/> that can hold only exactly the specified <see cref="capacity"/>.
+    /// Creates a <see cref="SortedPointBuffer{TKey,TValue}"/> that can hold only exactly the specified <paramref name="capacity"/>.
     /// </summary>
-    /// <param name="capacity">The maximum number of items that can be stored in this class</param>
+    /// <param name="capacity">The maximum number of items that can be stored in this class.</param>
     /// <param name="removeDuplicates">specifies if the point buffer should remove duplicate key values upon reading.</param>
     public SortedPointBuffer(int capacity, bool removeDuplicates)
     {
@@ -114,7 +114,7 @@ public class SortedPointBuffer<TKey, TValue> : TreeStream<TKey, TValue> where TK
     }
 
     /// <summary>
-    /// Creates a <see cref="SortedPointBuffer{TKey,TValue}"/> that can hold only exactly the specified <see cref="capacity"/>
+    /// Creates a <see cref="SortedPointBuffer{TKey,TValue}"/> that can hold only exactly the specified <paramref name="capacity"/>
     /// using the specified duplicate handler.
     /// </summary>
     /// <param name="capacity">The maximum number of items that can be stored in this class.</param>

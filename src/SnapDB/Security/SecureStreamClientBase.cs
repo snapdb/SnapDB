@@ -48,6 +48,10 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
 
     #region [ Constructors ]
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SecureStreamClientBase"/> class.
+    /// This constructor is protected and internally accessible within the component's message class.
+    /// </summary>
     protected internal SecureStreamClientBase() : base(MessageClass.Component)
     {
     }
@@ -57,12 +61,15 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
     #region [ Methods ]
 
     /// <summary>
-    /// Attempts to authenticate the supplied stream.
+    /// Attempts to authenticate the supplied network stream, optionally using SSL/TLS encryption.
     /// </summary>
-    /// <param name="stream">The stream to authenticate</param>
-    /// <param name="useSsl"></param>
-    /// <param name="secureStream">the secure stream if the authentication was successful.</param>
-    /// <returns>true if successful</returns>
+    /// <param name="stream">The stream to authenticate.</param>
+    /// <param name="useSsl"><c>true</c> if SSL is to be used; otherwise, <c>false</c>.</param>
+    /// <param name="secureStream">
+    /// When successful, contains the authenticated and optionally encrypted stream.</param>
+    /// <returns>
+    /// <c>true</c> if authentication is successful and if SSL/TLS encryption is used and successful; otherwise, <c>false</c>.
+    /// </returns>
     public bool TryAuthenticate(Stream stream, bool useSsl, out Stream secureStream)
     {
         secureStream = null;
@@ -74,9 +81,11 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
         {
             if (!TryConnectSsl(stream, out ssl))
                 return false;
+
             stream2 = ssl;
             certSignatures = SecureStream.ComputeCertificateChallenge(false, ssl);
         }
+
         else
         {
             stream2 = stream;
@@ -111,10 +120,12 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
             ssl?.Dispose();
             return false;
         }
+
         catch (Exception ex)
         {
             Log.Publish(MessageLevel.Info, "Authentication Failed", null, null, ex);
             ssl?.Dispose();
+
             return false;
         }
     }
@@ -164,6 +175,12 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
         }
     }
 
+    /// <summary>
+    /// Attempts to authenticate a network stream with the provided certificate signatures.
+    /// </summary>
+    /// <param name="stream">The network stream to authenticate.</param>
+    /// <param name="certSignatures">The certificate signatures used for authentication.</param>
+    /// <returns><c>true</c> if authentication was successful; otherwise, <c>false</c>.</returns>
     protected abstract bool InternalTryAuthenticate(Stream stream, byte[] certSignatures);
 
     private bool TryConnectSsl(Stream stream, out SslStream ssl)
@@ -253,6 +270,7 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
                     stream2.Write(true);
                     stream2.Flush();
                     secureStream = stream2;
+
                     return true;
                 }
 

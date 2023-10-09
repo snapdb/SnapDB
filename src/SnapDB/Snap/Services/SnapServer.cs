@@ -148,7 +148,7 @@ public partial class SnapServer : DisposableLoggingClassBase
     /// <summary>
     /// Adds a database to the server
     /// </summary>
-    /// <param name="databaseConfig"></param>
+    /// <param name="databaseConfig">The configuration settings for the database.</param>
     public void AddDatabase(ServerDatabaseSettings databaseConfig)
     {
         if (databaseConfig is null)
@@ -171,6 +171,7 @@ public partial class SnapServer : DisposableLoggingClassBase
             using (Logger.AppendStackMessages(Log.InitialStackMessages))
                 database = SnapServerDatabaseBase.CreateDatabase(databaseConfig);
         }
+
         catch (Exception ex)
         {
             Log.Publish(MessageLevel.Critical, "Database failed to load.", databaseConfig.DatabaseName, null, ex);
@@ -186,6 +187,7 @@ public partial class SnapServer : DisposableLoggingClassBase
                 Log.Publish(MessageLevel.Error, "Database Already Exists", "Adding a database that already exists in the server: " + databaseName);
                 database.Dispose();
             }
+
             else
             {
                 Log.Publish(MessageLevel.Info, "Added Database", "Adding a database to the server: " + databaseName);
@@ -195,9 +197,9 @@ public partial class SnapServer : DisposableLoggingClassBase
     }
 
     /// <summary>
-    /// Adds the socket interface to the database
+    /// Adds the socket interface to the database.
     /// </summary>
-    /// <param name="socketSettings">the config data for the socket listener</param>
+    /// <param name="socketSettings">The config data for the socket listener.</param>
     public void AddSocketListener(SnapSocketListenerSettings socketSettings)
     {
         if (socketSettings is null)
@@ -216,7 +218,7 @@ public partial class SnapServer : DisposableLoggingClassBase
     /// <summary>
     /// Unloads the database name.
     /// </summary>
-    /// <param name="database"></param>
+    /// <param name="database">The name of the database to be removed.</param>
     public void RemoveDatabase(string database)
     {
         // TODO: Should this dispose of the database? Or is it assumed instance is not owned by collection...
@@ -235,7 +237,7 @@ public partial class SnapServer : DisposableLoggingClassBase
     /// <summary>
     /// Unloads the specified socket interface.
     /// </summary>
-    /// <param name="socketEndpoint"></param>
+    /// <param name="socketEndpoint">The endpoint of the socket listener.</param>
     public void UnloadSocket(IPEndPoint socketEndpoint)
     {
         SnapSocketListener listener;
@@ -296,7 +298,7 @@ public partial class SnapServer : DisposableLoggingClassBase
     }
 
     /// <summary>
-    /// Gets the database that matches <see cref="databaseName"/>
+    /// Gets the database that matches <paramref name="databaseName"/>
     /// </summary>
     /// <param name="databaseName">The name of the database to retrieve.</param>
     /// <returns>

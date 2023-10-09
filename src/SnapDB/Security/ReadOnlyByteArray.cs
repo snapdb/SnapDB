@@ -39,7 +39,10 @@ public readonly struct ReadonlyByteArray : IComparable<ReadonlyByteArray>, IEqua
     #endregion
 
     #region [ Constructors ]
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReadonlyByteArray"/> struct with the specified byte array.
+    /// </summary>
+    /// <param name="array">The byte array to wrap.</param>
     public ReadonlyByteArray(byte[] array)
     {
         m_value = array;
@@ -52,12 +55,20 @@ public readonly struct ReadonlyByteArray : IComparable<ReadonlyByteArray>, IEqua
     #endregion
 
     #region [ Methods ]
-
+    /// <summary>
+    /// Returns the hash code for this <see cref="ReadonlyByteArray"/> instance.
+    /// </summary>
+    /// <returns>The hash code.</returns>
     public override int GetHashCode()
     {
         return m_hashCode;
     }
 
+    /// <summary>
+    /// Determines whether this <see cref="ReadonlyByteArray"/> instance is equal to another object.
+    /// </summary>
+    /// <param name="other">The object to compare with this instance.</param>
+    /// <returns><c>true</c> if the objects are equal; otherwise, <c>false</c>.</returns>
     public override bool Equals(object other)
     {
         if (other is ReadonlyByteArray)
@@ -65,6 +76,15 @@ public readonly struct ReadonlyByteArray : IComparable<ReadonlyByteArray>, IEqua
         return false;
     }
 
+    /// <summary>
+    /// Compares this <see cref="ReadonlyByteArray"/> instance with another instance for ordering.
+    /// </summary>
+    /// <param name="other">The <see cref="ReadonlyByteArray"/> to compare with this instance.</param>
+    /// <returns>
+    /// A negative value if this instance is less than <paramref name="other"/>,
+    /// a positive value if this instance is greater than <paramref name="other"/>,
+    /// or zero if they are equal.
+    /// </returns>
     public int CompareTo(ReadonlyByteArray other)
     {
         if (m_value is null && other.m_value is null)
@@ -89,6 +109,11 @@ public readonly struct ReadonlyByteArray : IComparable<ReadonlyByteArray>, IEqua
         return 0;
     }
 
+    /// <summary>
+    /// Determines whether this <see cref="ReadonlyByteArray"/> instance is equal to another instance.
+    /// </summary>
+    /// <param name="other">The <see cref="ReadonlyByteArray"/> to compare with this instance.</param>
+    /// <returns><c>true</c> if the instances are equal; otherwise, <c>false</c>.</returns>
     public bool Equals(ReadonlyByteArray other)
     {
         if (m_hashCode != other.m_hashCode)

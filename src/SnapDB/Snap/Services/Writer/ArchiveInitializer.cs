@@ -119,6 +119,8 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     /// Creates a new <see cref="SortedTreeTable{TKey,TValue}"/> based on the settings passed to this class.
     /// Once created, it is up to he caller to make sure that this class is properly disposed of.
     /// </summary>
+    /// <param name="startKey">The key to start at.</param>
+    /// <param name="endKey">The key to end at.</param>
     /// <param name="estimatedSize">
     /// An optional estimated size (in bytes) for the archive file. Use a negative value to indicate no specific estimation.
     /// </param>

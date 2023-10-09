@@ -340,7 +340,7 @@ public class WeakList<T> : IEnumerable<T> where T : class
     /// Returns an enumerator that iterates through the collection.
     /// </summary>
     /// <returns>
-    /// A <see cref="System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
+    /// An <see cref="IEnumerator"/> that can be used to iterate through the collection.
     /// </returns>
     public Enumerator GetEnumerator()
     {
@@ -353,7 +353,7 @@ public class WeakList<T> : IEnumerable<T> where T : class
     /// Returns an enumerator that iterates through the collection.
     /// </summary>
     /// <returns>
-    /// A <see cref="System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
+    /// An <see cref="IEnumerator"/> that can be used to iterate through the collection.
     /// </returns>
     IEnumerator<T> IEnumerable<T>.GetEnumerator()
     {

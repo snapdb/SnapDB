@@ -29,16 +29,19 @@ using Gemstone.ArrayExtensions;
 
 namespace SnapDB.Security;
 
+/// <summary>
+/// Provides extension methods for enhancing security-related operations.
+/// </summary>
 public static class SecurityExtensions
 {
     #region [ Static ]
 
     /// <summary>
-    /// Does a time constant comparison of the two byte arrays.
+    /// Compares two byte arrays securely, preventing timing attacks.
     /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns>true if both arrays are equal</returns>
+    /// <param name="a">The first byte array to compare.</param>
+    /// <param name="b">The second byte array to compare.</param>
+    /// <returns><c>true</c> if both arrays are equal; otherwise, false.</returns>
     /// <remarks>
     /// If a or b is <c>null</c>, function returns immediately with a <c>false</c>.
     /// Certain cryptographic attacks can occur by comparing the amount of time it
@@ -59,11 +62,11 @@ public static class SecurityExtensions
     /// <summary>
     /// Does a time constant comparison of the two byte arrays.
     /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <param name="bPosition">the start position of <see cref="b"/></param>
-    /// <param name="bLength">the length of <see cref="b"/> to read past <see cref="bPosition"/></param>
-    /// <returns>true if both arrays are equal</returns>
+    /// <param name="a">The first byte array to compare.</param>
+    /// <param name="b">The second byte array to compare.</param>
+    /// <param name="bPosition">The start position of the <paramref name="b"/> byte array.</param>
+    /// <param name="bLength">The length of the portion to compare in <paramref name="b"/>.</param>
+    /// <returns><c>true</c> if both arrays are equal; otherwise, <c>false</c>.</returns>
     /// <remarks>
     /// If a or b is <c>null</c>, function returns immediately with a <c>false</c>.
     /// Certain cryptographic attacks can occur by comparing the amount of time it
@@ -83,11 +86,11 @@ public static class SecurityExtensions
     }
 
     /// <summary>
-    /// Does a time constant comparison of the two GUIDs.
+    /// Does a secure time constant comparison of the two GUIDs.
     /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns><c>true</c> if both GUIDs are equal</returns>
+    /// <param name="a">The first GUID to compare.</param>
+    /// <param name="b">The second GUID to compare.</param>
+    /// <returns><c>true</c> if both GUIDs are equal; otherwise, false.</returns>
     /// <remarks>
     /// Certain cryptographic attacks can occur by comparing the amount of time it
     /// takes to do certain operations. Comparing two byte arrays is one example.
@@ -102,6 +105,7 @@ public static class SecurityExtensions
         difference |= lpa[1] ^ lpb[1];
         difference |= lpa[2] ^ lpb[2];
         difference |= lpa[3] ^ lpb[3];
+
         return difference == 0;
     }
 

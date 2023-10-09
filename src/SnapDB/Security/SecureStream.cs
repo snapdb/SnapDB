@@ -39,18 +39,32 @@ internal enum AuthenticationMode : byte
     ResumeSession = 255
 }
 
+/// <summary>
+/// Provides utility methods for secure communication using SSL/TLS streams.
+/// </summary>
 public class SecureStream
 {
     #region [ Static ]
-
+    /// <summary>
+    /// Computes a certificate challenge for secure communication.
+    /// </summary>
+    /// <param name="isServer">Indicates whether the calling entity is the server.</param>
+    /// <param name="stream">The SSL stream used for communication.</param>
+    /// <returns>
+    /// A byte array representing the computed certificate challenge.
+    /// If <paramref name="isServer"/> is <c>true</c>, the challenge combines the remote and local certificate hashes.
+    /// If <paramref name="isServer"/> is <c>false</c>, the challenge combines the local and remote certificate hashes.
+    /// </returns>
     internal static byte[] ComputeCertificateChallenge(bool isServer, SslStream stream)
     {
         string localChallenge = string.Empty;
         string remoteChallenge = string.Empty;
         if (stream.RemoteCertificate is not null)
             remoteChallenge = stream.RemoteCertificate.GetCertHashString();
+
         if (stream.LocalCertificate is not null)
             localChallenge = stream.LocalCertificate.GetCertHashString();
+
         if (isServer)
             return Encoding.UTF8.GetBytes(remoteChallenge + localChallenge);
 

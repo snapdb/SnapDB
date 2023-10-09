@@ -35,7 +35,9 @@ namespace SnapDB.Snap.Services;
 public abstract class SnapClient : DisposableLoggingClassBase
 {
     #region [ Constructors ]
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SnapClient"/> class.
+    /// </summary>
     protected SnapClient() : base(MessageClass.Framework)
     {
     }

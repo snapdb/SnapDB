@@ -146,7 +146,10 @@ public class ServerDatabaseSettings : SettingsBase<ServerDatabaseSettings>, IToS
     #endregion
 
     #region [ Methods ]
-
+    /// <summary>
+    /// Saves the configuration to a stream.
+    /// </summary>
+    /// <param name="stream">The stream where the configuration will be saved.</param>
     public override void Save(Stream stream)
     {
         stream.Write((byte)1);
@@ -163,6 +166,10 @@ public class ServerDatabaseSettings : SettingsBase<ServerDatabaseSettings>, IToS
         RolloverLog.Save(stream);
     }
 
+    /// <summary>
+    /// Loads the configuration from a stream.
+    /// </summary>
+    /// <param name="stream">The stream from which the configuration will be loaded.</param>
     public override void Load(Stream stream)
     {
         TestForEditable();
@@ -194,6 +201,9 @@ public class ServerDatabaseSettings : SettingsBase<ServerDatabaseSettings>, IToS
         }
     }
 
+    /// <summary>
+    /// Validates the configuration.
+    /// </summary>
     public override void Validate()
     {
         ArchiveList.Validate();

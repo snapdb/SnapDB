@@ -71,6 +71,12 @@ public class ScramClient
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Authenticates the client to the server using SCRAM-SHA-256 or SCRAM-SHA-1 mechanism.
+    /// </summary>
+    /// <param name="stream">The stream used for communication with the server.</param>
+    /// <param name="additionalChallenge">Optional additional challenge data to include in the authentication process.</param>
+    /// <returns>True if authentication is successful, otherwise false.</returns>
     public bool AuthenticateAsClient(Stream stream, byte[]? additionalChallenge = null)
     {
         additionalChallenge ??= Array.Empty<byte>();
@@ -103,9 +109,9 @@ public class ScramClient
     /// Sets the server parameters and regenerates the salted password if
     /// the salt values have changed.
     /// </summary>
-    /// <param name="hashMethod">the hashing method</param>
-    /// <param name="salt">the salt for the user credentials.</param>
-    /// <param name="iterations">the number of iterations.</param>
+    /// <param name="hashMethod">The hashing method.</param>
+    /// <param name="salt">The salt for the user credentials.</param>
+    /// <param name="iterations">The number of iterations.</param>
     private void SetServerValues(HashMethod hashMethod, byte[] salt, int iterations)
     {
         bool hasPasswordDataChanged = false;

@@ -27,7 +27,7 @@
 namespace SnapDB.Snap;
 
 /// <summary>
-/// The interface that is required to use as a value in <see cref="SortedTree"/>
+/// The interface that is required to use as a value in the sorted tree.
 /// </summary>
 /// <typeparam name="T">A class that has a default constructor</typeparam>
 /// <remarks>

@@ -46,11 +46,19 @@ public class PointIdMatchFilterDefinition : MatchFilterDefinitionBase
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Creates a match filter from a binary stream.
+    /// </summary>
+    /// <typeparam name="TKey">The key type of the match filter.</typeparam>
+    /// <typeparam name="TValue">The value type of the match filter.</typeparam>
+    /// <param name="stream">The binary stream containing match filter data.</param>
+    /// <returns>A match filter created from the binary stream data.</returns>
     public override MatchFilterBase<TKey, TValue> Create<TKey, TValue>(BinaryStreamBase stream)
     {
         MethodInfo method = typeof(PointIdMatchFilter).GetMethod("CreateFromStream", BindingFlags.NonPublic | BindingFlags.Static);
         MethodInfo generic = method.MakeGenericMethod(typeof(TKey), typeof(TValue));
         object rv = generic.Invoke(null, new[] { stream });
+
         return (MatchFilterBase<TKey, TValue>)rv;
     }
 

@@ -28,10 +28,19 @@ using Org.BouncyCastle.Crypto;
 
 namespace SnapDB.Security;
 
+/// <summary>
+/// Provides utility methods for hashing data using various hash algorithms.
+/// </summary>
 public static class Hash
 {
     #region [ Static ]
 
+    /// <summary>
+    /// Computes a hash of the specified data using the given hash algorithm.
+    /// </summary>
+    /// <param name="hash">The hash algorithm to use.</param>
+    /// <param name="data">The data to hash.</param>
+    /// <returns>The computed hash as a byte array.</returns>
     public static byte[] Compute(IDigest hash, byte[] data)
     {
         byte[] result = new byte[hash.GetDigestSize()];
@@ -43,10 +52,19 @@ public static class Hash
     #endregion
 }
 
+/// <summary>
+/// Provides utility methods for hashing data using a specific hash algorithm of type <typeparamref name="T"/>.
+/// </summary>
+/// <typeparam name="T">The type of hash algorithm to use, which must implement the IDigest interface and have a default constructor.</typeparam>
 public static class Hash<T> where T : IDigest, new()
 {
     #region [ Static ]
 
+    /// <summary>
+    /// Computes a hash of the specified data using the specified hash algorithm of type <typeparamref name="T"/>.
+    /// </summary>
+    /// <param name="data">The data to hash.</param>
+    /// <returns>The computed hash as a byte array.</returns>
     public static byte[] Compute(byte[] data)
     {
         return Hash.Compute(new T(), data);

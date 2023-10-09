@@ -33,10 +33,6 @@ namespace SnapDB.Snap;
 /// Provides custom methods for working with SnapTypeBase-derived types.
 /// </summary>
 /// <typeparam name="T">The SnapTypeBase-derived type.</typeparam>
-/// <typeparam name="T">The SnapTypeBase-derived type.</typeparam>
-/// <typeparam name="T">The SnapTypeBase-derived type.</typeparam>
-/// <typeparam name="T">The SnapTypeBase-derived type.</typeparam>
-/// <typeparam name="T">The SnapTypeBase-derived type.</typeparam>
 public class SnapTypeCustomMethods<T> where T : SnapTypeBase<T>, new()
 {
     #region [ Members ]

@@ -31,34 +31,34 @@ using Org.BouncyCastle.Math;
 namespace SnapDB.Security.Authentication;
 
 /// <summary>
-/// An individual server side user credential
+/// An individual server side user credential.
 /// </summary>
 public class SrpUserCredential
 {
     #region [ Members ]
 
     /// <summary>
-    /// The number of SHA512 iterations using PBKDF2
+    /// The number of SHA512 iterations using PBKDF2.
     /// </summary>
     public readonly int Iterations;
 
     /// <summary>
-    /// The salt used to compute the password bytes (x)
+    /// The salt used to compute the password bytes (x).
     /// </summary>
     public readonly byte[] Salt;
 
     /// <summary>
-    /// Session Resume Encryption Key
+    /// Session Resume Encryption Key.
     /// </summary>
     public readonly byte[] ServerEncryptionKey = SaltGenerator.Create(32);
 
     /// <summary>
-    /// Session Resume HMAC key
+    /// Session Resume HMAC key.
     /// </summary>
     public readonly byte[] ServerHmacKey = SaltGenerator.Create(32);
 
     /// <summary>
-    /// Session Resume Key Name
+    /// Session Resume Key Name.
     /// </summary>
     public readonly Guid ServerKeyName = Guid.NewGuid();
 
@@ -68,10 +68,13 @@ public class SrpUserCredential
     public readonly SrpStrength SrpStrength;
 
     /// <summary>
-    /// The normalized name of the user
+    /// The normalized name of the user.
     /// </summary>
     public readonly string UserName;
 
+    /// <summary>
+    /// Username data in bytes.
+    /// </summary>
     public readonly byte[] UserNameBytes;
 
     /// <summary>
@@ -89,13 +92,13 @@ public class SrpUserCredential
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates user credentials
+    /// Creates user credentials.
     /// </summary>
-    /// <param name="username"></param>
-    /// <param name="salt"></param>
-    /// <param name="verification"></param>
-    /// <param name="iterations"></param>
-    /// <param name="srpStrength"></param>
+    /// <param name="username">The username associated with the user.</param>
+    /// <param name="verification">The user's password verification value.</param>
+    /// <param name="salt">The salt value used for password hashing.</param>
+    /// <param name="iterations">The number of iterations used in the password hashing process.</param>
+    /// <param name="srpStrength">The strength of the SRP protocol.</param>
     public SrpUserCredential(string username, byte[] verification, byte[] salt, int iterations, SrpStrength srpStrength)
     {
         UserName = username;
@@ -152,14 +155,18 @@ public class SrpUserCredential
     #endregion
 
     #region [ Methods ]
-
+    /// <summary>
+    /// Saves the current state or data of the object to a persistent storage or file.
+    /// </summary>
     public void Save()
     {
     }
 
+    /// <summary>
+    /// Loads the object's state or data from a persistent storage or file.
+    /// </summary>
     public void Load()
     {
     }
-
     #endregion
 }

@@ -175,6 +175,10 @@ public class MemoryPool : IDisposable
     }
 
 #if DEBUG
+    /// <summary>
+    /// Finalizes an instance of the <see cref="MemoryPool"/> class.
+    /// This finalizer logs an informational message when called.
+    /// </summary>
     ~MemoryPool()
     {
         s_log.Publish(MessageLevel.Info, "Finalizer Called", GetType().FullName);

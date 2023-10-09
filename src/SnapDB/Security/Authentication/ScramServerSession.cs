@@ -32,13 +32,19 @@ namespace SnapDB.Security.Authentication;
 public class ScramServerSession
 {
     #region [ Members ]
-
+    /// <summary>
+    /// The username to be used.
+    /// </summary>
     public string Username;
 
     #endregion
 
     #region [ Constructors ]
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ScramServerSession"/> class with the specified username.
+    /// </summary>
+    /// <param name="username">The username associated with the server session.</param>
     public ScramServerSession(string username)
     {
         Username = username;

@@ -201,6 +201,10 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
         EncodingMethod = encodingMethod;
     }
 
+    /// <summary>
+    /// Saves the configuration settings of the SnapServer to a stream.
+    /// </summary>
+    /// <param name="stream">The stream to which the configuration will be saved.</param>
     public override void Save(Stream stream)
     {
         stream.Write((byte)1);
@@ -279,7 +283,7 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
         m_prefix = string.Empty;
         m_pendingExtension = ".~d2i";
         m_finalExtension = ".d2i";
-        m_desiredRemainingSpace = 5 * 1024 * 1024 * 1024L; //5GB
+        m_desiredRemainingSpace = 5 * 1024 * 1024 * 1024L; // 5GB
         m_encodingMethod = EncodingDefinition.FixedSizeCombinedEncoding;
         WritePath = new ImmutableList<string>(x =>
         {

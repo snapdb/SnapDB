@@ -44,12 +44,26 @@ public class ScramUserCredentials
 
     #region [ Methods ]
 
+    /// <summary>
+    /// Attempts to look up a user credential by their username.
+    /// </summary>
+    /// <param name="username">The username of the user credential to look up.</param>
+    /// <param name="user">When this method returns, contains the user credential if found; otherwise, <c>null</c>.</param>
+    /// <returns><c>true</c> if the user credential was found; otherwise, <c>false</c>.</returns>
     public bool TryLookup(byte[] username, out ScramUserCredential? user)
     {
         lock (m_users)
             return m_users.TryGetValue(new ReadonlyByteArray(username), out user);
     }
 
+    /// <summary>
+    /// Adds a new user credential with the specified username and password.
+    /// </summary>
+    /// <param name="username">The username of the new user credential.</param>
+    /// <param name="password">The password associated with the new user credential.</param>
+    /// <param name="iterations">The number of iterations for key derivation (optional, default is 4000).</param>
+    /// <param name="saltSize">The size of the salt in bytes for key derivation (optional, default is 32).</param>
+    /// <param name="hashMethod">The hash method used for key derivation (optional, default is SHA-256).</param>
     public void AddUser(string username, string password, int iterations = 4000, int saltSize = 32, HashMethod hashMethod = HashMethod.Sha256)
     {
         ScramUserCredential user = new(username, password, iterations, saltSize, hashMethod);

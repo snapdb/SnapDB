@@ -31,15 +31,31 @@ using Org.BouncyCastle.Crypto.Parameters;
 
 namespace SnapDB.Security;
 
+/// <summary>
+/// Provides utility methods for computing Hash-based Message Authentication Code (HMAC) values using various hash algorithms.
+/// </summary>
 public static class Hmac
 {
     #region [ Static ]
-
+    /// <summary>
+    /// Computes an HMAC using the specified hash algorithm and key for the entire input data.
+    /// </summary>
+    /// <param name="hash">The hash algorithm to use for the HMAC.</param>
+    /// <param name="key">The secret key for the HMAC computation.</param>
+    /// <param name="data">The input data to compute the HMAC over.</param>
+    /// <returns>The computed HMAC as a byte array.</returns>
     public static byte[] Compute(IDigest hash, byte[] key, byte[] data)
     {
         return Compute(hash, key, data, 0, data.Length);
     }
 
+    /// <summary>
+    /// Computes an HMAC using the specified hash algorithm and key for the entire input data.
+    /// </summary>
+    /// <param name="hash">The hash algorithm to use for the HMAC.</param>
+    /// <param name="key">The secret key for the HMAC computation.</param>
+    /// <param name="data">The input data to compute the HMAC over.</param>
+    /// <returns>The computed HMAC as a byte array.</returns>
     public static byte[] Compute(IDigest hash, byte[] key, byte[] data, int position, int length)
     {
         data.ValidateParameters(position, length);
@@ -54,15 +70,33 @@ public static class Hmac
     #endregion
 }
 
+/// <summary>
+/// Provides utility methods for computing Hash-based Message Authentication Code (HMAC) values using a specific hash algorithm of type <typeparamref name="T"/>.
+/// </summary>
+/// <typeparam name="T">The type of hash algorithm to use, which must implement the IDigest interface and have a default constructor.</typeparam>
 public static class Hmac<T> where T : IDigest, new()
 {
     #region [ Static ]
 
+    /// <summary>
+    /// Computes an HMAC using the specified secret key for the entire input data.
+    /// </summary>
+    /// <param name="key">The secret key for the HMAC computation.</param>
+    /// <param name="data">The input data to compute the HMAC over.</param>
+    /// <returns>The computed HMAC as a byte array.</returns>
     public static byte[] Compute(byte[] key, byte[] data)
     {
         return Hmac.Compute(new T(), key, data, 0, data.Length);
     }
 
+    /// <summary>
+    /// Computes an HMAC using the specified secret key, input data, and a specified range within the input data.
+    /// </summary>
+    /// <param name="key">The secret key for the HMAC computation.</param>
+    /// <param name="data">The input data to compute the HMAC over.</param>
+    /// <param name="position">The starting position in the input data.</param>
+    /// <param name="length">The length of the input data to include in the HMAC computation.</param>
+    /// <returns>The computed HMAC as a byte array.</returns>
     public static byte[] Compute(byte[] key, byte[] data, int position, int length)
     {
         return Hmac.Compute(new T(), key, data, position, length);

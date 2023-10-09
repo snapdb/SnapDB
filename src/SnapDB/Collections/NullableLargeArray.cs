@@ -232,7 +232,7 @@ public class NullableLargeArray<T> : IEnumerable<T?>
     /// Returns an enumerator that iterates through the non-null elements of this collection.
     /// </summary>
     /// <returns>
-    /// A <see cref="System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
+    /// An <see cref="IEnumerator"/> that can be used to iterate through the collection.
     /// </returns>
     public IEnumerator<T?> GetEnumerator()
     {

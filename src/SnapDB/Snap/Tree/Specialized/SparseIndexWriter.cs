@@ -156,9 +156,8 @@ public sealed class SparseIndexWriter<TKey> : TreeStream<TKey, SnapUInt32> where
     /// This method is used to sequentially read key-value pairs from the data source.
     /// It should be called after switching to reading mode using <see cref="SwitchToReading"/> method.
     /// </remarks>
-    /// <paramref name="key">
-    /// The key to read./>
-    /// <paramref name="value">The value to read.<paramref/>
+    /// <paramref name="key">The key to read.</paramref>
+    /// <paramref name="value">The value to read.</paramref>
     protected override bool ReadNext(TKey key, SnapUInt32 value)
     {
         if (!m_isReading)

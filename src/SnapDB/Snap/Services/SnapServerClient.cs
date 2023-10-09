@@ -85,10 +85,10 @@ public partial class SnapServer
         }
 
         /// <summary>
-        /// Gets the database that matches <see cref="databaseName"/>.
+        /// Gets the database that matches <paramref name="databaseName"/>.
         /// </summary>
         /// <param name="databaseName">The case insensitive name of the database.</param>
-        /// <returns>The database that matches <see cref="databaseName"/>.</returns>
+        /// <returns>The database that matches <paramref name="databaseName"/>.</returns>
         public override ClientDatabaseBase GetDatabase(string databaseName)
         {
             if (m_disposed)
@@ -120,7 +120,7 @@ public partial class SnapServer
         }
 
         /// <summary>
-        /// Determines if <see cref="databaseName"/> is contained in the database.
+        /// Determines if <paramref name="databaseName"/> is contained in the database.
         /// </summary>
         /// <param name="databaseName">Name of database instance to access.</param>
         /// <returns>

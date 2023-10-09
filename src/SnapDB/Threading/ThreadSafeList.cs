@@ -187,7 +187,7 @@ public partial class ThreadSafeList<T> : IEnumerable<T>
     /// Returns an enumerator that iterates through the collection.
     /// </summary>
     /// <returns>
-    /// A <see cref="System.Collections.Generic.IEnumerator`1"/> that can be used to
+    /// An <see cref="IEnumerator"/> that can be used to
     /// iterate through the collection.
     /// </returns>
     public IEnumerator<T> GetEnumerator()
