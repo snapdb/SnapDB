@@ -16,19 +16,20 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  10/09/2023 - Lillian Gensolin
+//  10/10/2023 - Lillian Gensolin
 //       Generated original version of source code.
 //
 //******************************************************************************************************
 
 using System.Runtime.CompilerServices;
 
-namespace SnapDB.Snap.Collection;
+namespace SnapDB.Security;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Collection"/> namespace contains the <see cref="SortedPointBuffer{TKey, TValue}"/> class.
+/// The <see cref="SnapDB.Security"/> namespace organizes all the common SnapDB library functionality related to security features,
+/// e.g., the <see cref="HashMethod"/> class.
 /// </summary>
 [CompilerGenerated]
-class NamespaceDoc
+internal class NamespaceDoc
 {
 }

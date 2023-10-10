@@ -16,17 +16,18 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  10/09/2023 - Lillian Gensolin
+//  10/10/2023 - Lillian Gensolin
 //       Generated original version of source code.
 //
 //******************************************************************************************************
 
 using System.Runtime.CompilerServices;
 
-namespace SnapDB.Snap.Collection;
+namespace SnapDB.IO.Unmanaged;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Collection"/> namespace contains the <see cref="SortedPointBuffer{TKey, TValue}"/> class.
+/// The <see cref="SnapDB.IO.Unmanaged"/> namespace organizes all common SnapDB library functionality related to stream tools,
+/// e.g., the <see cref="MemoryPoolStream"/> class.
 /// </summary>
 [CompilerGenerated]
 class NamespaceDoc

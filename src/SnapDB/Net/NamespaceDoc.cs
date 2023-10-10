@@ -16,19 +16,19 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  10/09/2023 - Lillian Gensolin
+//  10/10/2023 - Lillian Gensolin
 //       Generated original version of source code.
 //
 //******************************************************************************************************
 
 using System.Runtime.CompilerServices;
 
-namespace SnapDB.Snap.Collection;
+namespace SnapDB.Net;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Collection"/> namespace contains the <see cref="SortedPointBuffer{TKey, TValue}"/> class.
+/// The <see cref="SnapDB.Net"/> namespace contains the <see cref="NetworkBinaryStream"/> class.
 /// </summary>
 [CompilerGenerated]
-class NamespaceDoc
+internal class NamespaceDoc
 {
 }

@@ -16,19 +16,20 @@
 //
 //  Code Modification History:
 //  ----------------------------------------------------------------------------------------------------
-//  10/09/2023 - Lillian Gensolin
+//  10/10/2023 - Lillian Gensolin
 //       Generated original version of source code.
 //
 //******************************************************************************************************
 
 using System.Runtime.CompilerServices;
 
-namespace SnapDB.Snap.Collection;
+namespace SnapDB.Collections;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Collection"/> namespace contains the <see cref="SortedPointBuffer{TKey, TValue}"/> class.
+/// The <see cref="SnapDB.Collections"/> namespace organizes all common SnapDB library functionality related to arrays, queues, lists, etc., 
+/// e.g., the <see cref="LargeArray{T}"/> class.
 /// </summary>
 [CompilerGenerated]
-class NamespaceDoc
+internal class NamespaceDoc
 {
 }
