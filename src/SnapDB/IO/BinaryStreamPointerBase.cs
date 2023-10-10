@@ -155,12 +155,13 @@ public abstract unsafe class BinaryStreamPointerBase : BinaryStreamBase
     #region [ Methods ]
 
     /// <summary>
-    /// Gets a pointer from the current position that can be used for writing up the the provided length.
-    /// The current position is not advanced after calling this function.
+    /// Gets a pointer to the specified write position in the binary stream that can be used for writing up the provided length and reserving space for writing the data.
+    /// Current position does not get advanced after calling this function.
     /// </summary>
-    /// <param name="position"></param>
-    /// <param name="length">The number of bytes valid for the writing.</param>
-    /// <remarks>This method will throw an exception if the provided length cannot be provided.</remarks>
+    /// <param name="position">The position in the binary stream to obtain the pointer for.</param>
+    /// <param name="length">The number of bytes valid for writing.</param>
+    /// <returns>A pointer to the specified write position in the binary stream.</returns>
+    /// <exception cref="Exception">Thrown if the provided <paramref name="length"/> is greater than the available remaining space in the stream.</exception>
     public byte* GetWritePointer(long position, int length)
     {
         Position = position;

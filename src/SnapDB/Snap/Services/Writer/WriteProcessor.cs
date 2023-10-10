@@ -29,10 +29,10 @@ using Gemstone.Diagnostics;
 namespace SnapDB.Snap.Services.Writer;
 
 /// <summary>
-/// Houses all of the write operations for the historian
+/// Houses all of the write operations for the historian.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TKey">The type of key.</typeparam>
+/// <typeparam name="TValue">The type of value associated with the key.</typeparam>
 public class WriteProcessor<TKey, TValue> : DisposableLoggingClassBase where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
@@ -99,10 +99,10 @@ public class WriteProcessor<TKey, TValue> : DisposableLoggingClassBase where TKe
     }
 
     /// <summary>
-    /// Writes the provided key/value to the engine.
+    /// Writes the provided key-value pair to the engine.
     /// </summary>
-    /// <param name="key"></param>
-    /// <param name="value"></param>
+    /// <param name="key">The key to be written to the engine.</param>
+    /// <param name="value">The value associated with the key to be written to the engine.</param>
     /// <returns>the transaction code so this write can be tracked.</returns>
     public long Write(TKey key, TValue value)
     {
@@ -112,8 +112,8 @@ public class WriteProcessor<TKey, TValue> : DisposableLoggingClassBase where TKe
     /// <summary>
     /// Writes the provided stream to the engine.
     /// </summary>
-    /// <param name="stream"></param>
-    /// <returns>the transaction code so this write can be tracked.</returns>
+    /// <param name="stream">The stream to be written to the engine.</param>
+    /// <returns>The transaction code so this write can be tracked.</returns>
     public long Write(TreeStream<TKey, TValue> stream)
     {
         long sequenceId = -1;
@@ -127,7 +127,7 @@ public class WriteProcessor<TKey, TValue> : DisposableLoggingClassBase where TKe
     /// <summary>
     /// Blocks until the specified point has progressed beyond the pre-stage level and can be queried by the user.
     /// </summary>
-    /// <param name="transactionId">the sequence number representing the desired point that was committed</param>
+    /// <param name="transactionId">The sequence number representing the desired point that was committed.</param>
     public void SoftCommit(long transactionId)
     {
         m_transactionTracker.WaitForSoftCommit(transactionId);
@@ -137,7 +137,7 @@ public class WriteProcessor<TKey, TValue> : DisposableLoggingClassBase where TKe
     /// Blocks until the specified point has been committed to the disk subsystem. If running in a In-Memory mode, will return
     /// as soon as it has been moved beyond the pre-stage level and can be queried by the user.
     /// </summary>
-    /// <param name="transactionId">the sequence number representing the desired point that was committed</param>
+    /// <param name="transactionId">The sequence number representing the desired point that was committed.</param>
     public void HardCommit(long transactionId)
     {
         if (m_isMemoryOnly)

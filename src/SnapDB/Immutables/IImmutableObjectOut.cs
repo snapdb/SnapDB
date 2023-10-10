@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  IImmutableObject`1.cs - Gbtc
+//  IImmutableObjectOut.cs - Gbtc
 //
 //  Copyright © 2016, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -39,11 +39,17 @@ public interface IImmutableObject<out T> : IImmutableObject
     /// <summary>
     /// Makes a clone of this object and allows it to be edited.
     /// </summary>
+    /// <returns>
+    /// An editable clone of the object.
+    /// </returns>
     new T CloneEditable();
 
     /// <summary>
-    /// Makes a readonly clone of this object. Returns the same object if it is already marked as readonly.
+    /// Makes a read-only clone of this object. Returns the same object if it is already marked as read-only.
     /// </summary>
+    /// <returns>
+    /// A read-only clone of this object.
+    /// </returns>
     new T CloneReadonly();
 
     #endregion

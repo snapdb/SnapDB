@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  SortedTreeTable`2.cs - Gbtc
+//  SortedTreeTable.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -31,6 +31,8 @@ namespace SnapDB.Snap.Storage;
 /// <summary>
 /// Represents an individual table contained within the file.
 /// </summary>
+/// <typeparam name="TKey">The key type used in the sorted tree table.</typeparam>
+/// <typeparam name="TValue">The value type used in the sorted tree table.</typeparam>
 public partial class SortedTreeTable<TKey, TValue> : IDisposable where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
@@ -157,13 +159,17 @@ public partial class SortedTreeTable<TKey, TValue> : IDisposable where TKey : Sn
     /// editor.Commit();
     /// }
     /// </example>
+    /// <returns>The current status of the edit of the archive table.</returns>
     public SortedTreeTableEditor<TKey, TValue> BeginEdit()
     {
         if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
+
         if (m_activeEditor is not null)
             throw new Exception("Only one concurrent edit is supported");
+
         m_activeEditor = new Editor(this);
+
         return m_activeEditor;
     }
 

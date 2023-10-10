@@ -39,8 +39,8 @@
             Gets a read pointer to a specified position in the stream for a specified length of data
             and determines if the stream supports writing at that position.
             <br />(Inherited from <a href="T_SnapDB_IO_BinaryStreamPointerBase.htm">BinaryStreamPointerBase</a>)</td></tr><tr><td><a href="https://learn.microsoft.com/dotnet/api/system.object.gettype#system-object-gettype" target="_blank" rel="noopener noreferrer">GetType</a></td><td>Gets the <a href="https://learn.microsoft.com/dotnet/api/system.type" target="_blank" rel="noopener noreferrer">Type</a> of the current instance.<br />(Inherited from <a href="https://learn.microsoft.com/dotnet/api/system.object" target="_blank" rel="noopener noreferrer">Object</a>)</td></tr><tr><td><a href="M_SnapDB_IO_BinaryStreamPointerBase_GetWritePointer.htm">GetWritePointer</a></td><td>
-            Gets a pointer from the current position that can be used for writing up the the provided length.
-            The current position is not advanced after calling this function.
+            Gets a pointer to the specified write position in the binary stream that can be used for writing up the provided length and reserving space for writing the data.
+            Current position does not get advanced after calling this function.
             <br />(Inherited from <a href="T_SnapDB_IO_BinaryStreamPointerBase.htm">BinaryStreamPointerBase</a>)</td></tr><tr><td><a href="M_SnapDB_IO_BinaryStreamBase_InsertBytes.htm">InsertBytes</a></td><td>
             Inserts a certain number of bytes into the stream, shifting valid data to the right.  The stream's position remains unchanged.
             (ie. pointing to the beginning of the newly inserted bytes).

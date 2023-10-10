@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  ArchiveInitializer`2.cs - Gbtc
+//  ArchiveInitializer.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -34,6 +34,8 @@ namespace SnapDB.Snap.Services.Writer;
 /// <summary>
 /// Creates new archive files based on user settings.
 /// </summary>
+/// <typeparam name="TKey">The key type used in the sorted tree table.</typeparam>
+/// <typeparam name="TValue">The value type used in the sorted tree table.</typeparam>
 public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
@@ -71,7 +73,7 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     /// <summary>
     /// Replaces the existing settings with this new set.
     /// </summary>
-    /// <param name="settings"></param>
+    /// <param name="settings">The new settings that will replace the old settings.</param>
     public void UpdateSettings(ArchiveInitializerSettings settings)
     {
         settings = settings.CloneReadonly();

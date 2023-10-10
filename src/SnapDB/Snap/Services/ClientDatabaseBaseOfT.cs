@@ -32,6 +32,8 @@ namespace SnapDB.Snap.Services;
 /// <summary>
 /// Represents a single historian database.
 /// </summary>
+/// <typeparam name="TKey">The key type used in the sorted tree table.</typeparam>
+/// <typeparam name="TValue">The value type used in the sorted tree table.</typeparam>
 public abstract class ClientDatabaseBase<TKey, TValue> : ClientDatabaseBase, IDatabaseReader<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Methods ]

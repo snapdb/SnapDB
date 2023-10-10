@@ -326,6 +326,7 @@ public class SortedTreeFile : IDisposable
     /// </summary>
     /// <param name="blockSize">The number of bytes per block in the file.</param>
     /// <param name="flags">Flags to write to the file</param>
+    /// <returns>The new in-memory archive file.</returns>
     public static SortedTreeFile CreateInMemory(int blockSize = 4096, params Guid[] flags)
     {
         return new SortedTreeFile
@@ -341,6 +342,9 @@ public class SortedTreeFile : IDisposable
     /// <param name="file">the path for the file.</param>
     /// <param name="blockSize">The number of bytes per block in the file.</param>
     /// <param name="flags">Flags to write to the file</param>
+    /// <returns>
+    /// The newly created <see cref="SortedTreeFile"/>.
+    /// </returns>
     public static SortedTreeFile CreateFile(string file, int blockSize = 4096, params Guid[] flags)
     {
         SortedTreeFile af = new();

@@ -202,23 +202,30 @@ public class SortedPointBuffer<TKey, TValue> : TreeStream<TKey, TValue> where TK
     {
         if (m_isReadingMode)
             throw new InvalidOperationException("Cannot enqueue to a list that is in ReadMode");
+
         if (IsFull)
             return false;
+
         m_methods.Copy(key, value, m_keyData[m_enqueueIndex], m_valueData[m_enqueueIndex]);
         m_enqueueIndex++;
+
         return true;
     }
 
     /// <summary>
     /// Advances the stream to the next value.
-    /// If before the beginning of the stream, advances to the first value
     /// </summary>
-    /// <returns><c>true</c> if the advance was successful; <c>false</c> if the end of the stream was reached.</returns>
-    /// <exception cref="InvalidOperationException">Occurs if <see cref="IsReadingMode"/> is set to <c>false</c></exception>
+    /// <param name="key">An output parameter to receive the key.</param>
+    /// <param name="value">An output parameter to receive the value.</param>
+    /// <returns>
+    ///   <c>true</c> if a key-value pair was successfully read; otherwise, <c>false</c> if the list is empty.
+    /// </returns>
+    /// <exception cref="InvalidOperationException">Thrown if the list is not in ReadMode.</exception>
     protected override bool ReadNext(TKey key, TValue value)
     {
         if (!m_isReadingMode)
             throw new InvalidOperationException("Cannot read from a list that is not in ReadMode");
+
         if (IsEmpty)
             return false;
 

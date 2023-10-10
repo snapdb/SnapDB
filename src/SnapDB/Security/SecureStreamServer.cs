@@ -70,6 +70,7 @@ internal static class SecureStreamServerCertificate
 /// A server host that manages a secure stream connection.
 /// This class is thread safe and can negotiate streams simultaneous.
 /// </summary>
+/// <typeparam name="T">The type of user token used for authentication.</typeparam>
 public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserToken, new()
 {
     #region [ Members ]
@@ -151,8 +152,8 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
     /// <summary>
     /// Adds the default user credential if the user logs in with no credentials specified.
     /// </summary>
-    /// <param name="enabled"></param>
-    /// <param name="userToken"></param>
+    /// <param name="enabled">Indicates whether or not the default user credential has been enabled.</param>
+    /// <param name="userToken">The user token type.</param>
     public void SetDefaultUser(bool enabled, T userToken)
     {
         lock (m_syncRoot)
@@ -188,7 +189,7 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
     /// <param name="useSsl">gets if ssl should be used</param>
     /// <param name="secureStream">the secure stream that is valid if the function returns true.</param>
     /// <param name="token">the user's token associated with what user created the stream</param>
-    /// <returns>true if successful, false otherwise</returns>
+    /// <returns><c>true</c> if successful, <c>false</c> otherwise</returns>
     public bool TryAuthenticateAsServer(Stream stream, bool useSsl, out Stream secureStream, out T token)
     {
         token = default;

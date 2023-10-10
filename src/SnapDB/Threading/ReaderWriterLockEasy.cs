@@ -127,6 +127,7 @@ public class ReaderWriterLockEasy
     /// <summary>
     /// Enters a read lock. Be sure to call within a using block.
     /// </summary>
+    /// <returns>A DisposableReadLock object that should be disposed to release the acquired read lock.</returns>
     public DisposableReadLock EnterReadLock()
     {
         return new DisposableReadLock(m_lock);

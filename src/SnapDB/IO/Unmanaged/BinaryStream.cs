@@ -53,8 +53,9 @@ public unsafe class BinaryStream : BinaryStreamPointerBase
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates a <see cref="BinaryStream"/> that is in memory only.
+    /// Creates a <see cref="BinaryStream"/> that is only in memory.
     /// </summary>
+    /// <exception cref="Exception">Thrown if not run on a little-endian processor.</exception>
     public BinaryStream() : this(new MemoryPoolStream(), false)
     {
         if (!BitConverter.IsLittleEndian)
@@ -62,8 +63,10 @@ public unsafe class BinaryStream : BinaryStreamPointerBase
     }
 
     /// <summary>
-    /// Creates a <see cref="BinaryStream"/> that is in memory only.
+    ///Initializes a new instance of the <see cref="BinaryStream"/> class using a specified memory pool.
     /// </summary>
+    /// <param name="pool">The memory pool to be used for stream operations.</param>
+    /// <exception cref="Exception">Thrown if not run on a little-endian processor.</exception>
     public BinaryStream(MemoryPool pool) : this(new MemoryPoolStream(pool), false)
     {
         if (!BitConverter.IsLittleEndian)

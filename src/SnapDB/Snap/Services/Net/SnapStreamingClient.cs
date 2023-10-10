@@ -121,11 +121,6 @@ public class SnapStreamingClient : SnapClient
     /// </summary>
     /// <param name="databaseName">The name of the database to retrieve.</param>
     /// <returns>A client database instance for the specified database name.</returns>
-    /// <remarks>
-    /// This method retrieves a client database instance associated with the specified <paramref name="databaseName"/>.
-    /// The method uses reflection to invoke the appropriate generic method to create the database instance based on the
-    /// specified key and value types associated with the database.
-    /// </remarks>
     public override ClientDatabaseBase GetDatabase(string databaseName)
     {
         DatabaseInfo info = m_databaseInfos[databaseName.ToUpper()];
@@ -140,10 +135,12 @@ public class SnapStreamingClient : SnapClient
     }
 
     /// <summary>
-    /// Accesses <see cref="ClientDatabaseBase{TKey,TValue}"/> for given <paramref name="databaseName"/>.
+    /// Accesses <see cref="ClientDatabaseBase{TKey, TValue}"/> for given <paramref name="databaseName"/>.
     /// </summary>
-    /// <param name="databaseName">Name of database instance to access.</param>
-    /// <returns><see cref="ClientDatabaseBase{TKey,TValue}"/> for given <paramref name="databaseName"/>.</returns>
+    /// <typeparam name="TKey">The type of key to get.</typeparam>
+    /// <typeparam name="TValue">The type of value associated with the key being acquired.</typeparam>
+    /// <param name="databaseName">The name of the database to access.</param>
+    /// <returns><see cref="ClientDatabaseBase{TKey, TValue}"/> for given <paramref name="databaseName"/>.</returns>
     public override ClientDatabaseBase<TKey, TValue> GetDatabase<TKey, TValue>(string databaseName)
     {
         return GetDatabase<TKey, TValue>(databaseName, null);

@@ -36,6 +36,8 @@ namespace SnapDB.Snap.Services;
 /// <summary>
 /// Creates an engine for reading/writing data from a SortedTreeStore.
 /// </summary>
+/// <typeparam name="TKey">The key type used in the sorted tree table.</typeparam>
+/// <typeparam name="TValue">The value type used in the sorted tree table.</typeparam>
 public partial class SnapServerDatabase<TKey, TValue> : SnapServerDatabaseBase where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
@@ -57,8 +59,10 @@ public partial class SnapServerDatabase<TKey, TValue> : SnapServerDatabaseBase w
     #region [ Constructors ]
 
     /// <summary>
+    /// Initializes a new instance of the SnapServerDatabase class with the specified settings.
     /// </summary>
-    /// <param name="settings"></param>
+    /// <param name="settings">The settings used to configure the SnapServerDatabase.</param>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="settings"/> is null.</exception>
     public SnapServerDatabase(ServerDatabaseSettings settings)
     {
         if (settings is null)

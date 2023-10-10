@@ -45,7 +45,7 @@ public class FixedSizeNodeScanner<TKey, TValue> : SortedTreeScannerBase<TKey, TV
     #region [ Constructors ]
 
     /// <summary>
-    /// creates a new class
+    /// Creates a new class.
     /// </summary>
     /// <param name="level">The level of the fixed-size node in the sorted tree.</param>
     /// <param name="blockSize">The size of the block containing the fixed-size node.</param>
@@ -129,11 +129,16 @@ public class FixedSizeNodeScanner<TKey, TValue> : SortedTreeScannerBase<TKey, TV
     /// <summary>
     /// Using <see cref="SortedTreeScannerBase{TKey,TValue}.Pointer"/> to advance to the next KeyValue.
     /// </summary>
+    /// <param name="key">The key read from the stream.</param>
+    /// <param name="value">The value read from the stream.</param>
+    /// <param name="upperBounds">The upper bounds for key comparison.</param>
+    /// <returns><c>true</c> if search can still be advanced; otherwise, <c>false</c> if the upper bound has been reached.</returns>
     protected override unsafe bool InternalReadWhile(TKey key, TValue value, TKey upperBounds)
     {
         byte* ptr = Pointer + IndexOfNextKeyValue * m_keyValueSize;
         key.Read(ptr);
         value.Read(ptr + KeySize);
+
         if (key.IsLessThan(upperBounds))
         {
             IndexOfNextKeyValue++;
@@ -147,6 +152,11 @@ public class FixedSizeNodeScanner<TKey, TValue> : SortedTreeScannerBase<TKey, TV
     /// <summary>
     /// Using <see cref="SortedTreeScannerBase{TKey,TValue}.Pointer"/> to advance to the next KeyValue.
     /// </summary>
+    /// <param name="key">The next key to advance to.</param>
+    /// <param name="value">The next value to advance to.</param>
+    /// <param name="upperBounds">The highest key that can be advanced to - stop when reached.</param>
+    /// <param name="filter">The filter to abide by during the advancement for matching key-value pairs.</param>
+    /// <returns><c>true</c> if advancement can still be made; otherwise, <c>false</c> if iterations reached the end.</returns>
     protected override unsafe bool InternalReadWhile(TKey key, TValue value, TKey upperBounds, MatchFilterBase<TKey, TValue>? filter)
     {
     TryAgain:

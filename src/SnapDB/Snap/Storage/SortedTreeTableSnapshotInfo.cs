@@ -32,6 +32,8 @@ namespace SnapDB.Snap.Storage;
 /// Acquires a read transaction on the current archive partition. This will allow all user created
 /// transactions to have snapshot isolation of the entire data set.
 /// </summary>
+/// <typeparam name="TKey">The key type for the sorted tree table.</typeparam>
+/// <typeparam name="TValue">The value type used in the sorted tree table.</typeparam>
 public class SortedTreeTableSnapshotInfo<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
@@ -59,6 +61,8 @@ public class SortedTreeTableSnapshotInfo<TKey, TValue> where TKey : SnapTypeBase
     /// <summary>
     /// Opens an instance of the archive file to allow for concurrent reading of a snapshot.
     /// </summary>
+    /// <typeparam name="TKey">The key type for the sorted tree table.</typeparam>
+    /// <typeparam name="TValue">The value type used in the sorted tree table.</typeparam>
     /// <returns>
     /// A new <see cref="SortedTreeTableReadSnapshot{TKey, TValue}"/> instance for reading data from the table.
     /// </returns>

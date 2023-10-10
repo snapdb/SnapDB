@@ -392,6 +392,7 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     /// Gets the block index when seeking for the provided key.
     /// </summary>
     /// <param name="key">The key to start the search from.</param>
+    /// <returns>The resultant block index found after seeking for the provided key.</returns>
     protected uint FindLeafNodeAddress(TKey key)
     {
         return m_lookupKey(key, m_level);
@@ -518,6 +519,8 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     /// Advances the stream to the next value.
     /// If before the beginning of the stream, advances to the first value.
     /// </summary>
+    /// <param name="key">The key to advance to.</param>
+    /// <param name="value">The value associated with the key to advance to.</param>
     /// <returns><c>true</c> if the advance was successful; otherwise, <c>false</c> if the end of the stream was reached.</returns>
     protected override bool ReadNext(TKey key, TValue value)
     {
@@ -535,6 +538,9 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
     /// <summary>
     /// A catch all read function.
     /// </summary>
+    /// <param name="key">The key to read.</param>
+    /// <param name="value">The value associated with the key to read.</param>
+    /// <returns><c>true</c> if the advance was successful; otherwise, <c>false</c> to indicate that the end of stream has been reached.</returns>
     protected bool ReadCatchAll(TKey key, TValue value)
     {
         // If there are no more records in the current node.

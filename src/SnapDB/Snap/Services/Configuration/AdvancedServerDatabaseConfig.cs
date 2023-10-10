@@ -42,6 +42,8 @@ namespace SnapDB.Snap.Services.Configuration;
 /// <summary>
 /// Creates a configuration for the database to utilize.
 /// </summary>
+/// <typeparam name="TKey">The key type used in the sorted tree table.</typeparam>
+/// <typeparam name="TValue">The value type used in the sorted tree table.</typeparam>
 public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSettings where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
@@ -56,8 +58,11 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
     #region [ Constructors ]
 
     /// <summary>
-    /// Gets a database config.
+    /// Initializes a new instance of the AdvancedServerDatabaseConfig class with the specified configuration options.
     /// </summary>
+    /// <param name="databaseName">The name of the database.</param>
+    /// <param name="mainPath">The main path associated with the database.</param>
+    /// <param name="supportsWriting">A flag indicating whether the database supports writing.</param>
     public AdvancedServerDatabaseConfig(string databaseName, string mainPath, bool supportsWriting)
     {
         SupportsWriting = supportsWriting;

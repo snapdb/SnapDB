@@ -126,7 +126,7 @@ public class IntegratedSecurityServer : DisposableLoggingClassBase
     /// <summary>
     /// Saves to the supplied stream.
     /// </summary>
-    /// <param name="stream"></param>
+    /// <param name="stream">The binary stream to which the state will be saved.</param>
     public void Save(Stream stream)
     {
         stream.WriteByte(1);
@@ -136,7 +136,7 @@ public class IntegratedSecurityServer : DisposableLoggingClassBase
     /// <summary>
     /// Loads from the supplied stream.
     /// </summary>
-    /// <param name="stream"></param>
+    /// <param name="stream">The binary stream from which the state will be loaded.</param>
     public void Load(Stream stream)
     {
         byte version = stream.ReadNextByte();

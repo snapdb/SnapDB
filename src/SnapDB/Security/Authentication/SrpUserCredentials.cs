@@ -60,11 +60,11 @@ public class SrpUserCredentials
     /// <summary>
     /// Adds the specified user to the credentials database.
     /// </summary>
-    /// <param name="username"></param>
-    /// <param name="password"></param>
-    /// <param name="strength"></param>
-    /// <param name="saltSize"></param>
-    /// <param name="iterations"></param>
+    /// <param name="username">The user's chosen name to add to the database.</param>
+    /// <param name="password">The user's chosen password to add to the database.</param>
+    /// <param name="strength">The strength rating of the password.</param>
+    /// <param name="saltSize">The size of salt to be used for password hashing (default is 32).</param>
+    /// <param name="iterations">How many iterations used for password hashing (default is 4000).</param>
     public void AddUser(string username, string password, SrpStrength strength = SrpStrength.Bits1024, int saltSize = 32, int iterations = 4000)
     {
         SrpUserCredential user = new(username, password, strength, saltSize, iterations);
@@ -76,11 +76,11 @@ public class SrpUserCredentials
     /// <summary>
     /// Adds the specified user to the credential database.
     /// </summary>
-    /// <param name="username"></param>
-    /// <param name="verifier"></param>
-    /// <param name="passwordSalt"></param>
-    /// <param name="iterations"></param>
-    /// <param name="strength"></param>
+    /// <param name="username">The username of the new user.</param>
+    /// <param name="verifier">The SRP verifier value associated with the user.</param>
+    /// <param name="passwordSalt">The salt value used for password hashing.</param>
+    /// <param name="iterations">The number of iterations used for password hashing.</param>
+    /// <param name="strength">The strength of the SRP protocol.</param>
     public void AddUser(string username, byte[] verifier, byte[] passwordSalt, int iterations, SrpStrength strength)
     {
         SrpUserCredential user = new(username, passwordSalt, verifier, iterations, strength);

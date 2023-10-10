@@ -36,6 +36,7 @@ public partial class UnmanagedMemoryStream : UnmanagedMemoryStreamCore, ISupport
     /// <summary>
     /// Create a new <see cref="UnmanagedMemoryStream"/> that allocates its own unmanaged memory.
     /// </summary>
+    /// <param name="allocationSize">The set definition for the size capacity of memory allocations.</param>
     public UnmanagedMemoryStream(int allocationSize = 4096) : base(allocationSize)
     {
     }
@@ -74,6 +75,7 @@ public partial class UnmanagedMemoryStream : UnmanagedMemoryStreamCore, ISupport
     /// <summary>
     /// Acquire an IO Session.
     /// </summary>
+    /// <returns>A new <see cref="BinaryStreamIoSessionBase"/> instance of type <see cref="IoSession"/>.</returns>
     public BinaryStreamIoSessionBase CreateIoSession()
     {
         return new IoSession(this);

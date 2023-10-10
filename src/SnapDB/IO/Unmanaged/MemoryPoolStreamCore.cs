@@ -168,6 +168,8 @@ public class MemoryPoolStreamCore : IDisposable
     /// <summary>
     /// Create a new <see cref="MemoryPoolStreamCore"/>.
     /// </summary>
+    /// <param name="pool">The memory pool to associate with the stream.</param>
+
     public MemoryPoolStreamCore(MemoryPool pool)
     {
         m_pool = pool;
@@ -336,6 +338,7 @@ public class MemoryPoolStreamCore : IDisposable
     /// <summary>
     /// Gets a block for the following IO session.
     /// </summary>
+    /// <param name="args">The BlockArguments specifying the block's position and length.</param>
     public void GetBlock(BlockArguments args)
     {
         if (IsDisposed)

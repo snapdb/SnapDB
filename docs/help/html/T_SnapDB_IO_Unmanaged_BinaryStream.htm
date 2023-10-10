@@ -8,12 +8,12 @@
 	<a href="T_SnapDB_IO_BinaryStreamPointerBase.htm">SnapDB.IO.BinaryStreamPointerBase</a>);</code></pre></div></div><dl class="inheritanceHierarchy"><dt>Inheritance</dt><dd><a href="https://learn.microsoft.com/dotnet/api/system.object" target="_blank" rel="noopener noreferrer">Object</a>  <span class="icon is-small"><i class="fa fa-arrow-right"></i></span>  <a href="T_SnapDB_IO_BinaryStreamBase.htm">BinaryStreamBase</a>  <span class="icon is-small"><i class="fa fa-arrow-right"></i></span>  <a href="T_SnapDB_IO_BinaryStreamPointerBase.htm">BinaryStreamPointerBase</a>  <span class="icon is-small"><i class="fa fa-arrow-right"></i></span>  <span class="selflink">BinaryStream</span></dd></dl></div><h2 class="quickLinkHeader"><span class="icon toggleSection" tabindex="0"><i class="fa fa-angle-down"></i></span>Remarks</h2><div id="IDBCSection">
             This class allows reading and writing binary data and is designed for use with little-endian processors.
             </div><h2 class="quickLinkHeader"><span class="icon toggleSection" tabindex="0"><i class="fa fa-angle-down"></i></span>Constructors</h2><div id="IDA0SB0FASection"><table id="ConstructorList" class="table is-hoverable"><tr><td><a href="M_SnapDB_IO_Unmanaged_BinaryStream__ctor.htm">BinaryStream<span id="LSTF50A7D09_0" data-languageSpecificText="cs=()|vb=|cpp=()|nu=()|fs=()"></span></a></td><td>
-            Creates a <span class="selflink">BinaryStream</span> that is in memory only.
+            Creates a <span class="selflink">BinaryStream</span> that is only in memory.
             </td></tr><tr><td><a href="M_SnapDB_IO_Unmanaged_BinaryStream__ctor_3.htm">BinaryStream(Boolean)</a></td><td>
             Creates a <span class="selflink">BinaryStream</span> that is in memory only.
             </td></tr><tr><td><a href="M_SnapDB_IO_Unmanaged_BinaryStream__ctor_2.htm">BinaryStream(MemoryPool)</a></td><td>
-            Creates a <span class="selflink">BinaryStream</span> that is in memory only.
-            </td></tr><tr><td><a href="M_SnapDB_IO_Unmanaged_BinaryStream__ctor_1.htm">BinaryStream(ISupportsBinaryStream, Boolean)</a></td><td>
+            Initializes a new instance of the <span class="selflink">BinaryStream</span> class using a specified memory pool.
+             </td></tr><tr><td><a href="M_SnapDB_IO_Unmanaged_BinaryStream__ctor_1.htm">BinaryStream(ISupportsBinaryStream, Boolean)</a></td><td>
             Creates a <span class="selflink">BinaryStream</span> that is at position 0 of the provided stream.
             </td></tr></table></div><h2 class="quickLinkHeader"><span class="icon toggleSection" tabindex="0"><i class="fa fa-angle-down"></i></span>Properties</h2><div id="ID03B0FASection"><table id="PropertyList" class="table is-hoverable"><tr><td><a href="P_SnapDB_IO_Unmanaged_BinaryStream_BaseStream.htm">BaseStream</a></td><td>
             Gets the underlying stream associated with the BinaryStream instance.
@@ -53,8 +53,8 @@
             Gets a read pointer to a specified position in the stream for a specified length of data
             and determines if the stream supports writing at that position.
             <br />(Inherited from <a href="T_SnapDB_IO_BinaryStreamPointerBase.htm">BinaryStreamPointerBase</a>)</td></tr><tr><td><a href="https://learn.microsoft.com/dotnet/api/system.object.gettype#system-object-gettype" target="_blank" rel="noopener noreferrer">GetType</a></td><td>Gets the <a href="https://learn.microsoft.com/dotnet/api/system.type" target="_blank" rel="noopener noreferrer">Type</a> of the current instance.<br />(Inherited from <a href="https://learn.microsoft.com/dotnet/api/system.object" target="_blank" rel="noopener noreferrer">Object</a>)</td></tr><tr><td><a href="M_SnapDB_IO_BinaryStreamPointerBase_GetWritePointer.htm">GetWritePointer</a></td><td>
-            Gets a pointer from the current position that can be used for writing up the the provided length.
-            The current position is not advanced after calling this function.
+            Gets a pointer to the specified write position in the binary stream that can be used for writing up the provided length and reserving space for writing the data.
+            Current position does not get advanced after calling this function.
             <br />(Inherited from <a href="T_SnapDB_IO_BinaryStreamPointerBase.htm">BinaryStreamPointerBase</a>)</td></tr><tr><td><a href="M_SnapDB_IO_BinaryStreamBase_InsertBytes.htm">InsertBytes</a></td><td>
             Inserts a certain number of bytes into the stream, shifting valid data to the right.  The stream's position remains unchanged.
             (ie. pointing to the beginning of the newly inserted bytes).

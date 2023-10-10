@@ -232,8 +232,15 @@ public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
     }
 
     /// <summary>
-    /// This will return a byte array of data that can be written to an archive file.
+    /// Gets the binary representation of the file allocation table.
     /// </summary>
+    /// <returns>A byte array representing the file allocation table that can be written to an archive file.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the file allocation table is invalid.</exception>
+    /// <remarks>
+    /// This method constructs the binary representation of the file allocation table, including metadata and flags.
+    /// It ensures the validity of the file allocation table before generating the bytes.
+    /// </remarks>
+    /// <seealso cref="IsFileAllocationTableValid"/>
     public byte[] GetBytes()
     {
         if (!IsFileAllocationTableValid())

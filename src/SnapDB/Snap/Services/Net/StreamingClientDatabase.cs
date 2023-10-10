@@ -282,7 +282,7 @@ public class StreamingClientDatabase<TKey, TValue> : ClientDatabaseBase<TKey, TV
     /// <summary>
     /// Defines the encoding method to use for the server.
     /// </summary>
-    /// <param name="encoding"></param>
+    /// <param name="encoding">The method to encode for the server.</param>
     public void SetEncodingMode(EncodingDefinition encoding)
     {
         m_encodingMode = Library.CreateStreamEncoding<TKey, TValue>(encoding);
@@ -403,8 +403,8 @@ public class StreamingClientDatabase<TKey, TValue> : ClientDatabaseBase<TKey, TV
     /// <summary>
     /// Writes an individual key/value to the sorted tree store.
     /// </summary>
-    /// <param name="key"></param>
-    /// <param name="value"></param>
+    /// <param name="key">The key to be written to the sorted tree store.</param>
+    /// <param name="value">The value associated with the key to be written to the sorted tree store.</param>
     public override void Write(TKey key, TValue value)
     {
         if (m_reader is not null)
@@ -444,6 +444,7 @@ public class StreamingClientDatabase<TKey, TValue> : ClientDatabaseBase<TKey, TV
     /// <summary>
     /// Enumerates all of the files attached to the database.
     /// </summary>
+    /// <returns>The enumerated files.</returns>
     public override List<ArchiveDetails> GetAllAttachedFiles()
     {
         throw new NotImplementedException();

@@ -31,6 +31,8 @@ namespace SnapDB.Snap.Services;
 /// <summary>
 /// Provides a list of resources that each system transaction could be using.
 /// </summary>
+/// <typeparam name="TKey">The key type for the archive list.</typeparam>
+/// <typeparam name="TValue">The value type for the archive list.</typeparam>
 public class ArchiveListSnapshot<TKey, TValue> : IDisposable where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
@@ -149,10 +151,11 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable where TKey : SnapTy
     }
 
     /// <summary>
-    /// Attempts to get the file for the provided fileId
+    /// Attempts to get the file for the provided fileId.
     /// </summary>
-    /// <param name="fileId"></param>
-    /// <returns>Null if not found</returns>
+    /// <param name="fileId">The unique identifier for the file.</param>
+    /// <returns><c>null</c> if not found.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if object has been disposed.</exception>
     public ArchiveTableSummary<TKey, TValue>? TryGetFile(Guid fileId)
     {
         if (IsDisposed)

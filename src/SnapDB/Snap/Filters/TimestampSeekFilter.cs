@@ -54,8 +54,10 @@ public partial class TimestampSeekFilter
     /// <summary>
     /// Creates a seek filter that filters keys falling within a specified time range.
     /// </summary>
+    /// <typeparam name="TKey">The type of key that implements SeekFilterBase.</typeparam>
     /// <param name="firstTime">The starting timestamp of the time range query (inclusive).</param>
     /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
+    /// <returns>The fixed range for the seek filter to search during.</returns>
     public static SeekFilterBase<TKey> CreateFromRange<TKey>(ulong firstTime, ulong lastTime) where TKey : TimestampPointIdBase<TKey>, new()
     {
         return new FixedRange<TKey>(firstTime, lastTime);
@@ -64,6 +66,7 @@ public partial class TimestampSeekFilter
     /// <summary>
     /// Creates a seek filter that filters keys falling within a specified time range.
     /// </summary>
+    /// <typeparam name="TKey">The type of key that implements SeekFilterBase.</typeparam>
     /// <param name="firstTime">The starting timestamp of the time range query (inclusive).</param>
     /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
     /// <param name="mainInterval">The smallest interval that is exact.</param>
@@ -83,6 +86,7 @@ public partial class TimestampSeekFilter
     /// <summary>
     /// Creates a seek filter that filters keys falling within a specified time range.
     /// </summary>
+    /// <typeparam name="TKey">The type of key that implements SeekFilterBase.</typeparam>
     /// <param name="firstTime">The starting timestamp of the time range query (inclusive).</param>
     /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
     /// <param name="interval">The exact interval.</param>
@@ -101,6 +105,7 @@ public partial class TimestampSeekFilter
     /// <summary>
     /// Creates a seek filter that filters keys falling within a specified time range.
     /// </summary>
+    /// <typeparam name="TKey">The type of key that implements SeekFilterBase.</typeparam>
     /// <param name="firstTime">The starting timestamp of the time range query (inclusive).</param>
     /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
     /// <param name="mainInterval">The smallest interval that is exact.</param>
@@ -120,6 +125,7 @@ public partial class TimestampSeekFilter
     /// <summary>
     /// Creates a seek filter that filters keys falling within a specified time range.
     /// </summary>
+    /// <typeparam name="TKey">The type of key that implements SeekFilterBase.</typeparam>
     /// <param name="firstTime">The starting timestamp of the time range query (inclusive).</param>
     /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
     /// <param name="interval">The exact interval to do the scan.</param>
@@ -136,15 +142,19 @@ public partial class TimestampSeekFilter
     }
 
     /// <summary>
-    /// Loads a key seek filter base from the provided <paramref name="stream"/>.
+    /// Loads a key seek filter base from the provided <paramref name="stream"/>;
     /// </summary>
+    /// <typeparam name="TKey">The type of key that implements SeekFilterBase.</typeparam>
     /// <param name="stream">The stream to load the filter from.</param>
+    /// <returns>A seek filter base that will be created from the specified stream.</returns>
+    /// <exception cref="VersionNotFoundException">Thrown if the version cannot be reached.</exception>
     [MethodImpl(MethodImplOptions.NoOptimization)]
     private static SeekFilterBase<TKey> CreateFromStream<TKey>(BinaryStreamBase stream) where TKey : TimestampPointIdBase<TKey>, new()
     {
         byte version = stream.ReadUInt8();
 
-        return version switch
+        return version 
+            switch
         {
             0 => null,
             1 => new FixedRange<TKey>(stream),

@@ -138,8 +138,10 @@ public class TransactionalFileStructure : IDisposable
     }
 
     /// <summary>
-    /// This will start a transactional edit on the file.
+    /// Starts a transactional edit on the specified file.
     /// </summary>
+    /// <returns>The file being transactionally edited.</returns>
+    /// <exception cref="Exception">Thrown if there already exists one edit transaction, or it has been opened in read-only mode.</exception>
     public TransactionalEdit BeginEdit()
     {
         if (m_diskIo.IsReadOnly)
@@ -196,6 +198,9 @@ public class TransactionalFileStructure : IDisposable
     /// <summary>
     /// Creates a new archive file that is completely in memory.
     /// </summary>
+    /// <param name="blockSize">The size of the data block.</param>
+    /// <param name="flags">Flags associated with the specified disk.</param>
+    /// <returns>The new disk created in memory.</returns>
     public static TransactionalFileStructure CreateInMemory(int blockSize, params Guid[] flags)
     {
         DiskIo disk = DiskIo.CreateMemoryFile(Globals.MemoryPool, blockSize, flags);
@@ -204,8 +209,14 @@ public class TransactionalFileStructure : IDisposable
     }
 
     /// <summary>
-    /// Creates a new archive file using the provided file. File is editable.
+    /// Creates a new archive editable file using the provided file.
     /// </summary>
+    /// <param name="fileName">The name of the new file.</param>
+    /// <param name="blockSize">The size of the data block.</param>
+    /// <param name="flags">The flags associated with the specified new file.</param>
+    /// <returns>The new archive editable file.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if the file name is null.</exception>
+    /// <exception cref="Exception">Thrown if the name of the new file already exists.</exception>
     public static TransactionalFileStructure CreateFile(string fileName, int blockSize, params Guid[] flags)
     {
         if (fileName is null)
@@ -222,6 +233,11 @@ public class TransactionalFileStructure : IDisposable
     /// <summary>
     /// Opens an existing file.
     /// </summary>
+    /// <param name="fileName">The name of the existing file to open.</param>
+    /// <param name="isReadOnly">A boolean that tells us whether or not the file is read-only.</param>
+    /// <returns><c>true</c> if the file is read-only; otherwise, <c>false</c> if not.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if the file name is null.</exception>
+    /// <exception cref="Exception">Thrown if the file name does not exist.</exception>
     public static TransactionalFileStructure OpenFile(string fileName, bool isReadOnly)
     {
         if (fileName is null)

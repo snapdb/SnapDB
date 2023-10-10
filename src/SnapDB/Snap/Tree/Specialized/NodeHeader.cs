@@ -136,8 +136,8 @@ public unsafe class NodeHeader<TKey> where TKey : SnapTypeBase<TKey>, new()
     /// <summary>
     /// The constructor that is used for inheriting. Must call Initialize before using it.
     /// </summary>
-    /// <param name="level"></param>
-    /// <param name="blockSize"></param>
+    /// <param name="level">The level of the node.</param>
+    /// <param name="blockSize">The size of the block.</param>
     public NodeHeader(byte level, int blockSize)
     {
         Level = level;

@@ -39,7 +39,10 @@ public class SnapCustomMethodsInt32 : SnapTypeCustomMethods<SnapInt32>
     /// <param name="key2">The key to be compared to.</param>
     /// <param name="recordCount">The number of records in the memory block.</param>
     /// <param name="keyValueSize">The size of each key value pair in bytes.</param>
-    /// <returns></returns>
+    /// <returns>
+    /// The index of the found key if it exists, or the bitwise complement of the index
+    /// where the key should be inserted if it doesn't exist.
+    /// </returns>
     public override unsafe int BinarySearch(byte* pointer, SnapInt32 key2, int recordCount, int keyValueSize)
     {
         int lastFoundIndex = LastFoundIndex;

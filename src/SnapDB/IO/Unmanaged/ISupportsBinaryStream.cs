@@ -57,8 +57,9 @@ public interface ISupportsBinaryStream : IDisposable
     #region [ Methods ]
 
     /// <summary>
-    /// Acquire an IO Session.
+    /// Acquire an IO session.
     /// </summary>
+    /// <returns>The IO session to be created.</returns>
     BinaryStreamIoSessionBase CreateIoSession();
 
     #endregion

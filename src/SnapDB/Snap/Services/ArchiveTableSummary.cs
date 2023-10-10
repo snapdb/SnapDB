@@ -32,6 +32,8 @@ namespace SnapDB.Snap.Services;
 /// Contains an immutable class of the current table
 /// along with its most recent snapshot.
 /// </summary>
+/// <typeparam name="TKey">The key type used in the sorted tree table.</typeparam>
+/// <typeparam name="TValue">The value type used in the sorted tree table.</typeparam>
 public class ArchiveTableSummary<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Constructors ]

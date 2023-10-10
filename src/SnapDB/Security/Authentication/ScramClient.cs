@@ -57,10 +57,15 @@ public class ScramClient
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates a new set of client credentials.
+    /// Initializes a new instance of the SCRAM (Salted Challenge Response Authentication Mechanism) client with the provided username and password.
     /// </summary>
-    /// <param name="username"></param>
-    /// <param name="password"></param>
+    /// <param name="username">The username to be used for authentication.</param>
+    /// <param name="password">The password associated with the username.</param>
+    /// <remarks>
+    /// This constructor initializes a new instance of the SCRAM client with the provided <paramref name="username"/> and <paramref name="password"/>.
+    /// It converts the username and password to UTF-8 bytes and normalizes them using FormKC normalization.
+    /// </remarks>
+    /// <seealso cref="Scram"/>
     public ScramClient(string username, string password)
     {
         m_usernameBytes = Scram.Utf8.GetBytes(username.Normalize(NormalizationForm.FormKC));

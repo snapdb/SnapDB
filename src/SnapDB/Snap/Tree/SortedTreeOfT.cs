@@ -33,6 +33,8 @@ namespace SnapDB.Snap.Tree;
 /// This base class translates all of the core methods into simple methods
 /// that must be implemented by classes derived from this base class.
 /// </summary>
+/// <typeparam name="TKey">The key type for the sorted tree.</typeparam>
+/// <typeparam name="TValue">The value type for the sorted tree.</typeparam>
 /// <remarks>
 /// This class does not support concurrent read operations.  This is due to the caching method of each tree.
 /// If concurrent read operations are desired, clone the tree.

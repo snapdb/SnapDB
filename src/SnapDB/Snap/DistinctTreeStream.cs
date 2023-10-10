@@ -64,17 +64,24 @@ public class DistinctTreeStream<TKey, TValue> : TreeStream<TKey, TValue> where T
 
     #region [ Properties ]
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets a value indicating whether this stream is always sequential, which is true for this implementation.
+    /// </summary>
     public override bool IsAlwaysSequential => true;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets a value indicating that this stream never contains duplicate items, which is true for this implementation.
+    /// </summary>
     public override bool NeverContainsDuplicates => true;
 
     #endregion
 
     #region [ Methods ]
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Disposes of managed resources used by this stream.
+    /// </summary>
+    /// <param name="disposing">True if disposing of managed resources, false if finalizing.</param>
     protected override void Dispose(bool disposing)
     {
         if (disposing)
@@ -82,22 +89,32 @@ public class DistinctTreeStream<TKey, TValue> : TreeStream<TKey, TValue> where T
         base.Dispose(disposing);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Callback method invoked when the end of the stream is reached.
+    /// </summary>
     protected override void EndOfStreamReached()
     {
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Reads the next key-value pair from the stream and handles duplicates.
+    /// </summary>
+    /// <param name="key">The key to read into.</param>
+    /// <param name="value">The value to read into.</param>
+    /// <returns><c>true</c> if a key-value pair was successfully read, <c>false</c> if the end of the stream is reached.</returns>
     protected override bool ReadNext(TKey key, TValue value)
     {
     TryAgain:
         if (!m_baseStream.Read(key, value))
             return false;
+
         if (m_isLastValueValid && key.IsEqualTo(m_lastKey))
             goto TryAgain;
+
         m_isLastValueValid = true;
         key.CopyTo(m_lastKey);
         value.CopyTo(m_lastValue);
+
         return true;
     }
 

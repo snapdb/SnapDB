@@ -48,7 +48,10 @@ public abstract class MatchFilterDefinitionBase
     /// <summary>
     /// Determines if a key-value pair is contained in the filter.
     /// </summary>
+    /// <typeparam name="TKey">The key for this match filter base.</typeparam>
+    /// <typeparam name="TValue">The value associated with the key for this match filter base.</typeparam>
     /// <param name="stream">The value to check.</param>
+    /// <returns>An instance of <see cref="MatchFilterBase{TKey, TValue}"/>.</returns>
     public abstract MatchFilterBase<TKey, TValue> Create<TKey, TValue>(BinaryStreamBase stream);
 
     #endregion

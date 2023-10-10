@@ -58,7 +58,7 @@ public abstract class ArchiveList : DisposableLoggingClassBase
     /// <summary>
     /// Loads the specified files into the archive list.
     /// </summary>
-    /// <param name="archiveFiles"></param>
+    /// <param name="archiveFiles">The files to be archived.</param>
     public abstract void LoadFiles(IEnumerable<string> archiveFiles);
 
     /// <summary>
@@ -69,8 +69,9 @@ public abstract class ArchiveList : DisposableLoggingClassBase
     public abstract void GetFullStatus(StringBuilder status, int maxFileListing = -1);
 
     /// <summary>
-    /// Gets a complete list of all archive files
+    /// Gets a complete list of all archive files.
     /// </summary>
+    /// <returns>All of the attached archive files.</returns>
     public abstract List<ArchiveDetails> GetAllAttachedFiles();
 
     /// <summary>

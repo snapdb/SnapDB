@@ -61,6 +61,7 @@ public abstract class ClientDatabaseBase : IDisposable
     /// <summary>
     /// Enumerates all of the files attached to the database.
     /// </summary>
+    /// <returns>All of the attached files to be enumerated.</returns>
     public abstract List<ArchiveDetails> GetAllAttachedFiles();
 
     /// <summary>

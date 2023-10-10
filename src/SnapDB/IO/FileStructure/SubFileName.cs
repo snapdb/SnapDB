@@ -151,8 +151,8 @@ public class SubFileName : IComparable<SubFileName>, IEquatable<SubFileName>
     /// <summary>
     /// Compares the equality of the two file names.
     /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
+    /// <param name="a">The first file name to compare.</param>
+    /// <param name="b">The second file name to compare.</param>
     /// <returns><c>true</c>if they are equal, <c>false</c> if they are not.</returns>
     public static bool operator ==(SubFileName? a, SubFileName? b)
     {
@@ -168,8 +168,8 @@ public class SubFileName : IComparable<SubFileName>, IEquatable<SubFileName>
     /// <summary>
     /// Compares the two files if they are not equal.
     /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
+    /// <param name="a">The first file to compare.</param>
+    /// <param name="b">The second file to compare.</param>
     /// <returns>The two files.</returns>
     public static bool operator !=(SubFileName? a, SubFileName? b)
     {
@@ -187,8 +187,11 @@ public class SubFileName : IComparable<SubFileName>, IEquatable<SubFileName>
     public static SubFileName Empty => new(0, 0, 0);
 
     /// <summary>
-    /// Creates a random <see cref="SubFileName"/>
+    /// Creates a random <see cref="SubFileName"/>.
     /// </summary>
+    /// <returns>
+    /// The newly created random <see cref="SubFileName"/>.
+    /// </returns>
     public static SubFileName CreateRandom()
     {
         return Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
@@ -200,6 +203,9 @@ public class SubFileName : IComparable<SubFileName>, IEquatable<SubFileName>
     /// <param name="fileType">The type identifier of the file.</param>
     /// <param name="keyType">The GUID identifier of the type of the SortedTreeStore.</param>
     /// <param name="valueType">The GUID identifier of the value type of the SortedTreeStore.</param>
+    /// <returns>
+    /// The created file from the data.
+    /// </returns>
     public static unsafe SubFileName Create(Guid fileType, Guid keyType, Guid valueType)
     {
         byte[] data = new byte[16 * 3];
@@ -240,6 +246,7 @@ public class SubFileName : IComparable<SubFileName>, IEquatable<SubFileName>
     /// Creates a <see cref="SubFileName"/> from the supplied data.
     /// </summary>
     /// <param name="data"></param>
+    /// <returns>A new SubFileName instance generated from the provided data.</returns>
     public static unsafe SubFileName Create(byte[] data)
     {
         byte[] hash = SHA1.HashData(data);

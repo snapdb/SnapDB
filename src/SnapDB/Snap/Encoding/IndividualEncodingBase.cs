@@ -102,6 +102,8 @@ public abstract class IndividualEncodingBase<T>
     /// <param name="prevValue">The previous value used for decoding reference, if required by <see cref="UsesPreviousValue"/>; otherwise, <c>null</c>.</param>
     /// <param name="value">The decoded value.</param>
     /// <param name="isEndOfStream">Indicates whether the end of the stream has been reached by returning <c>true</c>. If there is not end-of-stream symbol, always returns <c>false</c>.</param>
+    /// <returns>The number of bytes necessary to decode the next key-value pair.</returns>
+
     public virtual unsafe int Decode(byte* stream, T prevValue, T value, out bool isEndOfStream)
     {
         BinaryStreamPointerWrapper bs = new(stream, MaxCompressionSize);

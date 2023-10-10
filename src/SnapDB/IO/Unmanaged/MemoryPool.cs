@@ -326,9 +326,10 @@ public class MemoryPool : IDisposable
     }
 
     /// <summary>
-    /// Changes the allowable buffer size.
+    /// Changes the allowable maximum buffer size.
     /// </summary>
-    /// <param name="value">The number of bytes to set.</param>
+    /// <param name="value">The new maximum buffer size in bytes.</param>
+    /// <returns>The previous maximum buffer size before the change.</returns>
     public long SetMaximumBufferSize(long value)
     {
         lock (m_syncRoot)
@@ -348,7 +349,7 @@ public class MemoryPool : IDisposable
     /// <summary>
     /// Changes the utilization level.
     /// </summary>
-    /// <param name="utilizationLevel"></param>
+    /// <param name="utilizationLevel">The new target utilization level to set.</param>
     public void SetTargetUtilizationLevel(TargetUtilizationLevels utilizationLevel)
     {
         lock (m_syncRoot)

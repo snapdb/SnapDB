@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  ArchiveList`2.cs - Gbtc
+//  ArchiveList.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -39,6 +39,8 @@ namespace SnapDB.Snap.Services;
 /// Manages the complete list of archive resources and the
 /// associated reading and writing that goes along with it.
 /// </summary>
+/// <typeparam name="TKey">The key type used in the archive list.</typeparam>
+/// <typeparam name="TValue">The value type used in the archive list.</typeparam>
 public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
@@ -179,7 +181,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     /// <summary>
     /// Loads the specified files into the archive list.
     /// </summary>
-    /// <param name="archiveFiles"></param>
+    /// <param name="archiveFiles">The files to be archived.</param>
     public override void LoadFiles(IEnumerable<string> archiveFiles)
     {
         if (m_disposed)
@@ -275,8 +277,9 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     }
 
     /// <summary>
-    /// Gets a complete list of all archive files
+    /// Gets a complete list of all archive files.
     /// </summary>
+    /// <returns>All of the attached archive files.</returns>
     public override List<ArchiveDetails> GetAllAttachedFiles()
     {
         List<ArchiveDetails> attachedFiles = new();
@@ -370,7 +373,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     /// Queues the supplied file as a file that needs to be deleted.
     /// MUST be called from a synchronized context.
     /// </summary>
-    /// <param name="file"></param>
+    /// <param name="file">The file to be queued for deletion.</param>
     private void AddFileToDelete(SortedTreeTable<TKey, TValue> file)
     {
         if (file.BaseFile.IsMemoryFile)
@@ -394,7 +397,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     /// Queues the supplied file as one that needs to be disposed when no longer in use.
     /// MUST be called from a synchronized context.
     /// </summary>
-    /// <param name="file"></param>
+    /// <param name="file">The file to be queued for disposal.</param>
     private void AddFileToDispose(SortedTreeTable<TKey, TValue> file)
     {
         if (!InternalIsFileBeingUsed(file))

@@ -30,8 +30,9 @@ using SnapDB.Snap.Types;
 namespace SnapDB.Snap.Tree;
 
 /// <summary>
-/// Contains information on how to parse the index nodes of the SortedTree
+/// Contains information on how to parse the index nodes of the SortedTree.
 /// </summary>
+/// <typeparam name="TKey">The key type for the sparse index.</typeparam>
 public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
 {
     #region [ Members ]
@@ -75,7 +76,7 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the indexed address for the root node
+    /// Gets the indexed address for the root node.
     /// </summary>
     public uint RootNodeIndexAddress { get; private set; }
 
@@ -121,8 +122,8 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
     /// <summary>
     /// Gets the node index of the first leaf node in the tree.
     /// </summary>
-    /// <param name="level">the level of the node requesting the lookup</param>
-    /// <returns>the index of the first leaf node</returns>
+    /// <param name="level">The level of the node requesting the lookup.</param>
+    /// <returns>The index of the first leaf node.</returns>
     public uint GetFirstIndex(byte level)
     {
         if (RootNodeLevel == level)
@@ -134,8 +135,10 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
         {
             SortedTreeNodeBase<TKey, SnapUInt32> currentNode = GetNode(nodeLevel);
             currentNode.SetNodeIndex(nodeIndexAddress);
+
             if (!currentNode.TryGetFirstRecord(m_tmpValue))
                 throw new Exception("Node is empty");
+
             nodeIndexAddress = m_tmpValue.Value;
             nodeLevel--;
         }
@@ -172,23 +175,34 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
     /// Gets the data for the following key.
     /// </summary>
     /// <param name="key">The key to look up. Only uses the key portion of the TKeyValue</param>
-    /// <param name="level"></param>
+    /// <param name="level">The level in the sorted tree that the search is at.</param>
+    /// <returns>
+    /// The value associated with the specified key at the given level, or a default value
+    /// if the key is not found in the sorted tree.
+    /// </returns>
     public uint Get(TKey key, byte level)
     {
         if (RootNodeLevel == 0)
             return RootNodeIndexAddress;
+
         SortedTreeNodeBase<TKey, SnapUInt32> node = FindNode(key, level + 1);
         node.GetOrGetNext(key, m_tmpValue);
+
         return m_tmpValue.Value;
     }
 
     /// <summary>
     /// Updates the specified leaf node to the provided key.
     /// </summary>
+    /// <param name="oldKey">The old key that is to be updated.</param>
+    /// <param name="newKey">The new key to replace the old key.</param>
+    /// <param name="level">The level of the node.</param>
+    /// <exception cref="Exception">Thrown if key of root cannot be updated.</exception>
     public void UpdateKey(TKey oldKey, TKey newKey, byte level)
     {
         if (level <= RootNodeLevel)
             GetNode(level).UpdateKey(oldKey, newKey);
+
         else
             throw new Exception("Cannot update key of root");
     }
@@ -196,9 +210,9 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
     /// <summary>
     /// Updates the value for the provided key.
     /// </summary>
-    /// <param name="key"></param>
-    /// <param name="value"></param>
-    /// <param name="level"></param>
+    /// <param name="key">The key whose value is to be updated.</param>
+    /// <param name="value">The value to be updated associated with the key.</param>
+    /// <param name="level">The level of the node.</param>
     public void UpdateValue(TKey key, SnapUInt32 value, byte level)
     {
         if (level <= RootNodeLevel)
@@ -210,8 +224,8 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
     /// <summary>
     /// Removes the specified leaf node from the sparse index
     /// </summary>
-    /// <param name="key">The leaf node to remove</param>
-    /// <param name="level"></param>
+    /// <param name="key">The leaf node to remove.</param>
+    /// <param name="level">The level of the node being removed.</param>
     public void Remove(TKey key, byte level)
     {
         if (level <= RootNodeLevel)
@@ -242,10 +256,10 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
     /// <summary>
     /// When attempting to remove or combine a node, we must check the parent to find which one will be supported to remove.
     /// </summary>
-    /// <param name="key">the lower key of the node that is being combined or removed.</param>
-    /// <param name="level">the level</param>
-    /// <param name="canCombineLeft">outputs true if this node may be combined with the left node.</param>
-    /// <param name="canCombineRight">outputs false if this node may be combined with the right node.</param>
+    /// <param name="key">The lower key of the node that is being combined or removed.</param>
+    /// <param name="level">The level of the node where combination is occurring.</param>
+    /// <param name="canCombineLeft">Outputs <c>true</c> if this node may be combined with the left node; otherwise, <c>false</c>.</param>
+    /// <param name="canCombineRight">Outputs <c>true</c> if this node may be combined with the right node; otherwise, <c>false</c>.</param>
     public void CanCombineWithSiblings(TKey key, byte level, out bool canCombineLeft, out bool canCombineRight)
     {
         if (level <= RootNodeLevel)
@@ -280,8 +294,8 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
     /// <summary>
     /// Creates a new root node by combining the current root node with the provided node data.
     /// </summary>
-    /// <param name="leafKey"></param>
-    /// <param name="leafNodeIndex"></param>
+    /// <param name="leafKey">The type of leaf being combined.</param>
+    /// <param name="leafNodeIndex">The index that specifies location of the leaf node.</param>
     private void CreateNewRootNode(TKey leafKey, uint leafNodeIndex)
     {
         if (RootNodeLevel + 1 > 250)
@@ -319,7 +333,7 @@ public sealed class SparseIndex<TKey> where TKey : SnapTypeBase<TKey>, new()
     /// <summary>
     /// Sets the capacity to the following number of levels.
     /// </summary>
-    /// <param name="count">the number of levels to include.</param>
+    /// <param name="count">The number of levels to include.</param>
     private void SetCapacity(int count)
     {
         m_nodes = new SortedTreeNodeBase<TKey, SnapUInt32>[count];

@@ -71,9 +71,16 @@ public class ReadSnapshot
     #region [ Methods ]
 
     /// <summary>
-    /// Opens an ArchiveFileStream that can be used to read the file passed to this function.
+    /// Opens an ArchiveFileStream that can be used to read the fspecified file.
     /// </summary>
     /// <param name="fileIndex">The index of the file to open.</param>
+    /// <returns>An ArchiveFileStream for reading the specified file.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="fileIndex"/> is out of range.</exception>
+    /// <remarks>
+    /// This method allows you to open an ArchiveFileStream for reading a file identified by its index.
+    /// The provided <paramref name="fileIndex"/> is used to locate and open the corresponding file.
+    /// </remarks>
+
     public SubFileStream OpenFile(int fileIndex)
     {
         if (fileIndex < 0 || fileIndex >= Header.Files.Count)
@@ -83,8 +90,16 @@ public class ReadSnapshot
     }
 
     /// <summary>
-    /// Opens an ArchiveFileStream that can be used to read/write to the file passed to this function.
+    /// Opens an ArchiveFileStream that can be used to read or write to the specified file.
     /// </summary>
+    /// <param name="fileName">The name of the file to open.</param>
+    /// <returns>An ArchiveFileStream for reading the specified file.</returns>
+    /// <exception cref="Exception">Thrown if the specified file does not exist.</exception>
+    /// <remarks>
+    /// This method allows you to open an ArchiveFileStream for reading a file identified by its name.
+    /// The provided <paramref name="fileName"/> is used to locate and open the corresponding file.
+    /// </remarks>
+
     public SubFileStream OpenFile(SubFileName fileName)
     {
         for (int x = 0; x < Header.Files.Count; x++)

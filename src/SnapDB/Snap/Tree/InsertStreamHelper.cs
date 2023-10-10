@@ -82,6 +82,8 @@ public class InsertStreamHelper<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     /// <summary>
     /// Initializes a new instance of the <see cref="InsertStreamHelper{TKey, TValue}"/> class.
     /// </summary>
+    /// <param name="stream">The input TreeStream to initialize the helper.</param>
+
     public InsertStreamHelper(TreeStream<TKey, TValue> stream)
     {
         Stream = stream;

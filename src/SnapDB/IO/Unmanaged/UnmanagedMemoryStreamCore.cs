@@ -164,6 +164,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// <summary>
     /// Create a new <see cref="UnmanagedMemoryStreamCore"/> that allocates its own unmanaged memory.
     /// </summary>
+    /// <param name="allocationSize">The set definition for the allocation memory capacity.</param>
     protected UnmanagedMemoryStreamCore(int allocationSize = 4096)
     {
         if (!BitMath.IsPowerOfTwo(allocationSize) || allocationSize < 4096 || allocationSize > 1024 * 1024)
@@ -297,6 +298,8 @@ public class UnmanagedMemoryStreamCore : IDisposable
     /// <summary>
     /// Gets a block for the following IO session.
     /// </summary>
+    /// <param name="args">The BlockArguments specifying the block's position and length.</param>
+
     public void GetBlock(BlockArguments args)
     {
         if (IsDisposed)

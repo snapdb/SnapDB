@@ -43,6 +43,7 @@ public partial class MemoryPoolStream : MemoryPoolStreamCore, ISupportsBinaryStr
     /// <summary>
     /// Create a new <see cref="MemoryPoolStream"/>
     /// </summary>
+    /// <param name="pool">The memory pool to associate with the stream.</param>
     public MemoryPoolStream(MemoryPool pool) : base(pool)
     {
         BlockSize = pool.PageSize;
@@ -78,6 +79,7 @@ public partial class MemoryPoolStream : MemoryPoolStreamCore, ISupportsBinaryStr
     /// <summary>
     /// Creates a new binary from an IO session.
     /// </summary>
+    /// <returns>The newly created binary stream.</returns>
     public BinaryStreamBase CreateBinaryStream()
     {
         return new BinaryStream(this);
@@ -86,6 +88,7 @@ public partial class MemoryPoolStream : MemoryPoolStreamCore, ISupportsBinaryStr
     /// <summary>
     /// Acquire an IO Session.
     /// </summary>
+    /// <returns>The newly created IO session.</returns>
     public BinaryStreamIoSessionBase CreateIoSession()
     {
         return new IoSession(this);

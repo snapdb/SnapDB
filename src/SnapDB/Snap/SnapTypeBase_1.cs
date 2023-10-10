@@ -51,9 +51,9 @@ public abstract class SnapTypeBase<T> : SnapTypeBase, IComparable<T>, IEquatable
     #region [ Methods ]
 
     /// <summary>
-    /// Copies the source to the destination
+    /// Copies the source to the destination.
     /// </summary>
-    /// <param name="destination"></param>
+    /// <param name="destination">The destination for the source to be copied to.</param>
     public abstract void CopyTo(T destination);
 
     /// <summary>

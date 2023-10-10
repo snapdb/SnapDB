@@ -57,10 +57,10 @@ public class IntegratedSecurityUserCredential
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates user credentials
+    /// Creates user credentials.
     /// </summary>
-    /// <param name="username"></param>
-    /// <param name="userToken"></param>
+    /// <param name="username">The created name for the user.</param>
+    /// <param name="userToken">The generated token to be associated with the user's chosen name.</param>
     public IntegratedSecurityUserCredential(string username, Guid userToken)
     {
         Username = username;
@@ -76,6 +76,8 @@ public class IntegratedSecurityUserCredential
     /// <summary>
     /// Loads user credentials from the supplied stream.
     /// </summary>
+    /// <param name="stream">The binary stream from which the state will be loaded.</param>
+
     public IntegratedSecurityUserCredential(Stream stream)
     {
         Load(stream);
@@ -88,7 +90,7 @@ public class IntegratedSecurityUserCredential
     /// <summary>
     /// Saves to the supplied stream.
     /// </summary>
-    /// <param name="stream"></param>
+    /// <param name="stream">The binary stream to which the state will be saved.</param>
     public void Save(Stream stream)
     {
         stream.WriteByte(1);
@@ -100,7 +102,7 @@ public class IntegratedSecurityUserCredential
     /// <summary>
     /// Loads from the supplied stream.
     /// </summary>
-    /// <param name="stream"></param>
+    /// <param name="stream">The binary stream from which the state will be loaded.</param>
     public void Load(Stream stream)
     {
         byte version = stream.ReadNextByte();

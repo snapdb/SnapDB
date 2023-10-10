@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  FirstStageWriter`2.cs - Gbtc
+//  FirstStageWriter.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -36,6 +36,8 @@ namespace SnapDB.Snap.Services.Writer;
 /// <summary>
 /// Handles how data is initially taken from pre-stage chunks and serialized to the disk.
 /// </summary>
+/// <typeparam name="TKey">The key type used in the sorted tree table.</typeparam>
+/// <typeparam name="TValue">The value type used in the sorted tree table.</typeparam>
 public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
@@ -72,8 +74,16 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates a stage writer.
+    /// Initializes a new instance of the FirstStageWriter class with the provided settings and archive list.
     /// </summary>
+    /// <param name="settings">The settings to configure the FirstStageWriter.</param>
+    /// <param name="list">The archive list to associate with the FirstStageWriter.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="settings"/> is null.</exception>
+    /// <remarks>
+    /// This constructor initializes a new instance of the FirstStageWriter class with the specified <paramref name="settings"/> and
+    /// associates it with the given <paramref name="list"/>.
+    /// It creates necessary internal objects, such as archive initializers, reset events, and task schedulers, to manage the first stage of writing.
+    /// </remarks>
     public FirstStageWriter(FirstStageWriterSettings settings, ArchiveList<TKey, TValue> list) : base(MessageClass.Framework)
     {
         if (settings is null)
@@ -288,9 +298,9 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
     }
 
     /// <summary>
-    /// Triggers a rollover if the provided sequence id has not yet been committed.
+    /// Triggers a rollover if the provided sequence ID has not yet been committed.
     /// </summary>
-    /// <param name="sequenceId"></param>
+    /// <param name="sequenceId">The provided sequence ID to commit.</param>
     public void Commit(long sequenceId)
     {
         lock (m_syncRoot)

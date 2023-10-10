@@ -133,11 +133,12 @@ public static class TimestampPointIdSeekFilter
     #region [ Static ]
 
     /// <summary>
-    /// Creates a filter for the specified timestamp and point ID.
+    /// Creates a new SeekFilterBase instance for finding a key based on a timestamp and point ID.
     /// </summary>
-    /// <param name="timestamp">The specific timestamp to find.</param>
-    /// <param name="pointId">The specific point ID to find.</param>
-    /// <returns>Seek filter to find specific key.</returns>
+    /// <typeparam name="TKey">The type of key that implements TimestampPointIdBase.</typeparam>
+    /// <param name="timestamp">The specific timestamp to seek.</param>
+    /// <param name="pointId">The specific point ID to seek.</param>
+    /// <returns>A SeekFilterBase instance configured to seek the specified timestamp and point ID.</returns>
     public static SeekFilterBase<TKey> FindKey<TKey>(ulong timestamp, ulong pointId) where TKey : TimestampPointIdBase<TKey>, new()
     {
         return new SeekToKey<TKey>(timestamp, pointId);

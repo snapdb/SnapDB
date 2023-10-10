@@ -49,11 +49,11 @@ public class IntegratedSecurityUserCredentials
     #region [ Methods ]
 
     /// <summary>
-    /// Gets if the user exists in the database
+    /// Gets if the user exists in the database.
     /// </summary>
-    /// <param name="identity">the identity to check</param>
+    /// <param name="identity">The identity to check.</param>
     /// <param name="token">The token to extract for the user.</param>
-    /// <returns>true if the user exists</returns>
+    /// <returns><c>true</c> if the user exists; otherwise, <c>false</c>.</returns>
     public bool TryGetToken(IIdentity identity, out Guid token)
     {
         token = Guid.Empty;
@@ -77,7 +77,7 @@ public class IntegratedSecurityUserCredentials
     /// <summary>
     /// Adds the specified user to the credentials database.
     /// </summary>
-    /// <param name="username"></param>
+    /// <param name="username">The username of the new user to add.</param>
     public void AddUser(string username)
     {
         AddUser(username, Guid.NewGuid());
@@ -86,8 +86,8 @@ public class IntegratedSecurityUserCredentials
     /// <summary>
     /// Adds the specified user to the credentials database.
     /// </summary>
-    /// <param name="username"></param>
-    /// <param name="userToken"></param>
+    /// <param name="username">The username of the new user to add.</param>
+    /// <param name="userToken">The token to be associated with the username.</param>
     public void AddUser(string username, Guid userToken)
     {
         IntegratedSecurityUserCredential user = new(username, userToken);
@@ -99,7 +99,7 @@ public class IntegratedSecurityUserCredentials
     /// <summary>
     /// Saves to the supplied stream.
     /// </summary>
-    /// <param name="stream"></param>
+    /// <param name="stream">The binary stream to which the users will be saved.</param>
     public void Save(Stream stream)
     {
         stream.WriteByte(1);
@@ -116,7 +116,7 @@ public class IntegratedSecurityUserCredentials
     /// <summary>
     /// Loads from the supplied stream.
     /// </summary>
-    /// <param name="stream"></param>
+    /// <param name="stream">The binary stream from which the users will be loaded.</param>
     public void Load(Stream stream)
     {
         byte version = stream.ReadNextByte();

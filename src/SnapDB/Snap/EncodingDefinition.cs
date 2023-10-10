@@ -241,9 +241,9 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     /// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="System.Object"/>.
     /// </summary>
     /// <returns>
-    /// true if the specified object  is equal to the current object; otherwise, false.
+    /// <c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.
     /// </returns>
-    /// <param name="obj">The object to compare with the current object. </param>
+    /// <param name="obj">The object to compare with the current object.</param>
     public override bool Equals(object? obj)
     {
         if (obj is not EncodingDefinition o)
@@ -326,6 +326,9 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     /// <summary>
     /// Checks for inequality between two encoding definitions.
     /// </summary>
+    /// <param name="a">The first encoding definition to compare.</param>
+    /// <param name="b">The second encoding definition to compare against.</param>
+    /// <returns><c>true</c> if inequal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(EncodingDefinition a, EncodingDefinition b)
     {
         return !(a == b);
@@ -334,12 +337,17 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     /// <summary>
     /// Checks for equality between two encoding definitions.
     /// </summary>
+    /// <param name="a">The first encoding definition to compare.</param>
+    /// <param name="b">The second encoding definition to compare against.</param>
+    /// <returns><c>true</c> if equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(EncodingDefinition a, EncodingDefinition b)
     {
         if (ReferenceEquals(a, b))
             return true;
+
         if (a is null)
             return false;
+
         return a.Equals(b);
     }
 

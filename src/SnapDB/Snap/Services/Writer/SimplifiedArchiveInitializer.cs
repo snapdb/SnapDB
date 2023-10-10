@@ -34,6 +34,8 @@ namespace SnapDB.Snap.Services.Writer;
 /// <summary>
 /// Creates new archive files based on user settings.
 /// </summary>
+/// <typeparam name="TKey">The key type used in the sorted tree table.</typeparam>
+/// <typeparam name="TValue">The value type used in the sorted tree table.</typeparam>
 public class SimplifiedArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
@@ -47,7 +49,7 @@ public class SimplifiedArchiveInitializer<TKey, TValue> where TKey : SnapTypeBas
     /// <summary>
     /// Creates a <see cref="ArchiveInitializer{TKey,TValue}"/>
     /// </summary>
-    /// <param name="settings"></param>
+    /// <param name="settings">The settings to apply to the ne w<see cref="ArchiveInitializer{TKey, TValue}"/>.</param>
     public SimplifiedArchiveInitializer(SimplifiedArchiveInitializerSettings settings)
     {
         Settings = settings.CloneReadonly();
@@ -71,7 +73,7 @@ public class SimplifiedArchiveInitializer<TKey, TValue> where TKey : SnapTypeBas
     /// <summary>
     /// Replaces the existing settings with this new set.
     /// </summary>
-    /// <param name="settings"></param>
+    /// <param name="settings">The new set of settings.</param>
     public void UpdateSettings(SimplifiedArchiveInitializerSettings settings)
     {
         settings = settings.CloneReadonly();

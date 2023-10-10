@@ -94,6 +94,11 @@ public class ArchiveDetails
     /// <summary>
     /// Creates a <see cref="ArchiveDetails"/> from a specific <see cref="ArchiveTableSummary{TKey,TValue}"/>
     /// </summary>
+    /// <typeparam name="TKey">The type of the archive's keys.</typeparam>
+    /// <typeparam name="TValue">The type of the archive's values.</typeparam>
+    /// <param name="table">The ArchiveTableSummary to create details from.</param>
+    /// <returns>An ArchiveDetails object containing information about the archive table.</returns>
+
     public static ArchiveDetails Create<TKey, TValue>(ArchiveTableSummary<TKey, TValue> table) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         ArchiveDetails details = new()

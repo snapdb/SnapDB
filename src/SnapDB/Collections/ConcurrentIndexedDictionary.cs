@@ -32,9 +32,11 @@ namespace SnapDB.Collections;
 /// <summary>
 /// A thread-safe indexed dictionary that can only be added to.
 /// </summary>
+/// <typeparam name="TKey">The type of keys in the dictionary.</typeparam>
+/// <typeparam name="TValue">The type of values in the dictionary.</typeparam>
 /// <remarks>
-/// This is a special purpose class that supports only the 'Add' and 'Get' operations.
-/// It is designed to have indexing and dictionary lookup capabilities.
+/// This is a special purpose class that supports only the "add" and "get" operations.
+/// It is designed for indexing and dicitionary lookup capabilities.
 /// </remarks>
 public class ConcurrentIndexedDictionary<TKey, TValue> where TKey : notnull
 {

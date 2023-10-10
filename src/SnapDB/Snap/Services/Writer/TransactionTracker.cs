@@ -53,11 +53,16 @@ public class TransactionTracker<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
 
         #region [ Constructors ]
 
+        /// <summary>
+        /// Initializes a new instance of the WaitForCommit class with the specified transaction ID.
+        /// </summary>
+        /// <param name="transactionId">The transaction ID to wait for.</param>
         public WaitForCommit(long transactionId)
         {
             TransactionId = transactionId;
             m_resetEvent = new ManualResetEvent(false);
         }
+
 
         #endregion
 
@@ -107,8 +112,8 @@ public class TransactionTracker<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     /// <summary>
     /// Creates a new transaction tracker that monitors the provided buffers.
     /// </summary>
-    /// <param name="prebuffer"></param>
-    /// <param name="firstStageWriter"></param>
+    /// <param name="prebuffer">The prebuffer to track transactions.</param>
+    /// <param name="firstStageWriter">The first stage writer to monitor for transaction commits.</param>
     public TransactionTracker(PrebufferWriter<TKey, TValue> prebuffer, FirstStageWriter<TKey, TValue> firstStageWriter)
     {
         m_waitingForHardCommit = new List<WaitForCommit>();
@@ -130,7 +135,7 @@ public class TransactionTracker<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     /// <summary>
     /// Wait for the specified transaction to commit to memory.
     /// </summary>
-    /// <param name="transactionId"></param>
+    /// <param name="transactionId">The transaction ID to wait for.</param>
     public void WaitForSoftCommit(long transactionId)
     {
         lock (m_syncRoot)
@@ -155,7 +160,7 @@ public class TransactionTracker<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     /// <summary>
     /// Waits for the specified transaction to commit to the disk.
     /// </summary>
-    /// <param name="transactionId"></param>
+    /// <param name="transactionId">The transaction ID to wait for.</param>
     public void WaitForHardCommit(long transactionId)
     {
         bool triggerSoft = false;
@@ -186,7 +191,7 @@ public class TransactionTracker<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     /// <summary>
     /// Event handler.
     /// </summary>
-    /// <param name="transactionId"></param>
+    /// <param name="transactionId">The transaction ID to wait for.</param>
     private void TransactionSoftCommitted(long transactionId)
     {
         lock (m_syncRoot)
@@ -207,7 +212,7 @@ public class TransactionTracker<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     /// <summary>
     /// Event handler.
     /// </summary>
-    /// <param name="transactionId"></param>
+    /// <param name="transactionId">The transaction ID to wait for.</param>
     private void TransactionHardCommitted(long transactionId)
     {
         lock (m_syncRoot)

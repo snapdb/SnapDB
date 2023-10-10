@@ -81,6 +81,7 @@ public partial class SnapServer : DisposableLoggingClassBase
     /// <summary>
     /// Creates a new instance of <see cref="SnapServer"/> and adds the supplied database
     /// </summary>
+    /// <param name="settings">The settings to apply to the <see cref="SnapServer"/>.</param>
     public SnapServer(IToServerDatabaseSettings settings) : this()
     {
         AddDatabase(settings);
@@ -89,6 +90,7 @@ public partial class SnapServer : DisposableLoggingClassBase
     /// <summary>
     /// Creates a new instance of <see cref="SnapServer"/>
     /// </summary>
+    /// <param name="settings">The settings to apply to the new <see cref="SnapServer"/>.</param>
     public SnapServer(IToServerSettings settings) : this()
     {
         if (settings is null)
@@ -140,6 +142,15 @@ public partial class SnapServer : DisposableLoggingClassBase
         }
     }
 
+    /// <summary>
+    /// Adds a database to the server using the provided database configuration.
+    /// </summary>
+    /// <param name="databaseConfig">The database configuration to add to the server.</param>
+    /// <remarks>
+    /// This method adds a new database to the server based on the provided <paramref name="databaseConfig"/>.
+    /// It converts the database configuration from an <see cref="IToServerDatabaseSettings"/> object to
+    /// a <see cref="ServerDatabaseSettings"/> object before adding it to the server.
+    /// </remarks>
     public void AddDatabase(IToServerDatabaseSettings databaseConfig)
     {
         AddDatabase(databaseConfig.ToServerDatabaseSettings());

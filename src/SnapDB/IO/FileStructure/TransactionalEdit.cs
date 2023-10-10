@@ -130,6 +130,7 @@ public sealed class TransactionalEdit : IDisposable
     /// <summary>
     /// Releases all the resources used by the <see cref="ReadSnapshot"/> object.
     /// </summary>
+    /// <returns>null</returns>
     public void Dispose()
     {
         if (m_disposed)
@@ -142,6 +143,10 @@ public sealed class TransactionalEdit : IDisposable
     /// <summary>
     /// Creates and opens a new file on the current file system.
     /// </summary>
+    /// <param name="fileName">The specified name of the file.</param>
+    /// <returns>
+    /// The newly opened file.
+    /// </returns>
     public SubFileStream CreateFile(SubFileName fileName)
     {
         if (m_disposed)
@@ -156,6 +161,7 @@ public sealed class TransactionalEdit : IDisposable
     /// Opens a ArchiveFileStream that can be used to read/write to the file passed to this function.
     /// </summary>
     /// <param name="fileIndex">The index of the file to open.</param>
+    /// <returns>A SubFileStream representing the opened file.</returns>
     public SubFileStream OpenFile(int fileIndex)
     {
         if (m_disposed)
@@ -175,6 +181,8 @@ public sealed class TransactionalEdit : IDisposable
     /// <summary>
     /// Opens a ArchiveFileStream that can be used to read and write to the file passed to this function.
     /// </summary>
+    /// <param name="fileName">The name of the specified file to be passed to the function.</param>
+    /// <returns>Exception if file does not exist, otherwise, the file passed to the function.</returns>
     public SubFileStream OpenFile(SubFileName fileName)
     {
         if (m_disposed)

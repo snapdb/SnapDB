@@ -34,6 +34,8 @@ namespace SnapDB.Snap.Services;
 /// until <see cref="ArchiveListEditor.Dispose"/> is called. Therefore, keep locks to a minimum and always
 /// use a Using block.
 /// </summary>
+/// <typeparam name="TKey">The key type for the archive list.</typeparam>
+/// <typeparam name="TValue">The value type for the archive list.</typeparam>
 public abstract class ArchiveListEditor<TKey, TValue> : ArchiveListEditor where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Methods ]

@@ -61,10 +61,10 @@ public class SimplifiedFileWriter : IDisposable
     /// <summary>
     /// Creates a simplified file writer.
     /// </summary>
-    /// <param name="pendingFileName"></param>
-    /// <param name="completeFileName"></param>
-    /// <param name="blockSize"></param>
-    /// <param name="flags"></param>
+    /// <param name="pendingFileName">The name of the pending file.</param>
+    /// <param name="completeFileName">The name of the complete file.</param>
+    /// <param name="blockSize">The size of data blocks within the file.</param>
+    /// <param name="flags">Optional flags associated with the file.</param>>
     public SimplifiedFileWriter(string pendingFileName, string completeFileName, int blockSize, params Guid[] flags)
     {
         m_pendingFileName = pendingFileName;

@@ -94,6 +94,8 @@ public abstract class TreeStream<TKey, TValue> : IDisposable where TKey : class,
     /// Advances the stream to the next value.
     /// If before the beginning of the stream, advances to the first value
     /// </summary>
+    /// <param name="key">The key to be advanced to.</param>
+    /// <param name="value">The value associated with the key to be advanced to.</param>
     /// <returns><c>true</c> if the advance was successful; otherwise, <c>false</c> if the end of the stream was reached.</returns>
     public bool Read(TKey key, TValue value)
     {
@@ -115,8 +117,9 @@ public abstract class TreeStream<TKey, TValue> : IDisposable where TKey : class,
     }
 
     /// <summary>
-    /// Allow rolling back the EOS
+    /// Sets the end-of-stream (EOS) flag, indicating whether the stream has reached its end.
     /// </summary>
+    /// <param name="value">The value to set for the EOS flag.</param>
     /// <exception cref="ObjectDisposedException">
     /// Thrown if <paramref name="value"/> is <c>false</c> and this class
     /// has already been disposed.
@@ -132,6 +135,8 @@ public abstract class TreeStream<TKey, TValue> : IDisposable where TKey : class,
     /// Advances the stream to the next value.
     /// If before the beginning of the stream, advances to the first value
     /// </summary>
+    /// <param name="key">The key to be advanced to.</param>
+    /// <param name="value">The value associated with the key to be advanced to.</param>
     /// <returns>
     /// <c>true</c> if the advance was successful; <c>false</c> if the end of the stream was reached.
     /// </returns>

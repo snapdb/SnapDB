@@ -165,7 +165,7 @@ public class RolloverLogFile
     /// <summary>
     /// Recovers this rollover during an application crash.
     /// </summary>
-    /// <param name="list"></param>
+    /// <param name="list">The archive list to recover.</param>
     public void Recover(ArchiveList list)
     {
         using (ArchiveListEditor edit = list.AcquireEditLock())

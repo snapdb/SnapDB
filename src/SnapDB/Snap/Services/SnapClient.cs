@@ -64,6 +64,8 @@ public abstract class SnapClient : DisposableLoggingClassBase
     /// Accesses <see cref="ClientDatabaseBase{TKey,TValue}"/> for given <paramref name="databaseName"/>.
     /// </summary>
     /// <param name="databaseName">Name of database instance to access.</param>
+    /// <typeparam name="TKey">The type of key to access.</typeparam>
+    /// <typeparam name="TValue">The type of value associated with the key to access.</typeparam>
     /// <returns><see cref="ClientDatabaseBase{TKey,TValue}"/> for given <paramref name="databaseName"/>.</returns>
     public abstract ClientDatabaseBase<TKey, TValue> GetDatabase<TKey, TValue>(string databaseName) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new();
 

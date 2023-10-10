@@ -50,8 +50,11 @@ public class SecureStreamClientIntegratedSecurity : SecureStreamClientBase
     }
 
     /// <summary>
-    /// Creates a new <see cref="SecureStreamClientIntegratedSecurity"/>
+    /// Creates a new <see cref="SecureStreamClientIntegratedSecurity"/>.
     /// </summary>
+    /// <param name="username">The username for authentication.</param>
+    /// <param name="password">The password for authentication.</param>
+    /// <param name="domain">The domain for authentication (if applicable).</param>
     public SecureStreamClientIntegratedSecurity(string username, string password, string domain)
     {
         m_client = new IntegratedSecurityClient(username, password, domain);

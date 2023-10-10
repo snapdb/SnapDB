@@ -60,7 +60,7 @@ public class ScramServer
     /// <summary>
     /// Requests that the provided stream be authenticated.
     /// </summary>
-    /// <param name="stream"></param>
+    /// <param name="stream">The binary stream to which the users will be saved.</param>
     /// <param name="additionalChallenge">
     /// Additional data to include in the challenge. If using SSL certificates,
     /// adding the thumbprint to the challenge will allow detecting man in the middle attacks.

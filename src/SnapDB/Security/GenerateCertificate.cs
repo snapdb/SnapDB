@@ -69,8 +69,15 @@ public static class GenerateCertificate
     }
 
     /// <summary>
-    /// Creates new certificate.
+    /// Creates new certificate with the specified attributes and saves it to a file.
     /// </summary>
+    /// <param name="subjectDirName">The distinguished name for the subject.</param>
+    /// <param name="startDate">The validity start date of the certificate.</param>
+    /// <param name="endDate">The validity end date of the certificate.</param>
+    /// <param name="signatureBits">The number of bits for the signature algorithm.</param>
+    /// <param name="keyStrength">The key strength for generating public/private key pairs.</param>
+    /// <param name="password">The password to protect the private key in the PKCS#12 file.</param>
+    /// <param name="fileName">The name of the PKCS#12 file to save the certificate.</param>
     public static void CreateSelfSignedCertificate(string subjectDirName, DateTime startDate, DateTime endDate, int signatureBits, int keyStrength, string password, string fileName)
     {
         string signatureAlgorithm = signatureBits switch

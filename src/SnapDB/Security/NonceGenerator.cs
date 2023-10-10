@@ -58,6 +58,7 @@ public unsafe class NonceGenerator
     {
         if (length < 16)
             throw new ArgumentOutOfRangeException(nameof(length), "Cannot be less than 16");
+
         m_nonceNumber = 0;
         m_startingNonce = new byte[length];
         using RNGCryptoServiceProvider rng = new();
@@ -71,6 +72,7 @@ public unsafe class NonceGenerator
     /// <summary>
     /// Gets the next nonce value.
     /// </summary>
+    /// <returns>The next nonce value.</returns>
     public byte[] Next()
     {
         long date = Stopwatch.GetTimestamp();

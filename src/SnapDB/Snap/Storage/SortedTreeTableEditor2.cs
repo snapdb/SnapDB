@@ -29,9 +29,10 @@ using SnapDB.Snap.Tree;
 namespace SnapDB.Snap.Storage;
 
 /// <summary>
-/// A single instance editor that is used
-/// to modifiy an archive file.
+/// A single instance editor that is used to modify an archive file.
 /// </summary>
+/// <typeparam name="TKey">The key type for the sorted tree table editor.</typeparam>
+/// <typeparam name="TValue">The value type for the sorted tree table editor.</typeparam>
 public abstract class SortedTreeTableEditor<TKey, TValue> : IDisposable where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
@@ -96,14 +97,14 @@ public abstract class SortedTreeTableEditor<TKey, TValue> : IDisposable where TK
     /// <summary>
     /// Adds a single point to the archive file.
     /// </summary>
-    /// <param name="key">The key</param>
-    /// <param name="value">the value</param>
+    /// <param name="key">The key to be added.</param>
+    /// <param name="value">The value associated with the key to be added.</param>
     public abstract void AddPoint(TKey key, TValue value);
 
     /// <summary>
     /// Adds all of the points to this archive file.
     /// </summary>
-    /// <param name="stream"></param>
+    /// <param name="stream">The stream of points to be added to the archive file.</param>
     public abstract void AddPoints(TreeStream<TKey, TValue> stream);
 
     /// <summary>

@@ -37,6 +37,8 @@ namespace SnapDB;
 /// Provides a buffer of point data where reads are isolated from writes.
 /// However, reads must be synchronized with other reads and writes must be synchronized with other writes.
 /// </summary>
+/// <typeparam name="T">The type of elements stored in the queue.</typeparam>
+
 public class IsolatedQueue<T>
 {
     #region [ Members ]
@@ -96,7 +98,7 @@ public class IsolatedQueue<T>
         /// <summary>
         /// Adds the following item to the queue. Be sure to check if it is full first.
         /// </summary>
-        /// <param name="item"></param>
+        /// <param name="item">The item to be added to the queue.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Enqueue(T item)
         {
@@ -190,9 +192,12 @@ public class IsolatedQueue<T>
     }
 
     /// <summary>
-    /// Attempts to dequeue the specified item from the <see cref="IsolatedQueue{T}"/>.
+    /// Attempts to dequeue an item from the queue.
     /// </summary>
-    /// <param name="item">an output for the item.</param>
+    /// <param name="item">When this method returns, contains the dequeued item, if successful; otherwise, the default value for the type.</param>
+    /// <returns>
+    ///   <c>true</c> if an item was successfully dequeued; otherwise, <c>false</c>.
+    /// </returns>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public bool TryDequeue(out T item)
     {
@@ -200,6 +205,7 @@ public class IsolatedQueue<T>
         {
             item = m_currentTail.Dequeue();
             m_dequeueCount++;
+
             return true;
         }
 

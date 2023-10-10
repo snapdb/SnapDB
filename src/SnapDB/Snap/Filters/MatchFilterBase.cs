@@ -57,6 +57,7 @@ public abstract class MatchFilterBase<TKey, TValue>
     /// </summary>
     /// <param name="key">The key to check.</param>
     /// <param name="value">The value to check.</param>
+    /// <returns><c>true</c> if the key-value is contained in the filter; otherwise, false.</returns>
     public abstract bool Contains(TKey key, TValue value);
 
     #endregion

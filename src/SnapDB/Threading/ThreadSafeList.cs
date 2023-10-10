@@ -134,6 +134,7 @@ public partial class ThreadSafeList<T> : IEnumerable<T>
     /// Removes an item from the list.
     /// </summary>
     /// <param name="item">The item to remove from the list.</param>
+    /// <returns><c>true</c> if the item is successfully removed; otherwise, <c>false</c>.</returns>
     public bool Remove(T item)
     {
         Wrapper itemToRemove = null;

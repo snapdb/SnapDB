@@ -58,8 +58,10 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     }
 
     /// <summary>
-    /// Creates a new <see cref="ImmutableList{TKey}"/>.
+    /// 
     /// </summary>
+    /// <param name="capacity">The integer capacity that the list can hold.</param>
+    /// <param name="formatter">An optional formatter for the items in the list of type <typeparamref name="T"/>.</param>
     public ImmutableList(int capacity, Func<T?, T>? formatter = null)
     {
         m_formatter = formatter;

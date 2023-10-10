@@ -48,7 +48,9 @@ public abstract class SeekFilterDefinitionBase
     /// <summary>
     /// Determines if a key-value is contained in the filter.
     /// </summary>
-    /// <param name="stream">The value to check.</param>
+    /// <typeparam name="TKey">The type of keys in the seek filter.</typeparam>
+    /// <param name="stream">The binary stream to create the seek filter for.</param>
+    /// <returns>An instance of <see cref="SeekFilterBase{TKey}"/>.</returns>
     public abstract SeekFilterBase<TKey> Create<TKey>(BinaryStreamBase stream);
 
     #endregion

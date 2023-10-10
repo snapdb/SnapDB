@@ -36,6 +36,8 @@ namespace SnapDB.Snap.Services.Writer;
 /// Represents a series of stages that an archive file progresses through
 /// in order to properly condition the data.
 /// </summary>
+/// <typeparam name="TKey">The key type used in the sorted tree table.</typeparam>
+/// <typeparam name="TValue">The value type used in the sorted tree table.</typeparam>
 public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]

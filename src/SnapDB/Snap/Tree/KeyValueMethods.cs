@@ -59,8 +59,8 @@ public abstract class KeyValueMethods
 /// Allows combined operations on key/value methods. If a substantial amount of copying is occuring,
 /// overriding this method to support the specific copy can make things faster.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TKey">The key to be operated on.</typeparam>
+/// <typeparam name="TValue">The value associated with the key to be operated on.</typeparam>
 public class KeyValueMethods<TKey, TValue> : KeyValueMethods where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Properties ]
@@ -82,10 +82,10 @@ public class KeyValueMethods<TKey, TValue> : KeyValueMethods where TKey : SnapTy
     /// <summary>
     /// Copies the source values to the destination.
     /// </summary>
-    /// <param name="srcKey"></param>
-    /// <param name="srcValue"></param>
-    /// <param name="destKey"></param>
-    /// <param name="dstValue"></param>
+    /// <param name="srcKey">The source key to be copied to the destination.</param>
+    /// <param name="srcValue">The source value associated with the key to be copied to the destination.</param>
+    /// <param name="destKey">The copy key after it has reached the destination.</param>
+    /// <param name="dstValue">The copy value associated with the key after it has reached the destination.</param>
     public virtual void Copy(TKey srcKey, TValue srcValue, TKey destKey, TValue dstValue)
     {
         srcKey.CopyTo(destKey);
