@@ -27,7 +27,7 @@ namespace SnapDB.IO.FileStructure.Media;
 
 
 /// <summary>
-/// The <see cref="SnapDB.IO.FileStructure.Media"/> namespace organizes all common SnapDB library functionality related to ,
+/// The <see cref="Media"/> namespace organizes all common SnapDB library functionality related to ,
 /// e.g., the <see cref="DiskIoSession"/> class.
 /// </summary>
 [CompilerGenerated]

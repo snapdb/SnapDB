@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Snap.Storage;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Storage"/> namespace organizes all common SnapDB library functionality related to storing data,
+/// The <see cref="Storage"/> namespace organizes all common SnapDB library functionality related to storing data,
 /// e.g., the <see cref="SortedTreeFile"/> class.
 /// </summary>
 [CompilerGenerated]

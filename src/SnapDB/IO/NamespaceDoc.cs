@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.IO;
 
 /// <summary>
-/// The <see cref="SnapDB.IO"/> namespace organizes all common SnapDB library functionality related to I/O implementation,
+/// The <see cref="IO"/> namespace organizes all common SnapDB library functionality related to I/O implementation,
 /// e.g., the <see cref="BinaryStreamBase"/> class.
 /// </summary>
 [CompilerGenerated]

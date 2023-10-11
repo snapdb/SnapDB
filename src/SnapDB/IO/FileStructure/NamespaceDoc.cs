@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.IO.FileStructure;
 
 /// <summary>
-/// The <see cref="SnapDB.IO.FileStructure"/> namespace organizes all common SnapDB library functionality related to file and subfile structuring,
+/// The <see cref="FileStructure"/> namespace organizes all common SnapDB library functionality related to file and subfile structuring,
 /// e.g., the <see cref="FileHeaderBlock"/> class.
 /// </summary>
 [CompilerGenerated]

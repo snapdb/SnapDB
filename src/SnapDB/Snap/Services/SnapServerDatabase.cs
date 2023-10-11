@@ -139,7 +139,7 @@ public partial class SnapServerDatabase<TKey, TValue> : SnapServerDatabaseBase w
     }
 
     /// <summary>
-    /// Creates a <see cref="ClientDatabase"/>
+    /// Creates a <see cref="ClientDatabaseBase"/>
     /// </summary>
     /// <param name="client">The SnapClient instance that will use the created database.</param>
     /// <param name="onDispose">An optional action to execute when the client database is disposed.</param>

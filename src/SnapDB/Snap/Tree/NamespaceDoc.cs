@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Snap.Tree;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Tree"/> namespace organizes all common SnapDB library functionality related to sorted binary trees,
+/// The <see cref="Tree"/> namespace organizes all common SnapDB library functionality related to sorted binary trees,
 /// e.g., the <see cref="SortedTree{TKey, TValue}"/> class.
 /// </summary>
 [CompilerGenerated]

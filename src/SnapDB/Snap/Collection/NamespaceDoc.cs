@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Snap.Collection;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Collection"/> namespace contains the <see cref="SortedPointBuffer{TKey, TValue}"/> class.
+/// The <see cref="Collection"/> namespace contains the <see cref="SortedPointBuffer{TKey, TValue}"/> class.
 /// </summary>
 [CompilerGenerated]
 class NamespaceDoc

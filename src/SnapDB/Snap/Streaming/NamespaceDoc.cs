@@ -26,8 +26,8 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Snap.Streaming;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Streaming"/> namespace organizes all common SnapDB library functionality related to stream encoding,
-/// e.g., the <see cref="StreamEncodingGeneric{TKey, TValue}"/> class.
+/// The <see cref="Streaming"/> namespace organizes all common SnapDB library functionality related to stream encoding,
+/// e.g., the <see cref="StreamEncodingBase{TKey, TValue}"/> class.
 /// </summary>
 [CompilerGenerated]
 class NamespaceDoc

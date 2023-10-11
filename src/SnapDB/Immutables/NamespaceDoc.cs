@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Immutables;
 
 /// <summary>
-/// The <see cref="SnapDB.Immutables"/> namespace organizes all common SnapDB library functionality related to immutable objects,
+/// The <see cref="Immutables"/> namespace organizes all common SnapDB library functionality related to immutable objects,
 /// e.g., the <see cref="IImmutableObject"/> class.
 /// </summary>
 [CompilerGenerated]

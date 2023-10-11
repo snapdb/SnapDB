@@ -81,7 +81,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     /// Creates an ArchiveList
     /// </summary>
     /// <param name="settings">The settings for the archive list. Null will revert to a default setting.</param>
-    public ArchiveList(ArchiveListSettings settings = null)
+    public ArchiveList(ArchiveListSettings? settings = null)
     {
         settings ??= new ArchiveListSettings();
 

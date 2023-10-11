@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Snap.Types.UInt32;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Types.UInt32"/> namespace organizes all common SnapDB library functionality related to unsigned 32-bit integers,
+/// The <see cref="UInt32"/> namespace organizes all common SnapDB library functionality related to unsigned 32-bit integers,
 /// e.g., the <see cref="SnapUInt32"/> class.
 /// </summary>
 [CompilerGenerated]

@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Text;
 
 /// <summary>
-/// The <see cref="SnapDB.Text"/> namespace organizes all common SnapDB library functionality related to natural comparison mechanisms,
+/// The <see cref="Text"/> namespace organizes all common SnapDB library functionality related to natural comparison mechanisms,
 /// e.g., the <see cref="NaturalComparer"/> class.
 /// </summary>
 [CompilerGenerated]

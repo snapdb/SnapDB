@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Snap.Types;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Types"/> namespace organizes all common SnapDB library functionality related to timestamp information,
+/// The <see cref="Types"/> namespace organizes all common SnapDB library functionality related to timestamp information,
 /// e.g., the <see cref="TimestampBase{TKey}"/> class.
 /// </summary>
 [CompilerGenerated]

@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Snap.Types.Int32;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Types.Int32"/> namespace organizes all common SnapDB library functionality related to signed 32-bit integers,
+/// The <see cref="Int32"/> namespace organizes all common SnapDB library functionality related to signed 32-bit integers,
 /// e.g., the <see cref="SnapInt32"/> class.
 /// </summary>
 [CompilerGenerated]

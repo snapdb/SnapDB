@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Snap.Services.Writer;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Services.Writer"/> namespace organizes all common SnapDB library functionality related to writing capabilities,
+/// The <see cref="Writer"/> namespace organizes all common SnapDB library functionality related to writing capabilities,
 /// e.g., the <see cref="ArchiveInitializer{TKey, TValue}"/> class.
 /// </summary>
 [CompilerGenerated]

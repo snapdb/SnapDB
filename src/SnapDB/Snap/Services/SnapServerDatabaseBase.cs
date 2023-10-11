@@ -59,7 +59,7 @@ public abstract class SnapServerDatabaseBase : DisposableLoggingClassBase
     #region [ Methods ]
 
     /// <summary>
-    /// Creates a <see cref="SnapServerDatabase{TKey,TValue}.ClientDatabase"/>
+    /// Creates a <see cref="ClientDatabaseBase"/>.
     /// </summary>
     /// <param name="client">The SnapClient associated with the new client-specific database.</param>
     /// <param name="onDispose">An action to be executed when the client-specific database is disposed.</param>

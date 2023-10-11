@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Snap.Tree.Specialized;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Tree.Specialized"/> namespace organizes all common SnapDB library functionality related to sorted binary tree nodes,
+/// The <see cref="Specialized"/> namespace organizes all common SnapDB library functionality related to sorted binary tree nodes,
 /// e.g., the <see cref="SequentialSortedTreeWriter{TKey, TValue}"/> class.
 /// </summary>
 [CompilerGenerated]

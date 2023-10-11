@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Security.BouncyCastle;
 
 /// <summary>
-/// The <see cref="SnapDB.Security.BouncyCastle"/> namespace organizes all SnapDB library functionality related to SRP protocols.
+/// The <see cref="BouncyCastle"/> namespace organizes all SnapDB library functionality related to SRP protocols.
 /// </summary>
 [CompilerGenerated]
 internal class NamespaceDoc

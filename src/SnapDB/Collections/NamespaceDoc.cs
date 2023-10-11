@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Collections;
 
 /// <summary>
-/// The <see cref="SnapDB.Collections"/> namespace organizes all common SnapDB library functionality related to arrays, queues, lists, etc., 
+/// The <see cref="Collections"/> namespace organizes all common SnapDB library functionality related to arrays, queues, lists, etc., 
 /// e.g., the <see cref="LargeArray{T}"/> class.
 /// </summary>
 [CompilerGenerated]

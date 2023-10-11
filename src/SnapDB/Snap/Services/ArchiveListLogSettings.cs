@@ -31,7 +31,7 @@ using SnapDB.IO;
 namespace SnapDB.Snap.Services;
 
 /// <summary>
-/// The settings for a <see cref="ArchiveListLog"/>.
+/// The settings for an archive list log.
 /// </summary>
 public class ArchiveListLogSettings : SettingsBase<ArchiveListLogSettings>
 {

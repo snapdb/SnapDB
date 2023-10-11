@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Security;
 
 /// <summary>
-/// The <see cref="SnapDB.Security"/> namespace organizes all the common SnapDB library functionality related to security features,
+/// The <see cref="Security"/> namespace organizes all the common SnapDB library functionality related to security features,
 /// e.g., the <see cref="HashMethod"/> class.
 /// </summary>
 [CompilerGenerated]

@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Snap;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap"/> namespace organizes all common SnapDB library functionality related to general feature helpers,
+/// The <see cref="Snap"/> namespace organizes all common SnapDB library functionality related to general feature helpers,
 /// e.g., the <see cref="Library"/> class.
 /// </summary>
 [CompilerGenerated]

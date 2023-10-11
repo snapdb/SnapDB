@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Snap.Encoding;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Encoding"/> namespace organizes all common SnapDB library functionality related to encoding protocol,
+/// The <see cref="Encoding"/> namespace organizes all common SnapDB library functionality related to encoding protocol,
 /// e.g., the <see cref="EncodingLibrary"/> class.
 /// </summary>
 [CompilerGenerated]

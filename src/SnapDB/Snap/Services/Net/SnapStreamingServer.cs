@@ -83,7 +83,7 @@ public class SnapStreamingServer : DisposableLoggingClassBase
     #region [ Methods ]
 
     /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="SnapNetworkServer"/> object and optionally releases the managed resources.
+    /// Releases the unmanaged resources used by the <see cref="SnapStreamingServer"/> object and optionally releases the managed resources.
     /// </summary>
     /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
     protected override void Dispose(bool disposing)

@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.IO.Unmanaged;
 
 /// <summary>
-/// The <see cref="SnapDB.IO.Unmanaged"/> namespace organizes all common SnapDB library functionality related to stream tools,
+/// The <see cref="Unmanaged"/> namespace organizes all common SnapDB library functionality related to stream tools,
 /// e.g., the <see cref="MemoryPoolStream"/> class.
 /// </summary>
 [CompilerGenerated]

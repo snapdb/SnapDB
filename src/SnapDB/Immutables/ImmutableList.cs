@@ -34,39 +34,39 @@ namespace SnapDB.Immutables;
 /// unless they implement <see cref="IImmutableObject"/>.
 /// </summary>
 /// <typeparam name="T">List type.</typeparam>
-public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?>
+public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T>>, IList<T>
 {
     #region [ Members ]
 
-    private readonly Func<T?, T>? m_formatter;
+    private readonly Func<T, T>? m_formatter;
     private readonly bool m_isISupportsReadonlyType;
-    private List<T?> m_list;
+    private List<T> m_list;
 
     #endregion
 
     #region [ Constructors ]
 
     /// <summary>
-    /// Creates a new <see cref="ImmutableList{TKey}"/>.
+    /// Creates a new <see cref="ImmutableList{T}"/>.
     /// </summary>
     /// <param name="formatter">Allows items to be formatted when inserted into a list.</param>
-    public ImmutableList(Func<T?, T>? formatter = null)
+    public ImmutableList(Func<T, T>? formatter = null)
     {
         m_formatter = formatter;
         m_isISupportsReadonlyType = typeof(IImmutableObject).IsAssignableFrom(typeof(T));
-        m_list = new List<T?>();
+        m_list = new List<T>();
     }
 
     /// <summary>
-    /// 
+    /// Creates a new <see cref="ImmutableList{T}"/>.
     /// </summary>
     /// <param name="capacity">The integer capacity that the list can hold.</param>
     /// <param name="formatter">An optional formatter for the items in the list of type <typeparamref name="T"/>.</param>
-    public ImmutableList(int capacity, Func<T?, T>? formatter = null)
+    public ImmutableList(int capacity, Func<T, T>? formatter = null)
     {
         m_formatter = formatter;
         m_isISupportsReadonlyType = typeof(IImmutableObject).IsAssignableFrom(typeof(T));
-        m_list = new List<T?>(capacity);
+        m_list = new List<T>(capacity);
     }
 
     #endregion
@@ -84,7 +84,7 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     /// </summary>
     /// <returns>The element at the specified index.</returns>
     /// <param name="index">The zero-based index of the element to get or set.</param>
-    public T? this[int index]
+    public T this[int index]
     {
         get => m_list[index];
         set
@@ -109,13 +109,13 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     /// The collection whose elements should be added to the end of the <see cref="List{T}"/>.
     /// The collection itself cannot be <c>null</c>, but it can contain elements that are <c>null</c>.
     /// </param>
-    public void AddRange(IEnumerable<T?> collection)
+    public void AddRange(IEnumerable<T> collection)
     {
         TestForEditable();
 
         if (m_formatter is not null)
         {
-            foreach (T? item in collection)
+            foreach (T item in collection)
                 m_list.Add(m_formatter(item));
 
             return;
@@ -148,22 +148,22 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     {
         if (m_isISupportsReadonlyType)
         {
-            List<T?> oldList = m_list;
-            m_list = new List<T?>(oldList.Count);
+            List<T> oldList = m_list;
+            m_list = new List<T>(oldList.Count);
 
             for (int x = 0; x < oldList.Count; x++)
             {
                 IImmutableObject? item = (IImmutableObject?)oldList[x];
 
                 if (item is null)
-                    m_list.Add(default);
+                    m_list.Add(default!);
                 else
                     m_list.Add((T)item.CloneEditable());
             }
         }
         else
         {
-            m_list = new List<T?>(m_list);
+            m_list = new List<T>(m_list);
         }
     }
 
@@ -184,7 +184,7 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     /// <summary>Adds an item to the <see cref="ICollection"/>.</summary>
     /// <param name="item">The object to add to the <see cref="ICollection"/>.</param>
     /// <exception cref="NotSupportedException">The <see cref="ICollection"/> is read-only.</exception>
-    public void Add(T? item)
+    public void Add(T item)
     {
         TestForEditable();
 
@@ -205,7 +205,7 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     /// </summary>
     /// <returns><c>true</c> if <paramref name="item"/> is found in the <see cref="ICollection"/>; otherwise, <c>false</c>.</returns>
     /// <param name="item">The object to locate in the <see cref="ICollection"/>.</param>
-    public bool Contains(T? item)
+    public bool Contains(T item)
     {
         return m_list.Contains(item);
     }
@@ -218,7 +218,7 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     /// The <see cref="Array"/> must have zero-based indexing.
     /// </param>
     /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
-    public void CopyTo(T?[] array, int arrayIndex)
+    public void CopyTo(T[] array, int arrayIndex)
     {
         m_list.CopyTo(array, arrayIndex);
     }
@@ -226,40 +226,40 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T?>>, IList<T?
     /// <summary>
     /// Removes the first occurrence of a specific object from the <see cref="ICollection"/>.
     /// </summary>
+    /// <param name="item">The object to remove from the <see cref="ICollection"/>.</param>
     /// <returns>
     /// <c>true</c> if <paramref name="item"/> was successfully removed from the <see cref="ICollection"/>;
     /// otherwise, <c>false</c>. This method also returns false if <paramref name="item"/> is not found in the original <see cref="ICollection"/>.
     /// </returns>
-    /// <param name="item">The object to remove from the <see cref="ICollection"/>.</param>
-    public bool Remove(T? item)
+    public bool Remove(T item)
     {
         TestForEditable();
         return m_list.Remove(item);
     }
 
     /// <summary>
-    /// Determines the index of a specific item in the <see cref="IList"/>.
+    /// Determines the index of a specific item in the <see cref="IList{T}"/>.
     /// </summary>
+    /// <param name="item">The object to locate in the <see cref="IList{T}"/>.</param>
     /// <returns>The index of <paramref name="item"/> if found in the list; otherwise, -1.</returns>
-    /// <param name="item">The object to locate in the <see cref="IList"/>.</param>
-    public int IndexOf(T? item)
+    public int IndexOf(T item)
     {
         return m_list.IndexOf(item);
     }
 
     /// <summary>
-    /// Inserts an item to the <see cref="IList"/> at the specified index.
+    /// Inserts an item to the <see cref="IList{T}"/> at the specified index.
     /// </summary>
     /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
-    /// <param name="item">The object to insert into the <see cref="IList"/>.</param>
-    public void Insert(int index, T? item)
+    /// <param name="item">The object to insert into the <see cref="IList{T}"/>.</param>
+    public void Insert(int index, T item)
     {
         TestForEditable();
         m_list.Insert(index, m_formatter is null ? item : m_formatter(item));
     }
 
     /// <summary>
-    /// Removes the <see cref="IList"/> item at the specified index.
+    /// Removes the <see cref="IList{T}"/> item at the specified index.
     /// </summary>
     /// <param name="index">The zero-based index of the item to remove.</param>
     public void RemoveAt(int index)

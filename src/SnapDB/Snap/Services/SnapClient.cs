@@ -57,7 +57,6 @@ public abstract class SnapClient : DisposableLoggingClassBase
     /// The <see cref="GetDatabase"/> method retrieves a client database with the specified <paramref name="databaseName"/>.
     /// If a database with the specified name does not exist, this method may return null or throw an exception.
     /// </remarks>
-    /// <seealso cref="ClientDatabaseBase"/>
     public abstract ClientDatabaseBase GetDatabase(string databaseName);
 
     /// <summary>

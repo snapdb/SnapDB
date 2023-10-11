@@ -26,8 +26,8 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Snap.Services.Reader;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Services.Reader"/> namespace organizes all common SnapDB library functionality related to reading capabilities
-/// e.g., the <see cref="Snap.Services.Reader.ArchiveTreeStreamWrapper{TKey, TValue}"/> class.
+/// The <see cref="Reader"/> namespace organizes all common SnapDB library functionality related to reading capabilities
+/// e.g., the <see cref="ArchiveTreeStreamWrapper{TKey, TValue}"/> class.
 /// </summary>
 [CompilerGenerated]
 internal class NamespaceDoc

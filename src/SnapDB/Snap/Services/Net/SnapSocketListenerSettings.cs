@@ -73,24 +73,16 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     /// </summary>
     public bool DefaultUserIsAdmin = false;
 
-    /// <summary>
-    /// Force the use of SSL for all clients connecting to this socket.
-    /// </summary>
+    // Force the use of SSL for all clients connecting to this socket.
     private bool m_forceSsl = false;
 
-    /// <summary>
-    /// The local IP address to host on. Leave empty to bind to all local interfaces.
-    /// </summary>
+    // The local IP address to host on. Leave empty to bind to all local interfaces.
     private string m_localIpAddress = DefaultIpAddress;
 
-    /// <summary>
-    /// The local TCP port to host on.
-    /// </summary>
+    // The local TCP port to host on.
     private int m_localTcpPort = DefaultNetworkPort;
 
-    /// <summary>
-    /// A server name that must be supplied at startup before a key exchange occurs.
-    /// </summary>
+    // A server name that must be supplied at startup before a key exchange occurs.
     private string m_serverName = DefaultServerName;
 
     #endregion
@@ -111,7 +103,7 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     }
 
     /// <summary>
-    /// Gets the local <see cref="IPEndPoint"/> from the values in <see cref="m_localIpAddress"/> and <see cref="m_localTcpPort"/>
+    /// Gets the local <see cref="IPEndPoint"/> from the values in local IP address TCP port.
     /// </summary>
     public IPEndPoint LocalEndPoint
     {

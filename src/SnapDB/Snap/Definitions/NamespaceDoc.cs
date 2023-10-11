@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Snap.Definitions;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Definitions"/> namespace organizes all common SnapDB library functionality related to definitions,
+/// The <see cref="Definitions"/> namespace organizes all common SnapDB library functionality related to definitions,
 /// e.g., the <see cref="IndividualEncodingDefinitionBase"/> class.
 /// </summary>
 [CompilerGenerated]

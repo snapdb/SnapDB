@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Snap.Services;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Services"/> namespace organizes all common SnapDB library functionality related to server settings and configuration,
+/// The <see cref="Services"/> namespace organizes all common SnapDB library functionality related to server settings and configuration,
 /// e.g., the <see cref="ServerSettings"/> class.
 /// </summary>
 [CompilerGenerated]

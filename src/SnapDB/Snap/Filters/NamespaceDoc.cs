@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Snap.Filters;
 
 /// <summary>
-/// The <see cref="SnapDB.Snap.Filters"/> namespace organizes all common SnapDB library functionality related to filter features,
+/// The <see cref="Filters"/> namespace organizes all common SnapDB library functionality related to filter features,
 /// e.g., the <see cref="FilterLibrary"/> class.
 /// </summary>
 [CompilerGenerated]

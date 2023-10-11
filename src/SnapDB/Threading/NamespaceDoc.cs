@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Threading;
 
 /// <summary>
-/// The <see cref="SnapDB.Threading"/> namespace organizes all SnapDB library functionality related to commonly used integrated tools,
+/// The <see cref="Threading"/> namespace organizes all SnapDB library functionality related to commonly used integrated tools,
 /// e.g., the <see cref="EventTimer"/> class.
 /// </summary>
 [CompilerGenerated]

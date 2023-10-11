@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Security.Authentication;
 
 /// <summary>
-/// The <see cref="SnapDB.Security.Authentication"/> namespace organizes all common SnapDB library functionality related to user credential authentication, 
+/// The <see cref="Authentication"/> namespace organizes all common SnapDB library functionality related to user credential authentication, 
 /// e.g., the <see cref="IntegratedSecurityUserCredential"/> class.
 /// </summary>
 [CompilerGenerated]

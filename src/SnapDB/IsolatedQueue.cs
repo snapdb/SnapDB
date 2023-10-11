@@ -111,7 +111,7 @@ public class IsolatedQueue<T>
         public T Dequeue()
         {
             T item = m_blocks[m_tail];
-            m_blocks[m_tail] = default;
+            m_blocks[m_tail] = default!;
             // No memory barrier here since .NET 2.0 ensures that writes will not be reordered.
             m_tail++;
 

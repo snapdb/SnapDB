@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 namespace SnapDB.Net;
 
 /// <summary>
-/// The <see cref="SnapDB.Net"/> namespace contains the <see cref="NetworkBinaryStream"/> class.
+/// The <see cref="Net"/> namespace contains the <see cref="NetworkBinaryStream"/> class.
 /// </summary>
 [CompilerGenerated]
 internal class NamespaceDoc

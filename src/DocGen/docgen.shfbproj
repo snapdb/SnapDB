@@ -93,6 +93,22 @@
           </configurations>
         </component>
       </ComponentConfig>
+      <ComponentConfig id="Resolve ThirdParty Reference Links" enabled="True">
+        <component id="Resolve ThirdParty Reference Links">
+          <configuration>
+            <urlProviders>
+              <formattedProvider title="BouncyCastle URL Provider">
+                <targetMatcher pattern=".:Org\.BouncyCastle(\.|$).*" fullyQualifiedMemberName="false" sandcastleTarget="true"/>
+                <urlFormatter format="https://gridprotectionalliance.github.io/bc-csharp/help/html/{target}.htm" target="_self"/>
+              </formattedProvider>
+              <formattedProvider title="Gemstone.Diagnostics URL Provider">
+                <targetMatcher pattern=".:Gemstone\.Diagnostics(\.|$).*" fullyQualifiedMemberName="false" sandcastleTarget="true"/>
+                <urlFormatter format="https://gemstone.github.io/diagnostics/help/html/{target}.htm" target="_self"/>
+              </formattedProvider>
+            </urlProviders>
+          </configuration>
+        </component>
+      </ComponentConfig>
     </ComponentConfigurations>
     <PlugInConfigurations>
       <PlugInConfig id="Table of Contents Exclusion" enabled="True">

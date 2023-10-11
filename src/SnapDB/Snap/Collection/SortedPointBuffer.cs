@@ -54,7 +54,7 @@ public class SortedPointBuffer<TKey, TValue> : TreeStream<TKey, TValue> where TK
     /// </summary>
     private int m_dequeueIndex;
 
-    private readonly Action<TKey, TKey> m_duplicateHandler;
+    private readonly Action<TKey, TKey>? m_duplicateHandler;
 
     /// <summary>
     /// The index of the next point to write.
@@ -119,7 +119,7 @@ public class SortedPointBuffer<TKey, TValue> : TreeStream<TKey, TValue> where TK
     /// </summary>
     /// <param name="capacity">The maximum number of items that can be stored in this class.</param>
     /// <param name="duplicateHandler">Function that will handle encountered duplicates.</param>
-    protected SortedPointBuffer(int capacity, Action<TKey, TKey> duplicateHandler) : this(capacity, duplicateHandler is null)
+    protected SortedPointBuffer(int capacity, Action<TKey, TKey>? duplicateHandler) : this(capacity, duplicateHandler is null)
     {
         m_duplicateHandler = duplicateHandler;
     }
@@ -185,7 +185,7 @@ public class SortedPointBuffer<TKey, TValue> : TreeStream<TKey, TValue> where TK
     /// Gets if the stream will never return duplicate keys. Do not return <c>true</c> unless it is guaranteed that
     /// the data read from this stream will never contain duplicates.
     /// </summary>
-    public override bool NeverContainsDuplicates => m_removeDuplicates || (object)m_duplicateHandler is not null;
+    public override bool NeverContainsDuplicates => m_removeDuplicates || m_duplicateHandler is not null;
 
     #endregion
 
