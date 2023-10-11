@@ -239,8 +239,7 @@ public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
     /// <remarks>
     /// This method constructs the binary representation of the file allocation table, including metadata and flags.
     /// It ensures the validity of the file allocation table before generating the bytes.
-    /// </remarks>
-    /// <seealso cref="IsFileAllocationTableValid"/>
+    /// </remarks>    
     public byte[] GetBytes()
     {
         if (!IsFileAllocationTableValid())

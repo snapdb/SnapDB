@@ -75,7 +75,7 @@ public partial class UnmanagedMemoryStream : UnmanagedMemoryStreamCore, ISupport
     /// <summary>
     /// Acquire an IO Session.
     /// </summary>
-    /// <returns>A new <see cref="BinaryStreamIoSessionBase"/> instance of type <see cref="IoSession"/>.</returns>
+    /// <returns>A new <see cref="BinaryStreamIoSessionBase"/> instance of type <see cref="BinaryStreamIoSessionBase"/>.</returns>
     public BinaryStreamIoSessionBase CreateIoSession()
     {
         return new IoSession(this);
