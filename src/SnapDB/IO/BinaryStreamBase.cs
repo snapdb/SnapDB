@@ -253,7 +253,7 @@ public abstract unsafe class BinaryStreamBase : IDisposable
 
     /// <summary>
     /// Inserts a certain number of bytes into the stream, shifting valid data to the right.  The stream's position remains unchanged.
-    /// (ie. pointing to the beginning of the newly inserted bytes).
+    /// (i.e., pointing to the beginning of the newly inserted bytes).
     /// </summary>
     /// <param name="numberOfBytes">The number of bytes to insert</param>
     /// <param name="lengthOfValidDataToShift">The number of bytes that will need to be shifted to perform this insert</param>
@@ -271,11 +271,11 @@ public abstract unsafe class BinaryStreamBase : IDisposable
 
     /// <summary>
     /// Removes a certain number of bytes from the stream, shifting valid data after this location to the left.  The stream's position remains unchanged.
-    /// (ie. pointing to where the data used to exist).
+    /// (i.e., pointing to where the data used to exist).
     /// </summary>
     /// <param name="numberOfBytes">
-    /// The distance to shift.  Positive means shifting to the right (ie. inserting data)
-    /// Negative means shift to the left (ie. deleting data)
+    /// The distance to shift.  Positive means shifting to the right (i.e., inserting data)
+    /// Negative means shift to the left (i.e., deleting data)
     /// </param>
     /// <param name="lengthOfValidDataToShift">
     /// The number of bytes that will need to be shifted to perform the remove.

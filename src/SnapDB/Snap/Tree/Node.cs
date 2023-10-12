@@ -292,12 +292,12 @@ public unsafe class Node<TKey> where TKey : SnapTypeBase<TKey>, new()
     protected int HeaderSize => OffsetOfLowerBounds + KeySize * 2;
 
     /// <summary>
-    /// Is the index of the left sibling null. i.e. equal to <see cref="uint.MaxValue"/>
+    /// Is the index of the left sibling null, i.e., equal to <see cref="uint.MaxValue"/>
     /// </summary>
     protected bool IsLeftSiblingIndexNull => m_leftSiblingNodeIndex == uint.MaxValue;
 
     /// <summary>
-    /// Is the index of the right sibling null. i.e. equal to <see cref="uint.MaxValue"/>
+    /// Is the index of the right sibling null, i.e., equal to <see cref="uint.MaxValue"/>
     /// </summary>
     protected bool IsRightSiblingIndexNull => m_rightSiblingNodeIndex == uint.MaxValue;
 
