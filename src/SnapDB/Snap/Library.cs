@@ -152,7 +152,7 @@ public static class Library
                                 {
                                     try
                                     {
-                                        if ((object)assemblyType is not null && !assemblyType.IsAbstract && !assemblyType.ContainsGenericParameters)
+                                        if ((object?)assemblyType is not null && !assemblyType.IsAbstract && !assemblyType.ContainsGenericParameters)
                                         {
                                             if (typeCreateSingleValueEncodingBase.IsAssignableFrom(assemblyType))
                                             {
@@ -236,7 +236,7 @@ public static class Library
         Tuple<Type, Type> t = Tuple.Create(typeof(TKey), typeof(TValue));
         lock (s_syncRoot)
         {
-            if (s_keyValueMethodsList.TryGetValue(t, out object obj))
+            if (s_keyValueMethodsList.TryGetValue(t, out object? obj))
                 return (KeyValueMethods<TKey, TValue>)obj;
         }
 
@@ -298,7 +298,7 @@ public static class Library
                 return;
             }
 
-            if (s_typeLookup.TryGetValue(id, out Type existingType))
+            if (s_typeLookup.TryGetValue(id, out Type? existingType))
             {
                 if (existingType != type)
                     throw new Exception("Existing type does not have a unique Guid. Type1:" + type.FullName + " Type2: " + existingType.FullName + " ID: " + id);

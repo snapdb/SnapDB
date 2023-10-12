@@ -96,7 +96,7 @@ public class WorkerThreadSynchronization : DisposableLoggingClassBase
         public void Run()
         {
             Action callback = Interlocked.Exchange(ref m_callback, null);
-            if ((object)callback is not null)
+            if ((object?)callback is not null)
                 callback();
         }
 

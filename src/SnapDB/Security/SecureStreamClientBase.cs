@@ -70,10 +70,10 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
     /// <returns>
     /// <c>true</c> if authentication is successful and if SSL/TLS encryption is used and successful; otherwise, <c>false</c>.
     /// </returns>
-    public bool TryAuthenticate(Stream stream, bool useSsl, out Stream secureStream)
+    public bool TryAuthenticate(Stream stream, bool useSsl, out Stream? secureStream)
     {
         secureStream = null;
-        SslStream ssl = null;
+        SslStream? ssl = null;
         Stream stream2;
         byte[] certSignatures;
 
@@ -133,12 +133,12 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
     /// <summary>
     /// Attempts to authenticate the provided stream, disposing the secure stream upon completion.
     /// </summary>
-    /// <param name="stream">the stream to authenticate</param>
-    /// <param name="useSsl">gets if SSL will be used to authenticate</param>
-    /// <returns>true if successful, false otherwise</returns>
+    /// <param name="stream">The stream to authenticate.</param>
+    /// <param name="useSsl">Gets if SSL will be used to authenticate.</param>
+    /// <returns><c>true</c> if successful, <c>false</c> otherwise.</returns>
     public bool TryAuthenticate(Stream stream, bool useSsl = true)
     {
-        Stream secureStream = null;
+        Stream? secureStream = null;
         try
         {
             return TryAuthenticate(stream, useSsl, out secureStream);
@@ -161,7 +161,7 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
     /// </returns>
     public Stream Authenticate(Stream stream, bool useSsl = true)
     {
-        Stream secureStream = null;
+        Stream? secureStream = null;
         try
         {
             if (TryAuthenticate(stream, useSsl, out secureStream))

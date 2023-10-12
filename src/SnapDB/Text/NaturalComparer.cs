@@ -79,13 +79,13 @@ public class NaturalComparer : Comparer<string>
         if (x == y)
             return 0;
 
-        if (!m_table.TryGetValue(x, out string[] x1))
+        if (!m_table.TryGetValue(x, out string[]? x1))
         {
             x1 = Regex.Split(x.Replace(" ", ""), "([0-9]+)");
             m_table.Add(x, x1);
         }
 
-        if (!m_table.TryGetValue(y, out string[] y1))
+        if (!m_table.TryGetValue(y, out string[]? y1))
         {
             y1 = Regex.Split(y.Replace(" ", ""), "([0-9]+)");
             m_table.Add(y, y1);

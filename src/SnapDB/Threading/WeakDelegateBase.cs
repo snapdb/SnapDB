@@ -79,7 +79,7 @@ public abstract class WeakDelegateBase<T> : WeakReference where T : class
     /// <returns><c>true</c> if successful, <c>false</c> if the delegate has been garbage collected.</returns>
     protected bool TryInvokeInternal(object[] parameters)
     {
-        object target = base.Target;
+        object? target = base.Target;
         if (target is null)
             return false;
 

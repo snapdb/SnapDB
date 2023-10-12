@@ -232,7 +232,7 @@ internal unsafe class IndexParser : IndexMapper
     /// <returns>The value at the specified offset within the specified block.</returns>
     private uint GetBlockIndexValue(uint blockIndex, int offset, BlockType blockType, uint blockBaseIndex)
     {
-        DiskIoSession buffer = m_ioSessions.SourceIndex;
+        DiskIoSession? buffer = m_ioSessions.SourceIndex;
 
         if (blockIndex == 0)
             return 0;

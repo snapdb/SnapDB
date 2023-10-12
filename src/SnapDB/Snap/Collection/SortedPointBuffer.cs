@@ -190,7 +190,7 @@ public class SortedPointBuffer<TKey, TValue> : TreeStream<TKey, TValue> where TK
     #endregion
 
     #region [ Methods ]
-
+     
     /// <summary>
     /// Attempts to enqueue the provided item to the list.
     /// </summary>

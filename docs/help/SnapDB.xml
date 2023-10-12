@@ -4155,9 +4155,10 @@
       <summary>
             Attempts to authenticate the provided stream, disposing the secure stream upon completion.
             </summary>
-      <param name="stream">the stream to authenticate</param>
-      <param name="useSsl">gets if SSL will be used to authenticate</param>
-      <returns>true if successful, false otherwise</returns>
+      <param name="stream">The stream to authenticate.</param>
+      <param name="useSsl">Gets if SSL will be used to authenticate.</param>
+      <returns>
+        <c>true</c> if successful, <c>false</c> otherwise.</returns>
     </member>
     <member name="M:SnapDB.Security.SecureStreamClientBase.TryAuthenticate(System.IO.Stream,System.Boolean,System.IO.Stream@)">
       <summary>

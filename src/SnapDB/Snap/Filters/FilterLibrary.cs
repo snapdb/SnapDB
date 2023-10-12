@@ -92,7 +92,7 @@ public class FilterLibrary
         {
             lock (m_syncRoot)
             {
-                if (m_filters.TryGetValue(filter, out MatchFilterDefinitionBase encoding))
+                if (m_filters.TryGetValue(filter, out MatchFilterDefinitionBase? encoding))
                     return encoding.Create<TKey, TValue>(stream);
             }
         }
@@ -122,7 +122,7 @@ public class FilterLibrary
         {
             lock (m_syncRoot)
             {
-                if (m_seekFilters.TryGetValue(filter, out SeekFilterDefinitionBase encoding))
+                if (m_seekFilters.TryGetValue(filter, out SeekFilterDefinitionBase? encoding))
                     return encoding.Create<TKey>(stream);
             }
         }

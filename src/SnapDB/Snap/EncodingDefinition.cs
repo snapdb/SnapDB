@@ -316,7 +316,7 @@ public class EncodingDefinition : IComparable<EncodingDefinition>, IComparable, 
     /// <param name="other">An object to compare with this object.</param>
     public bool Equals(EncodingDefinition other)
     {
-        return (object)other is not null && m_hashCode == other.m_hashCode && IsKeyValueEncoded == other.IsKeyValueEncoded && m_keyEncodingMethod == other.m_keyEncodingMethod && m_valueEncodingMethod == other.m_valueEncodingMethod && m_keyValueEncodingMethod == other.m_keyValueEncodingMethod;
+        return (object?)other is not null && m_hashCode == other.m_hashCode && IsKeyValueEncoded == other.IsKeyValueEncoded && m_keyEncodingMethod == other.m_keyEncodingMethod && m_valueEncodingMethod == other.m_valueEncodingMethod && m_keyValueEncodingMethod == other.m_keyValueEncodingMethod;
     }
 
     #endregion

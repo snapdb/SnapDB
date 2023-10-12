@@ -134,7 +134,7 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
 
                 for (int x = 0; x < resource.Tables.Length; x++)
                 {
-                    ArchiveTableSummary<TKey, TValue> table = resource.Tables[x];
+                    ArchiveTableSummary<TKey, TValue>? table = resource.Tables[x];
 
                     if (table.SortedTreeTable.BaseFile.Snapshot.Header.Flags.Contains(m_settings.MatchFlag) && table.SortedTreeTable.BaseFile.Snapshot.Header.Flags.Contains(FileFlags.IntermediateFile))
                     {
@@ -185,7 +185,7 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
                         }
                     }
 
-                    RolloverLogFile logFile = null;
+                    RolloverLogFile? logFile = null;
 
                     void CreateLog(Guid x)
                     {

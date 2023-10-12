@@ -73,7 +73,7 @@ public class ScramServer
         byte[] usernameBytes = stream.ReadBytes();
         byte[] clientNonce = stream.ReadBytes();
 
-        if (!Users.TryLookup(usernameBytes, out ScramUserCredential user))
+        if (!Users.TryLookup(usernameBytes, out ScramUserCredential? user))
             return null;
 
         byte[] serverNonce = m_nonce.Next();

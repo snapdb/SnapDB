@@ -54,9 +54,9 @@ public class TimestampPointIdSeekFilterDefinition : SeekFilterDefinitionBase
     /// <returns>New seek filter based on information in binary stream.</returns>
     public override SeekFilterBase<TKey> Create<TKey>(BinaryStreamBase stream)
     {
-        MethodInfo method = typeof(TimestampPointIdSeekFilter).GetMethod("CreateFromStream", BindingFlags.NonPublic | BindingFlags.Static);
+        MethodInfo? method = typeof(TimestampPointIdSeekFilter).GetMethod("CreateFromStream", BindingFlags.NonPublic | BindingFlags.Static);
         MethodInfo generic = method.MakeGenericMethod(typeof(TKey));
-        object rv = generic.Invoke(null, new[] { stream });
+        object? rv = generic.Invoke(null, new[] { stream });
 
         return (SeekFilterBase<TKey>)rv;
     }

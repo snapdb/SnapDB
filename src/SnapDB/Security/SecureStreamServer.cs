@@ -190,11 +190,11 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
     /// <param name="secureStream">the secure stream that is valid if the function returns true.</param>
     /// <param name="token">the user's token associated with what user created the stream</param>
     /// <returns><c>true</c> if successful, <c>false</c> otherwise</returns>
-    public bool TryAuthenticateAsServer(Stream stream, bool useSsl, out Stream secureStream, out T token)
+    public bool TryAuthenticateAsServer(Stream stream, bool useSsl, out Stream? secureStream, out T? token)
     {
         token = default;
         secureStream = null;
-        SslStream ssl = null;
+        SslStream? ssl = null;
 
         try
         {
@@ -204,6 +204,7 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
             {
                 if (!TryConnectSsl(stream, out ssl))
                     return false;
+
                 stream2 = ssl;
                 certSignatures = SecureStream.ComputeCertificateChallenge(true, ssl);
             }
@@ -225,6 +226,7 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
                     {
                         stream2.Write(false);
                         ssl?.Dispose();
+
                         return false;
                     }
 

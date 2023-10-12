@@ -32,7 +32,7 @@ namespace SnapDB.Snap.Types;
 /// necessary for the historian engine to operate
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
-public abstract class TimestampPointIdBase<TKey> : TimestampBase<TKey> where TKey : SnapTypeBase<TKey>, new()
+public abstract class TimestampPointIDBase<TKey> : TimestampBase<TKey> where TKey : SnapTypeBase<TKey>, new()
 {
     #region [ Members ]
 
