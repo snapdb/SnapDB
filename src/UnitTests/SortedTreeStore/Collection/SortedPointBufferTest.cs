@@ -52,7 +52,7 @@ public class SortedPointBufferTest
         for (int x = 0; x < maxCount; x++)
         {
             key.Timestamp = (ulong)r.Next();
-            key.PointId = (ulong)x;
+            key.PointID = (ulong)x;
 
             buffer.TryEnqueue(key, value);
         }
@@ -67,7 +67,7 @@ public class SortedPointBufferTest
         for (int x = 0; x < maxCount; x++)
         {
             buffer.ReadSorted(x, key, value);
-            Console.WriteLine(key.Timestamp + "\t" + key.PointId);
+            Console.WriteLine(key.Timestamp + "\t" + key.PointID);
         }
     }
 
@@ -95,7 +95,7 @@ public class SortedPointBufferTest
             for (int x = 0; x < pointCount; x++)
             {
                 key.Timestamp = (ulong)r.Next();
-                key.PointId = (ulong)x;
+                key.PointID = (ulong)x;
 
                 buffer.TryEnqueue(key, value);
             }
@@ -133,7 +133,7 @@ public class SortedPointBufferTest
             for (int x = 0; x < pointCount; x++)
             {
                 key.Timestamp = (ulong)r.Next();
-                key.PointId = (ulong)x;
+                key.PointID = (ulong)x;
 
                 buffer.TryEnqueue(key, value);
             }
@@ -173,7 +173,7 @@ public class SortedPointBufferTest
             buffer.IsReadingMode = false;
             for (int x = 0; x < pointCount; x++)
             {
-                key.PointId = (ulong)x;
+                key.PointID = (ulong)x;
 
                 buffer.TryEnqueue(key, value);
             }
@@ -209,7 +209,7 @@ public class SortedPointBufferTest
             buffer.IsReadingMode = false;
             for (int x = 0; x < pointCount; x++)
             {
-                key.PointId = (ulong)x;
+                key.PointID = (ulong)x;
 
                 buffer.TryEnqueue(key, value);
             }

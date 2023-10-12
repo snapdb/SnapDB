@@ -32,7 +32,7 @@ using SnapDB.UnitTests.Snap;
 namespace SnapDB.UnitTests.SortedTreeStore.Filters;
 
 [TestFixture]
-public class PointIdFilterTest
+public class PointIDFilterTest
 {
     #region [ Methods ]
 
@@ -40,7 +40,7 @@ public class PointIdFilterTest
     public void TestBitArray()
     {
         List<ulong> list = new();
-        MatchFilterBase<HistorianKey, HistorianValue> pointId = PointIdMatchFilter.CreateFromList<HistorianKey, HistorianValue>(list);
+        MatchFilterBase<HistorianKey, HistorianValue> pointId = PointIDMatchFilter.CreateFromList<HistorianKey, HistorianValue>(list);
 
         if (!pointId.GetType().FullName.Contains("BitArrayFilter"))
             throw new Exception("Wrong type");
@@ -61,7 +61,7 @@ public class PointIdFilterTest
     {
         List<ulong> list = new();
         list.Add(132412341);
-        MatchFilterBase<HistorianKey, HistorianValue> pointId = PointIdMatchFilter.CreateFromList<HistorianKey, HistorianValue>(list);
+        MatchFilterBase<HistorianKey, HistorianValue> pointId = PointIDMatchFilter.CreateFromList<HistorianKey, HistorianValue>(list);
 
         if (!pointId.GetType().FullName.Contains("UIntHashSet"))
             throw new Exception("Wrong type");
@@ -82,7 +82,7 @@ public class PointIdFilterTest
     {
         List<ulong> list = new();
         list.Add(13242345234523412341ul);
-        MatchFilterBase<HistorianKey, HistorianValue> pointId = PointIdMatchFilter.CreateFromList<HistorianKey, HistorianValue>(list);
+        MatchFilterBase<HistorianKey, HistorianValue> pointId = PointIDMatchFilter.CreateFromList<HistorianKey, HistorianValue>(list);
 
         if (!pointId.GetType().FullName.Contains("ULongHashSet"))
             throw new Exception("Wrong type");

@@ -50,16 +50,16 @@ public class HistorianStreamEncoding : PairEncodingBase<HistorianKey, HistorianV
 
     public override void Encode(BinaryStreamBase stream, HistorianKey prevKey, HistorianValue prevValue, HistorianKey currentKey, HistorianValue currentValue)
     {
-        if (currentKey.Timestamp == prevKey.Timestamp && (currentKey.PointId ^ prevKey.PointId) < 64 && currentKey.EntryNumber == 0 && currentValue.Value1 <= uint.MaxValue //must be a 32-bit value
+        if (currentKey.Timestamp == prevKey.Timestamp && (currentKey.PointID ^ prevKey.PointID) < 64 && currentKey.EntryNumber == 0 && currentValue.Value1 <= uint.MaxValue //must be a 32-bit value
             && currentValue.Value2 == 0 && currentValue.Value3 == 0)
         {
             if (currentValue.Value1 == 0)
             {
-                stream.Write((byte)(currentKey.PointId ^ prevKey.PointId));
+                stream.Write((byte)(currentKey.PointID ^ prevKey.PointID));
             }
             else
             {
-                stream.Write((byte)((currentKey.PointId ^ prevKey.PointId) | 64));
+                stream.Write((byte)((currentKey.PointID ^ prevKey.PointID) | 64));
                 stream.Write((uint)currentValue.Value1);
             }
 
@@ -92,7 +92,7 @@ public class HistorianStreamEncoding : PairEncodingBase<HistorianKey, HistorianV
         if (currentKey.Timestamp != prevKey.Timestamp)
             stream.Write7Bit(currentKey.Timestamp ^ prevKey.Timestamp);
 
-        stream.Write7Bit(currentKey.PointId ^ prevKey.PointId);
+        stream.Write7Bit(currentKey.PointID ^ prevKey.PointID);
 
         if (currentKey.EntryNumber != 0)
             stream.Write7Bit(currentKey.EntryNumber);
@@ -126,7 +126,7 @@ public class HistorianStreamEncoding : PairEncodingBase<HistorianKey, HistorianV
             if (code < 64)
             {
                 key.Timestamp = prevKey.Timestamp;
-                key.PointId = prevKey.PointId ^ code;
+                key.PointID = prevKey.PointID ^ code;
                 key.EntryNumber = 0;
                 value.Value1 = 0;
                 value.Value2 = 0;
@@ -135,7 +135,7 @@ public class HistorianStreamEncoding : PairEncodingBase<HistorianKey, HistorianV
             else
             {
                 key.Timestamp = prevKey.Timestamp;
-                key.PointId = prevKey.PointId ^ code ^ 64;
+                key.PointID = prevKey.PointID ^ code ^ 64;
                 key.EntryNumber = 0;
                 value.Value1 = stream.ReadUInt32();
                 value.Value2 = 0;
@@ -150,7 +150,7 @@ public class HistorianStreamEncoding : PairEncodingBase<HistorianKey, HistorianV
         else
             key.Timestamp = prevKey.Timestamp;
 
-        key.PointId = prevKey.PointId ^ stream.Read7BitUInt64();
+        key.PointID = prevKey.PointID ^ stream.Read7BitUInt64();
 
         if ((code & 32) != 0) //E is set)
             key.EntryNumber = stream.Read7BitUInt64();

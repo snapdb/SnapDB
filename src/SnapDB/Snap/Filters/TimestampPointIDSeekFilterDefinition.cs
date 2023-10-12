@@ -31,14 +31,14 @@ using SnapDB.Snap.Definitions;
 namespace SnapDB.Snap.Filters;
 
 /// <summary>
-/// Represents a seek filter definition for the <see cref="TimestampPointIdSeekFilter"/> methods.
+/// Represents a seek filter definition for the <see cref="TimestampPointIDSeekFilter"/> methods.
 /// </summary>
-public class TimestampPointIdSeekFilterDefinition : SeekFilterDefinitionBase
+public class TimestampPointIDSeekFilterDefinition : SeekFilterDefinitionBase
 {
     #region [ Properties ]
 
     /// <summary>
-    /// Gets the filter type Guid for the <see cref="TimestampPointIdSeekFilterDefinition"/>.
+    /// Gets the filter type Guid for the <see cref="TimestampPointIDSeekFilterDefinition"/>.
     /// </summary>
     public override Guid FilterType => FilterGuid;
 
@@ -47,14 +47,14 @@ public class TimestampPointIdSeekFilterDefinition : SeekFilterDefinitionBase
     #region [ Methods ]
 
     /// <summary>
-    /// Creates a new seek filter for the <see cref="TimestampPointIdSeekFilterDefinition"/>.
+    /// Creates a new seek filter for the <see cref="TimestampPointIDSeekFilterDefinition"/>.
     /// </summary>
     /// <typeparam name="TKey">Type of key/</typeparam>
     /// <param name="stream">Binary stream to create seek filter from.</param>
     /// <returns>New seek filter based on information in binary stream.</returns>
     public override SeekFilterBase<TKey> Create<TKey>(BinaryStreamBase stream)
     {
-        MethodInfo? method = typeof(TimestampPointIdSeekFilter).GetMethod("CreateFromStream", BindingFlags.NonPublic | BindingFlags.Static);
+        MethodInfo? method = typeof(TimestampPointIDSeekFilter).GetMethod("CreateFromStream", BindingFlags.NonPublic | BindingFlags.Static);
         MethodInfo generic = method.MakeGenericMethod(typeof(TKey));
         object? rv = generic.Invoke(null, new[] { stream });
 
@@ -66,7 +66,7 @@ public class TimestampPointIdSeekFilterDefinition : SeekFilterDefinitionBase
     #region [ Static ]
 
     /// <summary>
-    /// Guid for the <see cref="TimestampPointIdSeekFilterDefinition"/>.
+    /// Guid for the <see cref="TimestampPointIDSeekFilterDefinition"/>.
     /// </summary>
     // {8E0A841F-03C3-4B55-87CB-9F9A732F86DC}
     public static Guid FilterGuid = new(0x8E0A841F, 0x03C3, 0x4B55, 0x87, 0xCB, 0x9F, 0x9A, 0x73, 0x2F, 0x86, 0xDC);

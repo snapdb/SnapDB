@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  PointIdMatchFilterDefinition.cs - Gbtc
+//  PointIDMatchFilterDefinition.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -33,7 +33,7 @@ namespace SnapDB.Snap.Filters;
 /// <summary>
 /// Defines a filter for matching data based on point IDs using a bit array to set <c>true</c> and <c>false</c> values.
 /// </summary>
-public class PointIdMatchFilterDefinition : MatchFilterDefinitionBase
+public class PointIDMatchFilterDefinition : MatchFilterDefinitionBase
 {
     #region [ Properties ]
 
@@ -55,7 +55,7 @@ public class PointIdMatchFilterDefinition : MatchFilterDefinitionBase
     /// <returns>A match filter created from the binary stream data.</returns>
     public override MatchFilterBase<TKey, TValue> Create<TKey, TValue>(BinaryStreamBase stream)
     {
-        MethodInfo? method = typeof(PointIdMatchFilter).GetMethod("CreateFromStream", BindingFlags.NonPublic | BindingFlags.Static);
+        MethodInfo? method = typeof(PointIDMatchFilter).GetMethod("CreateFromStream", BindingFlags.NonPublic | BindingFlags.Static);
 
         if(method != null)
         {
@@ -74,7 +74,7 @@ public class PointIdMatchFilterDefinition : MatchFilterDefinitionBase
     #region [ Static ]
 
     /// <summary>
-    /// The globally unique identifier (GUID) for the PointIdMatchFilterDefinition.
+    /// The globally unique identifier (GUID) for the PointIDMatchFilterDefinition.
     /// </summary>
     // {2034A3E3-F92E-4749-9306-B04DC36FD743}
     public static Guid FilterGuid = new(0x2034a3e3, 0xf92e, 0x4749, 0x93, 0x06, 0xb0, 0x4d, 0xc3, 0x6f, 0xd7, 0x43);

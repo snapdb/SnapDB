@@ -397,7 +397,7 @@ public class ArchiveReaderSequentialTest
         for (ulong v = start; v < start + step * count; v += step)
         {
             key.SetMin();
-            key.PointId = v;
+            key.PointID = v;
             edit.AddPoint(key, value);
         }
 
@@ -416,7 +416,7 @@ public class ArchiveReaderSequentialTest
         for (ulong v = startPoint; v < startPoint + stepPoint * countPoint; v += stepPoint)
         {
             key.Timestamp = t;
-            key.PointId = v;
+            key.PointID = v;
             edit.AddPoint(key, value);
         }
 
@@ -436,7 +436,7 @@ public class ArchiveReaderSequentialTest
         {
             count--;
             key.Timestamp = t;
-            key.PointId = pointId;
+            key.PointID = pointId;
             value.Value1 = v;
 
             edit.AddPoint(key, value);

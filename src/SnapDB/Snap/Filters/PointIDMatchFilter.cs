@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  PointIdMatchFilter.cs - Gbtc
+//  PointIDMatchFilter.cs - Gbtc
 //
 //  Copyright © 2014, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -32,14 +32,14 @@ using System.Data;
 using System.Runtime.CompilerServices;
 using SnapDB.IO;
 using SnapDB.Snap.Types;
-using static SnapDB.Snap.Filters.PointIdMatchFilterBitArray;
+using static SnapDB.Snap.Filters.PointIDMatchFilterBitArray;
 
 namespace SnapDB.Snap.Filters;
 
 /// <summary>
 /// Partial class for creating and managing match filters based on point IDs.
 /// </summary>
-public partial class PointIdMatchFilter
+public partial class PointIDMatchFilter
 {
     #region [ Static ]
 
@@ -50,7 +50,7 @@ public partial class PointIdMatchFilter
     /// <typeparam name="TValue">The value type of the match filter.</typeparam>
     /// <param name="pointId">The point ID to create the filter for.</param>
     /// <returns>A match filter based on the specified point ID.</returns>
-    public static MatchFilterBase<TKey, TValue> CreateFromPointId<TKey, TValue>(ulong pointId) where TKey : TimestampPointIdBase<TKey>, new()
+    public static MatchFilterBase<TKey, TValue> CreateFromPointID<TKey, TValue>(ulong pointId) where TKey : TimestampPointIDBase<TKey>, new()
     {
         return pointId switch
         {
@@ -72,7 +72,7 @@ public partial class PointIdMatchFilter
     /// The match filter includes keys whose point IDs match any of the point IDs in the <paramref name="listOfPointIDs"/> collection.
     /// The appropriate filter type is chosen based on the maximum point ID value in the list.
     /// </remarks>
-    public static MatchFilterBase<TKey, TValue> CreateFromList<TKey, TValue>(IEnumerable<ulong> listOfPointIDs) where TKey : TimestampPointIdBase<TKey>, new()
+    public static MatchFilterBase<TKey, TValue> CreateFromList<TKey, TValue>(IEnumerable<ulong> listOfPointIDs) where TKey : TimestampPointIDBase<TKey>, new()
     {
         ulong maxValue = 0;
         ulong[] pointIDs = listOfPointIDs as ulong[] ?? listOfPointIDs.ToArray();
@@ -104,7 +104,7 @@ public partial class PointIdMatchFilter
     /// The match filter is deserialized from the binary stream based on its version and data format.
     /// </remarks>
     [MethodImpl(MethodImplOptions.NoOptimization)]
-    private static MatchFilterBase<TKey, TValue>? CreateFromStream<TKey, TValue>(BinaryStreamBase stream) where TKey : TimestampPointIdBase<TKey>, new()
+    private static MatchFilterBase<TKey, TValue>? CreateFromStream<TKey, TValue>(BinaryStreamBase stream) where TKey : TimestampPointIDBase<TKey>, new()
     {
         MatchFilterBase<TKey, TValue> filter;
         byte version = stream.ReadUInt8();

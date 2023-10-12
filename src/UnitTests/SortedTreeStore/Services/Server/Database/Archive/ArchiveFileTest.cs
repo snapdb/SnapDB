@@ -77,7 +77,7 @@ public class ArchiveFileTest
                 for (int y = 0; y < 10; y++)
                 {
                     key.Timestamp = x;
-                    key.PointId = x;
+                    key.PointID = x;
                     value.Value1 = x;
                     value.Value3 = x;
                     fileEditor.AddPoint(key, value);
@@ -101,7 +101,7 @@ public class ArchiveFileTest
         HistorianKey key = new();
         HistorianValue value = new();
         key.Timestamp = 1;
-        key.PointId = 2;
+        key.PointID = 2;
         value.Value1 = 3;
         value.Value2 = 4;
         using SortedTreeTable<HistorianKey, HistorianValue> target = SortedTreeFile.CreateInMemory().OpenOrCreateTable<HistorianKey, HistorianValue>(EncodingDefinition.FixedSizeCombinedEncoding);
@@ -134,7 +134,7 @@ public class ArchiveFileTest
             scanner.SeekToStart();
             Assert.AreEqual(true, scanner.Read(key, value));
             Assert.AreEqual(1uL, key.Timestamp);
-            Assert.AreEqual(2uL, key.PointId);
+            Assert.AreEqual(2uL, key.PointID);
             Assert.AreEqual(3uL, value.Value1);
             Assert.AreEqual(4uL, value.Value2);
         }
@@ -152,7 +152,7 @@ public class ArchiveFileTest
         HistorianKey key = new();
         HistorianValue value = new();
         key.Timestamp = 1;
-        key.PointId = 2;
+        key.PointID = 2;
         value.Value1 = 3;
         value.Value2 = 4;
 

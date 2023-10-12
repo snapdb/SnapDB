@@ -31,13 +31,13 @@ namespace SnapDB.UnitTests.Snap;
 /// <summary>
 /// The standard key used for the historian.
 /// </summary>
-public class HistorianKey : TimestampPointIdBase<HistorianKey>
+public class HistorianKey : TimestampPointIDBase<HistorianKey>
 {
     #region [ Members ]
 
     // TODO: Engine, not user, should accommodate incrementing EntryNumber for duplicates.
     /// <summary>
-    /// The number of the entry. This allows for duplicate values to be stored using the same Timestamp and PointId.
+    /// The number of the entry. This allows for duplicate values to be stored using the same Timestamp and PointID.
     /// </summary>
     /// <remarks>
     /// When writing data, this property is managed by the historian engine. Do not change this value in your code.
@@ -85,7 +85,7 @@ public class HistorianKey : TimestampPointIdBase<HistorianKey>
     public override void SetMin()
     {
         Timestamp = 0;
-        PointId = 0;
+        PointID = 0;
         EntryNumber = 0;
     }
 
@@ -95,7 +95,7 @@ public class HistorianKey : TimestampPointIdBase<HistorianKey>
     public override void SetMax()
     {
         Timestamp = ulong.MaxValue;
-        PointId = ulong.MaxValue;
+        PointID = ulong.MaxValue;
         EntryNumber = ulong.MaxValue;
     }
 
@@ -105,28 +105,28 @@ public class HistorianKey : TimestampPointIdBase<HistorianKey>
     public override void Clear()
     {
         Timestamp = 0;
-        PointId = 0;
+        PointID = 0;
         EntryNumber = 0;
     }
 
     public override void Read(BinaryStreamBase stream)
     {
         Timestamp = stream.ReadUInt64();
-        PointId = stream.ReadUInt64();
+        PointID = stream.ReadUInt64();
         EntryNumber = stream.ReadUInt64();
     }
 
     public override void Write(BinaryStreamBase stream)
     {
         stream.Write(Timestamp);
-        stream.Write(PointId);
+        stream.Write(PointID);
         stream.Write(EntryNumber);
     }
 
     public override void CopyTo(HistorianKey destination)
     {
         destination.Timestamp = Timestamp;
-        destination.PointId = PointId;
+        destination.PointID = PointID;
         destination.EntryNumber = EntryNumber;
     }
 
@@ -141,9 +141,9 @@ public class HistorianKey : TimestampPointIdBase<HistorianKey>
             return -1;
         if (Timestamp > other.Timestamp)
             return 1;
-        if (PointId < other.PointId)
+        if (PointID < other.PointID)
             return -1;
-        if (PointId > other.PointId)
+        if (PointID > other.PointID)
             return 1;
         if (EntryNumber < other.EntryNumber)
             return -1;
@@ -158,9 +158,9 @@ public class HistorianKey : TimestampPointIdBase<HistorianKey>
             return -1;
         if (Timestamp > *(ulong*)stream)
             return 1;
-        if (PointId < *(ulong*)(stream + 8))
+        if (PointID < *(ulong*)(stream + 8))
             return -1;
-        if (PointId > *(ulong*)(stream + 8))
+        if (PointID > *(ulong*)(stream + 8))
             return 1;
         if (EntryNumber < *(ulong*)(stream + 16))
             return -1;
@@ -178,7 +178,7 @@ public class HistorianKey : TimestampPointIdBase<HistorianKey>
         HistorianKey key = new()
         {
             Timestamp = Timestamp,
-            PointId = PointId,
+            PointID = PointID,
             EntryNumber = EntryNumber
         };
         return key;
@@ -187,8 +187,8 @@ public class HistorianKey : TimestampPointIdBase<HistorianKey>
     public override string ToString()
     {
         if (Timestamp <= (ulong)DateTime.MaxValue.Ticks)
-            return TimestampAsDate.ToString("yyyy-MM-dd HH:mm:ss.fffffff") + "/" + PointId;
-        return Timestamp + "/" + PointId;
+            return TimestampAsDate.ToString("yyyy-MM-dd HH:mm:ss.fffffff") + "/" + PointID;
+        return Timestamp + "/" + PointID;
     }
 
     // Read(byte*)
@@ -202,14 +202,14 @@ public class HistorianKey : TimestampPointIdBase<HistorianKey>
     public override unsafe void Read(byte* stream)
     {
         Timestamp = *(ulong*)stream;
-        PointId = *(ulong*)(stream + 8);
+        PointID = *(ulong*)(stream + 8);
         EntryNumber = *(ulong*)(stream + 16);
     }
 
     public override unsafe void Write(byte* stream)
     {
         *(ulong*)stream = Timestamp;
-        *(ulong*)(stream + 8) = PointId;
+        *(ulong*)(stream + 8) = PointID;
         *(ulong*)(stream + 16) = EntryNumber;
     }
 
@@ -219,8 +219,8 @@ public class HistorianKey : TimestampPointIdBase<HistorianKey>
             return Timestamp < right.Timestamp;
 
         //Implied left.Timestamp == right.Timestamp
-        if (PointId != right.PointId)
-            return PointId < right.PointId;
+        if (PointID != right.PointID)
+            return PointID < right.PointID;
 
         //Implied left.EntryNumber == right.EntryNumber
         return EntryNumber < right.EntryNumber;
@@ -228,7 +228,7 @@ public class HistorianKey : TimestampPointIdBase<HistorianKey>
 
     public override bool IsEqualTo(HistorianKey right)
     {
-        return Timestamp == right.Timestamp && PointId == right.PointId && EntryNumber == right.EntryNumber;
+        return Timestamp == right.Timestamp && PointID == right.PointID && EntryNumber == right.EntryNumber;
     }
 
     public override bool IsGreaterThan(HistorianKey right)
@@ -237,8 +237,8 @@ public class HistorianKey : TimestampPointIdBase<HistorianKey>
             return Timestamp > right.Timestamp;
 
         //Implied left.Timestamp == right.Timestamp
-        if (PointId != right.PointId)
-            return PointId > right.PointId;
+        if (PointID != right.PointID)
+            return PointID > right.PointID;
 
         //Implied left.EntryNumber == right.EntryNumber
         return EntryNumber > right.EntryNumber;
@@ -250,8 +250,8 @@ public class HistorianKey : TimestampPointIdBase<HistorianKey>
             return Timestamp > right.Timestamp;
 
         //Implied left.Timestamp == right.Timestamp
-        if (PointId != right.PointId)
-            return PointId > right.PointId;
+        if (PointID != right.PointID)
+            return PointID > right.PointID;
 
         //Implied left.EntryNumber == right.EntryNumber
         return EntryNumber >= right.EntryNumber;

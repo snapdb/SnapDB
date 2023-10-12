@@ -61,7 +61,7 @@ public class SequentialSortedTreeWriterTest
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointId = (ulong)x;
+            key.PointID = (ulong)x;
             points.TryEnqueue(key, value);
         }
 
@@ -102,7 +102,7 @@ public class SequentialSortedTreeWriterTest
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointId = (ulong)x;
+            key.PointID = (ulong)x;
             points.TryEnqueue(key, value);
         }
 
@@ -141,7 +141,7 @@ public class SequentialSortedTreeWriterTest
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointId = (ulong)x;
+            key.PointID = (ulong)x;
             points.TryEnqueue(key, value);
         }
 
@@ -177,9 +177,9 @@ public class SequentialSortedTreeWriterTest
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointId = (ulong)r.Next();
+            key.PointID = (ulong)r.Next();
             key.Timestamp = (ulong)r.Next();
-            value.Value1 = key.PointId;
+            value.Value1 = key.PointID;
             points.TryEnqueue(key, value);
         }
 
@@ -195,10 +195,10 @@ public class SequentialSortedTreeWriterTest
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointId = (ulong)r.Next();
+            key.PointID = (ulong)r.Next();
             key.Timestamp = (ulong)r.Next();
             sts.Get(key, value);
-            if (value.Value1 != key.PointId)
+            if (value.Value1 != key.PointID)
                 throw new Exception();
         }
     }

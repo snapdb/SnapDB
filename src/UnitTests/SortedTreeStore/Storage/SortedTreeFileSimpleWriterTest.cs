@@ -52,7 +52,7 @@ public class SortedTreeFileSimpleWriterTest
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointId = (ulong)x;
+            key.PointID = (ulong)x;
             points.TryEnqueue(key, value);
         }
 
@@ -96,7 +96,7 @@ public class SortedTreeFileSimpleWriterTest
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointId = (ulong)x;
+            key.PointID = (ulong)x;
             points.TryEnqueue(key, value);
         }
 
@@ -137,7 +137,7 @@ public class SortedTreeFileSimpleWriterTest
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointId = (ulong)x;
+            key.PointID = (ulong)x;
             points.TryEnqueue(key, value);
         }
 
@@ -158,7 +158,7 @@ public class SortedTreeFileSimpleWriterTest
             int cnt = 0;
             while (scanner.Read(key, value))
             {
-                if (key.PointId != (ulong)cnt)
+                if (key.PointID != (ulong)cnt)
                     throw new Exception();
                 cnt++;
             }
@@ -187,7 +187,7 @@ public class SortedTreeFileSimpleWriterTest
 
         for (int x = 0; x < pointCount; x++)
         {
-            key.PointId = (ulong)x;
+            key.PointID = (ulong)x;
             points.TryEnqueue(key, value);
         }
 
@@ -208,7 +208,7 @@ public class SortedTreeFileSimpleWriterTest
             int cnt = 0;
             while (scanner.Read(key, value))
             {
-                if (key.PointId != (ulong)cnt)
+                if (key.PointID != (ulong)cnt)
                     throw new Exception();
                 cnt++;
             }

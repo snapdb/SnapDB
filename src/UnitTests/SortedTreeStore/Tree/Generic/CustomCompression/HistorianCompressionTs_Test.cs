@@ -186,7 +186,7 @@ internal class HistorianCompressionTs
         HistorianValue value = new();
 
         key.Timestamp = 0;
-        key.PointId = 0;
+        key.PointID = 0;
         key.EntryNumber = 0;
 
         value.Value1 = 0;
@@ -199,7 +199,7 @@ internal class HistorianCompressionTs
         Assert.AreEqual(0ul, value.Value2);
         Assert.AreEqual(0ul, value.Value3);
 
-        key.PointId = 1;
+        key.PointID = 1;
         tree.Add(key, value);
         tree.Get(key1, value);
         tree.Get(key, value);
@@ -207,7 +207,7 @@ internal class HistorianCompressionTs
         Assert.AreEqual(0ul, value.Value2);
         Assert.AreEqual(0ul, value.Value3);
 
-        key.PointId = 2;
+        key.PointID = 2;
         value.Value1 = 1;
         tree.Add(key, value);
         tree.Get(key1, value);
@@ -216,7 +216,7 @@ internal class HistorianCompressionTs
         Assert.AreEqual(0ul, value.Value2);
         Assert.AreEqual(0ul, value.Value3);
 
-        key.PointId = 3;
+        key.PointID = 3;
         value.Value1 = 561230651435234523ul;
         tree.Add(key, value);
         tree.Get(key1, value);
@@ -226,7 +226,7 @@ internal class HistorianCompressionTs
         Assert.AreEqual(0ul, value.Value3);
 
 
-        key.PointId = 35602353232;
+        key.PointID = 35602353232;
         value.Value1 = 561230651435234523ul;
         tree.Add(key, value);
         tree.Get(key1, value);
@@ -236,7 +236,7 @@ internal class HistorianCompressionTs
         Assert.AreEqual(0ul, value.Value3);
 
 
-        key.PointId++;
+        key.PointID++;
         value.Value1 = 561230651435234523ul;
         value.Value2 = 561230651435234524ul;
         value.Value3 = 561230651435234525ul;
@@ -258,7 +258,7 @@ internal class HistorianCompressionTs
         Assert.AreEqual(561230651435234524ul, value.Value2);
         Assert.AreEqual(561230651435234525ul, value.Value3);
 
-        key.PointId++;
+        key.PointID++;
         key.EntryNumber = 0;
         value.AsSingle = 60.1f;
         value.Value2 = 0;
@@ -271,7 +271,7 @@ internal class HistorianCompressionTs
         Assert.AreEqual(0ul, value.Value3);
 
 
-        key.PointId++;
+        key.PointID++;
         key.EntryNumber = 0;
         value.AsSingle = -60.1f;
         value.Value2 = 0;

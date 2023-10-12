@@ -215,7 +215,7 @@ public class TestPageSizes
                 for (ulong x = 0; x < 1000000; x++)
                 {
                     key.Timestamp = x;
-                    key.PointId = 2 * x;
+                    key.PointID = 2 * x;
                     value.Value3 = 3 * x;
                     value.Value1 = 4 * x;
                     //if ((x % 100) == 0)
@@ -273,7 +273,7 @@ public class TestPageSizes
                 for (ulong x = i * 5000; x < max; x++)
                 {
                     key.Timestamp = (uint)r.Next();
-                    key.PointId = 2 * x;
+                    key.PointID = 2 * x;
                     value.Value3 = 3 * x;
                     value.Value1 = 4 * x;
                     //if ((x % 100) == 0)
@@ -327,7 +327,7 @@ public class TestPageSizes
             for (ulong x = 0; x < count; x++)
             {
                 key.Timestamp = (uint)r.Next();
-                key.PointId = 2 * x;
+                key.PointID = 2 * x;
                 value.Value3 = 3 * x;
                 value.Value1 = 4 * x;
                 //if ((x % 100) == 0)
@@ -376,7 +376,7 @@ public class TestPageSizes
             for (uint x = 0; x < 10000000; x++)
             {
                 key.Timestamp = 1;
-                key.PointId = x;
+                key.PointID = x;
                 edit.AddPoint(key, value);
             }
 

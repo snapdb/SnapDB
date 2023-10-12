@@ -92,7 +92,7 @@ public class UnionReaderTest
         for (int x = 0; x < 1000; x++)
         {
             key.Timestamp = (ulong)r.Next();
-            key.PointId = (ulong)r.Next();
+            key.PointID = (ulong)r.Next();
             key.EntryNumber = (ulong)r.Next();
             edit.AddPoint(key, value);
         }

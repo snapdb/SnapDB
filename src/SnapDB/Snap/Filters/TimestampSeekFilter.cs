@@ -46,7 +46,7 @@ public partial class TimestampSeekFilter
     /// The seek filter includes keys with timestamps greater than or equal to <paramref name="firstTime"/> and
     /// less than or equal to <paramref name="lastTime"/>. It effectively filters keys within the time range.
     /// </remarks>
-    public static SeekFilterBase<TKey> CreateFromRange<TKey>(DateTime firstTime, DateTime lastTime) where TKey : TimestampPointIdBase<TKey>, new()
+    public static SeekFilterBase<TKey> CreateFromRange<TKey>(DateTime firstTime, DateTime lastTime) where TKey : TimestampPointIDBase<TKey>, new()
     {
         return new FixedRange<TKey>((ulong)firstTime.Ticks, (ulong)lastTime.Ticks);
     }
@@ -58,7 +58,7 @@ public partial class TimestampSeekFilter
     /// <param name="firstTime">The starting timestamp of the time range query (inclusive).</param>
     /// <param name="lastTime">The ending timestamp of the time range query (inclusive).</param>
     /// <returns>The fixed range for the seek filter to search during.</returns>
-    public static SeekFilterBase<TKey> CreateFromRange<TKey>(ulong firstTime, ulong lastTime) where TKey : TimestampPointIdBase<TKey>, new()
+    public static SeekFilterBase<TKey> CreateFromRange<TKey>(ulong firstTime, ulong lastTime) where TKey : TimestampPointIDBase<TKey>, new()
     {
         return new FixedRange<TKey>(firstTime, lastTime);
     }
@@ -78,7 +78,7 @@ public partial class TimestampSeekFilter
     /// MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
     /// Tolerance = 0.001 seconds.
     /// </remarks>
-    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(ulong firstTime, ulong lastTime, ulong mainInterval, ulong subInterval, ulong tolerance) where TKey : TimestampPointIdBase<TKey>, new()
+    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(ulong firstTime, ulong lastTime, ulong mainInterval, ulong subInterval, ulong tolerance) where TKey : TimestampPointIDBase<TKey>, new()
     {
         return new IntervalRanges<TKey>(firstTime, lastTime, mainInterval, subInterval, tolerance);
     }
@@ -97,7 +97,7 @@ public partial class TimestampSeekFilter
     /// MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
     /// Tolerance = 0.001 seconds.
     /// </remarks>
-    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(ulong firstTime, ulong lastTime, ulong interval, ulong tolerance) where TKey : TimestampPointIdBase<TKey>, new()
+    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(ulong firstTime, ulong lastTime, ulong interval, ulong tolerance) where TKey : TimestampPointIDBase<TKey>, new()
     {
         return new IntervalRanges<TKey>(firstTime, lastTime, interval, interval, tolerance);
     }
@@ -117,7 +117,7 @@ public partial class TimestampSeekFilter
     /// MainInterval = 0.1 seconds. SubInterval = 0.0333333 seconds.
     /// Tolerance = 0.001 seconds.
     /// </remarks>
-    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(DateTime firstTime, DateTime lastTime, TimeSpan mainInterval, TimeSpan subInterval, TimeSpan tolerance) where TKey : TimestampPointIdBase<TKey>, new()
+    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(DateTime firstTime, DateTime lastTime, TimeSpan mainInterval, TimeSpan subInterval, TimeSpan tolerance) where TKey : TimestampPointIDBase<TKey>, new()
     {
         return new IntervalRanges<TKey>((ulong)firstTime.Ticks, (ulong)lastTime.Ticks, (ulong)mainInterval.Ticks, (ulong)subInterval.Ticks, (ulong)tolerance.Ticks);
     }
@@ -136,7 +136,7 @@ public partial class TimestampSeekFilter
     /// Interval = 0.1 seconds.
     /// Tolerance = 0.001 seconds.
     /// </remarks>
-    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(DateTime firstTime, DateTime lastTime, TimeSpan interval, TimeSpan tolerance) where TKey : TimestampPointIdBase<TKey>, new()
+    public static SeekFilterBase<TKey> CreateFromIntervalData<TKey>(DateTime firstTime, DateTime lastTime, TimeSpan interval, TimeSpan tolerance) where TKey : TimestampPointIDBase<TKey>, new()
     {
         return new IntervalRanges<TKey>((ulong)firstTime.Ticks, (ulong)lastTime.Ticks, (ulong)interval.Ticks, (ulong)interval.Ticks, (ulong)tolerance.Ticks);
     }
@@ -149,7 +149,7 @@ public partial class TimestampSeekFilter
     /// <returns>A seek filter base that will be created from the specified stream.</returns>
     /// <exception cref="VersionNotFoundException">Thrown if the version cannot be reached.</exception>
     [MethodImpl(MethodImplOptions.NoOptimization)]
-    private static SeekFilterBase<TKey> CreateFromStream<TKey>(BinaryStreamBase stream) where TKey : TimestampPointIdBase<TKey>, new()
+    private static SeekFilterBase<TKey> CreateFromStream<TKey>(BinaryStreamBase stream) where TKey : TimestampPointIDBase<TKey>, new()
     {
         byte version = stream.ReadUInt8();
 

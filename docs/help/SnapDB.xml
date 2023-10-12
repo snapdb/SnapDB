@@ -6352,21 +6352,21 @@
       <param name="stream">The binary stream to which the filter should be saved.</param>
       <exception cref="T:System.NotSupportedException">Thrown when saving the universe filter is not supported.</exception>
     </member>
-    <member name="T:SnapDB.Snap.Filters.PointIdMatchFilter">
+    <member name="T:SnapDB.Snap.Filters.PointIDMatchFilter">
       <summary>
             Partial class for creating and managing match filters based on point IDs.
             </summary>
     </member>
-    <member name="M:SnapDB.Snap.Filters.PointIdMatchFilter.#ctor">
+    <member name="M:SnapDB.Snap.Filters.PointIDMatchFilter.#ctor">
       <summary>
         <markup>
           <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Snap.Filters.PointIdMatchFilter</parameter>
+            <parameter>SnapDB.Snap.Filters.PointIDMatchFilter</parameter>
           </include>
         </markup>
       </summary>
     </member>
-    <member name="M:SnapDB.Snap.Filters.PointIdMatchFilter.CreateFromList``2(System.Collections.Generic.IEnumerable{System.UInt64})">
+    <member name="M:SnapDB.Snap.Filters.PointIDMatchFilter.CreateFromList``2(System.Collections.Generic.IEnumerable{System.UInt64})">
       <summary>
             Creates a match filter that filters keys based on a list of point IDs.
             </summary>
@@ -6379,7 +6379,7 @@
             The appropriate filter type is chosen based on the maximum point ID value in the list.
             </remarks>
     </member>
-    <member name="M:SnapDB.Snap.Filters.PointIdMatchFilter.CreateFromPointId``2(System.UInt64)">
+    <member name="M:SnapDB.Snap.Filters.PointIDMatchFilter.CreateFromPointID``2(System.UInt64)">
       <summary>
             Creates a filter from the provided <paramref name="pointId" />.
             </summary>
@@ -6388,28 +6388,28 @@
       <typeparam name="TValue">The value type of the match filter.</typeparam>
       <returns>A match filter based on the specified point ID.</returns>
     </member>
-    <member name="T:SnapDB.Snap.Filters.PointIdMatchFilterBitArray">
+    <member name="T:SnapDB.Snap.Filters.PointIDMatchFilterBitArray">
       <summary>
             A class for implementing a match filter using a <see cref="T:SnapDB.Collections.BitArray" />.
             </summary>
     </member>
-    <member name="M:SnapDB.Snap.Filters.PointIdMatchFilterBitArray.#ctor">
+    <member name="M:SnapDB.Snap.Filters.PointIDMatchFilterBitArray.#ctor">
       <summary>
         <markup>
           <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Snap.Filters.PointIdMatchFilterBitArray</parameter>
+            <parameter>SnapDB.Snap.Filters.PointIDMatchFilterBitArray</parameter>
           </include>
         </markup>
       </summary>
     </member>
-    <member name="T:SnapDB.Snap.Filters.PointIdMatchFilterBitArray.BitArrayFilter`2">
+    <member name="T:SnapDB.Snap.Filters.PointIDMatchFilterBitArray.BitArrayFilter`2">
       <summary>
             A filter that uses a <see cref="T:SnapDB.Collections.BitArray" /> to set <c>true</c> and <c>false</c> values.
             </summary>
       <typeparam name="TKey">The type of keys in the filter.</typeparam>
       <typeparam name="TValue">The type of values in the filter.</typeparam>
     </member>
-    <member name="M:SnapDB.Snap.Filters.PointIdMatchFilterBitArray.BitArrayFilter`2.#ctor(SnapDB.IO.BinaryStreamBase,System.Int32,System.UInt64)">
+    <member name="M:SnapDB.Snap.Filters.PointIDMatchFilterBitArray.BitArrayFilter`2.#ctor(SnapDB.IO.BinaryStreamBase,System.Int32,System.UInt64)">
       <summary>
             Creates a new filter backed by a <see cref="T:SnapDB.Collections.BitArray" />.
             </summary>
@@ -6417,14 +6417,14 @@
       <param name="pointCount">The number of points in the stream.</param>
       <param name="maxValue">The maximum value stored in the bit array. Cannot be larger than <c>int.MaxValue-1</c>.</param>
     </member>
-    <member name="M:SnapDB.Snap.Filters.PointIdMatchFilterBitArray.BitArrayFilter`2.#ctor(System.Collections.Generic.IEnumerable{System.UInt64},System.UInt64)">
+    <member name="M:SnapDB.Snap.Filters.PointIDMatchFilterBitArray.BitArrayFilter`2.#ctor(System.Collections.Generic.IEnumerable{System.UInt64},System.UInt64)">
       <summary>
             Creates a bit array filter from <paramref name="points" />.
             </summary>
       <param name="points">The points to use.</param>
       <param name="maxValue">The maximum value stored in the bit array. Cannot be larger than <c>int.MaxValue-1</c>.</param>
     </member>
-    <member name="M:SnapDB.Snap.Filters.PointIdMatchFilterBitArray.BitArrayFilter`2.Contains(`0,`1)">
+    <member name="M:SnapDB.Snap.Filters.PointIDMatchFilterBitArray.BitArrayFilter`2.Contains(`0,`1)">
       <summary>
             Determines whether the filter contains the specified key and value.
             </summary>
@@ -6433,42 +6433,42 @@
       <returns>
         <c>true</c> if the filter contains the specified key and value; otherwise, <c>false</c>.</returns>
     </member>
-    <member name="P:SnapDB.Snap.Filters.PointIdMatchFilterBitArray.BitArrayFilter`2.FilterType">
+    <member name="P:SnapDB.Snap.Filters.PointIDMatchFilterBitArray.BitArrayFilter`2.FilterType">
       <summary>
-            Gets the unique identifier for the filter type associated with the <see cref="T:SnapDB.Snap.Filters.PointIdMatchFilterBitArray.BitArrayFilter`2" />.
+            Gets the unique identifier for the filter type associated with the <see cref="T:SnapDB.Snap.Filters.PointIDMatchFilterBitArray.BitArrayFilter`2" />.
             </summary>
     </member>
-    <member name="P:SnapDB.Snap.Filters.PointIdMatchFilterBitArray.BitArrayFilter`2.MaxValue">
+    <member name="P:SnapDB.Snap.Filters.PointIDMatchFilterBitArray.BitArrayFilter`2.MaxValue">
       <summary>
             Gets or sets the maximum value used in the bit array. Cannot be larger than <see cref="F:System.Int32.MaxValue" /> - 1.
             </summary>
     </member>
-    <member name="P:SnapDB.Snap.Filters.PointIdMatchFilterBitArray.BitArrayFilter`2.MinValue">
+    <member name="P:SnapDB.Snap.Filters.PointIDMatchFilterBitArray.BitArrayFilter`2.MinValue">
       <summary>
             Gets or sets the minimum value used in the bit array.
             </summary>
     </member>
-    <member name="M:SnapDB.Snap.Filters.PointIdMatchFilterBitArray.BitArrayFilter`2.Save(SnapDB.IO.BinaryStreamBase)">
+    <member name="M:SnapDB.Snap.Filters.PointIDMatchFilterBitArray.BitArrayFilter`2.Save(SnapDB.IO.BinaryStreamBase)">
       <summary>
             Saves the filter data to the specified <see cref="T:SnapDB.IO.BinaryStreamBase" />.
             </summary>
       <param name="stream">The stream to which the filter data will be saved.</param>
     </member>
-    <member name="T:SnapDB.Snap.Filters.PointIdMatchFilterDefinition">
+    <member name="T:SnapDB.Snap.Filters.PointIDMatchFilterDefinition">
       <summary>
             Defines a filter for matching data based on point IDs using a bit array to set <c>true</c> and <c>false</c> values.
             </summary>
     </member>
-    <member name="M:SnapDB.Snap.Filters.PointIdMatchFilterDefinition.#ctor">
+    <member name="M:SnapDB.Snap.Filters.PointIDMatchFilterDefinition.#ctor">
       <summary>
         <markup>
           <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Snap.Filters.PointIdMatchFilterDefinition</parameter>
+            <parameter>SnapDB.Snap.Filters.PointIDMatchFilterDefinition</parameter>
           </include>
         </markup>
       </summary>
     </member>
-    <member name="M:SnapDB.Snap.Filters.PointIdMatchFilterDefinition.Create``2(SnapDB.IO.BinaryStreamBase)">
+    <member name="M:SnapDB.Snap.Filters.PointIDMatchFilterDefinition.Create``2(SnapDB.IO.BinaryStreamBase)">
       <summary>
             Creates a match filter from a binary stream.
             </summary>
@@ -6477,12 +6477,12 @@
       <typeparam name="TValue">The value type of the match filter.</typeparam>
       <returns>A match filter created from the binary stream data.</returns>
     </member>
-    <member name="F:SnapDB.Snap.Filters.PointIdMatchFilterDefinition.FilterGuid">
+    <member name="F:SnapDB.Snap.Filters.PointIDMatchFilterDefinition.FilterGuid">
       <summary>
-            The globally unique identifier (GUID) for the PointIdMatchFilterDefinition.
+            The globally unique identifier (GUID) for the PointIDMatchFilterDefinition.
             </summary>
     </member>
-    <member name="P:SnapDB.Snap.Filters.PointIdMatchFilterDefinition.FilterType">
+    <member name="P:SnapDB.Snap.Filters.PointIDMatchFilterDefinition.FilterType">
       <summary>
             Gets the unique identifier for this match filter type.
             </summary>
@@ -6583,50 +6583,50 @@
       <param name="stream">The binary stream to save to.</param>
       <exception cref="T:System.NotSupportedException">Thrown because saving is not supported for this filter.</exception>
     </member>
-    <member name="T:SnapDB.Snap.Filters.TimestampPointIdSeekFilter">
+    <member name="T:SnapDB.Snap.Filters.TimestampPointIDSeekFilter">
       <summary>
             Represents a seek filter for a specific timestamp and point ID.
             </summary>
     </member>
-    <member name="M:SnapDB.Snap.Filters.TimestampPointIdSeekFilter.FindKey``1(System.UInt64,System.UInt64)">
+    <member name="M:SnapDB.Snap.Filters.TimestampPointIDSeekFilter.FindKey``1(System.UInt64,System.UInt64)">
       <summary>
             Creates a new SeekFilterBase instance for finding a key based on a timestamp and point ID.
             </summary>
       <param name="timestamp">The specific timestamp to seek.</param>
       <param name="pointId">The specific point ID to seek.</param>
-      <typeparam name="TKey">The type of key that implements TimestampPointIdBase.</typeparam>
+      <typeparam name="TKey">The type of key that implements TimestampPointIDBase.</typeparam>
       <returns>A SeekFilterBase instance configured to seek the specified timestamp and point ID.</returns>
     </member>
-    <member name="T:SnapDB.Snap.Filters.TimestampPointIdSeekFilterDefinition">
+    <member name="T:SnapDB.Snap.Filters.TimestampPointIDSeekFilterDefinition">
       <summary>
-            Represents a seek filter definition for the <see cref="T:SnapDB.Snap.Filters.TimestampPointIdSeekFilter" /> methods.
+            Represents a seek filter definition for the <see cref="T:SnapDB.Snap.Filters.TimestampPointIDSeekFilter" /> methods.
             </summary>
     </member>
-    <member name="M:SnapDB.Snap.Filters.TimestampPointIdSeekFilterDefinition.#ctor">
+    <member name="M:SnapDB.Snap.Filters.TimestampPointIDSeekFilterDefinition.#ctor">
       <summary>
         <markup>
           <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Snap.Filters.TimestampPointIdSeekFilterDefinition</parameter>
+            <parameter>SnapDB.Snap.Filters.TimestampPointIDSeekFilterDefinition</parameter>
           </include>
         </markup>
       </summary>
     </member>
-    <member name="M:SnapDB.Snap.Filters.TimestampPointIdSeekFilterDefinition.Create``1(SnapDB.IO.BinaryStreamBase)">
+    <member name="M:SnapDB.Snap.Filters.TimestampPointIDSeekFilterDefinition.Create``1(SnapDB.IO.BinaryStreamBase)">
       <summary>
-            Creates a new seek filter for the <see cref="T:SnapDB.Snap.Filters.TimestampPointIdSeekFilterDefinition" />.
+            Creates a new seek filter for the <see cref="T:SnapDB.Snap.Filters.TimestampPointIDSeekFilterDefinition" />.
             </summary>
       <param name="stream">Binary stream to create seek filter from.</param>
       <typeparam name="TKey">Type of key/</typeparam>
       <returns>New seek filter based on information in binary stream.</returns>
     </member>
-    <member name="F:SnapDB.Snap.Filters.TimestampPointIdSeekFilterDefinition.FilterGuid">
+    <member name="F:SnapDB.Snap.Filters.TimestampPointIDSeekFilterDefinition.FilterGuid">
       <summary>
-            Guid for the <see cref="T:SnapDB.Snap.Filters.TimestampPointIdSeekFilterDefinition" />.
+            Guid for the <see cref="T:SnapDB.Snap.Filters.TimestampPointIDSeekFilterDefinition" />.
             </summary>
     </member>
-    <member name="P:SnapDB.Snap.Filters.TimestampPointIdSeekFilterDefinition.FilterType">
+    <member name="P:SnapDB.Snap.Filters.TimestampPointIDSeekFilterDefinition.FilterType">
       <summary>
-            Gets the filter type Guid for the <see cref="T:SnapDB.Snap.Filters.TimestampPointIdSeekFilterDefinition" />.
+            Gets the filter type Guid for the <see cref="T:SnapDB.Snap.Filters.TimestampPointIDSeekFilterDefinition" />.
             </summary>
     </member>
     <member name="T:SnapDB.Snap.Filters.TimestampSeekFilter">
@@ -12598,7 +12598,7 @@
             The timestamp stored as native ticks.
             </summary>
     </member>
-    <member name="T:SnapDB.Snap.Types.TimestampPointIdBase`1">
+    <member name="T:SnapDB.Snap.Types.TimestampPointIDBase`1">
       <summary>
             Base implementation of a historian key.
             These are the required functions that are
@@ -12606,16 +12606,16 @@
             </summary>
       <typeparam name="TKey"></typeparam>
     </member>
-    <member name="M:SnapDB.Snap.Types.TimestampPointIdBase`1.#ctor">
+    <member name="M:SnapDB.Snap.Types.TimestampPointIDBase`1.#ctor">
       <summary>
         <markup>
           <include item="SMCAutoDocConstructor">
-            <parameter>SnapDB.Snap.Types.TimestampPointIdBase`1</parameter>
+            <parameter>SnapDB.Snap.Types.TimestampPointIDBase`1</parameter>
           </include>
         </markup>
       </summary>
     </member>
-    <member name="F:SnapDB.Snap.Types.TimestampPointIdBase`1.PointId">
+    <member name="F:SnapDB.Snap.Types.TimestampPointIDBase`1.PointID">
       <summary>
             The ID number of the point.
             </summary>

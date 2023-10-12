@@ -61,29 +61,29 @@ public class HistorianFileEncoding : PairEncodingBase<HistorianKey, HistorianVal
         //  Stage 4: 32 bit
         //  Stage 5: Catch all
 
-        if (key.Timestamp == prevKey.Timestamp && key.PointId > prevKey.PointId && key.PointId - prevKey.PointId <= 16 && key.EntryNumber == 0 && value.Value1 <= uint.MaxValue //must be a 32-bit value
+        if (key.Timestamp == prevKey.Timestamp && key.PointID > prevKey.PointID && key.PointID - prevKey.PointID <= 16 && key.EntryNumber == 0 && value.Value1 <= uint.MaxValue //must be a 32-bit value
             && value.Value2 == 0 && value.Value3 == 0)
         {
-            uint deltaPointId = (uint)(key.PointId - prevKey.PointId);
+            uint deltaPointID = (uint)(key.PointID - prevKey.PointID);
             //Could match Stage 1, 2, 3, or 4
 
             //Check for Stage 3
-            if (value.Value1 == 0 && deltaPointId <= 16)
+            if (value.Value1 == 0 && deltaPointID <= 16)
             {
                 //Stage 3: 28% of the time.
-                stream[0] = (byte)(0xC0 | (deltaPointId - 1));
+                stream[0] = (byte)(0xC0 | (deltaPointID - 1));
                 return 1;
             }
 
             //Check for Stage 1
-            if (value.Value1 >> 28 == 4 && deltaPointId <= 8)
+            if (value.Value1 >> 28 == 4 && deltaPointID <= 8)
             {
                 //Stage 1: 46% of the time
                 //Big Positive Float
 
                 //Must be stored big endian
                 //ByteCode is 0DDDVVVV
-                stream[0] = (byte)(((value.Value1 >> 24) & 0xF) | ((deltaPointId - 1) << 4));
+                stream[0] = (byte)(((value.Value1 >> 24) & 0xF) | ((deltaPointID - 1) << 4));
                 stream[1] = (byte)(value.Value1 >> 16);
                 stream[2] = (byte)(value.Value1 >> 8);
                 stream[3] = (byte)value.Value1;
@@ -91,11 +91,11 @@ public class HistorianFileEncoding : PairEncodingBase<HistorianKey, HistorianVal
             }
 
             //Check for stage 2
-            if (value.Value1 >> 28 == 12 && deltaPointId <= 4)
+            if (value.Value1 >> 28 == 12 && deltaPointID <= 4)
             {
                 //Must be stored big endian
                 //ByteCode is 10DDVVVV
-                stream[0] = (byte)(0x80 | ((value.Value1 >> 24) & 0xF) | ((deltaPointId - 1) << 4));
+                stream[0] = (byte)(0x80 | ((value.Value1 >> 24) & 0xF) | ((deltaPointID - 1) << 4));
                 stream[1] = (byte)(value.Value1 >> 16);
                 stream[2] = (byte)(value.Value1 >> 8);
                 stream[3] = (byte)value.Value1;
@@ -105,7 +105,7 @@ public class HistorianFileEncoding : PairEncodingBase<HistorianKey, HistorianVal
             //Check for stage 4
             //All conditions are in the logic statement that enters this block.
             //  deltaPointID <= 16
-            stream[0] = (byte)(0xD0 | (deltaPointId - 1));
+            stream[0] = (byte)(0xD0 | (deltaPointID - 1));
             *(uint*)(stream + 1) = (uint)value.Value1;
             return 5;
         }
@@ -117,11 +117,11 @@ public class HistorianFileEncoding : PairEncodingBase<HistorianKey, HistorianVal
         {
             stream[0] |= 0x10; //Set bit T
             Encoding7Bit.Write(stream, ref size, key.Timestamp - prevKey.Timestamp);
-            Encoding7Bit.Write(stream, ref size, key.PointId);
+            Encoding7Bit.Write(stream, ref size, key.PointID);
         }
         else
         {
-            Encoding7Bit.Write(stream, ref size, key.PointId - prevKey.PointId);
+            Encoding7Bit.Write(stream, ref size, key.PointID - prevKey.PointID);
         }
 
 
@@ -175,7 +175,7 @@ public class HistorianFileEncoding : PairEncodingBase<HistorianKey, HistorianVal
         {
             //If stage 1 (50% success)
             key.Timestamp = prevKey.Timestamp;
-            key.PointId = prevKey.PointId + 1 + ((code >> 4) & 0x7);
+            key.PointID = prevKey.PointID + 1 + ((code >> 4) & 0x7);
             key.EntryNumber = 0;
             value.Value1 = (4u << 28) | ((code & 0xF) << 24) | ((uint)stream[1] << 16) | ((uint)stream[2] << 8) | ((uint)stream[3] << 0);
             value.Value2 = 0;
@@ -187,7 +187,7 @@ public class HistorianFileEncoding : PairEncodingBase<HistorianKey, HistorianVal
         {
             //If stage 2 (16% success)
             key.Timestamp = prevKey.Timestamp;
-            key.PointId = prevKey.PointId + 1 + ((code >> 4) & 0x3);
+            key.PointID = prevKey.PointID + 1 + ((code >> 4) & 0x3);
             key.EntryNumber = 0;
             value.Value1 = (12u << 28) | ((code & 0xF) << 24) | ((uint)stream[1] << 16) | ((uint)stream[2] << 8) | ((uint)stream[3] << 0);
             value.Value2 = 0;
@@ -199,7 +199,7 @@ public class HistorianFileEncoding : PairEncodingBase<HistorianKey, HistorianVal
         {
             //If stage 3 (28% success)
             key.Timestamp = prevKey.Timestamp;
-            key.PointId = prevKey.PointId + 1 + (code & 0xF);
+            key.PointID = prevKey.PointID + 1 + (code & 0xF);
             key.EntryNumber = 0;
             value.Value1 = 0;
             value.Value2 = 0;
@@ -211,7 +211,7 @@ public class HistorianFileEncoding : PairEncodingBase<HistorianKey, HistorianVal
         {
             //If stage 4 (3% success)
             key.Timestamp = prevKey.Timestamp;
-            key.PointId = prevKey.PointId + 1 + (code & 0xF);
+            key.PointID = prevKey.PointID + 1 + (code & 0xF);
             key.EntryNumber = 0;
             value.Value1 = *(uint*)(stream + 1);
             value.Value2 = 0;
@@ -225,12 +225,12 @@ public class HistorianFileEncoding : PairEncodingBase<HistorianKey, HistorianVal
         if ((code & 16) != 0) //T is set
         {
             key.Timestamp = prevKey.Timestamp + Encoding7Bit.ReadUInt64(stream, ref size);
-            key.PointId = Encoding7Bit.ReadUInt64(stream, ref size);
+            key.PointID = Encoding7Bit.ReadUInt64(stream, ref size);
         }
         else
         {
             key.Timestamp = prevKey.Timestamp;
-            key.PointId = prevKey.PointId + Encoding7Bit.ReadUInt64(stream, ref size);
+            key.PointID = prevKey.PointID + Encoding7Bit.ReadUInt64(stream, ref size);
         }
 
 
@@ -291,7 +291,7 @@ public class HistorianFileEncoding : PairEncodingBase<HistorianKey, HistorianVal
 
             //If stage 1 (50% success)
             key.Timestamp = prevKey.Timestamp;
-            key.PointId = prevKey.PointId + 1 + ((code >> 4) & 0x7);
+            key.PointID = prevKey.PointID + 1 + ((code >> 4) & 0x7);
             key.EntryNumber = 0;
             value.Value1 = (4u << 28) | ((code & 0xF) << 24) | ((uint)b1 << 16) | ((uint)b2 << 8) | ((uint)b3 << 0);
             value.Value2 = 0;
@@ -307,7 +307,7 @@ public class HistorianFileEncoding : PairEncodingBase<HistorianKey, HistorianVal
 
             //If stage 2 (16% success)
             key.Timestamp = prevKey.Timestamp;
-            key.PointId = prevKey.PointId + 1 + ((code >> 4) & 0x3);
+            key.PointID = prevKey.PointID + 1 + ((code >> 4) & 0x3);
             key.EntryNumber = 0;
             value.Value1 = (12u << 28) | ((code & 0xF) << 24) | ((uint)b1 << 16) | ((uint)b2 << 8) | ((uint)b3 << 0);
             value.Value2 = 0;
@@ -319,7 +319,7 @@ public class HistorianFileEncoding : PairEncodingBase<HistorianKey, HistorianVal
         {
             //If stage 3 (28% success)
             key.Timestamp = prevKey.Timestamp;
-            key.PointId = prevKey.PointId + 1 + (code & 0xF);
+            key.PointID = prevKey.PointID + 1 + (code & 0xF);
             key.EntryNumber = 0;
             value.Value1 = 0;
             value.Value2 = 0;
@@ -331,7 +331,7 @@ public class HistorianFileEncoding : PairEncodingBase<HistorianKey, HistorianVal
         {
             //If stage 4 (3% success)
             key.Timestamp = prevKey.Timestamp;
-            key.PointId = prevKey.PointId + 1 + (code & 0xF);
+            key.PointID = prevKey.PointID + 1 + (code & 0xF);
             key.EntryNumber = 0;
             value.Value1 = stream.ReadUInt32();
             value.Value2 = 0;
@@ -344,12 +344,12 @@ public class HistorianFileEncoding : PairEncodingBase<HistorianKey, HistorianVal
         if ((code & 16) != 0) //T is set
         {
             key.Timestamp = prevKey.Timestamp + stream.Read7BitUInt64();
-            key.PointId = stream.Read7BitUInt64();
+            key.PointID = stream.Read7BitUInt64();
         }
         else
         {
             key.Timestamp = prevKey.Timestamp;
-            key.PointId = prevKey.PointId + stream.Read7BitUInt64();
+            key.PointID = prevKey.PointID + stream.Read7BitUInt64();
         }
 
 

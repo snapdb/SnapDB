@@ -58,7 +58,7 @@ public class PointStreamSequentialPoints : TreeStream<HistorianKey, HistorianVal
         if (m_count <= 0)
         {
             key.Timestamp = 0;
-            key.PointId = 0;
+            key.PointID = 0;
             value.Value3 = 0;
             value.Value1 = 0;
             return false;
@@ -66,7 +66,7 @@ public class PointStreamSequentialPoints : TreeStream<HistorianKey, HistorianVal
 
         m_count--;
         key.Timestamp = 0;
-        key.PointId = m_start;
+        key.PointID = m_start;
         value.AsSingle = 60.251f;
         m_start++;
         return true;
@@ -113,7 +113,7 @@ public class PointStreamSequential : TreeStream<HistorianKey, HistorianValue>
         if (m_count <= 0)
         {
             key.Timestamp = 0;
-            key.PointId = 0;
+            key.PointID = 0;
             value.Value3 = 0;
             value.Value1 = 0;
             return false;
@@ -121,7 +121,7 @@ public class PointStreamSequential : TreeStream<HistorianKey, HistorianValue>
 
         m_count--;
         key.Timestamp = m_key1(m_start);
-        key.PointId = m_key2(m_start);
+        key.PointID = m_key2(m_start);
         value.Value3 = m_value1(m_start);
         value.Value1 = m_value2(m_start);
         m_start++;

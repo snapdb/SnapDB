@@ -39,7 +39,7 @@ public abstract class TimestampPointIDBase<TKey> : TimestampBase<TKey> where TKe
     /// <summary>
     /// The ID number of the point.
     /// </summary>
-    public ulong PointId;
+    public ulong PointID;
 
     #endregion
 }

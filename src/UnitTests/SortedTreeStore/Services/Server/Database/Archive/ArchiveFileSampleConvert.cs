@@ -60,7 +60,7 @@ public class ArchiveFileSampleConvert
                 for (ulong v2 = 1; v2 < 86000; v2++)
                 {
                     key.Timestamp = v1 * 2342523;
-                    key.PointId = v2;
+                    key.PointID = v2;
                     value.Value1 = (ulong)r.Next();
                     value.Value3 = 0;
 
@@ -149,7 +149,7 @@ public class ArchiveFileSampleConvert
         {
             Assert.IsTrue(scanner.Read(key, value));
             Assert.AreEqual(key.Timestamp, v1 * 2342523);
-            Assert.AreEqual(key.PointId, v2);
+            Assert.AreEqual(key.PointID, v2);
             Assert.AreEqual(value.Value3, 0ul);
             Assert.AreEqual(value.Value1, (ulong)r.Next());
         }

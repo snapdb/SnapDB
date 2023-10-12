@@ -240,7 +240,7 @@ public class TestPageSizesBulk
         {
             for (uint x = 0; x < 1000000; x++)
             {
-                key.PointId = x;
+                key.PointID = x;
                 edit.AddPoint(key, value);
             }
 

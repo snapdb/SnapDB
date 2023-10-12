@@ -29,11 +29,11 @@ using SnapDB.Snap.Types;
 
 namespace SnapDB.Snap.Filters;
 
-public partial class PointIdMatchFilter
+public partial class PointIDMatchFilter
 {
     #region [ Members ]
 
-    private class ULongHashSet<TKey, TValue> : MatchFilterBase<TKey, TValue> where TKey : TimestampPointIdBase<TKey>, new()
+    private class ULongHashSet<TKey, TValue> : MatchFilterBase<TKey, TValue> where TKey : TimestampPointIDBase<TKey>, new()
     {
         #region [ Members ]
 
@@ -77,7 +77,7 @@ public partial class PointIdMatchFilter
 
         #region [ Properties ]
 
-        public override Guid FilterType => PointIdMatchFilterDefinition.FilterGuid;
+        public override Guid FilterType => PointIDMatchFilterDefinition.FilterGuid;
 
         #endregion
 
@@ -95,7 +95,7 @@ public partial class PointIdMatchFilter
 
         public override bool Contains(TKey key, TValue value)
         {
-            return m_points.Contains(key.PointId);
+            return m_points.Contains(key.PointID);
         }
 
         #endregion

@@ -33,7 +33,7 @@ namespace SnapDB.Snap.Filters;
 /// <summary>
 /// A class for implementing a match filter using a <see cref="BitArray"/>.
 /// </summary>
-public class PointIdMatchFilterBitArray
+public class PointIDMatchFilterBitArray
 {
     #region [ Members ]
 
@@ -42,7 +42,7 @@ public class PointIdMatchFilterBitArray
     /// </summary>
     /// <typeparam name="TKey">The type of keys in the filter.</typeparam>
     /// <typeparam name="TValue">The type of values in the filter.</typeparam>
-    public class BitArrayFilter<TKey, TValue> : MatchFilterBase<TKey, TValue> where TKey : TimestampPointIdBase<TKey>, new()
+    public class BitArrayFilter<TKey, TValue> : MatchFilterBase<TKey, TValue> where TKey : TimestampPointIDBase<TKey>, new()
     {
         #region [ Members ]
 
@@ -109,7 +109,7 @@ public class PointIdMatchFilterBitArray
         /// <summary>
         /// Gets the unique identifier for the filter type associated with the <see cref="BitArrayFilter{TKey, TValue}"/>.
         /// </summary>
-        public override Guid FilterType => PointIdMatchFilterDefinition.FilterGuid;
+        public override Guid FilterType => PointIDMatchFilterDefinition.FilterGuid;
 
         /// <summary>
         /// Gets or sets the maximum value used in the bit array. Cannot be larger than <see cref="int.MaxValue"/> - 1.
@@ -147,9 +147,9 @@ public class PointIdMatchFilterBitArray
         /// <returns><c>true</c> if the filter contains the specified key and value; otherwise, <c>false</c>.</returns>
         public override bool Contains(TKey key, TValue value)
         {
-            int point = (int)key.PointId;
+            int point = (int)key.PointID;
 
-            return key.PointId <= MaxValue && m_points.GetBitUnchecked(point);
+            return key.PointID <= MaxValue && m_points.GetBitUnchecked(point);
         }
 
         #endregion
