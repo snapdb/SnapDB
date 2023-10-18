@@ -63,8 +63,8 @@ public class SnapNetworkClient : SnapStreamingClient
                 credentials = new SecureStreamClientDefault();
         }
 
-        if (!IPAddress.TryParse(settings.ServerNameOrIp, out IPAddress ip))
-            ip = Dns.GetHostAddresses(settings.ServerNameOrIp)[0];
+        if (!IPAddress.TryParse(settings.ServerNameOrIP, out IPAddress ip))
+            ip = Dns.GetHostAddresses(settings.ServerNameOrIP)[0];
 
         IPEndPoint server = new(ip, settings.NetworkPort);
 

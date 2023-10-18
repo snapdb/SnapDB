@@ -121,14 +121,14 @@ public abstract class SnapClient : DisposableLoggingClassBase
     /// <summary>
     /// Connects to a server over a network socket.
     /// </summary>
-    /// <param name="serverOrIp">The name of the server to connect to, or the IP address to use.</param>
+    /// <param name="serverOrIP">The name of the server to connect to, or the IP address to use.</param>
     /// <param name="port">The port number to connect to.</param>
     /// <returns>A <see cref="SnapClient"/></returns>
-    public static SnapClient Connect(string serverOrIp, int port)
+    public static SnapClient Connect(string serverOrIP, int port)
     {
         SnapNetworkClientSettings settings = new()
         {
-            ServerNameOrIp = serverOrIp,
+            ServerNameOrIP = serverOrIP,
             NetworkPort = port
         };
 

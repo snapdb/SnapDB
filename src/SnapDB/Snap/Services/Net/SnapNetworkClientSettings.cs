@@ -41,7 +41,7 @@ public class SnapNetworkClientSettings
     /// <summary>
     /// The name of the server to connect to, or the IP address to use.
     /// </summary>
-    public string ServerNameOrIp = "localhost";
+    public string ServerNameOrIP = "localhost";
 
     /// <summary>
     /// Gets if integrated security will be used, or if the default user will be used.

@@ -46,7 +46,7 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     /// <summary>
     /// Defines the default network IP address for the <see cref="SnapSocketListener"/>.
     /// </summary>
-    public const string DefaultIpAddress = "";
+    public const string DefaultIPAddress = "";
 
     /// <summary>
     /// Defines the default network port for a <see cref="SnapSocketListener"/>.
@@ -77,7 +77,7 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     private bool m_forceSsl = false;
 
     // The local IP address to host on. Leave empty to bind to all local interfaces.
-    private string m_localIpAddress = DefaultIpAddress;
+    private string m_localIPAddress = DefaultIPAddress;
 
     // The local TCP port to host on.
     private int m_localTcpPort = DefaultNetworkPort;
@@ -110,15 +110,15 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
         get
         {
         #if SQLCLR
-            if (string.IsNullOrWhiteSpace(m_localIpAddress))
+            if (string.IsNullOrWhiteSpace(m_localIPAddress))
                 return new IPEndPoint(IPAddress.Any, m_localTcpPort);
 
-            return new IPEndPoint(IPAddress.Parse(m_localIpAddress), m_localTcpPort);
+            return new IPEndPoint(IPAddress.Parse(m_localIPAddress), m_localTcpPort);
         #else
             // SnapSocketListener automatically enables dual-stack socket for IPv6 to support legacy client implementations expecting IPv4 hosting
-            IPStack ipStack = string.IsNullOrWhiteSpace(m_localIpAddress) ? Transport.GetDefaultIPStack() : Transport.IsIPv6IP(m_localIpAddress) ? IPStack.IPv6 : IPStack.IPv4;
+            IPStack ipStack = string.IsNullOrWhiteSpace(m_localIPAddress) ? Transport.GetDefaultIPStack() : Transport.IsIPv6IP(m_localIPAddress) ? IPStack.IPv6 : IPStack.IPv4;
 
-            return Transport.CreateEndPoint(m_localIpAddress, m_localTcpPort, ipStack);
+            return Transport.CreateEndPoint(m_localIPAddress, m_localTcpPort, ipStack);
         #endif
         }
     }
@@ -126,13 +126,13 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     /// <summary>
     /// The local IP address to host on. Leave empty to bind to all local interfaces.
     /// </summary>
-    public string LocalIpAddress
+    public string LocalIPAddress
     {
-        get => m_localIpAddress;
+        get => m_localIPAddress;
         set
         {
             TestForEditable();
-            m_localIpAddress = value;
+            m_localIPAddress = value;
         }
     }
 
