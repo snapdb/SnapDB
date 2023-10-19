@@ -30,10 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
     <PackageReference Include="Gemstone.Common" Version="1.0.100" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />

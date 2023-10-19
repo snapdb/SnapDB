@@ -26,6 +26,7 @@
 
 using System.Net;
 using System.Net.Sockets;
+using Gemstone.Diagnostics;
 using SnapDB.Security;
 
 namespace SnapDB.Snap.Services.Net;
@@ -53,7 +54,7 @@ public class SnapNetworkClient : SnapStreamingClient
     /// If left null, the computers current credentials are use.
     /// </param>
     /// <param name="useSsl">Specifies if ssl encryption is desired for the connection.</param>
-    public SnapNetworkClient(SnapNetworkClientSettings settings, SecureStreamClientBase credentials = null, bool useSsl = false)
+    public SnapNetworkClient(SnapNetworkClientSettings settings, SecureStreamClientBase? credentials = null, bool useSsl = false)
     {
         if (credentials is null)
         {
@@ -63,7 +64,7 @@ public class SnapNetworkClient : SnapStreamingClient
                 credentials = new SecureStreamClientDefault();
         }
 
-        if (!IPAddress.TryParse(settings.ServerNameOrIP, out IPAddress ip))
+        if (!IPAddress.TryParse(settings.ServerNameOrIP, out IPAddress? ip))
             ip = Dns.GetHostAddresses(settings.ServerNameOrIP)[0];
 
         IPEndPoint server = new(ip, settings.NetworkPort);
@@ -85,27 +86,30 @@ public class SnapNetworkClient : SnapStreamingClient
     /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
     protected override void Dispose(bool disposing)
     {
-        if (!m_disposed)
-        {
-            base.Dispose(disposing); // Call base class Dispose().
+        if (m_disposed)
+            return;
+        
+        base.Dispose(disposing); // Call base class Dispose().
 
+        try
+        {
+            // This will be done regardless of whether the object is finalized or disposed.
+            if (!disposing)
+                return;
+            
             try
             {
-                // This will be done regardless of whether the object is finalized or disposed.
-                if (disposing)
-                    try
-                    {
-                        m_client.Client.Shutdown(SocketShutdown.Both);
-                        m_client.Close();
-                    }
-                    catch (Exception)
-                    {
-                    }
+                m_client.Client.Shutdown(SocketShutdown.Both);
+                m_client.Close();
             }
-            finally
+            catch (Exception ex)
             {
-                m_disposed = true; // Prevent duplicate dispose.
+                Logger.SwallowException(ex);
             }
+        }
+        finally
+        {
+            m_disposed = true; // Prevent duplicate dispose.
         }
     }
 
