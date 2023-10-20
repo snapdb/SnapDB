@@ -65,6 +65,7 @@ public class WriteProcessor<TKey, TValue> : DisposableLoggingClassBase where TKe
         m_isMemoryOnly = false;
         m_prebuffer = new PrebufferWriter<TKey, TValue>(settings.PrebufferWriter, m_firstStageWriter.AppendData);
         m_transactionTracker = new TransactionTracker<TKey, TValue>(m_prebuffer, m_firstStageWriter);
+
         foreach (CombineFilesSettings rollover in settings.StagingRollovers)
             m_stagingRollovers.Add(new CombineFiles<TKey, TValue>(rollover, list, rolloverLog));
     }
@@ -79,23 +80,25 @@ public class WriteProcessor<TKey, TValue> : DisposableLoggingClassBase where TKe
     /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
     protected override void Dispose(bool disposing)
     {
-        if (!m_disposed)
-            try
-            {
-                // This will be done regardless of whether the object is finalized or disposed.
-                if (disposing)
-                {
-                    // This will be done only when the object is disposed by calling Dispose().
-                    m_prebuffer.Stop();
-                    m_firstStageWriter.Stop();
-                    m_stagingRollovers.ForEach(x => x.Dispose());
-                }
-            }
-            finally
-            {
-                m_disposed = true; // Prevent duplicate dispose.
-                base.Dispose(disposing); // Call base class Dispose().
-            }
+        if (m_disposed)
+            return;
+        
+        try
+        {
+            // This will be done regardless of whether the object is finalized or disposed.
+            if (!disposing)
+                return;
+            
+            // This will be done only when the object is disposed by calling Dispose().
+            m_prebuffer.Stop();
+            m_firstStageWriter.Stop();
+            m_stagingRollovers.ForEach(x => x.Dispose());
+        }
+        finally
+        {
+            m_disposed = true; // Prevent duplicate dispose.
+            base.Dispose(disposing); // Call base class Dispose().
+        }
     }
 
     /// <summary>
