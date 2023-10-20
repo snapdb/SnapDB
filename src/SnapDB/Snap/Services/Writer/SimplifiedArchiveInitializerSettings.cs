@@ -172,6 +172,11 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
     /// </summary>
     public ImmutableList<string> WritePath { get; private set; }
 
+    /// <summary>
+    /// Gets or sets the metadata to be written to the archive.
+    /// </summary>
+    public byte[]? Metadata { get; set; }
+
     #endregion
 
     #region [ Methods ]

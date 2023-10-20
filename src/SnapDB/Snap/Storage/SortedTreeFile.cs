@@ -154,7 +154,7 @@ public class SortedTreeFile : IDisposable
     /// <returns>null if table does not exist</returns>
     public SortedTreeTable<TKey, TValue>? OpenTable<TKey, TValue>() where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
-        return OpenTable<TKey, TValue>(GetFileName<TKey, TValue>());
+        return OpenTable<TKey, TValue>(GetArchiveFileName<TKey, TValue>());
     }
 
     /// <summary>
@@ -169,7 +169,7 @@ public class SortedTreeFile : IDisposable
     /// <returns>null if table does not exist</returns>
     public SortedTreeTable<TKey, TValue>? OpenTable<TKey, TValue>(string tableName) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
-        return OpenTable<TKey, TValue>(GetFileName<TKey, TValue>(tableName));
+        return OpenTable<TKey, TValue>(GetArchiveFileName<TKey, TValue>(tableName));
     }
 
     /// <summary>
@@ -187,7 +187,7 @@ public class SortedTreeFile : IDisposable
         if (storageMethod is null)
             throw new ArgumentNullException(nameof(storageMethod));
 
-        SubFileName fileName = GetFileName<TKey, TValue>(tableName);
+        SubFileName fileName = GetArchiveFileName<TKey, TValue>(tableName);
         
         return OpenOrCreateTable<TKey, TValue>(storageMethod, fileName, maxSortedTreeBlockSize);
     }
@@ -208,9 +208,28 @@ public class SortedTreeFile : IDisposable
         if (storageMethod is null)
             throw new ArgumentNullException(nameof(storageMethod));
 
-        SubFileName fileName = GetFileName<TKey, TValue>();
+        SubFileName fileName = GetArchiveFileName<TKey, TValue>();
         
         return OpenOrCreateTable<TKey, TValue>(storageMethod, fileName, maxSortedTreeBlockSize);
+    }
+
+    /// <summary>
+    /// Gets the metadata from the archive file associated with the specified key and value types.
+    /// </summary>
+    /// <typeparam name="TKey">The type parameter specifying the data type for keys.</typeparam>
+    /// <typeparam name="TValue">The type parameter specifying the data type for values.</typeparam>
+    /// <returns>Metadata extracted from archive file; otherwise, <c>null</c> if no metadata exists.</returns>
+    public byte[]? GetMetadata<TKey, TValue>() where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    {
+        SubFileName fileName = GetMetadataFileName<TKey, TValue>();
+
+        if (!m_fileStructure.Snapshot.Header.ContainsSubFile(fileName))
+            return null;
+
+        using SubFileStream file = m_fileStructure.Snapshot.OpenFile(fileName);
+        using BinaryStream bs = new(file);
+
+        return bs.ReadBytes();
     }
 
     /// <summary>
@@ -258,28 +277,6 @@ public class SortedTreeFile : IDisposable
         return (SortedTreeTable<TKey, TValue>)m_openedFiles[fileName];
     }
 
-    /// <summary>
-    /// Helper method. Creates the <see cref="SubFileName"/> for the default table.
-    /// </summary>
-    /// <typeparam name="TKey">The type parameter specifying the data type for keys.</typeparam>
-    /// <typeparam name="TValue">The type parameter specifying the data type for values.</typeparam>
-    /// <returns>
-    /// A unique <see cref="SubFileName"/> associated with the specified key and value types.
-    /// </returns>
-    private SubFileName GetFileName<TKey, TValue>() where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
-    {
-        Guid keyType = new TKey().GenericTypeGuid;
-        Guid valueType = new TValue().GenericTypeGuid;
-        return SubFileName.Create(PrimaryArchiveType, keyType, valueType);
-    }
-
-    private SubFileName GetFileName<TKey, TValue>(string fileName) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
-    {
-        Guid keyType = new TKey().GenericTypeGuid;
-        Guid valueType = new TValue().GenericTypeGuid;
-        return SubFileName.Create(fileName, keyType, valueType);
-    }
-
     private void CreateArchiveFile<TKey, TValue>(SubFileName fileName, EncodingDefinition storageMethod, int maxSortedTreeBlockSize) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         if (maxSortedTreeBlockSize < 1024)
@@ -320,6 +317,12 @@ public class SortedTreeFile : IDisposable
     /// The guid where the primary archive component exists
     /// </summary>
     internal static readonly Guid PrimaryArchiveType = new(0xe0fca590, 0xf46e, 0x4060, 0x87, 0x64, 0xdf, 0xdc, 0xfc, 0x74, 0xd7, 0x28);
+
+    // {BDDC2947-D7A2-45B2-AEF1-AF1947311BD0}
+    /// <summary>
+    /// The guid where the primary archive component exists
+    /// </summary>
+    internal static readonly Guid MetadataArchiveType = new(0xbddc2947, 0xd7a2, 0x45b2, 0xae, 0xf1, 0xaf, 0x19, 0x47, 0x31, 0x1b, 0xd0);
 
     /// <summary>
     /// Creates a new in memory archive file.
@@ -374,6 +377,33 @@ public class SortedTreeFile : IDisposable
             throw new Exception("Archive type is unknown");
 
         return af;
+    }
+
+    // Helper method to create the SubFileName for the default table.
+    // Returns a unique SubFileName associated with the specified key and value types.
+    private static SubFileName GetArchiveFileName<TKey, TValue>() where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    {
+        Guid keyType = new TKey().GenericTypeGuid;
+        Guid valueType = new TValue().GenericTypeGuid;
+        return SubFileName.Create(PrimaryArchiveType, keyType, valueType);
+    }
+
+    // Helper method to create the SubFileName for the specified table name.
+    // Returns a unique SubFileName associated with the specified table name and key and value types.
+    private static SubFileName GetArchiveFileName<TKey, TValue>(string fileName) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    {
+        Guid keyType = new TKey().GenericTypeGuid;
+        Guid valueType = new TValue().GenericTypeGuid;
+        return SubFileName.Create(fileName, keyType, valueType);
+    }
+
+    // Helper method to create the SubFileName for the default metadata.
+    // Returns a unique SubFileName associated with the specified key and value types.
+    private static SubFileName GetMetadataFileName<TKey, TValue>() where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    {
+        Guid keyType = new TKey().GenericTypeGuid;
+        Guid valueType = new TValue().GenericTypeGuid;
+        return SubFileName.Create(MetadataArchiveType, keyType, valueType);
     }
 
     #endregion
