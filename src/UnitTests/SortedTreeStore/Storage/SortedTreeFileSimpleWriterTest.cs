@@ -24,6 +24,9 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
+using System.Text;
+using Gemstone.ArrayExtensions;
 using NUnit.Framework;
 using SnapDB.IO.FileStructure;
 using SnapDB.Snap;
@@ -152,6 +155,66 @@ public class SortedTreeFileSimpleWriterTest
         using SortedTreeFile file = SortedTreeFile.OpenFile(@"C:\Temp\fileTemp.d2i", true);
         using SortedTreeTable<HistorianKey, HistorianValue> table = file.OpenTable<HistorianKey, HistorianValue>();
         using SortedTreeTableReadSnapshot<HistorianKey, HistorianValue> read = table.AcquireReadSnapshot().CreateReadSnapshot();
+        using SortedTreeScannerBase<HistorianKey, HistorianValue> scanner = read.GetTreeScanner();
+        scanner.SeekToStart();
+        int cnt = 0;
+        while (scanner.Read(key, value))
+        {
+            if (key.PointID != (ulong)cnt)
+                throw new Exception();
+            cnt++;
+        }
+
+        if (cnt != pointCount)
+            throw new Exception();
+    }
+
+
+
+    [Test]
+    public void TestWithMetadata()
+    {
+        for (int x = 1; x < 1000000; x *= 2)
+            TestWithMetadata(x);
+    }
+
+    private void TestWithMetadata(int pointCount)
+    {
+        const string fileName = @"C:\Temp\fileTempWithMetadata";
+
+        SortedPointBuffer<HistorianKey, HistorianValue> points = new(pointCount, true);
+
+        HistorianKey key = new();
+        HistorianValue value = new();
+
+        for (int x = 0; x < pointCount; x++)
+        {
+            key.PointID = (ulong)x;
+            points.TryEnqueue(key, value);
+        }
+
+        points.IsReadingMode = true;
+
+        File.Delete($"{fileName}~d2i");
+        File.Delete($"{fileName}.d2i");
+
+        StringBuilder builder = new();
+
+        builder.AppendLine("\"ID\",\"PointTag\",\"Description\"");
+
+        for (int x = 0; x < pointCount; x++)
+            builder.AppendLine($"\"{x}\",\"Tag{x}\",\"Description{x}\"");
+
+        string csvMetadata = builder.ToString();
+        byte[] metadata = CompressData(Encoding.UTF8.GetBytes(csvMetadata));
+
+        // Write file which includes archive data and metadata.
+        SortedTreeFileSimpleWriter<HistorianKey, HistorianValue>.CreateWithMetadata($"{fileName}.~d2i", $"{fileName}.d2i", 4096, null, EncodingDefinition.FixedSizeCombinedEncoding, points, metadata);
+
+        // Verify
+        using SortedTreeFile file = SortedTreeFile.OpenFile($"{fileName}.d2i", true);
+        using SortedTreeTable<HistorianKey, HistorianValue> table = file.OpenTable<HistorianKey, HistorianValue>();
+        using SortedTreeTableReadSnapshot<HistorianKey, HistorianValue> read = table.AcquireReadSnapshot().CreateReadSnapshot();
         using (SortedTreeScannerBase<HistorianKey, HistorianValue> scanner = read.GetTreeScanner())
         {
             scanner.SeekToStart();
@@ -166,6 +229,46 @@ public class SortedTreeFileSimpleWriterTest
             if (cnt != pointCount)
                 throw new Exception();
         }
+
+        byte[] readMetadata = file.GetMetadata<HistorianKey, HistorianValue>();
+
+        if (readMetadata.CompareTo(metadata) != 0)
+            throw new Exception();
+
+        string decodedMetadata = Encoding.UTF8.GetString(DecompressData(readMetadata));
+
+        if (string.Compare(decodedMetadata, csvMetadata, StringComparison.Ordinal) != 0)
+            throw new Exception();
+
+        Test(pointCount, false);
+
+        FileInfo withMetadata = new($"{fileName}.d2i");
+        FileInfo withoutMetadata = new(@"C:\Temp\fileTemp.d2i");
+
+        // Percent file size of file metadata vs without
+        double percent = (double)withMetadata.Length / withoutMetadata.Length;
+
+        Console.WriteLine($"Percent larger with metadata for point count {pointCount:N0}: {percent:0.00%} ({withMetadata.Length - withoutMetadata.Length:N0} bytes): with {withMetadata.Length:N0} / without {withoutMetadata.Length:N0}");
+    }
+    
+    private static byte[] CompressData(byte[] data)
+    {
+        using MemoryStream compressedStream = new();
+        using (GZipStream zipStream = new(compressedStream, CompressionMode.Compress))
+            zipStream.Write(data, 0, data.Length);
+        
+        return compressedStream.ToArray();
+    }
+
+    private static byte[] DecompressData(byte[] compressedData)
+    {
+        using MemoryStream compressedStream = new(compressedData);
+        using GZipStream zipStream = new(compressedStream, CompressionMode.Decompress);
+        using MemoryStream resultStream = new();
+        
+        zipStream.CopyTo(resultStream);
+        
+        return resultStream.ToArray();
     }
 
     [Test]
@@ -202,20 +305,18 @@ public class SortedTreeFileSimpleWriterTest
         using SortedTreeFile file = SortedTreeFile.OpenFile(@"C:\Temp\fileTemp.d2i", true);
         using SortedTreeTable<HistorianKey, HistorianValue> table = file.OpenTable<HistorianKey, HistorianValue>();
         using SortedTreeTableReadSnapshot<HistorianKey, HistorianValue> read = table.AcquireReadSnapshot().CreateReadSnapshot();
-        using (SortedTreeScannerBase<HistorianKey, HistorianValue> scanner = read.GetTreeScanner())
+        using SortedTreeScannerBase<HistorianKey, HistorianValue> scanner = read.GetTreeScanner();
+        scanner.SeekToStart();
+        int cnt = 0;
+        while (scanner.Read(key, value))
         {
-            scanner.SeekToStart();
-            int cnt = 0;
-            while (scanner.Read(key, value))
-            {
-                if (key.PointID != (ulong)cnt)
-                    throw new Exception();
-                cnt++;
-            }
-
-            if (cnt != pointCount)
+            if (key.PointID != (ulong)cnt)
                 throw new Exception();
+            cnt++;
         }
+
+        if (cnt != pointCount)
+            throw new Exception();
     }
 
     #endregion
