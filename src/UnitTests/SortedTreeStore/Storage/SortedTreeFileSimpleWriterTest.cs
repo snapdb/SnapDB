@@ -190,6 +190,7 @@ public class SortedTreeFileSimpleWriterTest
         for (int x = 0; x < pointCount; x++)
         {
             key.PointID = (ulong)x;
+            value.Value1 = (ulong)x * 2;
             points.TryEnqueue(key, value);
         }
 
@@ -223,6 +224,10 @@ public class SortedTreeFileSimpleWriterTest
             {
                 if (key.PointID != (ulong)cnt)
                     throw new Exception();
+
+                if (value.Value1 != (ulong)cnt * 2)
+                    throw new Exception();
+
                 cnt++;
             }
 
