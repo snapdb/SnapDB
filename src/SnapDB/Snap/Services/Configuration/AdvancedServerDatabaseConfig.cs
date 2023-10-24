@@ -186,6 +186,11 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
     /// </remarks>
     public long TargetFileSize { get; set; }
 
+    /// <summary>
+    /// Gets or sets the metadata to be written to the archive.
+    /// </summary>
+    public byte[]? Metadata { get; set; }
+
     #endregion
 
     #region [ Methods ]
@@ -218,6 +223,7 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
         settings.FirstStageWriter.RolloverInterval = DiskFlushInterval; // 10 seconds
         settings.FirstStageWriter.EncodingMethod = ArchiveEncodingMethod;
         settings.FirstStageWriter.FinalSettings.ConfigureOnDisk(new[] { m_mainPath }, SI2.Giga, ArchiveDirectoryMethod.TopDirectoryOnly, ArchiveEncodingMethod, "stage1", intermediateFilePendingExtension, intermediateFileFinalExtension, FileFlags.Stage1, FileFlags.IntermediateFile);
+        settings.FirstStageWriter.FinalSettings.Metadata = Metadata;
 
         for (int stage = 2; stage <= StagingCount; stage++)
         {
@@ -230,6 +236,8 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
             else
                 // Final staging file
                 rollover.ArchiveSettings.ConfigureOnDisk(finalPaths, DesiredRemainingSpace, DirectoryMethod, ArchiveEncodingMethod, DatabaseName.ToNonNullNorEmptyString("stage" + stage).RemoveInvalidFileNameCharacters(), finalFilePendingExtension, finalFileFinalExtension, FileFlags.GetStage(stage));
+
+            rollover.ArchiveSettings.Metadata = Metadata;
 
             rollover.LogPath = m_mainPath;
             rollover.ExecuteTimer = 1000;

@@ -312,9 +312,9 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
 
     private void RolloverTask_Running(object? sender, EventArgs<ScheduledTaskRunningReason> e)
     {
-        //The worker can be disposed either via the Stop() method or 
-        //the Dispose() method.  If via the dispose method, then
-        //don't do any cleanup.
+        // The worker can be disposed either via the Stop() method or 
+        // the Dispose() method.  If via the dispose method, then
+        // don't do any cleanup.
         if (m_disposed && e.Argument == ScheduledTaskRunningReason.Disposing)
         {
             Log.Publish(MessageLevel.Info, "Rollover thread is Disposing");

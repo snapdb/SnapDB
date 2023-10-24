@@ -56,7 +56,40 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue> where TKey : SnapTy
         using SimplifiedFileWriter writer = new(pendingFileName, completeFileName, blockSize, flags);
         archiveIdCallback?.Invoke(writer.ArchiveId);
 
-        using (ISupportsBinaryStream file = writer.CreateFile(GetFileName()))
+        using (ISupportsBinaryStream file = writer.CreateFile(GetArchiveFileName()))
+        using (BinaryStream bs = new(file))
+            SequentialSortedTreeWriter<TKey, TValue>.Create(bs, blockSize - 32, treeNodeType, treeStream);
+
+        writer.Commit();
+    }
+
+    /// <summary>
+    /// Creates a new archive file using the specified parameters and writes data to it.
+    /// </summary>
+    /// <param name="pendingFileName">The name of the pending archive file.</param>
+    /// <param name="completeFileName">The name of the complete archive file.</param>
+    /// <param name="blockSize">The size of data blocks in the archive.</param>
+    /// <param name="archiveIdCallback">An optional callback to invoke with the archive ID.</param>
+    /// <param name="treeNodeType">The encoding definition for tree nodes.</param>
+    /// <param name="treeStream">The tree stream containing data to be written to the archive.</param>
+    /// <param name="metadata">The metadata to be written to the archive.</param>
+    /// <param name="flags">Optional flags associated with the archive.</param>
+    public static void CreateWithMetadata(string pendingFileName, string completeFileName, int blockSize, Action<Guid>? archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, byte[]? metadata, params Guid[] flags)
+    {
+        if (metadata is null)
+        {
+            Create(pendingFileName, completeFileName, blockSize, archiveIdCallback, treeNodeType, treeStream, flags);
+            return;
+        }
+
+        using SimplifiedFileWriter writer = new(pendingFileName, completeFileName, blockSize, flags);
+        archiveIdCallback?.Invoke(writer.ArchiveId);
+
+        using (ISupportsBinaryStream file = writer.CreateFile(GetMetadataFileName()))
+        using (BinaryStream bs = new(file))
+            bs.WriteWithLength(metadata);
+
+        using (ISupportsBinaryStream file = writer.CreateFile(GetArchiveFileName()))
         using (BinaryStream bs = new(file))
             SequentialSortedTreeWriter<TKey, TValue>.Create(bs, blockSize - 32, treeNodeType, treeStream);
 
@@ -122,11 +155,18 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue> where TKey : SnapTy
         return table;
     }
 
-    private static SubFileName GetFileName()
+    private static SubFileName GetArchiveFileName()
     {
         Guid keyType = new TKey().GenericTypeGuid;
         Guid valueType = new TValue().GenericTypeGuid;
         return SubFileName.Create(SortedTreeFile.PrimaryArchiveType, keyType, valueType);
+    }
+
+    private static SubFileName GetMetadataFileName()
+    {
+        Guid keyType = new TKey().GenericTypeGuid;
+        Guid valueType = new TValue().GenericTypeGuid;
+        return SubFileName.Create(SortedTreeFile.MetadataArchiveType, keyType, valueType);
     }
 
     #endregion

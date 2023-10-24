@@ -103,7 +103,7 @@ public class SimplifiedArchiveInitializer<TKey, TValue> where TKey : SnapTypeBas
         string pendingFile = CreateArchiveName(GetPathWithEnoughSpace(estimatedSize), startKey, endKey);
         string finalFile = Path.ChangeExtension(pendingFile, settings.FinalExtension);
 
-        SortedTreeFileSimpleWriter<TKey, TValue>.Create(pendingFile, finalFile, 4096, archiveIdCallback, settings.EncodingMethod, data, settings.Flags.ToArray());
+        SortedTreeFileSimpleWriter<TKey, TValue>.CreateWithMetadata(pendingFile, finalFile, 4096, archiveIdCallback, settings.EncodingMethod, data, settings.Metadata, settings.Flags.ToArray());
 
         return SortedTreeFile.OpenFile(finalFile, true).OpenTable<TKey, TValue>();
     }

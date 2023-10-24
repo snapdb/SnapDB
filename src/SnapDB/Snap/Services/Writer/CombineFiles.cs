@@ -109,15 +109,15 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
 
     private void OnExecute(object sender, EventArgs<ScheduledTaskRunningReason> e)
     {
-        //The worker can be disposed either via the Stop() method or 
-        //the Dispose() method.  If via the dispose method, then
-        //don't do any cleanup.
+        // The worker can be disposed either via the Stop() method or 
+        // the Dispose() method.  If via the dispose method, then
+        // don't do any cleanup.
         if (m_disposed && e.Argument == ScheduledTaskRunningReason.Disposing)
             return;
 
-        //go ahead and schedule the next rollover since nothing
-        //will happen until this function exits anyway.
-        //if the task is disposing, the following line does nothing.
+        // go ahead and schedule the next rollover since nothing
+        // will happen until this function exits anyway.
+        // if the task is disposing, the following line does nothing.
         m_rolloverTask.Start(m_settings.ExecuteTimer);
 
         lock (m_syncRoot)
