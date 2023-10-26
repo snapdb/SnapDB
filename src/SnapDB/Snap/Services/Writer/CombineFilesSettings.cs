@@ -83,10 +83,10 @@ public class CombineFilesSettings : SettingsBase<CombineFilesSettings>
     }
 
     /// <summary>
-    /// The size at which to create a rolled over file
+    /// The size at which to create a rolled over file.
     /// </summary>
     /// <remarks>
-    /// Must be between 1MB and 100GB
+    /// Must be between 1MB and 100GB.
     /// </remarks>
     public long CombineOnFileSize
     {
