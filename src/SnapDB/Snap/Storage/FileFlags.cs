@@ -88,6 +88,7 @@ public static class FileFlags
     /// </summary>
     public static readonly Guid Stage8 = new(0x69be577b, 0xc044, 0x49c2, 0x85, 0xb3, 0x8f, 0x8f, 0xad, 0x76, 0x38, 0x03);
 
+    // {B5A3FBC4-285A-4559-A3EA-0940219677F8}
     /// <summary>
     /// Indicates that the file is in Stage 9.
     /// </summary>
@@ -106,7 +107,7 @@ public static class FileFlags
     public static readonly Guid IntermediateFile = new(0xd4626375, 0x3e2f, 0x4a62, 0xbc, 0x12, 0x65, 0xbb, 0x45, 0xe4, 0xa7, 0xb6);
 
     /// <summary>
-    /// Gets the flag associated with the supplied stage
+    /// Gets the flag associated with the supplied stage.
     /// </summary>
     /// <param name="stageNumber">The stage number for which to retrieve the <see cref="Guid"/>.</param>
     /// <returns>
@@ -137,5 +138,67 @@ public static class FileFlags
         };
     }
 
+    /// <summary>
+    /// Gets the number of the supplied stage <paramref name="flag"/>.
+    /// </summary>
+    /// <param name="flag">Stage flag.</param>
+    /// <returns>Number of specified stage <paramref name="flag"/>; otherwise, -1 if flag is not a stage flag.</returns>
+    public static int GetStageNumber(Guid flag)
+    {
+        if (flag == Stage0)
+            return 0;
+        if (flag == Stage1)
+            return 1;
+        if (flag == Stage2)
+            return 2;
+        if (flag == Stage3)
+            return 3;
+        if (flag == Stage4)
+            return 4;
+        if (flag == Stage5)
+            return 5;
+        if (flag == Stage6)
+            return 6;
+        if (flag == Stage7)
+            return 7;
+        if (flag == Stage8)
+            return 8;
+        if (flag == Stage9)
+            return 9;
+
+        return -1;
+    }
+
+    /// <summary>
+    /// Gets the stage number from the set of supplied file <paramref name="flags"/>.
+    /// </summary>
+    /// <param name="flag">File flags.</param>
+    /// <returns>Stage number from the set of supplied file <paramref name="flags"/>; otherwise, -1 if none of the flags is a stage flag.</returns>
+    public static int GetStageNumber(Guid[] flags)
+    {
+        foreach (Guid flag in flags)
+        {
+            int stage = GetStageNumber(flag);
+
+            if (stage > -1)
+                return stage;
+        }
+
+        return -1;
+    }
+
+    /// <summary>
+    /// Determines if the supplied flag is a stage flag.
+    /// </summary>
+    /// <param name="flag">Flag to test.</param>
+    /// <returns><c>true</c> if <paramref name="flag"/> is a stage flag; otherwise, <c>false</c>.</returns>
+    public static bool IsStageFlag(Guid flag)
+    {
+        return GetStageNumber(flag) > -1;
+
+    }
+
+
+
     #endregion
-}
+    }
