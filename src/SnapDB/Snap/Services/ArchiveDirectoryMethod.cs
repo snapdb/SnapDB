@@ -32,22 +32,22 @@ namespace SnapDB.Snap.Services;
 public enum ArchiveDirectoryMethod
 {
     /// <summary>
-    /// Writes all files in the top directory
+    /// Writes all files in the top directory.
     /// </summary>
     TopDirectoryOnly,
 
     /// <summary>
-    /// Writes all files based on the starting year
+    /// Writes all files based on the starting year.
     /// </summary>
     Year,
 
     /// <summary>
-    /// Writes all files based on 'YearMonth'
+    /// Writes all files based on 'YearMonth'.
     /// </summary>
     YearMonth,
 
     /// <summary>
-    /// Writes all files based on 'Year\Month'
+    /// Writes all files based on 'Year\Month'.
     /// </summary>
     YearThenMonth
 }
