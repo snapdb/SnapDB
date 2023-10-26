@@ -23,6 +23,8 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
+using System.Linq;
+
 
 namespace SnapDB.Snap.Services;
 
@@ -41,6 +43,15 @@ public class ArchiveDetails
 
     #region [ Properties ]
 
+
+    /// <summary>
+    /// Gets the start time of the archive, if applicable to Key type.
+    /// </summary>
+    /// <remarks>
+    /// If Key type does not expose a TimestampAsDate property, value will be <see cref="DateTime.MinValue"/>.
+    /// </remarks>
+    public DateTime StartTime { get; private set; }
+
     /// <summary>
     /// Gets the end time of the archive, if applicable to Key type.
     /// </summary>
@@ -50,7 +61,7 @@ public class ArchiveDetails
     public DateTime EndTime { get; private set; }
 
     /// <summary>
-    /// The name of the file
+    /// The name of the file.
     /// </summary>
     public string FileName { get; private set; }
 
@@ -60,14 +71,14 @@ public class ArchiveDetails
     public long FileSize { get; private set; }
 
     /// <summary>
-    /// Gets the first key as a string.
-    /// </summary>
-    public string FirstKey { get; private set; }
-
-    /// <summary>
-    /// The ID for the file
+    /// The ID for the file.
     /// </summary>
     public Guid Id { get; private set; }
+
+    /// <summary>
+    /// Gets the flags for the archive file.
+    /// </summary>
+    public Guid[] Flags { get; private set; }
 
     /// <summary>
     /// Gets if the file contains anything.
@@ -75,17 +86,14 @@ public class ArchiveDetails
     public bool IsEmpty { get; private set; }
 
     /// <summary>
+    /// Gets the first key as a string.
+    /// </summary>
+    public string FirstKey { get; private set; }
+
+    /// <summary>
     /// Gets the last key as a string.
     /// </summary>
     public string LastKey { get; private set; }
-
-    /// <summary>
-    /// Gets the start time of the archive, if applicable to Key type.
-    /// </summary>
-    /// <remarks>
-    /// If Key type does not expose a TimestampAsDate property, value will be <see cref="DateTime.MinValue"/>.
-    /// </remarks>
-    public DateTime StartTime { get; private set; }
 
     #endregion
 
@@ -99,7 +107,9 @@ public class ArchiveDetails
     /// <param name="table">The ArchiveTableSummary to create details from.</param>
     /// <returns>An ArchiveDetails object containing information about the archive table.</returns>
 
-    public static ArchiveDetails Create<TKey, TValue>(ArchiveTableSummary<TKey, TValue> table) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    public static ArchiveDetails Create<TKey, TValue>(ArchiveTableSummary<TKey, TValue> table) 
+        where TKey : SnapTypeBase<TKey>, new() 
+        where TValue : SnapTypeBase<TValue>, new()
     {
         ArchiveDetails details = new()
         {
@@ -108,7 +118,8 @@ public class ArchiveDetails
             IsEmpty = table.IsEmpty,
             FileSize = table.SortedTreeTable.BaseFile.ArchiveSize,
             FirstKey = table.FirstKey.ToString(),
-            LastKey = table.LastKey.ToString()
+            LastKey = table.LastKey.ToString(),
+            Flags = table.SortedTreeTable.BaseFile.Snapshot.Header.Flags.ToArray()
         };
 
     #if SQLCLR
@@ -132,6 +143,5 @@ public class ArchiveDetails
     #endif
         return details;
     }
-
     #endregion
 }
