@@ -40,7 +40,7 @@ internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey>
     /// <summary>
     /// the end of the frame to search [Inclusive]
     /// </summary>
-    public TKey EndOfFrame
+    public new TKey EndOfFrame
     {
         get => m_seekFilter.EndOfFrame; 
         protected internal set => m_seekFilter.EndOfFrame = m_aclFilter(value, false);
@@ -49,7 +49,7 @@ internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey>
     /// <summary>
     /// the end of the entire range to search [Inclusive]
     /// </summary>
-    public TKey EndOfRange
+    public new TKey EndOfRange
 
     {
         get => m_seekFilter.EndOfRange; 
@@ -59,7 +59,7 @@ internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey>
     /// <summary>
     /// the start of the frame to search [Inclusive]
     /// </summary>
-    public TKey StartOfFrame
+    public new TKey StartOfFrame
     {
         get => m_seekFilter.StartOfFrame; 
         protected internal set => m_seekFilter.StartOfFrame = m_aclFilter(value, true);
@@ -68,7 +68,7 @@ internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey>
     /// <summary>
     /// the start of the entire range to search [Inclusive]
     /// </summary>
-    public TKey StartOfRange
+    public new TKey StartOfRange
     {
         get => m_seekFilter.StartOfRange; 
         protected internal set => m_seekFilter.StartOfRange = m_aclFilter(value, true);
