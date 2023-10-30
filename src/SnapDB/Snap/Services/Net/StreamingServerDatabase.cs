@@ -64,14 +64,14 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
     #region [ Properties ]
 
     /// <summary>
-    /// Gets or sets any defined access controlled seek filter function.
+    /// Gets or sets any defined access control seek filter function.
     /// </summary>
-    public Func<TKey, bool, TKey>? AccessControlledSeekFilter { get; set; }
+    public Func<TKey, AccessControlSeekPosition, bool>? AccessControlSeekFilter { get; set; }
 
     /// <summary>
-    /// Gets or sets any defined access controlled match filter function.
+    /// Gets or sets any defined access control match filter function.
     /// </summary>
-    public Func<TKey, TValue, bool>? AccessControlledMatchFilter { get; set; }
+    public Func<TKey, TValue, bool>? AccessControlMatchFilter { get; set; }
 
     #endregion
 
@@ -147,8 +147,8 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
             {
                 key1Parser = Library.Filters.GetSeekFilter<TKey>(m_stream.ReadGuid(), m_stream);
 
-                if (AccessControlledSeekFilter is not null)
-                    key1Parser = new AccessControlledSeekFilter<TKey>(key1Parser, AccessControlledSeekFilter);
+                if (AccessControlSeekFilter is not null)
+                    key1Parser = new AccessControlledSeekFilter<TKey>(key1Parser, AccessControlSeekFilter);
             }
             catch
             {
@@ -165,8 +165,8 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
             {
                 key2Parser = Library.Filters.GetMatchFilter<TKey, TValue>(m_stream.ReadGuid(), m_stream);
 
-                if (AccessControlledMatchFilter is not null)
-                    key2Parser = new AccessControlledMatchFilter<TKey, TValue>(key2Parser, AccessControlledMatchFilter);
+                if (AccessControlMatchFilter is not null)
+                    key2Parser = new AccessControlledMatchFilter<TKey, TValue>(key2Parser, AccessControlMatchFilter);
             }
             catch
             {

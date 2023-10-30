@@ -79,9 +79,9 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
         m_pointCount = 0;
         m_keySeekFilter = keySeekFilter;
         m_keyMatchFilter = keyMatchFilter;
-        m_keyMatchIsUniverse = m_keyMatchFilter as MatchFilterUniverse<TKey, TValue> is not null;
+        m_keyMatchIsUniverse = m_keyMatchFilter is MatchFilterUniverse<TKey, TValue>;
 
-        if (readerOptions.Timeout.Ticks > 0)
+        if (readerOptions!.Timeout.Ticks > 0)
         {
             m_timeout = new TimeoutOperation();
             m_timeout.RegisterTimeout(readerOptions.Timeout, () => m_timedOut = true);
@@ -91,7 +91,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
         m_snapshot.UpdateSnapshot();
         m_tablesOrigList = new List<BufferedArchiveStream<TKey, TValue>>();
 
-        for (int x = 0; x < m_snapshot.Tables.Count(); x++)
+        for (int x = 0; x < m_snapshot.Tables!.Count(); x++)
         {
             ArchiveTableSummary<TKey, TValue>? table = m_snapshot.Tables[x];
 
@@ -99,13 +99,14 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
                 continue;
             
             if (table.Contains(keySeekFilter.StartOfRange, keySeekFilter.EndOfRange))
+            {
                 try
                 {
                     m_tablesOrigList.Add(new BufferedArchiveStream<TKey, TValue>(x, table));
                 }
                 catch (Exception ex)
                 {
-                    //ToDo: Make sure firstkey.tostring doesn't ever throw an exception.
+                    // TODO: Make sure firstkey.tostring doesn't ever throw an exception.
                     StringBuilder sb = new();
                     sb.AppendLine($"Archive ID {table.FileId}");
                     sb.AppendLine($"First Key {table.FirstKey.ToString()}");
@@ -114,8 +115,11 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
                     sb.AppendLine($"File Name {table.SortedTreeTable.BaseFile.FilePath}");
                     s_log.Publish(MessageLevel.Error, "Error while reading file", sb.ToString(), null, ex);
                 }
+            }
             else
+            {
                 m_snapshot.Tables[x] = null;
+            }
         }
 
         m_sortedArchiveStreams = new CustomSortHelper<BufferedArchiveStream<TKey, TValue>>(m_tablesOrigList, IsLessThan);

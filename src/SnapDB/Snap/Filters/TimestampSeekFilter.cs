@@ -149,12 +149,11 @@ public partial class TimestampSeekFilter
     /// <returns>A seek filter base that will be created from the specified stream.</returns>
     /// <exception cref="VersionNotFoundException">Thrown if the version cannot be reached.</exception>
     [MethodImpl(MethodImplOptions.NoOptimization)]
-    private static SeekFilterBase<TKey> CreateFromStream<TKey>(BinaryStreamBase stream) where TKey : TimestampPointIDBase<TKey>, new()
+    private static SeekFilterBase<TKey>? CreateFromStream<TKey>(BinaryStreamBase stream) where TKey : TimestampPointIDBase<TKey>, new()
     {
         byte version = stream.ReadUInt8();
 
-        return version 
-            switch
+        return version switch
         {
             0 => null,
             1 => new FixedRange<TKey>(stream),

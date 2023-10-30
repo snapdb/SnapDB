@@ -92,7 +92,7 @@ public abstract class SnapTypeBase<T> : SnapTypeBase, IComparable<T>, IEquatable
     /// <returns>
     /// <c>true</c> if the current instance is equal to the <paramref name="right"/> instance; otherwise, <c>false</c>.
     /// </returns>
-    public virtual bool IsEqualTo(T right)
+    public virtual bool IsEqualTo(T? right)
     {
         return CompareTo(right) == 0;
     }
@@ -104,7 +104,7 @@ public abstract class SnapTypeBase<T> : SnapTypeBase, IComparable<T>, IEquatable
     /// <returns>
     /// <c>true</c> if the current instance is not equal to the <paramref name="right"/> instance; otherwise, <c>false</c>.
     /// </returns>
-    public virtual bool IsNotEqualTo(T right)
+    public virtual bool IsNotEqualTo(T? right)
     {
         return CompareTo(right) != 0;
     }
@@ -177,9 +177,9 @@ public abstract class SnapTypeBase<T> : SnapTypeBase, IComparable<T>, IEquatable
     /// <returns>A new instance that is a copy of the current instance.</returns>
     public virtual T Clone()
     {
-        T rv = new();
-        CopyTo(rv);
-        return rv;
+        T clone = new();
+        CopyTo(clone);
+        return clone;
     }
 
     /// <summary>
@@ -189,7 +189,7 @@ public abstract class SnapTypeBase<T> : SnapTypeBase, IComparable<T>, IEquatable
     /// <returns>
     /// A value that indicates the relative order of the objects being compared.
     /// </returns>
-    public abstract int CompareTo(T other);
+    public abstract int CompareTo(T? other);
 
     /// <summary>
     /// Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.
@@ -199,9 +199,14 @@ public abstract class SnapTypeBase<T> : SnapTypeBase, IComparable<T>, IEquatable
     /// </returns>
     /// <param name="x">The first object to compare.</param>
     /// <param name="y">The second object to compare.</param>
-    public virtual int Compare(T x, T y)
+    public virtual int Compare(T? x, T? y)
     {
-        return x.CompareTo(y);
+        return x switch
+        {
+            null when y is null => 0,
+            null => -1,
+            _ => y is null ? 1 : x.CompareTo(y)
+        };
     }
 
     /// <summary>
@@ -211,7 +216,7 @@ public abstract class SnapTypeBase<T> : SnapTypeBase, IComparable<T>, IEquatable
     /// <c>true</c> if the current object is equal to the <paramref name="other"/> parameter; otherwise, <c>false</c>.
     /// </returns>
     /// <param name="other">An object to compare with this object.</param>
-    public virtual bool Equals(T other)
+    public virtual bool Equals(T? other)
     {
         return IsEqualTo(other);
     }

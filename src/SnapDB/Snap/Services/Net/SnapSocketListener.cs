@@ -177,11 +177,13 @@ public class SnapSocketListener : DisposableLoggingClassBase
             SnapNetworkServer networkServerProcessing;
 
             using (Logger.AppendStackMessages(Log.InitialStackMessages))
-                networkServerProcessing = new SnapNetworkServer(m_authenticator, client, m_server);
-
-            // Apply any defined access controlled filter functions
-            networkServerProcessing.AccessControlledSeekFilter = m_settings.AccessControlledSeekFilter;
-            networkServerProcessing.AccessControlledMatchFilter = m_settings.AccessControlledMatchFilter;
+            {
+                networkServerProcessing = new SnapNetworkServer(m_authenticator, client, m_server)
+                {
+                    AccessControlSeekFilter = m_settings.AccessControlSeekFilter,
+                    AccessControlMatchFilter = m_settings.AccessControlMatchFilter
+                };
+            }
 
             lock (m_clients)
             {

@@ -1,5 +1,5 @@
 ﻿//******************************************************************************************************
-//  AccessControlledMatchFilter.cs - Gbtc
+//  AccessControlSeekPosition.cs - Gbtc
 //
 //  Copyright © 2023, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -21,31 +21,19 @@
 //
 //******************************************************************************************************
 
-using SnapDB.IO;
-
 namespace SnapDB.Snap.Filters;
 
-// Wrapper around any MatchFilterBase to apply access control to the filter
-internal class AccessControlledMatchFilter<TKey, TValue> : MatchFilterBase<TKey, TValue>
+/// <summary>
+/// Enumeration of seek positions for any access control seek filter.
+/// </summary>
+public enum AccessControlSeekPosition
 {
-    private readonly MatchFilterBase<TKey, TValue> m_matchFilter;
-    private readonly Func<TKey, TValue, bool> m_accessControlFilter;
-
-    public AccessControlledMatchFilter(MatchFilterBase<TKey, TValue> matchFilter, Func<TKey, TValue, bool> accessControlFilter)
-    {
-        m_matchFilter = matchFilter;
-        m_accessControlFilter = accessControlFilter;
-    }
-
-    public override Guid FilterType => m_matchFilter.FilterType;
-
-    public override void Save(BinaryStreamBase stream)
-    {
-        m_matchFilter.Save(stream);
-    }
-
-    public override bool Contains(TKey key, TValue value)
-    {
-        return m_accessControlFilter(key, value) && m_matchFilter.Contains(key, value);
-    }
+    /// <summary>
+    /// Access control check is for key at start of seek.
+    /// </summary>
+    Start,
+    /// <summary>
+    /// Access control check is for key at end of seek.
+    /// </summary>
+    End
 }

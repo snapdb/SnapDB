@@ -22,56 +22,69 @@
 //******************************************************************************************************
 
 using SnapDB.IO;
+using static SnapDB.Snap.Filters.AccessControlSeekPosition;
 
 namespace SnapDB.Snap.Filters;
 
 // Wrapper around any SeekFilterBase to apply access control to the filter
-internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey>
+internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> where TKey : SnapTypeBase<TKey>, new()
 {
     private readonly SeekFilterBase<TKey> m_seekFilter;
-    private readonly Func<TKey, bool /* isStart */, TKey> m_aclFilter;
+    private readonly Func<TKey, AccessControlSeekPosition, bool> m_accessControlFilter;
 
-    public AccessControlledSeekFilter(SeekFilterBase<TKey> seekSeekFilter, Func<TKey, bool, TKey> aclFilter)
+    public AccessControlledSeekFilter(SeekFilterBase<TKey> seekFilter, Func<TKey, AccessControlSeekPosition, bool> accessControlFilter)
     {
-        m_seekFilter = seekSeekFilter;
-        m_aclFilter = aclFilter;
+        m_seekFilter = seekFilter;
+        m_accessControlFilter = accessControlFilter;
     }
 
-    /// <summary>
-    /// the end of the frame to search [Inclusive]
-    /// </summary>
     public new TKey EndOfFrame
     {
-        get => m_seekFilter.EndOfFrame; 
-        protected internal set => m_seekFilter.EndOfFrame = m_aclFilter(value, false);
+        get => m_seekFilter.EndOfFrame;
+        set
+        {
+            if (m_accessControlFilter(value, End))
+                m_seekFilter.EndOfFrame = value;
+            else
+                m_seekFilter.EndOfFrame.SetMin();
+        }
     }
 
-    /// <summary>
-    /// the end of the entire range to search [Inclusive]
-    /// </summary>
     public new TKey EndOfRange
 
     {
-        get => m_seekFilter.EndOfRange; 
-        protected internal set => m_seekFilter.EndOfRange = m_aclFilter(value, false);
+        get => m_seekFilter.EndOfRange;
+        set
+        {
+            if (m_accessControlFilter(value, End))
+                m_seekFilter.EndOfRange = value;
+            else
+                m_seekFilter.EndOfRange.SetMin();
+        }
     }
 
-    /// <summary>
-    /// the start of the frame to search [Inclusive]
-    /// </summary>
     public new TKey StartOfFrame
     {
-        get => m_seekFilter.StartOfFrame; 
-        protected internal set => m_seekFilter.StartOfFrame = m_aclFilter(value, true);
+        get => m_seekFilter.StartOfFrame;
+        set
+        {
+            if (m_accessControlFilter(value, Start))
+                m_seekFilter.StartOfFrame = value;
+            else
+                m_seekFilter.StartOfFrame.SetMax();
+        }
     }
 
-    /// <summary>
-    /// the start of the entire range to search [Inclusive]
-    /// </summary>
     public new TKey StartOfRange
     {
-        get => m_seekFilter.StartOfRange; 
-        protected internal set => m_seekFilter.StartOfRange = m_aclFilter(value, true);
+        get => m_seekFilter.StartOfRange;
+        set
+        {
+            if (m_accessControlFilter(value, Start))
+                m_seekFilter.StartOfRange = value;
+            else
+                m_seekFilter.StartOfRange.SetMax();
+        }
     }
 
     public override Guid FilterType => m_seekFilter.FilterType;

@@ -31,6 +31,7 @@ using Gemstone.IO.StreamExtensions;
 using SnapDB.IO;
 using SnapDB.Security;
 using SnapDB.Security.Authentication;
+using SnapDB.Snap.Filters;
 
 namespace SnapDB.Snap.Services.Net;
 
@@ -89,14 +90,14 @@ public class SnapStreamingServer : DisposableLoggingClassBase
     protected IntegratedSecurityUserCredential User { get; set; }
 
     /// <summary>
-    /// Gets or sets any defined access controlled seek filter function.
+    /// Gets or sets any defined access control seek filter function.
     /// </summary>
-    public Func<object, bool, object>? AccessControlledSeekFilter { get; set; }
+    public Func<object, AccessControlSeekPosition, bool>? AccessControlSeekFilter { get; set; }
 
     /// <summary>
-    /// Gets or sets any defined access controlled match filter function.
+    /// Gets or sets any defined access control match filter function.
     /// </summary>
-    public Func<object, object, bool>? AccessControlledMatchFilter { get; set; }
+    public Func<object, object, bool>? AccessControlMatchFilter { get; set; }
 
     #endregion
 
@@ -207,8 +208,6 @@ public class SnapStreamingServer : DisposableLoggingClassBase
         {
             ServerCommand command = (ServerCommand)m_stream.ReadUInt8();
 
-            // TODO: (ACL Security) Likely need to add a user command to "ask" what points they have access to
-
             switch (command)
             {
                 case ServerCommand.GetAllDatabases:
@@ -252,7 +251,7 @@ public class SnapStreamingServer : DisposableLoggingClassBase
                     Type type = typeof(SnapStreamingServer);
                     MethodInfo method = type.GetMethod(nameof(ConnectToDatabase), BindingFlags.NonPublic | BindingFlags.Instance);
                     MethodInfo reflectionMethod = method?.MakeGenericMethod(database.Info.KeyType, database.Info.ValueType);
-                    bool success = (bool?)reflectionMethod?.Invoke(this, new object[] { database, User, AccessControlledSeekFilter, AccessControlledMatchFilter }) ?? false;
+                    bool success = (bool?)reflectionMethod?.Invoke(this, new object[] { database, User, AccessControlSeekFilter!, AccessControlMatchFilter! }) ?? false;
 
                     if (!success)
                         return;
@@ -274,35 +273,26 @@ public class SnapStreamingServer : DisposableLoggingClassBase
 
     // Called through reflection. Its the only way to call a generic function only knowing the Types
     [MethodImpl(MethodImplOptions.NoOptimization)] // Prevents removing this method as it may appear unused.
-    private bool ConnectToDatabase<TKey, TValue>(SnapServerDatabase<TKey, TValue>.ClientDatabase database, IntegratedSecurityUserCredential user, Func<object, bool, object>? accessControlledSeekFilter, Func<object, object, bool>? accessControlledMatchFilter) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    private bool ConnectToDatabase<TKey, TValue>
+    (
+        SnapServerDatabase<TKey, TValue>.ClientDatabase database, 
+        IntegratedSecurityUserCredential user, 
+        Func<object, AccessControlSeekPosition, bool>? accessControlSeekFilter, 
+        Func<object, object, bool>? accessControlMatchFilter
+    ) 
+    where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         m_stream.Write((byte)ServerResponse.SuccessfullyConnectedToDatabase);
         m_stream.Flush();
-        StreamingServerDatabase<TKey, TValue> engine = new(m_stream, database, user);
 
-        if (accessControlledSeekFilter is not null)
-            engine.AccessControlledSeekFilter = AppliedAccessControlSeekFilter;
-
-        if (accessControlledMatchFilter is not null)
-            engine.AccessControlledMatchFilter = AppliedAccessControlMatchFilter;
+        StreamingServerDatabase<TKey, TValue> engine = new(m_stream, database, user)
+        { 
+            AccessControlSeekFilter = accessControlSeekFilter,
+            AccessControlMatchFilter = accessControlMatchFilter
+        };
 
         return engine.RunDatabaseLevel();
-
-        TKey AppliedAccessControlSeekFilter(TKey key, bool isStart)
-        {
-            if (accessControlledSeekFilter(key, isStart) is TKey keyResult)
-                return keyResult;
-
-            throw new Exception("AccessControlledSeekFilter did not return the correct type");
-        }
-
-        bool AppliedAccessControlMatchFilter(TKey key, TValue value)
-        {
-            return accessControlledMatchFilter(key, value);
-        }
     }
-
-
 
     #endregion
 }
