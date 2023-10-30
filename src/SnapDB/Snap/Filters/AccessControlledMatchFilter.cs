@@ -22,6 +22,7 @@
 //******************************************************************************************************
 
 using SnapDB.IO;
+using SnapDB.Security.Authentication;
 
 namespace SnapDB.Snap.Filters;
 
@@ -29,11 +30,13 @@ namespace SnapDB.Snap.Filters;
 internal class AccessControlledMatchFilter<TKey, TValue> : MatchFilterBase<TKey, TValue>
 {
     private readonly MatchFilterBase<TKey, TValue> m_matchFilter;
-    private readonly Func<TKey, TValue, bool> m_accessControlFilter;
+    private readonly Func<IntegratedSecurityUserCredential, TKey, TValue, bool> m_accessControlFilter;
+    private readonly IntegratedSecurityUserCredential m_user;
 
-    public AccessControlledMatchFilter(MatchFilterBase<TKey, TValue> matchFilter, Func<TKey, TValue, bool> accessControlFilter)
+    public AccessControlledMatchFilter(MatchFilterBase<TKey, TValue> matchFilter, IntegratedSecurityUserCredential user, Func<IntegratedSecurityUserCredential, TKey, TValue, bool> accessControlFilter)
     {
         m_matchFilter = matchFilter;
+        m_user = user;
         m_accessControlFilter = accessControlFilter;
     }
 
@@ -46,6 +49,6 @@ internal class AccessControlledMatchFilter<TKey, TValue> : MatchFilterBase<TKey,
 
     public override bool Contains(TKey key, TValue value)
     {
-        return m_accessControlFilter(key, value) && m_matchFilter.Contains(key, value);
+        return m_accessControlFilter(m_user, key, value) && m_matchFilter.Contains(key, value);
     }
 }

@@ -32,6 +32,7 @@ using System.Net;
 using Gemstone.Communication;
 using Gemstone.IO.StreamExtensions;
 using SnapDB.Immutables;
+using SnapDB.Security.Authentication;
 using SnapDB.Snap.Filters;
 
 // ReSharper disable RedundantDefaultMemberInitializer
@@ -158,12 +159,12 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     /// <summary>
     /// Gets or sets any defined access control seek filter function.
     /// </summary>
-    public Func<object /*TKey*/, AccessControlSeekPosition, bool>? AccessControlSeekFilter { get; set; }
+    public Func<IntegratedSecurityUserCredential, object /*TKey*/, AccessControlSeekPosition, bool>? AccessControlSeekFilter { get; set; }
 
     /// <summary>
     /// Gets or sets any defined access control match filter function.
     /// </summary>
-    public Func<object /*TKey*/, object /*TValue*/, bool>? AccessControlMatchFilter { get; set; }
+    public Func<IntegratedSecurityUserCredential, object /*TKey*/, object /*TValue*/, bool>? AccessControlMatchFilter { get; set; }
 
     #endregion
 

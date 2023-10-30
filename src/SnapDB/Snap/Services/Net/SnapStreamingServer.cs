@@ -92,12 +92,12 @@ public class SnapStreamingServer : DisposableLoggingClassBase
     /// <summary>
     /// Gets or sets any defined access control seek filter function.
     /// </summary>
-    public Func<object, AccessControlSeekPosition, bool>? AccessControlSeekFilter { get; set; }
+    public Func<IntegratedSecurityUserCredential, object, AccessControlSeekPosition, bool>? AccessControlSeekFilter { get; set; }
 
     /// <summary>
     /// Gets or sets any defined access control match filter function.
     /// </summary>
-    public Func<object, object, bool>? AccessControlMatchFilter { get; set; }
+    public Func<IntegratedSecurityUserCredential, object, object, bool>? AccessControlMatchFilter { get; set; }
 
     #endregion
 
@@ -277,8 +277,8 @@ public class SnapStreamingServer : DisposableLoggingClassBase
     (
         SnapServerDatabase<TKey, TValue>.ClientDatabase database, 
         IntegratedSecurityUserCredential user, 
-        Func<object, AccessControlSeekPosition, bool>? accessControlSeekFilter, 
-        Func<object, object, bool>? accessControlMatchFilter
+        Func<IntegratedSecurityUserCredential, object, AccessControlSeekPosition, bool>? accessControlSeekFilter, 
+        Func<IntegratedSecurityUserCredential, object, object, bool>? accessControlMatchFilter
     ) 
     where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {

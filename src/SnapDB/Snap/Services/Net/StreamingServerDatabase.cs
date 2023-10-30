@@ -44,8 +44,9 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
 
     private StreamEncodingBase<TKey, TValue> m_encodingMethod;
     private SnapServerDatabase<TKey, TValue>.ClientDatabase m_sortedTreeEngine;
-    private readonly IntegratedSecurityUserCredential m_user;
     private readonly RemoteBinaryStream m_stream;
+    private readonly IntegratedSecurityUserCredential m_user;
+    private Func<TKey, TValue, bool>? m_canWrite;
 
     #endregion
 
@@ -66,12 +67,12 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
     /// <summary>
     /// Gets or sets any defined access control seek filter function.
     /// </summary>
-    public Func<TKey, AccessControlSeekPosition, bool>? AccessControlSeekFilter { get; set; }
+    public Func<IntegratedSecurityUserCredential, TKey, AccessControlSeekPosition, bool>? AccessControlSeekFilter { get; set; }
 
     /// <summary>
     /// Gets or sets any defined access control match filter function.
     /// </summary>
-    public Func<TKey, TValue, bool>? AccessControlMatchFilter { get; set; }
+    public Func<IntegratedSecurityUserCredential, TKey, TValue, bool>? AccessControlMatchFilter { get; set; }
 
     #endregion
 
@@ -86,6 +87,7 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
         while (true)
         {
             ServerCommand command = (ServerCommand)m_stream.ReadUInt8();
+
             switch (command)
             {
                 case ServerCommand.SetEncodingMethod:
@@ -114,7 +116,7 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
 
                 case ServerCommand.DisconnectDatabase:
                     m_sortedTreeEngine.Dispose();
-                    m_sortedTreeEngine = null;
+                    m_sortedTreeEngine = null!;
                     m_stream.Write((byte)ServerResponse.DatabaseDisconnected);
                     m_stream.Flush();
                     return true;
@@ -137,7 +139,7 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
 
     private bool ProcessRead()
     {
-        SeekFilterBase<TKey> key1Parser = null;
+        SeekFilterBase<TKey>? key1Parser = null;
         MatchFilterBase<TKey, TValue>? key2Parser = null;
         SortedTreeEngineReaderOptions? readerOptions = null;
 
@@ -148,7 +150,7 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
                 key1Parser = Library.Filters.GetSeekFilter<TKey>(m_stream.ReadGuid(), m_stream);
 
                 if (AccessControlSeekFilter is not null)
-                    key1Parser = new AccessControlledSeekFilter<TKey>(key1Parser, AccessControlSeekFilter);
+                    key1Parser = new AccessControlledSeekFilter<TKey>(key1Parser, m_user, AccessControlSeekFilter);
             }
             catch
             {
@@ -166,7 +168,7 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
                 key2Parser = Library.Filters.GetMatchFilter<TKey, TValue>(m_stream.ReadGuid(), m_stream);
 
                 if (AccessControlMatchFilter is not null)
-                    key2Parser = new AccessControlledMatchFilter<TKey, TValue>(key2Parser, AccessControlMatchFilter);
+                    key2Parser = new AccessControlledMatchFilter<TKey, TValue>(key2Parser, m_user, AccessControlMatchFilter);
             }
             catch
             {
@@ -243,12 +245,42 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
 
     private void ProcessWrite()
     {
+        m_encodingMethod.ResetEncoder();
         TKey key = new();
         TValue value = new();
-        m_encodingMethod.ResetEncoder();
+
+        m_canWrite ??= GetCanWriteFunction();
 
         while (m_encodingMethod.TryDecode(m_stream, key, value))
-            m_sortedTreeEngine.Write(key, value);
+        {
+            if (m_canWrite(key, value))
+                m_sortedTreeEngine.Write(key, value);
+        }
+    }
+
+    private Func<TKey, TValue, bool> GetCanWriteFunction()
+    {
+        // If no access control filters are defined, allow all writes.
+        if (AccessControlSeekFilter is null && AccessControlMatchFilter is null)
+            return (_, _) => true;
+
+        if (AccessControlMatchFilter is null)
+            return WriteAllowedBySeekFilter;
+            
+        if (AccessControlSeekFilter is null)
+            return WriteAllowedByMatchFilter;
+            
+        return (key, value) => WriteAllowedBySeekFilter(key, value) && WriteAllowedByMatchFilter(key, value);
+    }
+
+    private bool WriteAllowedBySeekFilter(TKey key, TValue _)
+    {
+        return AccessControlSeekFilter!(m_user, key, AccessControlSeekPosition.Start) && AccessControlSeekFilter(m_user, key, AccessControlSeekPosition.End);
+    }
+
+    private bool WriteAllowedByMatchFilter(TKey key, TValue value)
+    {
+        return AccessControlMatchFilter!(m_user, key, value);
     }
 
     #endregion

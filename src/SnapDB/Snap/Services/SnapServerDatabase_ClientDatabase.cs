@@ -167,12 +167,12 @@ public partial class SnapServerDatabase<TKey, TValue>
         /// <param name="keySeekFilter">a seek based filter to follow. Can be null.</param>
         /// <param name="keyMatchFilter">a match based filer to follow. Can be null.</param>
         /// <returns>A stream that will read the specified data.</returns>
-        public override TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions, SeekFilterBase<TKey> keySeekFilter, MatchFilterBase<TKey, TValue>? keyMatchFilter)
+        public override TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions, SeekFilterBase<TKey>? keySeekFilter, MatchFilterBase<TKey, TValue>? keyMatchFilter)
         {
             return Read(readerOptions, keySeekFilter, keyMatchFilter, null);
         }
 
-        public TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions, SeekFilterBase<TKey> keySeekFilter, MatchFilterBase<TKey, TValue>? keyMatchFilter, WorkerThreadSynchronization workerThreadSynchronization)
+        public TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions, SeekFilterBase<TKey>? keySeekFilter, MatchFilterBase<TKey, TValue>? keyMatchFilter, WorkerThreadSynchronization? workerThreadSynchronization)
         {
             if (m_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
