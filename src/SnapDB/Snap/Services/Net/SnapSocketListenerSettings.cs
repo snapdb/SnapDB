@@ -154,6 +154,16 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     /// </summary>
     public ImmutableList<string> Users { get; } = new();
 
+    /// <summary>
+    /// Gets or sets any defined access controlled seek filter function.
+    /// </summary>
+    public Func<object /*TKey*/, bool /*isStart*/, object /*TKey result*/>? AccessControlledSeekFilter { get; set; }
+
+    /// <summary>
+    /// Gets or sets any defined access controlled match filter function.
+    /// </summary>
+    public Func<object /*TKey*/, object /*TValue*/, bool /*contains*/>? AccessControlledMatchFilter { get; set; }
+
     #endregion
 
     #region [ Methods ]

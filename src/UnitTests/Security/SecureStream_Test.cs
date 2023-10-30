@@ -98,7 +98,7 @@ public class SecureStreamTest
 
     //}
 
-    // TODO: Disabled [Test]
+    [Test]
     public void TestDefault()
     {
         Logger.Console.Verbose = VerboseLevel.All;
@@ -110,7 +110,7 @@ public class SecureStreamTest
         ThreadPool.QueueUserWorkItem(ClientDefault, net.ClientStream);
 
         // TODO: This should timeout to accomodate initialization failure
-        if (!sa.TryAuthenticateAsServer(net.ServerStream, true, out Stream stream, out T))
+        if (!sa.TryAuthenticateAsServer(net.ServerStream, false, out Stream stream, out T))
             throw new Exception();
 
         stream.Write("Message");
@@ -150,10 +150,9 @@ public class SecureStreamTest
         Thread.Sleep(100);
     }
 
-    // TODO: Disabled [Test]
+    [Test]
     public void TestBenchmarkIntegrated()
     {
-        return;
         Logger.Console.Verbose = VerboseLevel.All;
         m_sw.Reset();
 
@@ -161,19 +160,20 @@ public class SecureStreamTest
 
         SecureStreamServer<NullUserToken> sa = new();
         sa.AddUserIntegratedSecurity("Zthe\\steven", new NullUserToken());
+        //sa.AddUserIntegratedSecurity("GPA\\rcarroll", new NullUserToken());
         ThreadPool.QueueUserWorkItem(ClientBenchmarkIntegrated, net.ClientStream);
 
         Stream stream;
-        sa.TryAuthenticateAsServer(net.ServerStream, true, out stream, out T);
-        sa.TryAuthenticateAsServer(net.ServerStream, true, out stream, out T);
-        sa.TryAuthenticateAsServer(net.ServerStream, true, out stream, out T);
-        sa.TryAuthenticateAsServer(net.ServerStream, true, out stream, out T);
-        sa.TryAuthenticateAsServer(net.ServerStream, true, out stream, out T);
+        sa.TryAuthenticateAsServer(net.ServerStream, false, out stream, out T);
+        sa.TryAuthenticateAsServer(net.ServerStream, false, out stream, out T);
+        sa.TryAuthenticateAsServer(net.ServerStream, false, out stream, out T);
+        sa.TryAuthenticateAsServer(net.ServerStream, false, out stream, out T);
+        sa.TryAuthenticateAsServer(net.ServerStream, false, out stream, out T);
 
         Thread.Sleep(100);
     }
 
-    // TODO: Disabled [Test]
+    [Test]
     public void TestRepeatIntegrated()
     {
         for (int x = 0; x < 5; x++)

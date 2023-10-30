@@ -131,6 +131,15 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
 
     #endregion
 
+    #region [ Properties ]
+
+    /// <summary>
+    /// Gets all authenticated users.
+    /// </summary>
+    public IntegratedSecurityUserCredentials Users => m_integrated.Users;
+
+    #endregion
+
     #region [ Methods ]
 
     /// <summary>

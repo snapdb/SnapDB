@@ -52,6 +52,9 @@ internal class SnapNetworkServer : SnapStreamingServer
         m_rawStream = new NetworkStream(m_client.Client);
         m_client.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
 
+        // TODO: Get client from negotiated authentication on socket
+        // User = <get user info>;
+
         Initialize(authentication, m_rawStream, server, requireSsl);
     }
 

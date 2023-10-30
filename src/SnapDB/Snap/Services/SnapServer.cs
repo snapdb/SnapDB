@@ -225,7 +225,6 @@ public partial class SnapServer : DisposableLoggingClassBase
         }
     }
 
-
     /// <summary>
     /// Unloads the database name.
     /// </summary>

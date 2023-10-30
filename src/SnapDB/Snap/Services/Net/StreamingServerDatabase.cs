@@ -25,6 +25,7 @@
 //******************************************************************************************************
 
 using SnapDB.IO;
+using SnapDB.Security.Authentication;
 using SnapDB.Snap.Filters;
 using SnapDB.Snap.Services.Reader;
 using SnapDB.Snap.Streaming;
@@ -43,19 +44,34 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
 
     private StreamEncodingBase<TKey, TValue> m_encodingMethod;
     private SnapServerDatabase<TKey, TValue>.ClientDatabase m_sortedTreeEngine;
-
+    private readonly IntegratedSecurityUserCredential m_user;
     private readonly RemoteBinaryStream m_stream;
 
     #endregion
 
     #region [ Constructors ]
 
-    public StreamingServerDatabase(RemoteBinaryStream netStream, SnapServerDatabase<TKey, TValue>.ClientDatabase engine)
+    public StreamingServerDatabase(RemoteBinaryStream netStream, SnapServerDatabase<TKey, TValue>.ClientDatabase engine, IntegratedSecurityUserCredential user)
     {
         m_stream = netStream;
         m_sortedTreeEngine = engine;
+        m_user = user;
         m_encodingMethod = Library.CreateStreamEncoding<TKey, TValue>(EncodingDefinition.FixedSizeCombinedEncoding);
     }
+
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// Gets or sets any defined access controlled seek filter function.
+    /// </summary>
+    public Func<TKey, bool, TKey>? AccessControlledSeekFilter { get; set; }
+
+    /// <summary>
+    /// Gets or sets any defined access controlled match filter function.
+    /// </summary>
+    public Func<TKey, TValue, bool>? AccessControlledMatchFilter { get; set; }
 
     #endregion
 
@@ -126,9 +142,13 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
         SortedTreeEngineReaderOptions? readerOptions = null;
 
         if (m_stream.ReadBoolean())
+        {
             try
             {
                 key1Parser = Library.Filters.GetSeekFilter<TKey>(m_stream.ReadGuid(), m_stream);
+
+                if (AccessControlledSeekFilter is not null)
+                    key1Parser = new AccessControlledSeekFilter<TKey>(key1Parser, AccessControlledSeekFilter);
             }
             catch
             {
@@ -137,11 +157,16 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
 
                 return false;
             }
+        }
 
         if (m_stream.ReadBoolean())
+        {
             try
             {
                 key2Parser = Library.Filters.GetMatchFilter<TKey, TValue>(m_stream.ReadGuid(), m_stream);
+
+                if (AccessControlledMatchFilter is not null)
+                    key2Parser = new AccessControlledMatchFilter<TKey, TValue>(key2Parser, AccessControlledMatchFilter);
             }
             catch
             {
@@ -150,8 +175,10 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
 
                 return false;
             }
+        }
 
         if (m_stream.ReadBoolean())
+        {
             try
             {
                 readerOptions = new SortedTreeEngineReaderOptions(m_stream);
@@ -163,6 +190,7 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
 
                 return false;
             }
+        }
 
         bool needToFinishStream = false;
 
@@ -192,8 +220,8 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
         catch (Exception ex)
         {
             if (needToFinishStream)
-
                 m_encodingMethod.WriteEndOfStream(m_stream);
+
             m_stream.Write((byte)ServerResponse.ErrorWhileReading);
             m_stream.Write(ex.ToString());
             m_stream.Flush();
