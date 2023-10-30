@@ -180,8 +180,9 @@ public class SnapSocketListener : DisposableLoggingClassBase
             {
                 networkServerProcessing = new SnapNetworkServer(m_authenticator, client, m_server)
                 {
-                    AccessControlSeekFilter = m_settings.AccessControlSeekFilter,
-                    AccessControlMatchFilter = m_settings.AccessControlMatchFilter
+                    UserCanSeek = m_settings.UserCanSeek,
+                    UserCanMatch = m_settings.UserCanMatch,
+                    UserCanWrite = m_settings.UserCanWrite
                 };
             }
 

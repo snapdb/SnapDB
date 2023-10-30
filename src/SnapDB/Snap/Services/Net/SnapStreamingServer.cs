@@ -87,17 +87,43 @@ public class SnapStreamingServer : DisposableLoggingClassBase
     /// <summary>
     /// Gets or sets user associated with this streaming server.
     /// </summary>
-    protected IntegratedSecurityUserCredential User { get; set; }
+    protected IntegratedSecurityUserCredential? User { get; set; }
 
     /// <summary>
-    /// Gets or sets any defined access control seek filter function.
+    /// Gets or sets any defined user read access control function for seek filters.
     /// </summary>
-    public Func<IntegratedSecurityUserCredential, object, AccessControlSeekPosition, bool>? AccessControlSeekFilter { get; set; }
+    /// <remarks>
+    /// Function parameters are: <br/>
+    /// <c>string UserId</c> - The user security ID (SID) of the user attempting to seek.<br/>
+    /// <c>TKey instance</c> - The key of the record being sought.<br/>
+    /// <c>AccessControlSeekPosition</c> - The position of the seek. i.e., <c>Start</c> or <c>End</c>.<br/>
+    /// <c>bool</c> - Return <c>true</c> if user is allowed to seek; otherwise, <c>false</c>.
+    /// </remarks>
+    public Func<string /*UserId*/, object /*TKey*/, AccessControlSeekPosition, bool>? UserCanSeek { get; set; }
 
     /// <summary>
-    /// Gets or sets any defined access control match filter function.
+    /// Gets or sets any defined user read access control function for match filters.
     /// </summary>
-    public Func<IntegratedSecurityUserCredential, object, object, bool>? AccessControlMatchFilter { get; set; }
+    /// <remarks>
+    /// Function parameters are: <br/>
+    /// <c>string UserId</c> - The user security ID (SID) of the user attempting to match.<br/>
+    /// <c>TKey instance</c> - The key of the record being matched.<br/>
+    /// <c>TValue instance</c> - The value of the record being matched.<br/>
+    /// <c>bool</c> - Return <c>true</c> if user is allowed to match; otherwise, <c>false</c>.
+    /// </remarks>
+    public Func<string /*UserId*/, object /*TKey*/, object /*TValue*/, bool>? UserCanMatch { get; set; }
+
+    /// <summary>
+    /// Gets or sets any defined user write access control function.
+    /// </summary>
+    /// <remarks>
+    /// Function parameters are: <br/>
+    /// <c>string UserId</c> - The user security ID (SID) of the user attempting to write.<br/>
+    /// <c>TKey instance</c> - The key of the record being written.<br/>
+    /// <c>TValue instance</c> - The value of the record being written.<br/>
+    /// <c>bool</c> - Return <c>true</c> if user is allowed to write; otherwise, <c>false</c>.
+    /// </remarks>
+    public Func<string /*UserId*/, object /*TKey*/, object /*TValue*/, bool>? UserCanWrite { get; set; }
 
     #endregion
 
@@ -170,7 +196,7 @@ public class SnapStreamingServer : DisposableLoggingClassBase
                 Logger.SwallowException(ex2);
             }
 
-            Log.Publish(MessageLevel.Warning, "Socket Exception", "Exception occured, Client will be disconnected.", null, ex);
+            Log.Publish(MessageLevel.Warning, "Socket Exception", "Exception occurred, Client will be disconnected.", null, ex);
         }
         finally
         {
@@ -251,7 +277,7 @@ public class SnapStreamingServer : DisposableLoggingClassBase
                     Type type = typeof(SnapStreamingServer);
                     MethodInfo method = type.GetMethod(nameof(ConnectToDatabase), BindingFlags.NonPublic | BindingFlags.Instance);
                     MethodInfo reflectionMethod = method?.MakeGenericMethod(database.Info.KeyType, database.Info.ValueType);
-                    bool success = (bool?)reflectionMethod?.Invoke(this, new object[] { database, User, AccessControlSeekFilter!, AccessControlMatchFilter! }) ?? false;
+                    bool success = (bool?)reflectionMethod?.Invoke(this, new object[] { database, User, UserCanSeek!, UserCanMatch!, UserCanWrite! }) ?? false;
 
                     if (!success)
                         return;
@@ -277,8 +303,9 @@ public class SnapStreamingServer : DisposableLoggingClassBase
     (
         SnapServerDatabase<TKey, TValue>.ClientDatabase database, 
         IntegratedSecurityUserCredential user, 
-        Func<IntegratedSecurityUserCredential, object, AccessControlSeekPosition, bool>? accessControlSeekFilter, 
-        Func<IntegratedSecurityUserCredential, object, object, bool>? accessControlMatchFilter
+        Func<string, object, AccessControlSeekPosition, bool>? userCanSeek, 
+        Func<string, object, object, bool>? userCanMatch,
+        Func<string, object, object, bool>? userCanWrite
     ) 
     where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
@@ -287,8 +314,9 @@ public class SnapStreamingServer : DisposableLoggingClassBase
 
         StreamingServerDatabase<TKey, TValue> engine = new(m_stream, database, user)
         { 
-            AccessControlSeekFilter = accessControlSeekFilter,
-            AccessControlMatchFilter = accessControlMatchFilter
+            UserCanSeek = userCanSeek,
+            UserCanMatch = userCanMatch,
+            UserCanWrite = userCanWrite
         };
 
         return engine.RunDatabaseLevel();

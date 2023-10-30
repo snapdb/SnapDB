@@ -65,14 +65,40 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
     #region [ Properties ]
 
     /// <summary>
-    /// Gets or sets any defined access control seek filter function.
+    /// Gets or sets any defined user read access control function for seek filters.
     /// </summary>
-    public Func<IntegratedSecurityUserCredential, TKey, AccessControlSeekPosition, bool>? AccessControlSeekFilter { get; set; }
+    /// <remarks>
+    /// Function parameters are: <br/>
+    /// <c>string UserId</c> - The user security ID (SID) of the user attempting to seek.<br/>
+    /// <c>TKey instance</c> - The key of the record being sought.<br/>
+    /// <c>AccessControlSeekPosition</c> - The position of the seek. i.e., <c>Start</c> or <c>End</c>.<br/>
+    /// <c>bool</c> - Return <c>true</c> if user is allowed to seek; otherwise, <c>false</c>.
+    /// </remarks>
+    public Func<string, TKey, AccessControlSeekPosition, bool>? UserCanSeek { get; set; }
 
     /// <summary>
-    /// Gets or sets any defined access control match filter function.
+    /// Gets or sets any defined user read access control function for match filters.
     /// </summary>
-    public Func<IntegratedSecurityUserCredential, TKey, TValue, bool>? AccessControlMatchFilter { get; set; }
+    /// <remarks>
+    /// Function parameters are: <br/>
+    /// <c>string UserId</c> - The user security ID (SID) of the user attempting to match.<br/>
+    /// <c>TKey instance</c> - The key of the record being matched.<br/>
+    /// <c>TValue instance</c> - The value of the record being matched.<br/>
+    /// <c>bool</c> - Return <c>true</c> if user is allowed to match; otherwise, <c>false</c>.
+    /// </remarks>
+    public Func<string, TKey, TValue, bool>? UserCanMatch { get; set; }
+
+    /// <summary>
+    /// Gets or sets any defined user write access control function.
+    /// </summary>
+    /// <remarks>
+    /// Function parameters are: <br/>
+    /// <c>string UserId</c> - The user security ID (SID) of the user attempting to write.<br/>
+    /// <c>TKey instance</c> - The key of the record being written.<br/>
+    /// <c>TValue instance</c> - The value of the record being written.<br/>
+    /// <c>bool</c> - Return <c>true</c> if user is allowed to write; otherwise, <c>false</c>.
+    /// </remarks>
+    public Func<string, TKey, TValue, bool>? UserCanWrite { get; set; }
 
     #endregion
 
@@ -149,8 +175,8 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
             {
                 key1Parser = Library.Filters.GetSeekFilter<TKey>(m_stream.ReadGuid(), m_stream);
 
-                if (AccessControlSeekFilter is not null)
-                    key1Parser = new AccessControlledSeekFilter<TKey>(key1Parser, m_user, AccessControlSeekFilter);
+                if (UserCanSeek is not null)
+                    key1Parser = new AccessControlledSeekFilter<TKey>(key1Parser, m_user, UserCanSeek);
             }
             catch
             {
@@ -167,8 +193,8 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
             {
                 key2Parser = Library.Filters.GetMatchFilter<TKey, TValue>(m_stream.ReadGuid(), m_stream);
 
-                if (AccessControlMatchFilter is not null)
-                    key2Parser = new AccessControlledMatchFilter<TKey, TValue>(key2Parser, m_user, AccessControlMatchFilter);
+                if (UserCanMatch is not null)
+                    key2Parser = new AccessControlledMatchFilter<TKey, TValue>(key2Parser, m_user, UserCanMatch);
             }
             catch
             {
@@ -260,27 +286,11 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
 
     private Func<TKey, TValue, bool> GetCanWriteFunction()
     {
-        // If no access control filters are defined, allow all writes.
-        if (AccessControlSeekFilter is null && AccessControlMatchFilter is null)
+        // If no write access control filter is defined, allow all writes.
+        if (UserCanWrite is null)
             return (_, _) => true;
-
-        if (AccessControlMatchFilter is null)
-            return WriteAllowedBySeekFilter;
             
-        if (AccessControlSeekFilter is null)
-            return WriteAllowedByMatchFilter;
-            
-        return (key, value) => WriteAllowedBySeekFilter(key, value) && WriteAllowedByMatchFilter(key, value);
-    }
-
-    private bool WriteAllowedBySeekFilter(TKey key, TValue _)
-    {
-        return AccessControlSeekFilter!(m_user, key, AccessControlSeekPosition.Start) && AccessControlSeekFilter(m_user, key, AccessControlSeekPosition.End);
-    }
-
-    private bool WriteAllowedByMatchFilter(TKey key, TValue value)
-    {
-        return AccessControlMatchFilter!(m_user, key, value);
+        return (key, value) => UserCanWrite(m_user.UserId, key, value);
     }
 
     #endregion

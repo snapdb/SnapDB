@@ -152,19 +152,45 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     }
 
     /// <summary>
-    /// A list of all Windows users that are allowed to connect to the historian.
+    /// A list of all users that are allowed to connect to the historian.
     /// </summary>
     public ImmutableList<string> Users { get; } = new();
 
     /// <summary>
-    /// Gets or sets any defined access control seek filter function.
+    /// Gets or sets any defined user read access control function for seek filters.
     /// </summary>
-    public Func<IntegratedSecurityUserCredential, object /*TKey*/, AccessControlSeekPosition, bool>? AccessControlSeekFilter { get; set; }
+    /// <remarks>
+    /// Function parameters are: <br/>
+    /// <c>string UserId</c> - The user security ID (SID) of the user attempting to seek.<br/>
+    /// <c>TKey instance</c> - The key of the record being sought.<br/>
+    /// <c>AccessControlSeekPosition</c> - The position of the seek. i.e., <c>Start</c> or <c>End</c>.<br/>
+    /// <c>bool</c> - Return <c>true</c> if user is allowed to seek; otherwise, <c>false</c>.
+    /// </remarks>
+    public Func<string /*UserId*/, object /*TKey*/, AccessControlSeekPosition, bool>? UserCanSeek { get; set; }
 
     /// <summary>
-    /// Gets or sets any defined access control match filter function.
+    /// Gets or sets any defined user read access control function for match filters.
     /// </summary>
-    public Func<IntegratedSecurityUserCredential, object /*TKey*/, object /*TValue*/, bool>? AccessControlMatchFilter { get; set; }
+    /// <remarks>
+    /// Function parameters are: <br/>
+    /// <c>string UserId</c> - The user security ID (SID) of the user attempting to match.<br/>
+    /// <c>TKey instance</c> - The key of the record being matched.<br/>
+    /// <c>TValue instance</c> - The value of the record being matched.<br/>
+    /// <c>bool</c> - Return <c>true</c> if user is allowed to match; otherwise, <c>false</c>.
+    /// </remarks>
+    public Func<string /*UserId*/, object /*TKey*/, object /*TValue*/, bool>? UserCanMatch { get; set; }
+
+    /// <summary>
+    /// Gets or sets any defined user write access control function.
+    /// </summary>
+    /// <remarks>
+    /// Function parameters are: <br/>
+    /// <c>string UserId</c> - The user security ID (SID) of the user attempting to write.<br/>
+    /// <c>TKey instance</c> - The key of the record being written.<br/>
+    /// <c>TValue instance</c> - The value of the record being written.<br/>
+    /// <c>bool</c> - Return <c>true</c> if user is allowed to write; otherwise, <c>false</c>.
+    /// </remarks>
+    public Func<string /*UserId*/, object /*TKey*/, object /*TValue*/, bool>? UserCanWrite { get; set; }
 
     #endregion
 

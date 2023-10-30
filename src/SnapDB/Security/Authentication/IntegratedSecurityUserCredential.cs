@@ -38,8 +38,11 @@ public class IntegratedSecurityUserCredential
     #region [ Members ]
 
     /// <summary>
-    /// The security identifier for the username
+    /// The security identifier (SID) for the username.
     /// </summary>
+    /// <remarks>
+    /// This value is automatically looked by username for the target OS.
+    /// </remarks>
     public string UserId;
 
     /// <summary>
