@@ -31,14 +31,14 @@ namespace SnapDB.Snap.Filters;
 internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> where TKey : SnapTypeBase<TKey>, new()
 {
     private readonly SeekFilterBase<TKey> m_seekFilter;
-    private readonly Func<string, TKey, AccessControlSeekPosition, bool> m_accessControlFilter;
+    private readonly Func<string, TKey, AccessControlSeekPosition, bool> m_userCanSeek;
     private readonly IntegratedSecurityUserCredential m_user;
 
-    public AccessControlledSeekFilter(SeekFilterBase<TKey> seekFilter, IntegratedSecurityUserCredential user, Func<string, TKey, AccessControlSeekPosition, bool> accessControlFilter)
+    public AccessControlledSeekFilter(SeekFilterBase<TKey> seekFilter, IntegratedSecurityUserCredential user, Func<string, TKey, AccessControlSeekPosition, bool> userCanSeek)
     {
         m_seekFilter = seekFilter;
         m_user = user;
-        m_accessControlFilter = accessControlFilter;
+        m_userCanSeek = userCanSeek;
     }
 
     public new TKey EndOfFrame
@@ -46,7 +46,7 @@ internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> where TKe
         get => m_seekFilter.EndOfFrame;
         set
         {
-            if (m_accessControlFilter(m_user.UserId, value, End))
+            if (m_userCanSeek(m_user.UserId, value, End))
                 m_seekFilter.EndOfFrame = value;
             else
                 m_seekFilter.EndOfFrame.SetMin();
@@ -59,7 +59,7 @@ internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> where TKe
         get => m_seekFilter.EndOfRange;
         set
         {
-            if (m_accessControlFilter(m_user.UserId, value, End))
+            if (m_userCanSeek(m_user.UserId, value, End))
                 m_seekFilter.EndOfRange = value;
             else
                 m_seekFilter.EndOfRange.SetMin();
@@ -71,7 +71,7 @@ internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> where TKe
         get => m_seekFilter.StartOfFrame;
         set
         {
-            if (m_accessControlFilter(m_user.UserId, value, Start))
+            if (m_userCanSeek(m_user.UserId, value, Start))
                 m_seekFilter.StartOfFrame = value;
             else
                 m_seekFilter.StartOfFrame.SetMax();
@@ -83,7 +83,7 @@ internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> where TKe
         get => m_seekFilter.StartOfRange;
         set
         {
-            if (m_accessControlFilter(m_user.UserId, value, Start))
+            if (m_userCanSeek(m_user.UserId, value, Start))
                 m_seekFilter.StartOfRange = value;
             else
                 m_seekFilter.StartOfRange.SetMax();
