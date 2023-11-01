@@ -30,6 +30,8 @@ using Gemstone.Diagnostics;
 using Gemstone.IO.StreamExtensions;
 using SnapDB.IO;
 using SnapDB.Security;
+using SnapDB.Security.Authentication;
+using SnapDB.Snap.Filters;
 
 namespace SnapDB.Snap.Services.Net;
 
@@ -77,6 +79,51 @@ public class SnapStreamingServer : DisposableLoggingClassBase
     protected SnapStreamingServer() : base(MessageClass.Framework)
     {
     }
+
+    #endregion
+
+    #region [ Properties ]
+
+    /// <summary>
+    /// Gets or sets user associated with this streaming server.
+    /// </summary>
+    protected IntegratedSecurityUserCredential? User { get; set; }
+
+    /// <summary>
+    /// Gets or sets any defined user read access control function for seek filters.
+    /// </summary>
+    /// <remarks>
+    /// Function parameters are: <br/>
+    /// <c>string UserId</c> - The user security ID (SID) of the user attempting to seek.<br/>
+    /// <c>TKey instance</c> - The key of the record being sought.<br/>
+    /// <c>AccessControlSeekPosition</c> - The position of the seek. i.e., <c>Start</c> or <c>End</c>.<br/>
+    /// <c>bool</c> - Return <c>true</c> if user is allowed to seek; otherwise, <c>false</c>.
+    /// </remarks>
+    public Func<string /*UserId*/, object /*TKey*/, AccessControlSeekPosition, bool>? UserCanSeek { get; set; }
+
+    /// <summary>
+    /// Gets or sets any defined user read access control function for match filters.
+    /// </summary>
+    /// <remarks>
+    /// Function parameters are: <br/>
+    /// <c>string UserId</c> - The user security ID (SID) of the user attempting to match.<br/>
+    /// <c>TKey instance</c> - The key of the record being matched.<br/>
+    /// <c>TValue instance</c> - The value of the record being matched.<br/>
+    /// <c>bool</c> - Return <c>true</c> if user is allowed to match; otherwise, <c>false</c>.
+    /// </remarks>
+    public Func<string /*UserId*/, object /*TKey*/, object /*TValue*/, bool>? UserCanMatch { get; set; }
+
+    /// <summary>
+    /// Gets or sets any defined user write access control function.
+    /// </summary>
+    /// <remarks>
+    /// Function parameters are: <br/>
+    /// <c>string UserId</c> - The user security ID (SID) of the user attempting to write.<br/>
+    /// <c>TKey instance</c> - The key of the record being written.<br/>
+    /// <c>TValue instance</c> - The value of the record being written.<br/>
+    /// <c>bool</c> - Return <c>true</c> if user is allowed to write; otherwise, <c>false</c>.
+    /// </remarks>
+    public Func<string /*UserId*/, object /*TKey*/, object /*TValue*/, bool>? UserCanWrite { get; set; }
 
     #endregion
 
@@ -149,7 +196,7 @@ public class SnapStreamingServer : DisposableLoggingClassBase
                 Logger.SwallowException(ex2);
             }
 
-            Log.Publish(MessageLevel.Warning, "Socket Exception", "Exception occured, Client will be disconnected.", null, ex);
+            Log.Publish(MessageLevel.Warning, "Socket Exception", "Exception occurred, Client will be disconnected.", null, ex);
         }
         finally
         {
@@ -186,6 +233,7 @@ public class SnapStreamingServer : DisposableLoggingClassBase
         while (true)
         {
             ServerCommand command = (ServerCommand)m_stream.ReadUInt8();
+
             switch (command)
             {
                 case ServerCommand.GetAllDatabases:
@@ -227,9 +275,9 @@ public class SnapStreamingServer : DisposableLoggingClassBase
                     }
 
                     Type type = typeof(SnapStreamingServer);
-                    MethodInfo method = type.GetMethod("ConnectToDatabase", BindingFlags.NonPublic | BindingFlags.Instance);
+                    MethodInfo method = type.GetMethod(nameof(ConnectToDatabase), BindingFlags.NonPublic | BindingFlags.Instance);
                     MethodInfo reflectionMethod = method?.MakeGenericMethod(database.Info.KeyType, database.Info.ValueType);
-                    bool success = (bool?)reflectionMethod?.Invoke(this, new object[] { database }) ?? false;
+                    bool success = (bool?)reflectionMethod?.Invoke(this, new object[] { database, User, UserCanSeek!, UserCanMatch!, UserCanWrite! }) ?? false;
 
                     if (!success)
                         return;
@@ -249,13 +297,28 @@ public class SnapStreamingServer : DisposableLoggingClassBase
         }
     }
 
-    //Called through reflection. Its the only way to call a generic function only knowing the Types
-    [MethodImpl(MethodImplOptions.NoOptimization)] //Prevents removing this method as it may appear unused.
-    private bool ConnectToDatabase<TKey, TValue>(SnapServerDatabase<TKey, TValue>.ClientDatabase database) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
+    // Called through reflection. Its the only way to call a generic function only knowing the Types
+    [MethodImpl(MethodImplOptions.NoOptimization)] // Prevents removing this method as it may appear unused.
+    private bool ConnectToDatabase<TKey, TValue>
+    (
+        SnapServerDatabase<TKey, TValue>.ClientDatabase database, 
+        IntegratedSecurityUserCredential user, 
+        Func<string, object, AccessControlSeekPosition, bool>? userCanSeek, 
+        Func<string, object, object, bool>? userCanMatch,
+        Func<string, object, object, bool>? userCanWrite
+    ) 
+    where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
     {
         m_stream.Write((byte)ServerResponse.SuccessfullyConnectedToDatabase);
         m_stream.Flush();
-        StreamingServerDatabase<TKey, TValue> engine = new(m_stream, database);
+
+        StreamingServerDatabase<TKey, TValue> engine = new(m_stream, database, user)
+        { 
+            UserCanSeek = userCanSeek,
+            UserCanMatch = userCanMatch,
+            UserCanWrite = userCanWrite
+        };
+
         return engine.RunDatabaseLevel();
     }
 

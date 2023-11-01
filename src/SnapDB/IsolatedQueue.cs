@@ -103,6 +103,7 @@ public class IsolatedQueue<T>
         public void Enqueue(T item)
         {
             m_blocks[m_head] = item;
+
             // No memory barrier here since .NET 2.0 ensures that writes will not be reordered.
             m_head++;
         }
@@ -112,6 +113,7 @@ public class IsolatedQueue<T>
         {
             T item = m_blocks[m_tail];
             m_blocks[m_tail] = default!;
+
             // No memory barrier here since .NET 2.0 ensures that writes will not be reordered.
             m_tail++;
 
@@ -264,19 +266,17 @@ public class IsolatedQueue<T>
     [MethodImpl(MethodImplOptions.NoInlining)]
     private bool TryDequeueSlower(out T item)
     {
-        if (m_currentTail is null)
-            if (!m_blocks.TryDequeue(out m_currentTail))
-            {
-                item = default;
-                return false;
-            }
+        if (m_currentTail is null && !m_blocks.TryDequeue(out m_currentTail))
+        {
+            item = default;
+            return false;
+        }
 
-        if (m_currentTail.DequeueMustMoveToNextNode)
-            if (!m_blocks.TryDequeue(out m_currentTail))
-            {
-                item = default;
-                return false;
-            }
+        if (m_currentTail.DequeueMustMoveToNextNode && !m_blocks.TryDequeue(out m_currentTail))
+        {
+            item = default;
+            return false;
+        }
 
         if (m_currentTail.CanDequeue)
         {

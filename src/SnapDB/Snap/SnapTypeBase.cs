@@ -63,12 +63,12 @@ public abstract class SnapTypeBase
     #region [ Methods ]
 
     /// <summary>
-    /// Sets the provided key to it's minimum value.
+    /// Sets the provided key to its minimum value.
     /// </summary>
     public abstract void SetMin();
 
     /// <summary>
-    /// Sets the privided key to it's maximum value.
+    /// Sets the provided key to its maximum value.
     /// </summary>
     public abstract void SetMax();
 
@@ -96,9 +96,12 @@ public abstract class SnapTypeBase
     public virtual unsafe void Read(Stream stream)
     {
         byte[] data = new byte[Size];
+        
+        // ReSharper disable once MustUseReturnValue
         stream.Read(data, 0, data.Length);
-        fixed (byte* lp = data)
-            Read(lp);
+        
+        fixed (byte* ptr = data)
+            Read(ptr);
     }
 
     /// <summary>
@@ -108,8 +111,9 @@ public abstract class SnapTypeBase
     public virtual unsafe void Write(Stream stream)
     {
         byte[] data = new byte[Size];
-        fixed (byte* lp = data)
-            Write(lp);
+
+        fixed (byte* ptr = data)
+            Write(ptr);
 
         stream.Write(data, 0, data.Length);
     }

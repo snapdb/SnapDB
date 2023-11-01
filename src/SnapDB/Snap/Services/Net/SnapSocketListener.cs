@@ -67,6 +67,7 @@ public class SnapSocketListener : DisposableLoggingClassBase
         m_settings = settings.CloneReadonly();
         m_settings.Validate();
 
+        // Authenticator exposes "Users" property to allow looks ups of user permissions
         m_authenticator = new SecureStreamServer<SocketUserPermissions>();
 
         if (settings.DefaultUserCanRead || settings.DefaultUserCanWrite || settings.DefaultUserIsAdmin)
@@ -108,30 +109,32 @@ public class SnapSocketListener : DisposableLoggingClassBase
     /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
     protected override void Dispose(bool disposing)
     {
-        if (!m_disposed)
-            try
+        if (m_disposed)
+            return;
+
+        try
+        {
+            if (!disposing)
+                return;
+
+            m_isRunning = false;
+
+            m_listener?.Stop();
+
+            m_server = null;
+
+            lock (m_clients)
             {
-                if (!disposing)
-                    return;
-
-                m_isRunning = false;
-
-                m_listener?.Stop();
-
-                m_server = null;
-
-                lock (m_clients)
-                {
-                    foreach (SnapNetworkServer client in m_clients)
-                        client.Dispose();
-                    m_clients.Clear();
-                }
+                foreach (SnapNetworkServer client in m_clients)
+                    client.Dispose();
+                m_clients.Clear();
             }
-            finally
-            {
-                m_disposed = true; // Prevent duplicate dispose.
-                base.Dispose(disposing); // Call base class Dispose().
-            }
+        }
+        finally
+        {
+            m_disposed = true; // Prevent duplicate dispose.
+            base.Dispose(disposing); // Call base class Dispose().
+        }
     }
 
     /// <summary>
@@ -174,7 +177,14 @@ public class SnapSocketListener : DisposableLoggingClassBase
             SnapNetworkServer networkServerProcessing;
 
             using (Logger.AppendStackMessages(Log.InitialStackMessages))
-                networkServerProcessing = new SnapNetworkServer(m_authenticator, client, m_server);
+            {
+                networkServerProcessing = new SnapNetworkServer(m_authenticator, client, m_server, m_settings.DefaultUser)
+                {
+                    UserCanSeek = m_settings.UserCanSeek,
+                    UserCanMatch = m_settings.UserCanMatch,
+                    UserCanWrite = m_settings.UserCanWrite
+                };
+            }
 
             lock (m_clients)
             {

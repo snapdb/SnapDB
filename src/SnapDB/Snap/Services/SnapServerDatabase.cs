@@ -224,7 +224,7 @@ public partial class SnapServerDatabase<TKey, TValue> : SnapServerDatabaseBase w
             Write(key, value);
     }
 
-    private SequentialReaderStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions, SeekFilterBase<TKey> keySeekFilter, MatchFilterBase<TKey, TValue>? keyMatchFilter, WorkerThreadSynchronization workerThreadSynchronization)
+    private SequentialReaderStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions, SeekFilterBase<TKey>? keySeekFilter, MatchFilterBase<TKey, TValue>? keyMatchFilter, WorkerThreadSynchronization workerThreadSynchronization)
     {
         if (m_disposed)
             throw new ObjectDisposedException(GetType().FullName);

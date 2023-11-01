@@ -29,49 +29,49 @@ using SnapDB.IO;
 namespace SnapDB.Snap.Filters;
 
 /// <summary>
-/// Represents a filter that is based on a series of ranges of the key value
+/// Represents a filter that is based on a series of ranges of the key value.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
+/// <typeparam name="TKey">The key to seek.</typeparam>
 public abstract class SeekFilterBase<TKey>
 {
     #region [ Properties ]
 
     /// <summary>
-    /// the end of the frame to search [Inclusive]
+    /// Gets the end of the frame to search [Inclusive].
     /// </summary>
-    public TKey EndOfFrame { get; protected set; }
+    public virtual TKey EndOfFrame { get; protected internal set; } = default!;
 
     /// <summary>
-    /// the end of the entire range to search [Inclusive]
+    /// Gets the end of the entire range to search [Inclusive].
     /// </summary>
-    public TKey EndOfRange { get; protected set; }
+    public virtual TKey EndOfRange { get; protected internal set; } = default!;
 
     /// <summary>
-    /// The filter guid
+    /// Gets the filter type identifier.
     /// </summary>
     public abstract Guid FilterType { get; }
 
     /// <summary>
-    /// the start of the frame to search [Inclusive]
+    /// Gets the start of the frame to search [Inclusive].
     /// </summary>
-    public TKey StartOfFrame { get; protected set; }
+    public virtual TKey StartOfFrame { get; protected internal set; } = default!;
 
     /// <summary>
-    /// the start of the entire range to search [Inclusive]
+    /// Gets the start of the entire range to search [Inclusive].
     /// </summary>
-    public TKey StartOfRange { get; protected set; }
+    public virtual TKey StartOfRange { get; protected internal set; } = default!;
 
     #endregion
 
     #region [ Methods ]
 
     /// <summary>
-    /// Serializes the filter to a stream
+    /// Serializes the filter to a stream.
     /// </summary>
-    /// <param name="stream">the stream to write to</param>
+    /// <param name="stream">Target stream for writing.</param>
     public abstract void Save(BinaryStreamBase stream);
 
-    //Seekable portion of the filter
+    // Seekable portion of the filter
 
     /// <summary>
     /// Resets the iterative nature of the filter.
@@ -85,7 +85,7 @@ public abstract class SeekFilterBase<TKey>
     /// <summary>
     /// Gets the next search window.
     /// </summary>
-    /// <returns>true if window exists, false if finished.</returns>
+    /// <returns><c>true</c>if window exists; otherwise, <c>false</c> if finished.</returns>
     public abstract bool NextWindow();
 
     #endregion

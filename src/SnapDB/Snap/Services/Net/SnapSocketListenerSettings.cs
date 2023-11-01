@@ -32,6 +32,7 @@ using System.Net;
 using Gemstone.Communication;
 using Gemstone.IO.StreamExtensions;
 using SnapDB.Immutables;
+using SnapDB.Snap.Filters;
 
 // ReSharper disable RedundantDefaultMemberInitializer
 namespace SnapDB.Snap.Services.Net;
@@ -77,7 +78,7 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     private bool m_forceSsl = false;
 
     // The local IP address to host on. Leave empty to bind to all local interfaces.
-    private string m_localIPAddress = DefaultIPAddress;
+    private string? m_localIPAddress = DefaultIPAddress;
 
     // The local TCP port to host on.
     private int m_localTcpPort = DefaultNetworkPort;
@@ -126,7 +127,7 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     /// <summary>
     /// The local IP address to host on. Leave empty to bind to all local interfaces.
     /// </summary>
-    public string LocalIPAddress
+    public string? LocalIPAddress
     {
         get => m_localIPAddress;
         set
@@ -150,9 +151,50 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     }
 
     /// <summary>
-    /// A list of all Windows users that are allowed to connect to the historian.
+    /// Gets or sets any default user name that should be used if no other user name can be determined.
+    /// </summary>
+    public string? DefaultUser { get; set; }
+
+    /// <summary>
+    /// A list of all users that are allowed to connect to the historian.
     /// </summary>
     public ImmutableList<string> Users { get; } = new();
+
+    /// <summary>
+    /// Gets or sets any defined user read access control function for seek filters.
+    /// </summary>
+    /// <remarks>
+    /// Function parameters are: <br/>
+    /// <c>string UserId</c> - The user security ID (SID) of the user attempting to seek.<br/>
+    /// <c>TKey instance</c> - The key of the record being sought.<br/>
+    /// <c>AccessControlSeekPosition</c> - The position of the seek. i.e., <c>Start</c> or <c>End</c>.<br/>
+    /// <c>bool</c> - Return <c>true</c> if user is allowed to seek; otherwise, <c>false</c>.
+    /// </remarks>
+    public Func<string /*UserId*/, object /*TKey*/, AccessControlSeekPosition, bool>? UserCanSeek { get; set; }
+
+    /// <summary>
+    /// Gets or sets any defined user read access control function for match filters.
+    /// </summary>
+    /// <remarks>
+    /// Function parameters are: <br/>
+    /// <c>string UserId</c> - The user security ID (SID) of the user attempting to match.<br/>
+    /// <c>TKey instance</c> - The key of the record being matched.<br/>
+    /// <c>TValue instance</c> - The value of the record being matched.<br/>
+    /// <c>bool</c> - Return <c>true</c> if user is allowed to match; otherwise, <c>false</c>.
+    /// </remarks>
+    public Func<string /*UserId*/, object /*TKey*/, object /*TValue*/, bool>? UserCanMatch { get; set; }
+
+    /// <summary>
+    /// Gets or sets any defined user write access control function.
+    /// </summary>
+    /// <remarks>
+    /// Function parameters are: <br/>
+    /// <c>string UserId</c> - The user security ID (SID) of the user attempting to write.<br/>
+    /// <c>TKey instance</c> - The key of the record being written.<br/>
+    /// <c>TValue instance</c> - The value of the record being written.<br/>
+    /// <c>bool</c> - Return <c>true</c> if user is allowed to write; otherwise, <c>false</c>.
+    /// </remarks>
+    public Func<string /*UserId*/, object /*TKey*/, object /*TValue*/, bool>? UserCanWrite { get; set; }
 
     #endregion
 
