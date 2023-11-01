@@ -27,7 +27,7 @@ using SnapDB.Security.Authentication;
 namespace SnapDB.Snap.Filters;
 
 // Wrapper around any MatchFilterBase to apply access control to the filter
-internal class AccessControlledMatchFilter<TKey, TValue> : MatchFilterBase<TKey, TValue>
+internal sealed class AccessControlledMatchFilter<TKey, TValue> : MatchFilterBase<TKey, TValue>
 {
     private readonly MatchFilterBase<TKey, TValue> m_matchFilter;
     private readonly Func<string, TKey, TValue, bool> m_userCanMatch;

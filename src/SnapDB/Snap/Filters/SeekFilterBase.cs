@@ -39,12 +39,12 @@ public abstract class SeekFilterBase<TKey>
     /// <summary>
     /// Gets the end of the frame to search [Inclusive].
     /// </summary>
-    public TKey EndOfFrame { get; protected internal set; } = default!;
+    public virtual TKey EndOfFrame { get; protected internal set; } = default!;
 
     /// <summary>
     /// Gets the end of the entire range to search [Inclusive].
     /// </summary>
-    public TKey EndOfRange { get; protected internal set; } = default!;
+    public virtual TKey EndOfRange { get; protected internal set; } = default!;
 
     /// <summary>
     /// Gets the filter type identifier.
@@ -54,12 +54,12 @@ public abstract class SeekFilterBase<TKey>
     /// <summary>
     /// Gets the start of the frame to search [Inclusive].
     /// </summary>
-    public TKey StartOfFrame { get; protected internal set; } = default!;
+    public virtual TKey StartOfFrame { get; protected internal set; } = default!;
 
     /// <summary>
     /// Gets the start of the entire range to search [Inclusive].
     /// </summary>
-    public TKey StartOfRange { get; protected internal set; } = default!;
+    public virtual TKey StartOfRange { get; protected internal set; } = default!;
 
     #endregion
 

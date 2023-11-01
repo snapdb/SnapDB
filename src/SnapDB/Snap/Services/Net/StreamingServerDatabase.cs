@@ -38,7 +38,6 @@ namespace SnapDB.Snap.Services.Net;
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
 internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
-
 {
     #region [ Members ]
 
@@ -186,6 +185,10 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
                 return false;
             }
         }
+        else if (UserCanSeek is not null)
+        {
+            key1Parser = new AccessControlledSeekFilter<TKey>(new SeekFilterUniverse<TKey>(), m_user, UserCanSeek);
+        }
 
         if (m_stream.ReadBoolean())
         {
@@ -203,6 +206,10 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
 
                 return false;
             }
+        }
+        else if (UserCanMatch is not null)
+        {
+            key2Parser = new AccessControlledMatchFilter<TKey, TValue>(new MatchFilterUniverse<TKey, TValue>(), m_user, UserCanMatch);
         }
 
         if (m_stream.ReadBoolean())

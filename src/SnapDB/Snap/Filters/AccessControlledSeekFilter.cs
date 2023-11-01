@@ -21,6 +21,8 @@
 //
 //******************************************************************************************************
 
+#pragma warning disable CA2245
+
 using SnapDB.IO;
 using SnapDB.Security.Authentication;
 using static SnapDB.Snap.Filters.AccessControlSeekPosition;
@@ -28,7 +30,7 @@ using static SnapDB.Snap.Filters.AccessControlSeekPosition;
 namespace SnapDB.Snap.Filters;
 
 // Wrapper around any SeekFilterBase to apply access control to the filter
-internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> where TKey : SnapTypeBase<TKey>, new()
+internal sealed class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> where TKey : SnapTypeBase<TKey>, new()
 {
     private readonly SeekFilterBase<TKey> m_seekFilter;
     private readonly Func<string, TKey, AccessControlSeekPosition, bool> m_userCanSeek;
@@ -39,12 +41,18 @@ internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> where TKe
         m_seekFilter = seekFilter;
         m_user = user;
         m_userCanSeek = userCanSeek;
+
+        // Reapply possibly pre-existing TKey values to ensure access control is applied
+        EndOfFrame = EndOfFrame;
+        EndOfRange = EndOfRange;
+        StartOfFrame = StartOfFrame;
+        StartOfRange = StartOfRange;
     }
 
-    public new TKey EndOfFrame
+    public override TKey EndOfFrame
     {
         get => m_seekFilter.EndOfFrame;
-        set
+        protected internal set
         {
             if (m_userCanSeek(m_user.UserId, value, End))
                 m_seekFilter.EndOfFrame = value;
@@ -53,11 +61,11 @@ internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> where TKe
         }
     }
 
-    public new TKey EndOfRange
+    public override TKey EndOfRange
 
     {
         get => m_seekFilter.EndOfRange;
-        set
+        protected internal set
         {
             if (m_userCanSeek(m_user.UserId, value, End))
                 m_seekFilter.EndOfRange = value;
@@ -66,10 +74,10 @@ internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> where TKe
         }
     }
 
-    public new TKey StartOfFrame
+    public override TKey StartOfFrame
     {
         get => m_seekFilter.StartOfFrame;
-        set
+        protected internal set
         {
             if (m_userCanSeek(m_user.UserId, value, Start))
                 m_seekFilter.StartOfFrame = value;
@@ -78,10 +86,10 @@ internal class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> where TKe
         }
     }
 
-    public new TKey StartOfRange
+    public override TKey StartOfRange
     {
         get => m_seekFilter.StartOfRange;
-        set
+        protected internal set
         {
             if (m_userCanSeek(m_user.UserId, value, Start))
                 m_seekFilter.StartOfRange = value;
