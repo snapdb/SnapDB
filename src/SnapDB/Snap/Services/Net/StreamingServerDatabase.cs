@@ -121,7 +121,6 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
                         m_encodingMethod = Library.CreateStreamEncoding<TKey, TValue>(new EncodingDefinition(m_stream));
                     }
                     catch
-
                     {
                         m_stream.Write((byte)ServerResponse.UnknownEncodingMethod);
                         m_stream.Flush();
@@ -187,7 +186,17 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
         }
         else if (UserCanSeek is not null)
         {
-            key1Parser = new AccessControlledSeekFilter<TKey>(new SeekFilterUniverse<TKey>(), m_user, UserCanSeek);
+            try
+            {
+                key1Parser = new AccessControlledSeekFilter<TKey>(new SeekFilterUniverse<TKey>(), m_user, UserCanSeek);
+            }
+            catch
+            {
+                m_stream.Write((byte)ServerResponse.UnknownOrCorruptSeekFilter);
+                m_stream.Flush();
+
+                return false;
+            }
         }
 
         if (m_stream.ReadBoolean())
@@ -209,7 +218,17 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
         }
         else if (UserCanMatch is not null)
         {
-            key2Parser = new AccessControlledMatchFilter<TKey, TValue>(new MatchFilterUniverse<TKey, TValue>(), m_user, UserCanMatch);
+            try
+            {
+                key2Parser = new AccessControlledMatchFilter<TKey, TValue>(new MatchFilterUniverse<TKey, TValue>(), m_user, UserCanMatch);
+            }
+            catch
+            {
+                m_stream.Write((byte)ServerResponse.UnknownOrCorruptMatchFilter);
+                m_stream.Flush();
+
+                return false;
+            }
         }
 
         if (m_stream.ReadBoolean())

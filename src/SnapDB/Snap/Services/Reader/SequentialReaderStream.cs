@@ -154,8 +154,9 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
         {
             Disposed?.Invoke(this);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Logger.SwallowException(ex, "Error in Disposed event");
         }
 
         Interlocked.Add(ref Stats.PointsReturned, m_pointCount);

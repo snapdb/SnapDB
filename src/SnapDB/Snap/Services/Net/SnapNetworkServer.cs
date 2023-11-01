@@ -104,7 +104,7 @@ internal class SnapNetworkServer : SnapStreamingServer
     {
         try
         {
-            m_client.Client.Shutdown(SocketShutdown.Both);
+            m_client.Client?.Shutdown(SocketShutdown.Both);
         }
         catch (SocketException ex)
         {

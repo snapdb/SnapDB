@@ -23,6 +23,7 @@
 
 #pragma warning disable CA2245
 
+using Gemstone.Diagnostics;
 using SnapDB.IO;
 using SnapDB.Security.Authentication;
 using static SnapDB.Snap.Filters.AccessControlSeekPosition;
@@ -54,10 +55,18 @@ internal sealed class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> wh
         get => m_seekFilter.EndOfFrame;
         protected internal set
         {
-            if (m_userCanSeek(m_user.UserId, value, End))
-                m_seekFilter.EndOfFrame = value;
-            else
+            try
+            {
+                if (m_userCanSeek(m_user.UserId, value, End))
+                    m_seekFilter.EndOfFrame = value;
+                else
+                    m_seekFilter.EndOfFrame.SetMin();
+            }
+            catch (Exception ex)
+            {
+                Logger.SwallowException(ex, "Error in provided user read access control function for seek filters");
                 m_seekFilter.EndOfFrame.SetMin();
+            }
         }
     }
 
@@ -67,10 +76,18 @@ internal sealed class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> wh
         get => m_seekFilter.EndOfRange;
         protected internal set
         {
-            if (m_userCanSeek(m_user.UserId, value, End))
-                m_seekFilter.EndOfRange = value;
-            else
+            try
+            {
+                if (m_userCanSeek(m_user.UserId, value, End))
+                    m_seekFilter.EndOfRange = value;
+                else
+                    m_seekFilter.EndOfRange.SetMin();
+            }
+            catch (Exception ex)
+            {
+                Logger.SwallowException(ex, "Error in provided user read access control function for seek filters");
                 m_seekFilter.EndOfRange.SetMin();
+            }
         }
     }
 
@@ -79,10 +96,18 @@ internal sealed class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> wh
         get => m_seekFilter.StartOfFrame;
         protected internal set
         {
-            if (m_userCanSeek(m_user.UserId, value, Start))
-                m_seekFilter.StartOfFrame = value;
-            else
+            try
+            {
+                if (m_userCanSeek(m_user.UserId, value, Start))
+                    m_seekFilter.StartOfFrame = value;
+                else
+                    m_seekFilter.StartOfFrame.SetMax();
+            }
+            catch (Exception ex)
+            {
+                Logger.SwallowException(ex, "Error in provided user read access control function for seek filters");
                 m_seekFilter.StartOfFrame.SetMax();
+            }
         }
     }
 
@@ -91,10 +116,18 @@ internal sealed class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> wh
         get => m_seekFilter.StartOfRange;
         protected internal set
         {
-            if (m_userCanSeek(m_user.UserId, value, Start))
-                m_seekFilter.StartOfRange = value;
-            else
+            try
+            {
+                if (m_userCanSeek(m_user.UserId, value, Start))
+                    m_seekFilter.StartOfRange = value;
+                else
+                    m_seekFilter.StartOfRange.SetMax();
+            }
+            catch (Exception ex)
+            {
+                Logger.SwallowException(ex, "Error in provided user read access control function for seek filters");
                 m_seekFilter.StartOfRange.SetMax();
+            }
         }
     }
 

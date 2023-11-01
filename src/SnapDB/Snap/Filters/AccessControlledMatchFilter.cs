@@ -21,6 +21,7 @@
 //
 //******************************************************************************************************
 
+using Gemstone.Diagnostics;
 using SnapDB.IO;
 using SnapDB.Security.Authentication;
 
@@ -49,6 +50,17 @@ internal sealed class AccessControlledMatchFilter<TKey, TValue> : MatchFilterBas
 
     public override bool Contains(TKey key, TValue value)
     {
-        return m_userCanMatch(m_user.UserId, key, value) && m_matchFilter.Contains(key, value);
+        try
+        {
+            if (!m_userCanMatch(m_user.UserId, key, value))
+                return false;
+        }
+        catch (Exception ex)
+        {
+            Logger.SwallowException(ex, "Error in provided user read access control function for match filters");
+            return false;
+        }
+
+        return m_matchFilter.Contains(key, value);
     }
 }

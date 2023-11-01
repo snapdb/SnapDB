@@ -122,77 +122,76 @@ public static class Library
         try
         {
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
             foreach (Assembly assembly in assemblies)
             {
-                if (!s_loadedAssemblies.Contains(assembly))
+                if (s_loadedAssemblies.Contains(assembly))
+                    continue;
+
+                s_loadedAssemblies.Add(assembly);
+
+                if (!s_filterAssemblyNames.Contains(assembly.GetName().Name) && !assembly.GetReferencedAssemblies().Any(x => s_filterAssemblyNames.Contains(x.Name)))
+                    continue;
+                
+                s_log.Publish(MessageLevel.Debug, "Loading Assembly", assembly.GetName().Name);
+
+                Module[] modules = assembly.GetModules(false);
+                
+                foreach (Module module in modules)
                 {
-                    s_loadedAssemblies.Add(assembly);
-
-                    if (s_filterAssemblyNames.Contains(assembly.GetName().Name) || assembly.GetReferencedAssemblies().Any(x => s_filterAssemblyNames.Contains(x.Name)))
+                    try
                     {
-                        s_log.Publish(MessageLevel.Debug, "Loading Assembly", assembly.GetName().Name);
+                        Type[] types;
 
-                        Module[] modules = assembly.GetModules(false);
-                        foreach (Module module in modules)
+                        try
+                        {
+                            types = module.GetTypes();
+                        }
+                        catch (ReflectionTypeLoadException ex)
+                        {
+                            s_log.Publish(MessageLevel.Debug, "Reflection Load Error Occurred", assembly.GetName().Name, ex + Environment.NewLine + string.Join(Environment.NewLine, ex.LoaderExceptions.Select(x => x.ToString())));
+                            types = ex.Types;
+                        }
+
+                        foreach (Type assemblyType in types)
                         {
                             try
                             {
-                                Type[] types;
-                                try
-                                {
-                                    types = module.GetTypes();
-                                }
-                                catch (ReflectionTypeLoadException ex)
-                                {
-                                    s_log.Publish(MessageLevel.Debug, "Reflection Load Error Occurred", assembly.GetName().Name, ex + Environment.NewLine + string.Join(Environment.NewLine, ex.LoaderExceptions.Select(x => x.ToString())));
-                                    types = ex.Types;
-                                }
+                                if ((object?)assemblyType is null || assemblyType.IsAbstract || assemblyType.ContainsGenericParameters)
+                                    continue;
 
-                                foreach (Type assemblyType in types)
+                                if (typeCreateSingleValueEncodingBase.IsAssignableFrom(assemblyType))
                                 {
-                                    try
-                                    {
-                                        if ((object?)assemblyType is not null && !assemblyType.IsAbstract && !assemblyType.ContainsGenericParameters)
-                                        {
-                                            if (typeCreateSingleValueEncodingBase.IsAssignableFrom(assemblyType))
-                                            {
-                                                s_log.Publish(MessageLevel.Debug, "Loading Individual Encoding Method", assemblyType.AssemblyQualifiedName);
-                                                Encodings.Register((IndividualEncodingDefinitionBase)Activator.CreateInstance(assemblyType));
-                                            }
-                                            else if (typeCreateDoubleValueEncodingBase.IsAssignableFrom(assemblyType))
-                                            {
-                                                s_log.Publish(MessageLevel.Debug, "Loading Pair Encoding Method", assemblyType.AssemblyQualifiedName);
-                                                Encodings.Register((PairEncodingDefinitionBase)Activator.CreateInstance(assemblyType));
-                                            }
-                                            else if (typeCreateFilterBase.IsAssignableFrom(assemblyType))
-                                            {
-                                                s_log.Publish(MessageLevel.Debug, "Loading Match Filter", assemblyType.AssemblyQualifiedName);
-                                                Filters.Register((MatchFilterDefinitionBase)Activator.CreateInstance(assemblyType));
-                                            }
-                                            else if (typeCreateSeekFilterBase.IsAssignableFrom(assemblyType))
-                                            {
-                                                s_log.Publish(MessageLevel.Debug, "Loading Seek Filter", assemblyType.AssemblyQualifiedName);
-                                                Filters.Register((SeekFilterDefinitionBase)Activator.CreateInstance(assemblyType));
-                                            }
-                                            else if (typeSnapTypeBase.IsAssignableFrom(assemblyType))
-                                            {
-                                                s_log.Publish(MessageLevel.Debug, "Loading Snap Type", assemblyType.AssemblyQualifiedName);
-                                                Register((SnapTypeBase)Activator.CreateInstance(assemblyType));
-                                            }
-                                            else if (typeKeyValueMethods.IsAssignableFrom(assemblyType))
-                                            {
-                                                s_log.Publish(MessageLevel.Debug, "Loading Key Value Methods", assemblyType.AssemblyQualifiedName);
-                                                KeyValueMethods obj = (KeyValueMethods)Activator.CreateInstance(assemblyType);
-                                                Tuple<Type, Type> ttypes = Tuple.Create(obj.KeyType, obj.ValueType);
-                                                if (!s_keyValueMethodsList.ContainsKey(ttypes))
-                                                    s_keyValueMethodsList.Add(ttypes, obj);
-                                            }
-                                        }
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        s_log.Publish(MessageLevel.Critical, "Static Constructor Error", null, null, ex);
-                                    }
+                                    s_log.Publish(MessageLevel.Debug, "Loading Individual Encoding Method", assemblyType.AssemblyQualifiedName);
+                                    Encodings.Register((IndividualEncodingDefinitionBase)Activator.CreateInstance(assemblyType));
+                                }
+                                else if (typeCreateDoubleValueEncodingBase.IsAssignableFrom(assemblyType))
+                                {
+                                    s_log.Publish(MessageLevel.Debug, "Loading Pair Encoding Method", assemblyType.AssemblyQualifiedName);
+                                    Encodings.Register((PairEncodingDefinitionBase)Activator.CreateInstance(assemblyType));
+                                }
+                                else if (typeCreateFilterBase.IsAssignableFrom(assemblyType))
+                                {
+                                    s_log.Publish(MessageLevel.Debug, "Loading Match Filter", assemblyType.AssemblyQualifiedName);
+                                    Filters.Register((MatchFilterDefinitionBase)Activator.CreateInstance(assemblyType));
+                                }
+                                else if (typeCreateSeekFilterBase.IsAssignableFrom(assemblyType))
+                                {
+                                    s_log.Publish(MessageLevel.Debug, "Loading Seek Filter", assemblyType.AssemblyQualifiedName);
+                                    Filters.Register((SeekFilterDefinitionBase)Activator.CreateInstance(assemblyType));
+                                }
+                                else if (typeSnapTypeBase.IsAssignableFrom(assemblyType))
+                                {
+                                    s_log.Publish(MessageLevel.Debug, "Loading Snap Type", assemblyType.AssemblyQualifiedName);
+                                    Register((SnapTypeBase)Activator.CreateInstance(assemblyType));
+                                }
+                                else if (typeKeyValueMethods.IsAssignableFrom(assemblyType))
+                                {
+                                    s_log.Publish(MessageLevel.Debug, "Loading Key Value Methods", assemblyType.AssemblyQualifiedName);
+                                    KeyValueMethods obj = (KeyValueMethods)Activator.CreateInstance(assemblyType);
+                                    Tuple<Type, Type> ttypes = Tuple.Create(obj.KeyType, obj.ValueType);
+                                    if (!s_keyValueMethodsList.ContainsKey(ttypes))
+                                        s_keyValueMethodsList.Add(ttypes, obj);
                                 }
                             }
                             catch (Exception ex)
@@ -200,6 +199,10 @@ public static class Library
                                 s_log.Publish(MessageLevel.Critical, "Static Constructor Error", null, null, ex);
                             }
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        s_log.Publish(MessageLevel.Critical, "Static Constructor Error", null, null, ex);
                     }
                 }
             }

@@ -223,7 +223,7 @@ public class SnapSocketListener : DisposableLoggingClassBase
     {
         try
         {
-            client.Client.Shutdown(SocketShutdown.Both);
+            client.Client?.Shutdown(SocketShutdown.Both);
         }
         catch (SocketException ex)
         {

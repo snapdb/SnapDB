@@ -139,6 +139,7 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
     public bool TryAuthenticate(Stream stream, bool useSsl = true)
     {
         Stream? secureStream = null;
+
         try
         {
             return TryAuthenticate(stream, useSsl, out secureStream);
@@ -162,10 +163,12 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
     public Stream Authenticate(Stream stream, bool useSsl = true)
     {
         Stream? secureStream = null;
+
         try
         {
             if (TryAuthenticate(stream, useSsl, out secureStream))
                 return secureStream;
+
             throw new AuthenticationException("Authentication Failed");
         }
         catch
@@ -186,6 +189,7 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
     private bool TryConnectSsl(Stream stream, out SslStream ssl)
     {
         ssl = new SslStream(stream, false, UserCertificateValidationCallback, UserCertificateSelectionCallback, EncryptionPolicy.RequireEncryption);
+
         try
         {
             ssl.AuthenticateAsClient("Local", null, SslProtocols.Tls12, false);
@@ -193,8 +197,10 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
         catch (Exception ex)
         {
             Log.Publish(MessageLevel.Info, "Authentication Failed", null, null, ex);
+            
             ssl.Dispose();
             ssl = null;
+
             return false;
         }
 
@@ -302,8 +308,9 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
             s_tempCert = GenerateCertificate.CreateSelfSignedCertificate("CN=Local", 256, 1024);
         }
 #if !DEBUG
-        catch
+        catch (Exception ex)
         {
+            Logger.SwallowException(ex);
         }
 #endif
 #endif

@@ -184,6 +184,7 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
     public void AddUserIntegratedSecurity(string username, T userToken)
     {
         Guid id = Guid.NewGuid();
+
         lock (m_syncRoot)
         {
             m_userTokens.Add(id, userToken);
@@ -209,6 +210,7 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
         {
             Stream stream2;
             byte[] certSignatures;
+
             if (useSsl)
             {
                 if (!TryConnectSsl(stream, out ssl))
@@ -228,6 +230,7 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
             State state = m_state;
             AuthenticationMode authenticationMode = (AuthenticationMode)stream2.ReadNextByte();
             Guid userToken;
+
             switch (authenticationMode)
             {
                 case AuthenticationMode.None:
@@ -305,6 +308,7 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
     private bool TryConnectSsl(Stream stream, out SslStream ssl)
     {
         ssl = new SslStream(stream, false, UserCertificateValidationCallback, UserCertificateSelectionCallback, EncryptionPolicy.RequireEncryption);
+        
         try
         {
             var cert = SecureStreamServerCertificate.TempCertificate;
@@ -314,8 +318,10 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
         catch (Exception ex)
         {
             Log.Publish(MessageLevel.Info, "Authentication Failed", null, null, ex);
+            
             ssl.Dispose();
             ssl = null;
+            
             return false;
         }
 
@@ -394,7 +400,7 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
     #endif
     }
 
-    private unsafe bool TryLoadTicket(byte[] ticket, out byte[] sessionSecret, out Guid userToken)
+    private unsafe bool TryLoadTicket(byte[]? ticket, out byte[]? sessionSecret, out Guid userToken)
     {
     #if SQLCLR
         sessionSecret = null;
@@ -416,7 +422,7 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
         //  byte[]    Encrypted Session Data 32+16
         //  byte[32]  HMAC (Sha2-256)
 
-        if (ticket is null || ticket.Length is not ticketSize)
+        if (ticket?.Length is not ticketSize)
             return false;
 
         fixed (byte* lp = ticket)
