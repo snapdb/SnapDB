@@ -178,7 +178,7 @@ public class SnapSocketListener : DisposableLoggingClassBase
 
             using (Logger.AppendStackMessages(Log.InitialStackMessages))
             {
-                networkServerProcessing = new SnapNetworkServer(m_authenticator, client, m_server)
+                networkServerProcessing = new SnapNetworkServer(m_authenticator, client, m_server, m_settings.DefaultUser)
                 {
                     UserCanSeek = m_settings.UserCanSeek,
                     UserCanMatch = m_settings.UserCanMatch,

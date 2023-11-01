@@ -28,6 +28,7 @@ using System.Net.Sockets;
 using System.Text;
 using Gemstone.Diagnostics;
 using SnapDB.Security;
+using SnapDB.Security.Authentication;
 
 namespace SnapDB.Snap.Services.Net;
 
@@ -46,14 +47,14 @@ internal class SnapNetworkServer : SnapStreamingServer
 
     #region [ Constructors ]
 
-    public SnapNetworkServer(SecureStreamServer<SocketUserPermissions> authentication, TcpClient client, SnapServer server, bool requireSsl = false)
+    public SnapNetworkServer(SecureStreamServer<SocketUserPermissions> authentication, TcpClient client, SnapServer server, string? defaultUser, bool requireSsl = false)
     {
         m_client = client;
         m_rawStream = new NetworkStream(m_client.Client);
         m_client.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
 
         // TODO: Must fix! Get client from negotiated authentication on socket:
-        User = null;
+        User = string.IsNullOrWhiteSpace(defaultUser) ? null : new IntegratedSecurityUserCredential(defaultUser, Guid.NewGuid());
 
         Initialize(authentication, m_rawStream, server, requireSsl);
     }

@@ -32,7 +32,6 @@ using System.Net;
 using Gemstone.Communication;
 using Gemstone.IO.StreamExtensions;
 using SnapDB.Immutables;
-using SnapDB.Security.Authentication;
 using SnapDB.Snap.Filters;
 
 // ReSharper disable RedundantDefaultMemberInitializer
@@ -79,7 +78,7 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     private bool m_forceSsl = false;
 
     // The local IP address to host on. Leave empty to bind to all local interfaces.
-    private string m_localIPAddress = DefaultIPAddress;
+    private string? m_localIPAddress = DefaultIPAddress;
 
     // The local TCP port to host on.
     private int m_localTcpPort = DefaultNetworkPort;
@@ -128,7 +127,7 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     /// <summary>
     /// The local IP address to host on. Leave empty to bind to all local interfaces.
     /// </summary>
-    public string LocalIPAddress
+    public string? LocalIPAddress
     {
         get => m_localIPAddress;
         set
@@ -150,6 +149,11 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
             m_localTcpPort = value;
         }
     }
+
+    /// <summary>
+    /// Gets or sets any default user name that should be used if no other user name can be determined.
+    /// </summary>
+    public string? DefaultUser { get; set; }
 
     /// <summary>
     /// A list of all users that are allowed to connect to the historian.
