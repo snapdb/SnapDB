@@ -24,6 +24,7 @@
 //
 //******************************************************************************************************
 
+using Gemstone.Diagnostics;
 using SnapDB.IO;
 using SnapDB.Security.Authentication;
 using SnapDB.Snap.Filters;
@@ -45,7 +46,6 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
     private SnapServerDatabase<TKey, TValue>.ClientDatabase m_sortedTreeEngine;
     private readonly RemoteBinaryStream m_stream;
     private readonly IntegratedSecurityUserCredential m_user;
-    private Func<TKey, TValue, bool>? m_canWrite;
 
     #endregion
 
@@ -188,6 +188,7 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
         {
             try
             {
+                // Still apply access control function if no seek filter is defined
                 key1Parser = new AccessControlledSeekFilter<TKey>(new SeekFilterUniverse<TKey>(), m_user, UserCanSeek);
             }
             catch
@@ -220,6 +221,7 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
         {
             try
             {
+                // Still apply access control function if no match filter is defined
                 key2Parser = new AccessControlledMatchFilter<TKey, TValue>(new MatchFilterUniverse<TKey, TValue>(), m_user, UserCanMatch);
             }
             catch
@@ -298,25 +300,29 @@ internal class StreamingServerDatabase<TKey, TValue> where TKey : SnapTypeBase<T
     private void ProcessWrite()
     {
         m_encodingMethod.ResetEncoder();
+
         TKey key = new();
         TValue value = new();
 
-        m_canWrite ??= GetCanWriteFunction();
-
         while (m_encodingMethod.TryDecode(m_stream, key, value))
         {
-            if (m_canWrite(key, value))
-                m_sortedTreeEngine.Write(key, value);
-        }
-    }
+            // If no write access control function is defined, allow all writes.
+            if (UserCanWrite is not null)
+            {
+                try
+                {
+                    if (!UserCanWrite(m_user.UserId, key, value))
+                        continue;
+                }
+                catch (Exception ex)
+                {
+                    Logger.SwallowException(ex, "Error in provided user write access control function");
+                    continue;
+                }
+            }
 
-    private Func<TKey, TValue, bool> GetCanWriteFunction()
-    {
-        // If no write access control filter is defined, allow all writes.
-        if (UserCanWrite is null)
-            return (_, _) => true;
-            
-        return (key, value) => UserCanWrite(m_user.UserId, key, value);
+            m_sortedTreeEngine.Write(key, value);
+        }
     }
 
     #endregion
