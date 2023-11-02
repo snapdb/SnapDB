@@ -30,7 +30,7 @@ namespace SnapDB.Snap.Services.Net;
 /// </summary>
 /// <typeparam name="TKey">The type of keys used in the socket interface.</typeparam>
 /// <typeparam name="TValue">The type of values used in the socket interface.</typeparam>
-public class SnapSocketListenerSettings<TKey, TValue> : SnapSocketListenerSettings
+public class SnapSocketListenerSettings<TKey, TValue> : SnapSocketListenerSettings where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
 
