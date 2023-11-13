@@ -20,7 +20,7 @@
     <PackageReference Include="Gemstone.Common" Version="1.0.101" />
     <PackageReference Include="Gemstone.Communication" Version="1.0.101" />
     <PackageReference Include="Gemstone.Diagnostics" Version="1.0.101" />
-    <PackageReference Include="Gemstone.IO" Version="1.0.101" />
+    <PackageReference Include="Gemstone.IO" Version="1.0.102" />
     <PackageReference Include="Gemstone.Numeric" Version="1.0.101" />
     <PackageReference Include="Gemstone.Security" Version="1.0.101" />
     <PackageReference Include="JetBrains.Annotations" Version="2023.2.0" />
