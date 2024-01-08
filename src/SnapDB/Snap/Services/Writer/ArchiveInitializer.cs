@@ -211,13 +211,63 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
 
         long remainingSpace = Settings.DesiredRemainingSpace;
 
-        foreach (string path in Settings.WritePath)
+        if (Settings.BalancingMethod == BalancingMethod.FillToDesired)
         {
-            FilePath.GetAvailableFreeSpace(path, out long freeSpace, out _);
+            foreach (string path in Settings.WritePath)
+            {
+                FilePath.GetAvailableFreeSpace(path, out long freeSpace, out _);
 
-            if (freeSpace - estimatedSize > remainingSpace)
-                return path;
+                if (freeSpace - estimatedSize > remainingSpace)
+                    return path;
+
+            }
         }
+
+        if (Settings.BalancingMethod == BalancingMethod.FillSmallestAvailable)
+        {
+            long current = 0;
+            string smallest = null;
+
+            foreach (string path in Settings.WritePath)
+            {
+                FilePath.GetAvailableFreeSpace(path, out long freeSpace, out _);
+
+                if (freeSpace - estimatedSize < remainingSpace)
+                    continue;
+                if (freeSpace < current)
+                {
+                smallest = path;
+                current = freeSpace;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(smallest))
+                return smallest;
+        }
+
+        if (Settings.BalancingMethod == BalancingMethod.FillLargestAvailable)
+        {
+            long current = 0;
+            string smallest = null;
+
+            foreach (string path in Settings.WritePath)
+            {
+                FilePath.GetAvailableFreeSpace(path, out long freeSpace, out _);
+
+                if (freeSpace - estimatedSize < remainingSpace)
+                    continue;
+                if (freeSpace < current)
+                {
+                    smallest = path;
+                    current = freeSpace;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(smallest))
+                return smallest;
+        }
+
+        //for pct, calculate percentage as freespace/totalspace then pick the largest to fill to a point
 
         throw new InvalidOperationException("Out of free space");
     }
