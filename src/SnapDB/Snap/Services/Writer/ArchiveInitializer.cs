@@ -234,6 +234,7 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
 
                 if (freeSpace - estimatedSize < remainingSpace)
                     continue;
+
                 if (freeSpace < current)
                 {
                 smallest = path;
@@ -248,7 +249,7 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
         if (Settings.BalancingMethod == BalancingMethod.FillLargestAvailable)
         {
             long current = 0;
-            string smallest = null;
+            string largest = null;
 
             foreach (string path in Settings.WritePath)
             {
@@ -256,15 +257,69 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
 
                 if (freeSpace - estimatedSize < remainingSpace)
                     continue;
-                if (freeSpace < current)
+
+                if (freeSpace > current)
                 {
-                    smallest = path;
+                    largest = path;
                     current = freeSpace;
                 }
             }
 
-            if (!string.IsNullOrEmpty(smallest))
-                return smallest;
+            if(!string.IsNullOrEmpty(largest)) 
+                return largest;
+
+        }
+
+        if (Settings.BalancingMethod == BalancingMethod.FillLargestTotal)
+        {
+            long current = 0;
+            string largestTotal = null;
+
+            foreach (string path in Settings.WritePath)
+            {
+                FilePath.GetAvailableFreeSpace(path, out long freeSpace, out long totalSize);
+
+                if (freeSpace - estimatedSize < totalSize)
+                    continue;
+                if (current < totalSize)
+                {
+                    largestTotal = path;
+                    current = totalSize;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(largestTotal))
+                return largestTotal;
+        }
+
+        if (Settings.BalancingMethod == BalancingMethod.FillToMatchingPercentage)
+        {
+            // how full the current path is (percentage format)
+            long currentPercentage;
+            // how full the fullest one is, which every other path will be compared to
+            long highestPercentage = 0;
+            // the location with the highest percentage
+            string fillStandard = null;
+
+            foreach (string path in Settings.WritePath)
+            {
+                FilePath.GetAvailableFreeSpace(path, out long freeSpace, out long totalSize);
+
+                currentPercentage = freeSpace/totalSize;
+
+                if (freeSpace - estimatedSize < remainingSpace)
+                    continue;
+
+                if (currentPercentage > highestPercentage)
+                {
+                    fillStandard = path;
+                    highestPercentage = currentPercentage;
+                }
+
+            }
+
+            if (!string.IsNullOrEmpty(fillStandard))
+                return fillStandard;
         }
 
         //for pct, calculate percentage as freespace/totalspace then pick the largest to fill to a point
