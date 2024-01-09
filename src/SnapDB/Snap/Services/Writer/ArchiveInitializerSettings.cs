@@ -31,6 +31,30 @@ using SnapDB.IO;
 
 namespace SnapDB.Snap.Services.Writer;
 
+public enum BalancingMethod
+{
+    /// <summary>
+    /// Fills in order
+    /// </summary>
+    FillToDesired,
+    /// <summary>
+    /// Fills the one with the smallest available space
+    /// </summary>
+    FillSmallestAvailable,
+    /// <summary>
+    /// Fills the one with the most available space
+    /// </summary>
+    FillLargestAvailable,
+    /// <summary>
+    /// Fills the one with the largest total space
+    /// </summary>
+    FillLargestTotal,
+    /// <summary>
+    /// Fills to the same percentage across the board
+    /// </summary>
+    FillToMatchingPercentage
+}
+
 /// <summary>
 /// Settings for <see cref="ArchiveInitializer{TKey,TValue}"/>.
 /// </summary>
@@ -39,6 +63,7 @@ public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSetting
     #region [ Members ]
 
     private long m_desiredRemainingSpace;
+    private BalancingMethod m_balancingMethod;
     private ArchiveDirectoryMethod m_directoryMethod;
     private EncodingDefinition m_encodingMethod;
     private string m_fileExtension;
@@ -82,6 +107,20 @@ public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSetting
 
             else
                 m_desiredRemainingSpace = value;
+        }
+    }
+
+    /// <summary>
+    /// The method used to balance file share load.
+    /// </summary>
+    public BalancingMethod BalancingMethod
+    {
+        get => m_balancingMethod;
+        set
+        {
+            TestForEditable();
+            
+            m_balancingMethod = value;
         }
     }
 
@@ -316,6 +355,7 @@ public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSetting
         m_fileExtension = ".d2i";
         m_desiredRemainingSpace = 5 * 1024 * 1024 * 1024L; //5GB
         m_encodingMethod = EncodingDefinition.FixedSizeCombinedEncoding;
+        m_balancingMethod = BalancingMethod.FillToDesired;
         WritePath = new ImmutableList<string>(x =>
         {
             PathHelpers.ValidatePathName(x);
