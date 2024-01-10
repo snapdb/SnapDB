@@ -294,32 +294,34 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
 
         if (Settings.BalancingMethod == BalancingMethod.FillToMatchingPercentage)
         {
-            // how full the current path is (percentage format)
-            long currentPercentage;
-            // how full the fullest one is, which every other path will be compared to
-            long highestPercentage = 0;
-            // the location with the highest percentage
-            string fillStandard = null;
+            // what percentage of the current path is left free
+            long currentRemainingPercentage;
+            // the occupancy percentage of the most empty space
+            long emptiestPercentage = 0;
+            // the location that needs to be filled, i.e. the location with the emptiestPercentage
+            string toFill = null;
 
             foreach (string path in Settings.WritePath)
             {
                 FilePath.GetAvailableFreeSpace(path, out long freeSpace, out long totalSize);
 
-                currentPercentage = freeSpace/totalSize;
-
                 if (freeSpace - estimatedSize < remainingSpace)
                     continue;
 
-                if (currentPercentage > highestPercentage)
-                {
-                    fillStandard = path;
-                    highestPercentage = currentPercentage;
-                }
+                currentRemainingPercentage = freeSpace / totalSize;
 
+                if (currentRemainingPercentage == emptiestPercentage)
+                    continue;
+
+                if (currentRemainingPercentage > emptiestPercentage)
+                    emptiestPercentage = currentRemainingPercentage;
+
+                if (currentRemainingPercentage < emptiestPercentage)
+                    toFill = path;
             }
 
-            if (!string.IsNullOrEmpty(fillStandard))
-                return fillStandard;
+            if (!string.IsNullOrEmpty(toFill))
+                return toFill;
         }
 
         //for pct, calculate percentage as freespace/totalspace then pick the largest to fill to a point
