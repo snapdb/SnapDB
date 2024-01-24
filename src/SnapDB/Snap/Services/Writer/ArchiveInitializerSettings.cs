@@ -34,23 +34,23 @@ namespace SnapDB.Snap.Services.Writer;
 public enum BalancingMethod
 {
     /// <summary>
-    /// Fills in order
+    /// Fills the path to meet the desired free space, prioritizing paths with the most available space
     /// </summary>
     FillToDesired,
     /// <summary>
-    /// Fills the one with the smallest available space
+    /// Fills the path with the least available space
     /// </summary>
     FillSmallestAvailable,
     /// <summary>
-    /// Fills the one with the most available space
+    /// Fills the path with the most available space
     /// </summary>
     FillLargestAvailable,
     /// <summary>
-    /// Fills the one with the largest total space
+    /// Fills the path with the most space, available or not, as long as there is room
     /// </summary>
     FillLargestTotal,
     /// <summary>
-    /// Fills to the same percentage across the board
+    /// Fills each path to the same amount across the board
     /// </summary>
     FillToMatchingPercentage
 }
