@@ -36,7 +36,7 @@ internal static class HelperFunctions
     #region [ Static ]
 
     /// <summary>
-    /// Performs the given action action and throws an exception if the action
+    /// Performs the given action and throws an exception if the action
     /// does not error. This is useful for debugging code and testing for exceptions.
     /// </summary>
     /// <param name="errorFunction">the action to perform</param>

@@ -1,0 +1,95 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34024.191
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapDB", "SnapDB\SnapDB.csproj", "{AB3102F3-053C-4505-928D-C90078B6FE03}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{5D08D933-6481-4890-80E9-DB8522DDE3B0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{FB2D68F7-E6B1-4A7E-8B90-9D472CEFB887}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\README.md = ..\docs\README.md
+	EndProjectSection
+EndProject
+Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "docgen", "DocGen\docgen.shfbproj", "{E0CCFF2A-C2DF-436C-B34C-A20215DA227A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AB3102F3-053C-4505-928D-C90078B6FE03} = {AB3102F3-053C-4505-928D-C90078B6FE03}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit Tests", "Unit Tests", "{72BFFD41-57CE-46E7-A81B-9E5F605EF8BE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapDB.UnitTests", "UnitTests\SnapDB.UnitTests.csproj", "{AF7B7022-7F26-4EEE-AECA-81D3C9ECA505}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A6B5DDFD-6F58-43AA-B1FC-D5CCEC868A05}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		..\.gitignore = ..\.gitignore
+		..\LICENSE = ..\LICENSE
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "References", "References", "{E51F7149-AF10-4E65-9C96-45CE982D78D6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gemstone.Common", "..\..\..\gemstone\common\src\Gemstone\Gemstone.Common.csproj", "{7DEF71C9-D4DB-4840-872B-C54CFE3C9F89}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gemstone.Communication", "..\..\..\gemstone\communication\src\Gemstone.Communication\Gemstone.Communication.csproj", "{A0275EF4-635D-47A3-8222-8F16F38D5A6B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gemstone.Diagnostics", "..\..\..\gemstone\diagnostics\src\Gemstone.Diagnostics\Gemstone.Diagnostics.csproj", "{F59501F0-1F6D-404C-868E-45F4E816D1F5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gemstone.IO", "..\..\..\gemstone\io\src\Gemstone.IO\Gemstone.IO.csproj", "{A49E6F64-FF27-4A51-B007-A8DB766DB782}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gemstone.Numeric", "..\..\..\gemstone\numeric\src\Gemstone.Numeric\Gemstone.Numeric.csproj", "{0CCFD2DE-2D50-4446-B199-231ECA587A64}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gemstone.Security", "..\..\..\gemstone\security\src\Gemstone.Security\Gemstone.Security.csproj", "{06F6654B-2827-4CED-9363-377CFA92EBC1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gemstone.Threading", "..\..\..\gemstone\threading\src\Gemstone.Threading\Gemstone.Threading.csproj", "{B707BA73-0C08-44DA-AA0E-E8663955804A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gemstone.Expressions", "..\..\..\gemstone\expressions\src\Gemstone.Expressions\Gemstone.Expressions.csproj", "{162A783B-2527-46B4-BB48-D0073E3AEC41}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Development|Any CPU = Development|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AB3102F3-053C-4505-928D-C90078B6FE03}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{AB3102F3-053C-4505-928D-C90078B6FE03}.Development|Any CPU.Build.0 = Development|Any CPU
+		{E0CCFF2A-C2DF-436C-B34C-A20215DA227A}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{AF7B7022-7F26-4EEE-AECA-81D3C9ECA505}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{AF7B7022-7F26-4EEE-AECA-81D3C9ECA505}.Development|Any CPU.Build.0 = Development|Any CPU
+		{7DEF71C9-D4DB-4840-872B-C54CFE3C9F89}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{7DEF71C9-D4DB-4840-872B-C54CFE3C9F89}.Development|Any CPU.Build.0 = Development|Any CPU
+		{A0275EF4-635D-47A3-8222-8F16F38D5A6B}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{A0275EF4-635D-47A3-8222-8F16F38D5A6B}.Development|Any CPU.Build.0 = Development|Any CPU
+		{F59501F0-1F6D-404C-868E-45F4E816D1F5}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{F59501F0-1F6D-404C-868E-45F4E816D1F5}.Development|Any CPU.Build.0 = Development|Any CPU
+		{A49E6F64-FF27-4A51-B007-A8DB766DB782}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{A49E6F64-FF27-4A51-B007-A8DB766DB782}.Development|Any CPU.Build.0 = Development|Any CPU
+		{0CCFD2DE-2D50-4446-B199-231ECA587A64}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{0CCFD2DE-2D50-4446-B199-231ECA587A64}.Development|Any CPU.Build.0 = Development|Any CPU
+		{06F6654B-2827-4CED-9363-377CFA92EBC1}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{06F6654B-2827-4CED-9363-377CFA92EBC1}.Development|Any CPU.Build.0 = Development|Any CPU
+		{B707BA73-0C08-44DA-AA0E-E8663955804A}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{B707BA73-0C08-44DA-AA0E-E8663955804A}.Development|Any CPU.Build.0 = Development|Any CPU
+		{162A783B-2527-46B4-BB48-D0073E3AEC41}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{162A783B-2527-46B4-BB48-D0073E3AEC41}.Development|Any CPU.Build.0 = Development|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AB3102F3-053C-4505-928D-C90078B6FE03} = {5D08D933-6481-4890-80E9-DB8522DDE3B0}
+		{E0CCFF2A-C2DF-436C-B34C-A20215DA227A} = {FB2D68F7-E6B1-4A7E-8B90-9D472CEFB887}
+		{AF7B7022-7F26-4EEE-AECA-81D3C9ECA505} = {72BFFD41-57CE-46E7-A81B-9E5F605EF8BE}
+		{7DEF71C9-D4DB-4840-872B-C54CFE3C9F89} = {E51F7149-AF10-4E65-9C96-45CE982D78D6}
+		{A0275EF4-635D-47A3-8222-8F16F38D5A6B} = {E51F7149-AF10-4E65-9C96-45CE982D78D6}
+		{F59501F0-1F6D-404C-868E-45F4E816D1F5} = {E51F7149-AF10-4E65-9C96-45CE982D78D6}
+		{A49E6F64-FF27-4A51-B007-A8DB766DB782} = {E51F7149-AF10-4E65-9C96-45CE982D78D6}
+		{0CCFD2DE-2D50-4446-B199-231ECA587A64} = {E51F7149-AF10-4E65-9C96-45CE982D78D6}
+		{06F6654B-2827-4CED-9363-377CFA92EBC1} = {E51F7149-AF10-4E65-9C96-45CE982D78D6}
+		{B707BA73-0C08-44DA-AA0E-E8663955804A} = {E51F7149-AF10-4E65-9C96-45CE982D78D6}
+		{162A783B-2527-46B4-BB48-D0073E3AEC41} = {E51F7149-AF10-4E65-9C96-45CE982D78D6}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7E46A9C7-6A36-42E7-B47C-083F3F9F5373}
+	EndGlobalSection
+EndGlobal

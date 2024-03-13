@@ -26,12 +26,8 @@
 
 #pragma warning disable CS0649
 
-using System.Runtime.InteropServices;
 using Gemstone;
-using Gemstone.Console;
 using Gemstone.Diagnostics;
-using Gemstone.Units;
-using JetBrains.Annotations;
 using SnapDB.Collections;
 using SnapDB.Threading;
 
@@ -46,41 +42,6 @@ namespace SnapDB.IO.Unmanaged;
 internal class MemoryPoolPageList : IDisposable
 {
     #region [ Members ]
-
-    // ReSharper disable IdentifierTypo
-    // ReSharper disable InconsistentNaming
-    // ReSharper disable NotAccessedField.Local
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    [NoReorder]
-    private class MEMORYSTATUSEX
-    {
-        #region [ Members ]
-
-        public uint dwLength;
-        public uint dwMemoryLoad;
-        public ulong ullTotalPhys;
-        public ulong ullAvailPhys;
-        public ulong ullTotalPageFile;
-        public ulong ullAvailPageFile;
-        public ulong ullTotalVirtual;
-        public ulong ullAvailVirtual;
-        public ulong ullAvailExtendedVirtual;
-
-        #endregion
-
-        #region [ Constructors ]
-
-        // ReSharper disable once ConvertConstructorToMemberInitializers
-        public MEMORYSTATUSEX()
-        {
-            dwLength = (uint)Marshal.SizeOf(typeof(MEMORYSTATUSEX));
-        }
-
-        #endregion
-    }
-    // ReSharper restore NotAccessedField.Local
-    // ReSharper restore InconsistentNaming
-    // ReSharper restore IdentifierTypo
 
     /// <summary>
     /// Defines the maximum supported number of bytes that can be allocated based
@@ -136,8 +97,8 @@ internal class MemoryPoolPageList : IDisposable
         m_syncRoot = new object();
         PageSize = pageSize;
 
-        long totalMemory = (long)GetTotalPhysicalMemory();
-        long availableMemory = (long)GetAvailablePhysicalMemory();
+        long totalMemory = (long)Common.GetTotalPhysicalMemory();
+        long availableMemory = (long)Common.GetAvailablePhysicalMemory();
 
         if (!Environment.Is64BitProcess)
         {
@@ -463,36 +424,6 @@ internal class MemoryPoolPageList : IDisposable
 
         return (int)targetMemoryBlockSize;
     }
-
-    // Gets the total physical system memory.
-    internal static ulong GetTotalPhysicalMemory()
-    {
-        if (Common.IsPosixEnvironment)
-        {
-            string output = Command.Execute("awk", "'/MemTotal/ {print $2}' /proc/meminfo").StandardOutput;
-            return ulong.Parse(output) * SI2.Kilo;
-        }
-
-        MEMORYSTATUSEX memStatus = new();
-        return GlobalMemoryStatusEx(memStatus) ? memStatus.ullTotalPhys : 0;
-    }
-
-    // Gets the available physical system memory.
-    internal static ulong GetAvailablePhysicalMemory()
-    {
-        if (Common.IsPosixEnvironment)
-        {
-            string output = Command.Execute("awk", "'/MemAvailable/ {print $2}' /proc/meminfo").StandardOutput;
-            return ulong.Parse(output) * SI2.Kilo;
-        }
-
-        MEMORYSTATUSEX memStatus = new();
-        return GlobalMemoryStatusEx(memStatus) ? memStatus.ullAvailPhys : 0;
-    }
-
-    [return: MarshalAs(UnmanagedType.Bool)]
-    [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern bool GlobalMemoryStatusEx([In] [Out] MEMORYSTATUSEX lpBuffer);
 
     #endregion
 }
