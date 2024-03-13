@@ -29,15 +29,12 @@
     <InformationalVersion Condition="'$(Configuration)'=='Release'">1.0.101 -- Release Build</InformationalVersion>
     <InformationalVersion Condition="'$(Configuration)'!='Release'">1.0.101 -- Debug Build</InformationalVersion>
     <Configurations>Debug;Release;Development</Configurations>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup>
     <OutputPath>..\..\build\$(Configuration)</OutputPath>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <DocumentationFile>..\..\build\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <DocumentationFile>..\..\build\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Development'">
@@ -63,22 +60,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\gemstone\common\src\Gemstone\Gemstone.Common.csproj" Condition="'$(Configuration)'=='Development'" AdditionalProperties="Configuration=Development" />
+    <ProjectReference Include="..\..\..\..\gemstone\common\src\Gemstone\Gemstone.Common.csproj" Condition="'$(Configuration)'=='Development'" />
     <PackageReference Include="Gemstone.Common" Version="1.0.101" Condition="'$(Configuration)'!='Development'" />
 
-    <ProjectReference Include="..\..\..\..\gemstone\communication\src\Gemstone.Communication\Gemstone.Communication.csproj" Condition="'$(Configuration)'=='Development'" AdditionalProperties="Configuration=Development" />
+    <ProjectReference Include="..\..\..\..\gemstone\communication\src\Gemstone.Communication\Gemstone.Communication.csproj" Condition="'$(Configuration)'=='Development'" />
     <PackageReference Include="Gemstone.Communication" Version="1.0.101" Condition="'$(Configuration)'!='Development'" />
 
-    <ProjectReference Include="..\..\..\..\gemstone\diagnostics\src\Gemstone.Diagnostics\Gemstone.Diagnostics.csproj" Condition="'$(Configuration)'=='Development'" AdditionalProperties="Configuration=Development" />
+    <ProjectReference Include="..\..\..\..\gemstone\diagnostics\src\Gemstone.Diagnostics\Gemstone.Diagnostics.csproj" Condition="'$(Configuration)'=='Development'" />
     <PackageReference Include="Gemstone.Diagnostics" Version="1.0.101" Condition="'$(Configuration)'!='Development'" />
 
-    <ProjectReference Include="..\..\..\..\gemstone\io\src\Gemstone.IO\Gemstone.IO.csproj" Condition="'$(Configuration)'=='Development'" AdditionalProperties="Configuration=Development" />
+    <ProjectReference Include="..\..\..\..\gemstone\io\src\Gemstone.IO\Gemstone.IO.csproj" Condition="'$(Configuration)'=='Development'" />
     <PackageReference Include="Gemstone.IO" Version="1.0.101" Condition="'$(Configuration)'!='Development'" />
 
-    <ProjectReference Include="..\..\..\..\gemstone\numeric\src\Gemstone.Numeric\Gemstone.Numeric.csproj" Condition="'$(Configuration)'=='Development'" AdditionalProperties="Configuration=Development" />
+    <ProjectReference Include="..\..\..\..\gemstone\numeric\src\Gemstone.Numeric\Gemstone.Numeric.csproj" Condition="'$(Configuration)'=='Development'" />
     <PackageReference Include="Gemstone.Numeric" Version="1.0.101" Condition="'$(Configuration)'!='Development'" />
 
-    <ProjectReference Include="..\..\..\..\gemstone\security\src\Gemstone.Security\Gemstone.Security.csproj" Condition="'$(Configuration)'=='Development'" AdditionalProperties="Configuration=Development" />
+    <ProjectReference Include="..\..\..\..\gemstone\security\src\Gemstone.Security\Gemstone.Security.csproj" Condition="'$(Configuration)'=='Development'" />
     <PackageReference Include="Gemstone.Security" Version="1.0.101" Condition="'$(Configuration)'!='Development'" />
 
     <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
