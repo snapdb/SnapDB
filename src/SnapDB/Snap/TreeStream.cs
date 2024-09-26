@@ -108,6 +108,24 @@ public abstract class TreeStream<TKey, TValue> : IDisposable where TKey : class,
         return true;
     }
 
+#if !SQLCLR
+    /// <summary>
+    /// Advances the stream to the next value. 
+    /// If before the beginning of the stream, advances to the first value
+    /// </summary>
+    /// <returns>True if the advance was successful. False if the end of the stream was reached.</returns>
+    public async ValueTask<bool> ReadAsync(TKey key, TValue value)
+    {
+        if (Eos || !await new ValueTask<bool>(ReadNext(key, value)))
+        {
+            EndOfStreamReached();
+            return false;
+        }
+
+        return true;
+    }
+#endif
+
     /// <summary>
     /// Occurs when the end of the stream has been reached. The default behavior is to call Dispose.
     /// </summary>
