@@ -49,7 +49,7 @@ public abstract class SnapClient : DisposableLoggingClassBase
     /// <summary>
     /// Gets the database that matches <paramref name="databaseName"/>.
     /// </summary>
-    /// <param name="databaseName">The case insensitive name of the database to retrieve.</param>
+    /// <param name="databaseName">The case-insensitive name of the database to retrieve.</param>
     /// <returns>
     /// A <see cref="ClientDatabaseBase"/> instance representing the requested client database.
     /// </returns>
@@ -57,7 +57,7 @@ public abstract class SnapClient : DisposableLoggingClassBase
     /// The <see cref="GetDatabase"/> method retrieves a client database with the specified <paramref name="databaseName"/>.
     /// If a database with the specified name does not exist, this method may return null or throw an exception.
     /// </remarks>
-    public abstract ClientDatabaseBase GetDatabase(string databaseName);
+    public abstract ClientDatabaseBase? GetDatabase(string databaseName);
 
     /// <summary>
     /// Accesses <see cref="ClientDatabaseBase{TKey,TValue}"/> for given <paramref name="databaseName"/>.
@@ -66,7 +66,7 @@ public abstract class SnapClient : DisposableLoggingClassBase
     /// <typeparam name="TKey">The type of key to access.</typeparam>
     /// <typeparam name="TValue">The type of value associated with the key to access.</typeparam>
     /// <returns><see cref="ClientDatabaseBase{TKey,TValue}"/> for given <paramref name="databaseName"/>.</returns>
-    public abstract ClientDatabaseBase<TKey, TValue> GetDatabase<TKey, TValue>(string databaseName) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new();
+    public abstract ClientDatabaseBase<TKey, TValue>? GetDatabase<TKey, TValue>(string databaseName) where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new();
 
     /// <summary>
     /// Gets basic information for every database connected to the server.
