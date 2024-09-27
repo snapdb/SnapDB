@@ -28,6 +28,10 @@ using System.Runtime.CompilerServices;
 using SnapDB.IO.Unmanaged;
 
 [assembly: InternalsVisibleTo("SnapDB.UnitTests")]
+[assembly: InternalsVisibleTo("GSF.SortedTreeStore.Test")]
+[assembly: InternalsVisibleTo("openHistorian.Adapters")]
+[assembly: InternalsVisibleTo("openHistorian.PerformanceTests")]
+[assembly: InternalsVisibleTo("ArchiveIntegrityChecker")]
 
 namespace SnapDB;
 
