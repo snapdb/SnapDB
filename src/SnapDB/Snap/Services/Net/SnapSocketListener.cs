@@ -92,7 +92,11 @@ public class SnapSocketListener : DisposableLoggingClassBase
 
         m_isRunning = true;
 
-        m_listener = new TcpListener(m_settings.LocalEndPoint) { Server = { DualMode = m_settings.LocalEndPoint.AddressFamily == AddressFamily.InterNetworkV6 } };
+        m_listener = new TcpListener(m_settings.LocalEndPoint);
+        
+        if (m_settings.LocalEndPoint.AddressFamily == AddressFamily.InterNetworkV6)
+            m_listener.Server.DualMode = true;
+        
         m_listener.Start();
 
         Log.Publish(MessageLevel.Info, "Constructor Called", $"Listening on {m_settings.LocalEndPoint}");
