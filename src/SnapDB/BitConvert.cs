@@ -70,5 +70,52 @@ public static class BitConvert
         return *(float*)&tmpValue;
     }
 
+    /// <summary>
+    /// Converts a Guid value into two unsigned 64-bit integers.
+    /// </summary>
+    /// <param name="value">Guid value to convert.</param>
+    /// <returns>
+    /// Two unsigned 64-bit integers representing the input Guid value.
+    /// </returns>
+    public static unsafe (ulong value1, ulong value2) ToUInt64Pair(Guid value)
+    {
+        byte[] bytes = value.ToByteArray();
+        ulong value1;
+        ulong value2;
+        
+        fixed (byte* ptr = bytes)
+        {
+            ulong* lptr = (ulong*)ptr;
+            value1 = *lptr;
+            lptr++;
+            value2 = *lptr;
+        }
+        
+        return (value1, value2);
+    }
+
+    /// <summary>
+    /// Converts two unsigned 64-bit integers into a Guid.
+    /// </summary>
+    /// <param name="value1">Value1 of the Guid.</param>
+    /// <param name="value2">Value2 of the Guid.</param>
+    /// <returns>
+    /// A Guid representation of the input unsigned 64-bit integers.
+    /// </returns>
+    public static unsafe Guid ToGuid(ulong value1, ulong value2)
+    {
+        ReadOnlySpan<byte> bytes = new byte[16];
+
+        fixed (byte* ptr = bytes)
+        {
+            ulong* lptr = (ulong*)ptr;
+            *lptr = value1;
+            lptr++;
+            *lptr = value2;
+        }
+
+        return new Guid(bytes);
+    }
+    
     #endregion
 }
