@@ -42,7 +42,7 @@ public static class BitConvert
     /// An unsigned 64-bit integer representation of the input single-precision floating-point number.
     /// </returns>
     /// <remarks>
-    /// This method performs an unsafe conversion by treating the input float as a uint and
+    /// This method performs an unsafe conversion by treating the input float as an uint and
     /// then casting it to ulong.
     /// </remarks>
     /// <seealso cref="ToUInt64(float)"/>
@@ -59,7 +59,7 @@ public static class BitConvert
     /// A single-precision floating-point number representing the input unsigned 64-bit integer.
     /// </returns>
     /// <remarks>
-    /// This method performs an unsafe conversion by first casting the input ulong to a uint
+    /// This method performs an unsafe conversion by first casting the input ulong to an uint
     /// and then treating it as a float.
     /// </remarks>
     /// <seealso cref="ToUInt64(float)"/>
