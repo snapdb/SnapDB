@@ -382,10 +382,17 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
             return;
         }
 
-        if (!InternalIsFileBeingUsed(file))
+        try
         {
-            file.BaseFile.Delete();
-            return;
+            if (!InternalIsFileBeingUsed(file))
+            {
+                file.BaseFile.Delete();
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.SwallowException(ex, "Queueing retry for file deletion...");
         }
 
         m_listLog.AddFileToDelete(file.ArchiveId);
