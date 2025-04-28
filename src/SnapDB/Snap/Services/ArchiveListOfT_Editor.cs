@@ -42,8 +42,7 @@ public partial class ArchiveList<TKey, TValue>
     {
         #region [ Members ]
 
-        private ArchiveList<TKey, TValue> m_list;
-
+        private readonly ArchiveList<TKey, TValue> m_list;
         private bool m_disposed;
 
         #endregion
@@ -57,7 +56,7 @@ public partial class ArchiveList<TKey, TValue>
         public Editor(ArchiveList<TKey, TValue> list)
         {
             m_list = list;
-            Monitor.Enter(m_list.m_syncRoot);
+            m_list.m_syncRoot.Enter();
         }
 
         #endregion
@@ -70,23 +69,24 @@ public partial class ArchiveList<TKey, TValue>
         /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
-            if (!m_disposed)
-                try
-                {
-                    // This will be done regardless of whether the object is finalized or disposed.
-                    if (disposing)
-                    {
-                        m_disposed = true;
-                        m_list.m_listLog.SaveLogToDisk();
-                        Monitor.Exit(m_list.m_syncRoot);
-                        m_list = null;
-                    }
-                }
-                finally
-                {
-                    m_disposed = true; // Prevent duplicate dispose.
-                    base.Dispose(disposing); // Call base class Dispose().
-                }
+            if (m_disposed)
+                return;
+            
+            try
+            {
+                // This will be done regardless of whether the object is finalized or disposed.
+                if (!disposing)
+                    return;
+
+                m_disposed = true;
+                m_list.m_listLog.SaveLogToDisk();
+                m_list.m_syncRoot.Exit();
+            }
+            finally
+            {
+                m_disposed = true; // Prevent duplicate dispose.
+                base.Dispose(disposing); // Call base class Dispose().
+            }
         }
 
         /// <summary>
@@ -104,8 +104,7 @@ public partial class ArchiveList<TKey, TValue>
         /// </remarks>
         public override void RenewArchiveSnapshot(Guid archiveId)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             m_list.m_fileSummaries[archiveId] = new ArchiveTableSummary<TKey, TValue>(m_list.m_fileSummaries[archiveId].SortedTreeTable);
         }
@@ -116,8 +115,7 @@ public partial class ArchiveList<TKey, TValue>
         /// <param name="sortedTree">Archive table to add.</param>
         public override void Add(SortedTreeTable<TKey, TValue> sortedTree)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             ArchiveTableSummary<TKey, TValue> summary = new(sortedTree);
             m_list.m_fileSummaries.Add(sortedTree.ArchiveId, summary);
@@ -148,14 +146,14 @@ public partial class ArchiveList<TKey, TValue>
         /// </remarks>
         public override bool TryRemoveAndDispose(Guid archiveId)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             SortedList<Guid, ArchiveTableSummary<TKey, TValue>> partitions = m_list.m_fileSummaries;
-            if (!partitions.ContainsKey(archiveId))
+            
+            if (!partitions.TryGetValue(archiveId, out ArchiveTableSummary<TKey, TValue>? partition))
                 return false;
 
-            SortedTreeTable<TKey, TValue> tree = partitions[archiveId].SortedTreeTable;
+            SortedTreeTable<TKey, TValue> tree = partition.SortedTreeTable;
             partitions.Remove(archiveId);
 
             m_list.AddFileToDispose(tree);
@@ -169,14 +167,14 @@ public partial class ArchiveList<TKey, TValue>
         /// <returns>true if deleted, false otherwise</returns>
         public override bool TryRemoveAndDelete(Guid archiveId)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             SortedList<Guid, ArchiveTableSummary<TKey, TValue>> partitions = m_list.m_fileSummaries;
-            if (!partitions.ContainsKey(archiveId))
+            
+            if (!partitions.TryGetValue(archiveId, out ArchiveTableSummary<TKey, TValue>? partition))
                 return false;
 
-            SortedTreeTable<TKey, TValue> tree = partitions[archiveId].SortedTreeTable;
+            SortedTreeTable<TKey, TValue> tree = partition.SortedTreeTable;
             partitions.Remove(archiveId);
 
             m_list.AddFileToDelete(tree);

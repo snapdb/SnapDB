@@ -45,28 +45,20 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
 {
     #region [ Members ]
 
-    /// <summary>
-    /// Contains all of the active snapshots of the archive lists
-    /// This is used for determining when resources are no longer in use.
-    /// </summary>
+    // Contains all the active snapshots of the archive lists.
+    // This is used for determining when resources are no longer in use.
     private readonly WeakList<ArchiveListSnapshot<TKey, TValue>> m_allSnapshots;
 
     private readonly List<SortedTreeTable<TKey, TValue>> m_filesToDelete;
     private readonly List<SortedTreeTable<TKey, TValue>> m_filesToDispose;
 
-    /// <summary>
-    /// Contains the list of all archives.
-    /// </summary>
+    // Contains the list of all archives.
     private readonly SortedList<Guid, ArchiveTableSummary<TKey, TValue>> m_fileSummaries;
 
-    /// <summary>
-    /// The log engine of the ArchiveList. This is where pending deletions or disposals are kept.
-    /// </summary>
+    // The log engine of the ArchiveList. This is where pending deletions or disposals are kept.
     private readonly ArchiveListLog m_listLog;
 
-    /// <summary>
-    /// The scheduled task for removing items.
-    /// </summary>
+    // The scheduled task for removing items.
     private readonly ScheduledTask m_processRemovals;
 
     private readonly ArchiveListSettings m_settings;
@@ -90,14 +82,14 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
 
         m_syncRoot = new Lock();
         m_fileSummaries = new SortedList<Guid, ArchiveTableSummary<TKey, TValue>>();
-        m_allSnapshots = new WeakList<ArchiveListSnapshot<TKey, TValue>>();
+        m_allSnapshots = [];
         m_listLog = new ArchiveListLog(m_settings.LogSettings);
-        m_filesToDelete = new List<SortedTreeTable<TKey, TValue>>();
-        m_filesToDispose = new List<SortedTreeTable<TKey, TValue>>();
+        m_filesToDelete = [];
+        m_filesToDispose = [];
         m_processRemovals = new ScheduledTask(ThreadingMode.DedicatedBackground);
         m_processRemovals.Running += ProcessRemovals_Running;
         m_processRemovals.Disposing += ProcessRemovals_Disposing;
-        //m_processRemovals.UnhandledException += ProcessRemovals_UnhandledException;
+        m_processRemovals.UnhandledException += ProcessRemovals_UnhandledException;
 
         AttachFileOrPath(m_settings.ImportPaths);
 
@@ -109,11 +101,10 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
 
     #region [ Methods ]
 
-    // TODO: JRC - think about custom exception handling messages with SafeInvoke for missing UnhandledException above
-    //private void ProcessRemovals_UnhandledException(object sender, EventArgs<Exception> e)
-    //{
-    //    Log.Publish(MessageLevel.Error, "Unknown error encountered while removing archive files.", null, null, e.Argument);
-    //}
+    private void ProcessRemovals_UnhandledException(object? sender, EventArgs<Exception> e)
+    {
+        Log.Publish(MessageLevel.Error, "Unknown error encountered while removing archive files.", null, null, e.Argument);
+    }
 
     /// <summary>
     /// Releases the unmanaged resources used by the log source base object and optionally releases the managed resources.
@@ -149,13 +140,13 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     /// </remarks>
     public override void AttachFileOrPath(IEnumerable<string> paths)
     {
-        List<string> attachedFiles = new();
+        List<string> attachedFiles = [];
 
         foreach (string path in paths)
         {
             try
             {
-                void ExceptionHandler(Exception ex)
+                void exceptionHandler(Exception ex)
                 {
                     Log.Publish(MessageLevel.Error, "Unknown error occurred while attaching paths", "Path: " + path, null, ex);
                 }
@@ -165,7 +156,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
 
                 else if (Directory.Exists(path))
                     foreach (string extension in m_settings.ImportExtensions)
-                        attachedFiles.AddRange(FilePath.GetFiles(path, "*" + extension, SearchOption.AllDirectories, ExceptionHandler));
+                        attachedFiles.AddRange(FilePath.GetFiles(path, "*" + extension, SearchOption.AllDirectories, exceptionHandler));
                 else
                     Log.Publish(MessageLevel.Warning, "File or path does not exist", path);
             }
@@ -187,7 +178,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
         if (m_disposed)
             throw new Exception("Object is disposing");
 
-        List<SortedTreeTable<TKey, TValue>> loadedFiles = new();
+        List<SortedTreeTable<TKey, TValue>> loadedFiles = [];
 
         foreach (string file in archiveFiles)
         {
@@ -279,10 +270,10 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     /// <summary>
     /// Gets a complete list of all archive files.
     /// </summary>
-    /// <returns>All of the attached archive files.</returns>
+    /// <returns>All the attached archive files.</returns>
     public override List<ArchiveDetails> GetAllAttachedFiles()
     {
-        List<ArchiveDetails> attachedFiles = new();
+        List<ArchiveDetails> attachedFiles = [];
 
         lock (m_syncRoot)
         {
@@ -328,7 +319,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     /// <summary>
     /// Creates an object that can be used to get updated snapshots from this archive list.
     /// Client must call <see cref="IDisposable.Dispose"/> method when finished with these resources as they will not
-    /// automatically be reclaimed by the garbage collector. Class will not be initiallized until calling <see cref="ArchiveListSnapshot{TKey,TValue}.UpdateSnapshot"/>.
+    /// automatically be reclaimed by the garbage collector. Class will not be initialized until calling <see cref="ArchiveListSnapshot{TKey,TValue}.UpdateSnapshot"/>.
     /// </summary>
     /// <returns>
     /// A new <see cref="ArchiveListSnapshot{TKey, TValue}"/> instance for client resources.
@@ -434,9 +425,9 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
         return m_allSnapshots.Where(snapshot => !snapshot.IsDisposed).Select(snapshot => snapshot.Tables).Where(tables => tables is not null).Any(tables => tables!.Any(summary => summary is not null && summary.SortedTreeTable == sortedTree));
     }
 
-    private void ProcessRemovals_Running(object sender, EventArgs<ScheduledTaskRunningReason> eventArgs)
+    private void ProcessRemovals_Running(object? sender, EventArgs<ScheduledTaskRunningReason> eventArgs)
     {
-        bool wasAFileDeleted = false;
+        bool fileDeleted = false;
 
         lock (m_syncRoot)
         {
@@ -446,7 +437,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
 
                 if (!InternalIsFileBeingUsed(file))
                 {
-                    wasAFileDeleted = true;
+                    fileDeleted = true;
                     file.BaseFile.Delete();
                     m_filesToDelete.RemoveAt(x);
                 }
@@ -456,14 +447,14 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
             {
                 SortedTreeTable<TKey, TValue> file = m_filesToDispose[x];
 
-                if (!InternalIsFileBeingUsed(file))
-                {
-                    file.BaseFile.Dispose();
-                    m_filesToDispose.RemoveAt(x);
-                }
+                if (InternalIsFileBeingUsed(file))
+                    continue;
+                
+                file.BaseFile.Dispose();
+                m_filesToDispose.RemoveAt(x);
             }
 
-            if (wasAFileDeleted)
+            if (fileDeleted)
             {
                 HashSet<Guid> files = new(m_filesToDelete.Select(x => x.ArchiveId));
                 m_listLog.ClearCompletedLogs(files);
@@ -474,7 +465,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
         }
     }
 
-    private void ProcessRemovals_Disposing(object sender, EventArgs eventArgs)
+    private void ProcessRemovals_Disposing(object? sender, EventArgs eventArgs)
     {
         lock (m_syncRoot)
         {
@@ -489,7 +480,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
 
     private void ReleaseClientResources()
     {
-        List<ArchiveListSnapshot<TKey, TValue>> tablesInUse = new();
+        List<ArchiveListSnapshot<TKey, TValue>> tablesInUse = [];
 
         lock (m_syncRoot)
             tablesInUse.AddRange(m_allSnapshots);
@@ -517,7 +508,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
         lock (m_syncRoot)
         {
             transaction.Tables = new ArchiveTableSummary<TKey, TValue>[m_fileSummaries.Count];
-            m_fileSummaries.Values.CopyTo(transaction.Tables, 0);
+            m_fileSummaries.Values.CopyTo(transaction.Tables!, 0);
         }
     }
 
