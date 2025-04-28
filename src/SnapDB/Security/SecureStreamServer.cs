@@ -107,7 +107,7 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
     //private CertificateServer m_cert;
     private readonly IntegratedSecurityServer m_integrated;
     private State m_state;
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
     private readonly Dictionary<Guid, T> m_userTokens;
 
     #endregion
@@ -119,7 +119,7 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
     /// </summary>
     public SecureStreamServer() : base(MessageClass.Component)
     {
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_state = new State { ContainsDefaultCredentials = false };
         InvalidateAllTickets();
         m_userTokens = new Dictionary<Guid, T>();

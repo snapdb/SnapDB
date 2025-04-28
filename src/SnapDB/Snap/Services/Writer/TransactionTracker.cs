@@ -99,7 +99,7 @@ public class TransactionTracker<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     private readonly FirstStageWriter<TKey, TValue> m_firstStageWriter;
     private readonly PrebufferWriter<TKey, TValue> m_prebuffer;
 
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
     private long m_transactionHardCommitted;
     private long m_transactionSoftCommitted;
     private readonly List<WaitForCommit> m_waitingForHardCommit;
@@ -119,7 +119,7 @@ public class TransactionTracker<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
         m_waitingForHardCommit = new List<WaitForCommit>();
         m_waitingForSoftCommit = new List<WaitForCommit>();
 
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_transactionSoftCommitted = 0;
         m_transactionHardCommitted = 0;
         m_prebuffer = prebuffer;

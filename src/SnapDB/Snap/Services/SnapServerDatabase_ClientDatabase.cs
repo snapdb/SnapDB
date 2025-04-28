@@ -47,7 +47,7 @@ public partial class SnapServerDatabase<TKey, TValue>
         private readonly Action<ClientDatabaseBase> m_onDispose;
         private readonly WeakList<SequentialReaderStream<TKey, TValue>> m_openStreams;
         private readonly SnapServerDatabase<TKey, TValue> m_server;
-        private readonly object m_syncRoot;
+        private readonly Lock m_syncRoot;
         private bool m_disposed;
 
         #endregion
@@ -63,7 +63,7 @@ public partial class SnapServerDatabase<TKey, TValue>
             if (!ReferenceEquals(client, onDispose.Target))
                 throw new ArgumentException("Does not reference a method in clientHost", nameof(onDispose));
 
-            m_syncRoot = new object();
+            m_syncRoot = new Lock();
             m_openStreams = new WeakList<SequentialReaderStream<TKey, TValue>>();
         }
 

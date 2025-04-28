@@ -70,7 +70,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     private readonly ScheduledTask m_processRemovals;
 
     private readonly ArchiveListSettings m_settings;
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
     private bool m_disposed;
 
     #endregion
@@ -88,7 +88,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
         m_settings = settings.CloneReadonly();
         m_settings.Validate();
 
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_fileSummaries = new SortedList<Guid, ArchiveTableSummary<TKey, TValue>>();
         m_allSnapshots = new WeakList<ArchiveListSnapshot<TKey, TValue>>();
         m_listLog = new ArchiveListLog(m_settings.LogSettings);
@@ -431,7 +431,7 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
     /// </remarks>
     private bool InternalIsFileBeingUsed(SortedTreeTable<TKey, TValue> sortedTree)
     {
-        return m_allSnapshots.Select(snapshot => snapshot.Tables).Where(tables => tables is not null).Any(tables => tables.Any(summary => summary is not null && summary.SortedTreeTable == sortedTree));
+        return m_allSnapshots.Where(snapshot => !snapshot.IsDisposed).Select(snapshot => snapshot.Tables).Where(tables => tables is not null).Any(tables => tables!.Any(summary => summary is not null && summary.SortedTreeTable == sortedTree));
     }
 
     private void ProcessRemovals_Running(object sender, EventArgs<ScheduledTaskRunningReason> eventArgs)

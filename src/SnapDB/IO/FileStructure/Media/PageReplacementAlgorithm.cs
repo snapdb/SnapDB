@@ -56,7 +56,7 @@ internal partial class PageReplacementAlgorithm : IDisposable
     /// <remarks>These items in the list are not in any particular order.</remarks>
     private readonly PageList m_pageList;
 
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
 
     private bool m_disposed;
 
@@ -80,7 +80,7 @@ internal partial class PageReplacementAlgorithm : IDisposable
 
         m_maxValidPosition = (int.MaxValue - 1) * (long)pool.PageSize; // Max position 
 
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_memoryPageSizeMask = pool.PageSize - 1;
         m_memoryPageSizeShiftBits = BitMath.CountBitsSet((uint)m_memoryPageSizeMask);
         m_pageList = new PageList(pool);

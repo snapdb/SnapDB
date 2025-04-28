@@ -36,14 +36,14 @@ internal class ArchiveListLog : DisposableLoggingClassBase
 {
     #region [ Members ]
 
-    private HashSet<Guid> m_allFilesToDelete;
+    private HashSet<Guid>? m_allFilesToDelete;
 
     private readonly List<ArchiveListLogFile> m_files = new();
 
     private ArchiveListLogFile m_pendingFile;
     private readonly ArchiveListLogSettings m_settings;
 
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
     private bool m_disposed;
 
     #endregion
@@ -61,7 +61,7 @@ internal class ArchiveListLog : DisposableLoggingClassBase
         m_settings = settings.CloneReadonly();
         m_settings.Validate();
 
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_pendingFile = new ArchiveListLogFile();
 
         if (m_settings.IsFileBacked)

@@ -50,7 +50,7 @@ public class EventTimer : DisposableLoggingClassBase
     private readonly LogStackMessages m_message;
     private readonly TimeSpan m_period;
     private bool m_stopping;
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
 
     private ScheduledTask m_timer;
     private bool m_disposed;
@@ -67,7 +67,7 @@ public class EventTimer : DisposableLoggingClassBase
     private EventTimer(TimeSpan period, TimeSpan dayOffset) : base(MessageClass.Component)
     {
         m_stopping = false;
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_period = period;
         m_dayOffset = dayOffset;
 

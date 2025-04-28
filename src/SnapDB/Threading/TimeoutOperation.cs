@@ -33,13 +33,13 @@ public class TimeoutOperation
 {
     #region [ Members ]
 
-    private Action m_callback;
-    private RegisteredWaitHandle m_registeredHandle;
-    private ManualResetEvent m_resetEvent;
+    private Action? m_callback;
+    private RegisteredWaitHandle? m_registeredHandle;
+    private ManualResetEvent? m_resetEvent;
 
     // ToDo: Figure out how to allow for a weak referenced callback.
 
-    private readonly object m_syncRoot = new();
+    private readonly Lock m_syncRoot = new();
 
     #endregion
 
@@ -74,7 +74,7 @@ public class TimeoutOperation
             if (m_registeredHandle is not null)
             {
                 m_registeredHandle.Unregister(null);
-                m_resetEvent.Dispose();
+                m_resetEvent?.Dispose();
                 m_resetEvent = null;
                 m_registeredHandle = null;
                 m_callback = null;
@@ -82,7 +82,7 @@ public class TimeoutOperation
         }
     }
 
-    private void BeginRun(object state, bool isTimeout)
+    private void BeginRun(object? state, bool isTimeout)
     {
         lock (m_syncRoot)
         {
@@ -90,8 +90,8 @@ public class TimeoutOperation
                 return;
 
             m_registeredHandle.Unregister(null);
-            m_resetEvent.Dispose();
-            m_callback();
+            m_resetEvent?.Dispose();
+            m_callback?.Invoke();
             m_resetEvent = null;
             m_registeredHandle = null;
             m_callback = null;

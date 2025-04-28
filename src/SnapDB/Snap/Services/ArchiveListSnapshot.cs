@@ -59,7 +59,7 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable where TKey : SnapTy
     /// </summary>
     private Action<ArchiveListSnapshot<TKey, TValue>> m_onDisposed;
 
-    private readonly object m_syncDisposing;
+    private readonly Lock m_syncDisposing;
 
     /// <summary>
     /// Contains an array of all of the resources currently used by this transaction.
@@ -78,7 +78,7 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable where TKey : SnapTy
     /// <param name="acquireResources"></param>
     public ArchiveListSnapshot(Action<ArchiveListSnapshot<TKey, TValue>> onDisposed, Action<ArchiveListSnapshot<TKey, TValue>> acquireResources)
     {
-        m_syncDisposing = new object();
+        m_syncDisposing = new Lock();
         m_onDisposed = onDisposed;
         m_acquireResources = acquireResources;
         m_tables = Array.Empty<ArchiveTableSummary<TKey, TValue>>();
@@ -110,7 +110,7 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable where TKey : SnapTy
         get
         {
             if (IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+               throw new ObjectDisposedException(GetType().FullName);
 
             return m_tables;
         }

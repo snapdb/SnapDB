@@ -37,7 +37,7 @@ internal class IndividualEncodingDictionary
 
     private readonly Dictionary<Guid, IndividualEncodingDefinitionBase> m_combinedEncoding;
     private readonly Dictionary<Tuple<Guid, Type>, IndividualEncodingDefinitionBase> m_keyTypedCombinedEncoding;
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
 
     #endregion
 
@@ -48,7 +48,7 @@ internal class IndividualEncodingDictionary
     /// </summary>
     public IndividualEncodingDictionary()
     {
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_combinedEncoding = new Dictionary<Guid, IndividualEncodingDefinitionBase>();
         m_keyTypedCombinedEncoding = new Dictionary<Tuple<Guid, Type>, IndividualEncodingDefinitionBase>();
     }

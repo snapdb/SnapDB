@@ -152,7 +152,7 @@ public class MemoryPoolStreamCore : IDisposable
     // The number of bits in the page size.
     private readonly int m_shiftLength;
 
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
 
     #endregion
 
@@ -177,7 +177,7 @@ public class MemoryPoolStreamCore : IDisposable
         m_pageSize = pool.PageSize;
         m_invertMask = ~(pool.PageSize - 1);
         m_settings = new Settings();
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
     }
 
     /// <summary>

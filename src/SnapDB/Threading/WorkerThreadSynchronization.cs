@@ -120,7 +120,7 @@ public class WorkerThreadSynchronization : DisposableLoggingClassBase
 
     private readonly List<CallbackRequest> m_pendingCallbacks;
 
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
 
     #endregion
 
@@ -131,7 +131,7 @@ public class WorkerThreadSynchronization : DisposableLoggingClassBase
     /// </summary>
     public WorkerThreadSynchronization() : base(MessageClass.Component)
     {
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_isSafeToCallback = false;
         m_isCallbackWaiting = false;
         m_isRequestCallbackMethodProcessing = false;

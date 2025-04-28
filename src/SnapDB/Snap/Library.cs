@@ -54,7 +54,7 @@ public static class Library
     /// </summary>
     public static readonly FilterLibrary Filters;
 
-    private static readonly object s_syncRoot;
+    private static readonly Lock s_syncRoot;
     private static readonly Dictionary<Guid, Type> s_typeLookup;
     private static readonly Dictionary<Type, Guid> s_registeredType;
 
@@ -75,7 +75,7 @@ public static class Library
             s_loadedAssemblies = new HashSet<Assembly>();
             Encodings = new EncodingLibrary();
             Filters = new FilterLibrary();
-            s_syncRoot = new object();
+            s_syncRoot = new Lock();
             s_typeLookup = new Dictionary<Guid, Type>();
             s_registeredType = new Dictionary<Type, Guid>();
             s_keyValueMethodsList = new Dictionary<Tuple<Type, Type>, object>();

@@ -81,7 +81,7 @@ public class PrebufferWriter<TKey, TValue> : DisposableLoggingClassBase where TK
     /// </summary>
     private bool m_stopped;
 
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
     private readonly SafeManualResetEvent m_waitForEmptyActiveQueue;
 
     /// <summary>
@@ -111,7 +111,7 @@ public class PrebufferWriter<TKey, TValue> : DisposableLoggingClassBase where TK
         m_performanceLog = Log.RegisterEvent(MessageLevel.Info, MessageFlags.PerformanceIssue, "Queue is full", 0, MessageRate.PerSecond(1), 1);
         m_currentlyRollingOverFullQueue = false;
         m_latestTransactionId.Value = 0;
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_activeQueue = new SortedPointBuffer<TKey, TValue>(m_settings.MaximumPointCount, true);
         m_processingQueue = new SortedPointBuffer<TKey, TValue>(m_settings.MaximumPointCount, true);
         m_activeQueue.IsReadingMode = false;

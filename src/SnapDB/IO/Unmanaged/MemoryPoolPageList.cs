@@ -73,7 +73,7 @@ internal class MemoryPoolPageList : IDisposable
     private readonly int m_pagesPerMemoryBlock;
     private readonly int m_pagesPerMemoryBlockMask;
     private readonly int m_pagesPerMemoryBlockShiftBits;
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
 
     // The number of pages that have been used.
     private int m_usedPageCount;
@@ -94,7 +94,7 @@ internal class MemoryPoolPageList : IDisposable
     /// </param>
     public MemoryPoolPageList(int pageSize, long maximumBufferSize)
     {
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         PageSize = pageSize;
 
         long totalMemory = (long)Common.GetTotalPhysicalMemory();

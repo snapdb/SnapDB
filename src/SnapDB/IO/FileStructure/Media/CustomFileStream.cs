@@ -57,7 +57,7 @@ internal sealed class CustomFileStream : IDisposable
     /// <summary>
     /// Needed to properly synchronize read and write operations.
     /// </summary>
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
 
     // Needed since this class computes footer check-sums.
     private bool m_disposed;
@@ -94,7 +94,7 @@ internal sealed class CustomFileStream : IDisposable
         IsSharingEnabled = isSharingEnabled;
         FileStructureBlockSize = fileStructureBlockSize;
         m_bufferQueue = s_resourceList.GetResourceQueue(ioSize);
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
 
         if (!File.Exists(fileName))
             return;

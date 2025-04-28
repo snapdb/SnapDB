@@ -87,7 +87,7 @@ internal partial class BufferedFile : IDiskMediumCoreFunctions
     /// <summary>
     /// Synchronize all calls to this class.
     /// </summary>
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
 
     /// <summary>
     /// Any uncommitted data resides in this location.
@@ -121,7 +121,7 @@ internal partial class BufferedFile : IDiskMediumCoreFunctions
         m_writeBuffer = new MemoryPoolStreamCore(pool);
         m_pool = pool;
         m_queue = stream;
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_pageReplacementAlgorithm = new PageReplacementAlgorithm(pool);
         pool.RequestCollection += m_pool_RequestCollection;
 

@@ -49,7 +49,7 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
     private readonly RolloverLog m_rolloverLog;
     private ScheduledTask m_rolloverTask;
     private readonly CombineFilesSettings m_settings;
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
     private bool m_disposed;
 
     #endregion
@@ -70,7 +70,7 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
         m_createNextStageFile = new SimplifiedArchiveInitializer<TKey, TValue>(settings.ArchiveSettings);
         m_rolloverLog = rolloverLog;
         m_rolloverComplete = new ManualResetEvent(false);
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_rolloverTask = new ScheduledTask(ThreadingMode.DedicatedForeground, ThreadPriority.BelowNormal);
         m_rolloverTask.Running += OnExecute;
         //m_rolloverTask.UnhandledException += OnException;

@@ -36,7 +36,7 @@ namespace SnapDB.Collections;
 /// <typeparam name="TValue">The type of values in the dictionary.</typeparam>
 /// <remarks>
 /// This is a special purpose class that supports only the "add" and "get" operations.
-/// It is designed for indexing and dicitionary lookup capabilities.
+/// It is designed for indexing and dictionary lookup capabilities.
 /// </remarks>
 public class ConcurrentIndexedDictionary<TKey, TValue> where TKey : notnull
 {
@@ -45,7 +45,7 @@ public class ConcurrentIndexedDictionary<TKey, TValue> where TKey : notnull
     private TValue[] m_items = new TValue[4];
 
     private readonly Dictionary<TKey, int> m_lookup = new();
-    private readonly object m_syncRoot = new();
+    private readonly Lock m_syncRoot = new();
 
     #endregion
 

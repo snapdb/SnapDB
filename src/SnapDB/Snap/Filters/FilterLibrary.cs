@@ -40,7 +40,7 @@ public class FilterLibrary
     private readonly Dictionary<Guid, MatchFilterDefinitionBase> m_filters;
     private readonly Dictionary<Guid, SeekFilterDefinitionBase> m_seekFilters;
 
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
 
     #endregion
 
@@ -48,7 +48,7 @@ public class FilterLibrary
 
     internal FilterLibrary()
     {
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_filters = new Dictionary<Guid, MatchFilterDefinitionBase>();
         m_seekFilters = new Dictionary<Guid, SeekFilterDefinitionBase>();
     }

@@ -41,7 +41,7 @@ public partial class SnapServer
 
         private readonly Dictionary<string, ClientDatabaseBase> m_connectedDatabases;
         private SnapServer m_server;
-        private readonly object m_syncRoot;
+        private readonly Lock m_syncRoot;
         private bool m_disposed;
 
         #endregion
@@ -54,7 +54,7 @@ public partial class SnapServer
         /// <param name="server">The collection to wrap.</param>
         public Client(SnapServer server)
         {
-            m_syncRoot = new object();
+            m_syncRoot = new Lock();
             m_connectedDatabases = new Dictionary<string, ClientDatabaseBase>();
             m_server = server ?? throw new ArgumentNullException(nameof(server));
             server.RegisterClient(this);

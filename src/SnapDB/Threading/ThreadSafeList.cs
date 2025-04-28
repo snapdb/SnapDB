@@ -58,7 +58,7 @@ public partial class ThreadSafeList<T> : IEnumerable<T>
 
     private readonly SortedList<long, Wrapper> m_list;
     private long m_sequenceNumber;
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
     private long m_version;
 
     #endregion
@@ -70,7 +70,7 @@ public partial class ThreadSafeList<T> : IEnumerable<T>
     /// </summary>
     public ThreadSafeList()
     {
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_list = new SortedList<long, Wrapper>();
         m_sequenceNumber = 0;
         m_version = 0;

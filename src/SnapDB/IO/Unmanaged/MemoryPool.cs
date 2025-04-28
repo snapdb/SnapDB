@@ -139,10 +139,10 @@ public class MemoryPool : IDisposable
 
     // All allocates are synchronized separately since an allocation can request a collection. 
     // This will create a queuing nature of the allocations.
-    private readonly object m_syncAllocate;
+    private readonly Lock m_syncAllocate;
 
     // Used for synchronizing modifications to this class.
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
 
     #endregion
 
@@ -162,8 +162,8 @@ public class MemoryPool : IDisposable
         if (!BitMath.IsPowerOfTwo((uint)pageSize))
             throw new ArgumentOutOfRangeException(nameof(pageSize), "Page size must be between 4KB and 256KB and a power of 2");
 
-        m_syncRoot = new object();
-        m_syncAllocate = new object();
+        m_syncRoot = new Lock();  
+        m_syncAllocate = new Lock();
         PageSize = pageSize;
         PageMask = PageSize - 1;
         PageShiftBits = BitMath.CountBitsSet((uint)PageMask);

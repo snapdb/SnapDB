@@ -277,7 +277,7 @@ public class WeakList<T> : IEnumerable<T> where T : class
 
     private Snapshot m_data;
 
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
 
     #endregion
 
@@ -288,7 +288,7 @@ public class WeakList<T> : IEnumerable<T> where T : class
     /// </summary>
     public WeakList()
     {
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_data = new Snapshot(8);
     }
 

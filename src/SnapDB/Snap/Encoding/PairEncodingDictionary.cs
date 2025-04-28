@@ -38,7 +38,7 @@ internal class PairEncodingDictionary
     private readonly Dictionary<EncodingDefinition, PairEncodingDefinitionBase> m_combinedEncoding;
     private readonly Dictionary<Tuple<EncodingDefinition, Type>, PairEncodingDefinitionBase> m_keyTypedCombinedEncoding;
     private readonly Dictionary<Tuple<EncodingDefinition, Type, Type>, PairEncodingDefinitionBase> m_keyValueTypedCombinedEncoding;
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
     private readonly Dictionary<Tuple<EncodingDefinition, Type>, PairEncodingDefinitionBase> m_valueTypedCombinedEncoding;
 
     #endregion
@@ -50,7 +50,7 @@ internal class PairEncodingDictionary
     /// </summary>
     public PairEncodingDictionary()
     {
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_combinedEncoding = new Dictionary<EncodingDefinition, PairEncodingDefinitionBase>();
         m_keyTypedCombinedEncoding = new Dictionary<Tuple<EncodingDefinition, Type>, PairEncodingDefinitionBase>();
         m_valueTypedCombinedEncoding = new Dictionary<Tuple<EncodingDefinition, Type>, PairEncodingDefinitionBase>();

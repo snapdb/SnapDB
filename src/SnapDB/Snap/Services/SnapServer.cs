@@ -59,7 +59,7 @@ public partial class SnapServer : DisposableLoggingClassBase
     /// </summary>
     private readonly Dictionary<IPEndPoint, SnapSocketListener> m_sockets;
 
-    private readonly object m_syncRoot = new();
+    private readonly Lock m_syncRoot = new();
     private bool m_disposed;
 
     #endregion

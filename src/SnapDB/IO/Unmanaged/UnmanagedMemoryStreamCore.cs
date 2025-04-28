@@ -155,7 +155,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
     // The number of bits in the page size.
     private readonly int m_shiftLength;
 
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
 
     #endregion
 
@@ -174,7 +174,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
         m_pageSize = allocationSize;
         m_invertMask = ~(allocationSize - 1);
         m_settings = new Settings();
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_memoryBlocks = new List<Memory>();
     }
 

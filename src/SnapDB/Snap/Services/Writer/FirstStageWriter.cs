@@ -66,7 +66,7 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
 
     private readonly FirstStageWriterSettings m_settings;
     private bool m_stopped;
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
     private bool m_disposed;
 
     #endregion
@@ -97,7 +97,7 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
         m_pendingTables1 = new List<SortedTreeTable<TKey, TValue>>();
         m_pendingTables2 = new List<SortedTreeTable<TKey, TValue>>();
         m_pendingTables3 = new List<SortedTreeTable<TKey, TValue>>();
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_rolloverTask = new ScheduledTask(ThreadingMode.DedicatedForeground);
         m_rolloverTask.Running += RolloverTask_Running;
         //m_rolloverTask.UnhandledException += OnProcessException;

@@ -44,7 +44,7 @@ public sealed class SafeManualResetEvent : IDisposable
 
     private ManualResetEvent m_resetEvent;
 
-    private readonly object m_syncRoot;
+    private readonly Lock m_syncRoot;
 
     /// <summary>
     /// The number of threads waiting.
@@ -63,7 +63,7 @@ public sealed class SafeManualResetEvent : IDisposable
     /// <param name="signaledState"><c>true</c> to set the initial state signaled; <c>false</c> to set the initial state to nonsignaled.</param>
     public SafeManualResetEvent(bool signaledState)
     {
-        m_syncRoot = new object();
+        m_syncRoot = new Lock();
         m_resetEvent = new ManualResetEvent(signaledState);
     }
 
