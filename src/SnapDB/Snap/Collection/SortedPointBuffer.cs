@@ -339,9 +339,7 @@ public class SortedPointBuffer<TKey, TValue> : TreeStream<TKey, TValue> where TK
 
         if (shouldSwap)
         {
-            int[] b1 = m_sortingBlocks1;
-            m_sortingBlocks1 = m_sortingBlocks2;
-            m_sortingBlocks2 = b1;
+            (m_sortingBlocks1, m_sortingBlocks2) = (m_sortingBlocks2, m_sortingBlocks1);
         }
     }
 

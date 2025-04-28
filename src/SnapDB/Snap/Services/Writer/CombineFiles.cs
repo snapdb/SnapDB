@@ -101,12 +101,7 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
         base.Dispose(disposing);
     }
 
-    private void OnException(object sender, EventArgs<Exception> e)
-    {
-        Log.Publish(MessageLevel.Error, "Unexpected Error when rolling over a file", null, null, e.Argument);
-    }
-
-    private void OnExecute(object sender, EventArgs<ScheduledTaskRunningReason> e)
+    private void OnExecute(object? sender, EventArgs<ScheduledTaskRunningReason> e)
     {
         // The worker can be disposed either via the Stop() method or 
         // the Dispose() method.  If via the dispose method, then
@@ -131,7 +126,7 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
                 List<ArchiveTableSummary<TKey, TValue>> list = [];
                 List<Guid> listIds = [];
 
-                for (int x = 0; x < resource.Tables.Length; x++)
+                for (int x = 0; x < resource.Tables!.Length; x++)
                 {
                     ArchiveTableSummary<TKey, TValue>? table = resource.Tables[x];
 
@@ -153,6 +148,7 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
                 for (int x = 0; x < list.Count; x++)
                 {
                     size += list[x].SortedTreeTable.BaseFile.ArchiveSize;
+
                     if (size > m_settings.CombineOnFileSize)
                     {
                         if (x != list.Count - 1) //If not the last entry
@@ -186,14 +182,14 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
 
                     RolloverLogFile? logFile = null;
 
-                    void CreateLog(Guid x)
+                    void createLog(Guid x)
                     {
                         logFile = m_rolloverLog.Create(listIds, x);
                     }
 
                     using (UnionReader<TKey, TValue> reader = new(list))
                     {
-                        SortedTreeTable<TKey, TValue> dest = m_createNextStageFile.CreateArchiveFile(startKey, endKey, size, reader, CreateLog);
+                        SortedTreeTable<TKey, TValue> dest = m_createNextStageFile.CreateArchiveFile(startKey, endKey, size, reader, createLog);
 
                         resource.Dispose();
 
@@ -215,6 +211,11 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
 
             m_rolloverComplete.Set();
         }
+    }
+
+    private static void OnException(object? sender, EventArgs<Exception> e)
+    {
+        LibraryEvents.OnSuppressedException(sender, e.Argument);
     }
 
     #endregion

@@ -425,9 +425,9 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
         RolloverComplete?.Invoke(sequenceNumber);
     }
 
-    private void OnProcessException(object sender, EventArgs<Exception> e)
+    private static void OnProcessException(object? sender, EventArgs<Exception> e)
     {
-        Log.Publish(MessageLevel.Critical, "Unhandled exception", "The worker thread threw an unhandled exception", null, e.Argument);
+        LibraryEvents.OnSuppressedException(sender, e.Argument);
     }
 
     #endregion

@@ -50,15 +50,11 @@ public class PrebufferWriter<TKey, TValue> : DisposableLoggingClassBase where TK
 
     private SortedPointBuffer<TKey, TValue> m_activeQueue;
 
-    /// <summary>
-    /// Gets if the rollover thread is currently working.
-    /// </summary>
+    // Gets if the rollover thread is currently working.
     private bool m_currentlyRollingOverFullQueue;
 
-    /// <summary>
-    /// The Transaction Id that is currently being processed by the rollover thread.
-    /// Its possible that it has not completed rolling over yet.
-    /// </summary>
+    // The Transaction ID that is currently being processed by the rollover thread.
+    // It is possible that it has not completed rolling over yet.
     private AtomicInt64 m_currentTransactionIdRollingOver = new();
 
     /// <summary>
@@ -265,7 +261,7 @@ public class PrebufferWriter<TKey, TValue> : DisposableLoggingClassBase where TK
     /// <summary>
     /// Processes the rollover of this file.
     /// </summary>
-    private void m_rolloverTask_Running(object sender, EventArgs<ScheduledTaskRunningReason> e)
+    private void m_rolloverTask_Running(object? sender, EventArgs<ScheduledTaskRunningReason> e)
     {
         //the nature of how the ScheduledTask works 
         //guarantees that this function will not be called concurrently
@@ -291,9 +287,7 @@ public class PrebufferWriter<TKey, TValue> : DisposableLoggingClassBase where TK
             }
 
             //Swap active and processing.
-            SortedPointBuffer<TKey, TValue> swap = m_activeQueue;
-            m_activeQueue = m_processingQueue;
-            m_processingQueue = swap;
+            (m_activeQueue, m_processingQueue) = (m_processingQueue, m_activeQueue);
             m_activeQueue.IsReadingMode = false; //Should do nothing, but just to be sure.
 
             m_waitForEmptyActiveQueue.Set();
@@ -320,9 +314,9 @@ public class PrebufferWriter<TKey, TValue> : DisposableLoggingClassBase where TK
         m_currentlyRollingOverFullQueue = false;
     }
 
-    private void OnProcessException(object sender, EventArgs<Exception> e)
+    private static void OnProcessException(object? sender, EventArgs<Exception> e)
     {
-        Log.Publish(MessageLevel.Critical, "Unhandled exception", "The worker thread threw an unhandled exception", null, e.Argument);
+        LibraryEvents.OnSuppressedException(sender, e.Argument);
     }
 
     #endregion

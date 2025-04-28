@@ -101,11 +101,6 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
 
     #region [ Methods ]
 
-    private void ProcessRemovals_UnhandledException(object? sender, EventArgs<Exception> e)
-    {
-        Log.Publish(MessageLevel.Error, "Unknown error encountered while removing archive files.", null, null, e.Argument);
-    }
-
     /// <summary>
     /// Releases the unmanaged resources used by the log source base object and optionally releases the managed resources.
     /// </summary>
@@ -476,6 +471,11 @@ public partial class ArchiveList<TKey, TValue> : ArchiveList where TKey : SnapTy
             m_filesToDispose.ForEach(x => x.BaseFile.Dispose());
             m_filesToDispose.Clear();
         }
+    }
+
+    private static void ProcessRemovals_UnhandledException(object? sender, EventArgs<Exception> e)
+    {
+        LibraryEvents.OnSuppressedException(sender, e.Argument);
     }
 
     private void ReleaseClientResources()
