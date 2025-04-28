@@ -91,8 +91,7 @@ public partial class SnapServer
         /// <returns>The database that matches <paramref name="databaseName"/>.</returns>
         public override ClientDatabaseBase GetDatabase(string databaseName)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
             databaseName = databaseName.ToUpper();
 
             ClientDatabaseBase database;
@@ -128,8 +127,7 @@ public partial class SnapServer
         /// </returns>
         public override bool Contains(string databaseName)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             return m_server.Contains(databaseName);
         }
@@ -141,8 +139,7 @@ public partial class SnapServer
         /// <exception cref="ObjectDisposedException">Thrown if the server settings object has been disposed.</exception>
         public override List<DatabaseInfo> GetDatabaseInfo()
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             return m_server.GetDatabaseInfo();
         }

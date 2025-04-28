@@ -94,13 +94,13 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
         m_createNextStageFile = new SimplifiedArchiveInitializer<TKey, TValue>(m_settings.FinalSettings);
         m_rolloverComplete = new SafeManualResetEvent(false);
         m_list = list;
-        m_pendingTables1 = new List<SortedTreeTable<TKey, TValue>>();
-        m_pendingTables2 = new List<SortedTreeTable<TKey, TValue>>();
-        m_pendingTables3 = new List<SortedTreeTable<TKey, TValue>>();
+        m_pendingTables1 = [];
+        m_pendingTables2 = [];
+        m_pendingTables3 = [];
         m_syncRoot = new Lock();
         m_rolloverTask = new ScheduledTask(ThreadingMode.DedicatedForeground);
         m_rolloverTask.Running += RolloverTask_Running;
-        //m_rolloverTask.UnhandledException += OnProcessException;
+        m_rolloverTask.UnhandledException += OnProcessException;
     }
 
     #endregion
@@ -334,9 +334,9 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
             pendingTables2 = m_pendingTables2;
             pendingTables3 = m_pendingTables3;
             sequenceNumber = m_lastCommittedSequenceNumber;
-            m_pendingTables1 = new List<SortedTreeTable<TKey, TValue>>();
-            m_pendingTables2 = new List<SortedTreeTable<TKey, TValue>>();
-            m_pendingTables3 = new List<SortedTreeTable<TKey, TValue>>();
+            m_pendingTables1 = [];
+            m_pendingTables2 = [];
+            m_pendingTables3 = [];
             m_rolloverComplete.Set();
         }
 
@@ -347,7 +347,7 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
 
         Log.Publish(MessageLevel.Info, "Pending Tables Report", "Pending Tables V1: " + pendingTables1.Count + " V2: " + pendingTables2.Count + " V3: " + pendingTables3.Count);
 
-        List<ArchiveTableSummary<TKey, TValue>> summaryTables = new();
+        List<ArchiveTableSummary<TKey, TValue>> summaryTables = [];
 
         foreach (SortedTreeTable<TKey, TValue> table in pendingTables1)
         {
@@ -425,11 +425,10 @@ public class FirstStageWriter<TKey, TValue> : DisposableLoggingClassBase where T
         RolloverComplete?.Invoke(sequenceNumber);
     }
 
-    #endregion
+    private void OnProcessException(object sender, EventArgs<Exception> e)
+    {
+        Log.Publish(MessageLevel.Critical, "Unhandled exception", "The worker thread threw an unhandled exception", null, e.Argument);
+    }
 
-    // TODO: JRC - think about custom exception handling messages with SafeInvoke for missing UnhandledException above
-    //private void OnProcessException(object sender, EventArgs<Exception> e)
-    //{
-    //    Log.Publish(MessageLevel.Critical, "Unhandled exception", "The worker thread threw an unhandled exception", null, e.Argument);
-    //}
+    #endregion
 }

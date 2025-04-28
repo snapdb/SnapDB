@@ -96,8 +96,7 @@ public partial class SubFileStream
         /// </summary>
         public override void Clear()
         {
-            if (IsDisposed || m_dataIoSession.IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed || m_dataIoSession.IsDisposed, this);
 
             m_dataIoSession.Clear();
         }
@@ -107,8 +106,7 @@ public partial class SubFileStream
             int blockDataLength = m_blockDataLength;
             long pos = args.Position;
 
-            if (IsDisposed || m_dataIoSession.IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed || m_dataIoSession.IsDisposed, this);
 
             if (pos < 0)
                 throw new ArgumentOutOfRangeException(nameof(args), "position cannot be negative");

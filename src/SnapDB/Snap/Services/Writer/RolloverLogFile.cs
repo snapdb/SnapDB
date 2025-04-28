@@ -58,7 +58,7 @@ public class RolloverLogFile
     /// <summary>
     /// Gets all of the source files.
     /// </summary>
-    public readonly List<Guid> SourceFiles = new();
+    public readonly List<Guid> SourceFiles = [];
 
     #endregion
 

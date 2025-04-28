@@ -47,7 +47,7 @@ internal class ArchiveListLogFile
     /// <summary>
     /// Gets the list of all files that are pending deletion.
     /// </summary>
-    public readonly List<Guid> FilesToDelete = new();
+    public readonly List<Guid> FilesToDelete = [];
 
     #endregion
 

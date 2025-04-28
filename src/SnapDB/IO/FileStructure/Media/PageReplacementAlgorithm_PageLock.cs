@@ -58,8 +58,7 @@ internal partial class PageReplacementAlgorithm
 
             lock (m_parent.m_syncRoot)
             {
-                if (m_parent.m_disposed)
-                    throw new ObjectDisposedException(GetType().FullName);
+                ObjectDisposedException.ThrowIf(m_parent.m_disposed, this);
                 m_parent.m_arrayIndexLocks.Add(this);
             }
         }
@@ -116,8 +115,7 @@ internal partial class PageReplacementAlgorithm
         {
             lock (m_parent.m_syncRoot)
             {
-                if (m_parent.m_disposed)
-                    throw new ObjectDisposedException(GetType().FullName);
+                ObjectDisposedException.ThrowIf(m_parent.m_disposed, this);
 
                 if (position < 0)
                     throw new ArgumentOutOfRangeException(nameof(position), "Cannot be negative");
@@ -158,8 +156,7 @@ internal partial class PageReplacementAlgorithm
         {
             lock (m_parent.m_syncRoot)
             {
-                if (m_parent.m_disposed)
-                    throw new ObjectDisposedException(GetType().FullName);
+                ObjectDisposedException.ThrowIf(m_parent.m_disposed, this);
 
                 if (position < 0)
                     throw new ArgumentOutOfRangeException(nameof(position), "Cannot be negative");

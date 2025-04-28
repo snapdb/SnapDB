@@ -116,7 +116,7 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue> where TKey : SnapTy
         TKey key = new();
         TValue value = new();
 
-        List<SortedTreeTable<TKey, TValue>> pendingFiles = new();
+        List<SortedTreeTable<TKey, TValue>> pendingFiles = [];
 
         try
         {

@@ -72,7 +72,7 @@ public partial class SnapServer : DisposableLoggingClassBase
     public SnapServer() : base(MessageClass.Framework)
     {
         m_sockets = new Dictionary<IPEndPoint, SnapSocketListener>();
-        m_clients = new WeakList<Client>();
+        m_clients = [];
         m_databases = new Dictionary<string, SnapServerDatabaseBase>();
 
         Log.Publish(MessageLevel.Info, "Server Constructor Called");

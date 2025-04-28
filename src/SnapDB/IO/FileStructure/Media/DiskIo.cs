@@ -82,8 +82,7 @@ internal sealed class DiskIo : IDisposable
     {
         get
         {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed, this);
 
             return m_stream.Length;
         }
@@ -101,8 +100,7 @@ internal sealed class DiskIo : IDisposable
     {
         get
         {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed, this);
 
             return m_isReadOnly;
         }
@@ -115,8 +113,7 @@ internal sealed class DiskIo : IDisposable
     {
         get
         {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed, this);
 
             return m_stream.Header;
         }
@@ -129,8 +126,7 @@ internal sealed class DiskIo : IDisposable
     {
         get
         {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed, this);
 
             return m_stream.Header.LastAllocatedBlock;
         }
@@ -167,8 +163,7 @@ internal sealed class DiskIo : IDisposable
     /// </summary>
     public void RollbackChanges()
     {
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         if (m_isReadOnly)
             throw new ReadOnlyException();
@@ -184,8 +179,7 @@ internal sealed class DiskIo : IDisposable
     /// <exception cref="ReadOnlyException">Thrown if the object is in read-only mode.</exception>
     public void CommitChanges(FileHeaderBlock header)
     {
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         if (m_isReadOnly)
             throw new ReadOnlyException();
@@ -202,8 +196,7 @@ internal sealed class DiskIo : IDisposable
     /// <exception cref="ObjectDisposedException">Thrown if the <see cref="DiskIo"/> instance is disposed.</exception>
     public DiskIoSession CreateDiskIoSession(FileHeaderBlock header, SubFileHeader? file)
     {
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         return new DiskIoSession(this, m_stream.CreateIoSession(), header, file);
     }

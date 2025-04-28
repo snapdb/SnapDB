@@ -119,8 +119,7 @@ public partial class ThreadSafeList<T>
         /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
         public bool MoveNext()
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
             if (m_nextItemExists)
                 m_iterator.UnsafeUnregisterItem();
 
@@ -134,8 +133,7 @@ public partial class ThreadSafeList<T>
         /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
         public void Reset()
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             if (m_nextItemExists)
                 m_iterator.UnsafeUnregisterItem();

@@ -12,7 +12,7 @@ public static class Number
 {
     #region [ Static ]
 
-    private static readonly double[] s_powersOf10d = { 1f, 10f, 100f, 1000f, 10000f, 100000f, 1000000f, 10000000f, 100000000f, 1000000000f, 10000000000f, 100000000000f };
+    private static readonly double[] s_powersOf10d = [1f, 10f, 100f, 1000f, 10000f, 100000f, 1000000f, 10000000f, 100000000f, 1000000000f, 10000000000f, 100000000000f];
 
     /// <summary>
     /// Writes a floating-point value to a character array.

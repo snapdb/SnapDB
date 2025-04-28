@@ -64,7 +64,7 @@ public partial class SnapServerDatabase<TKey, TValue>
                 throw new ArgumentException("Does not reference a method in clientHost", nameof(onDispose));
 
             m_syncRoot = new Lock();
-            m_openStreams = new WeakList<SequentialReaderStream<TKey, TValue>>();
+            m_openStreams = [];
         }
 
         #endregion
@@ -78,8 +78,7 @@ public partial class SnapServerDatabase<TKey, TValue>
         {
             get
             {
-                if (m_disposed)
-                    throw new ObjectDisposedException(GetType().FullName);
+                ObjectDisposedException.ThrowIf(m_disposed, this);
 
                 return m_server.Info;
             }
@@ -140,8 +139,7 @@ public partial class SnapServerDatabase<TKey, TValue>
         /// </summary>
         public override void SoftCommit()
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             m_server.SoftCommit();
         }
@@ -154,8 +152,7 @@ public partial class SnapServerDatabase<TKey, TValue>
         /// </summary>
         public override void HardCommit()
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             m_server.HardCommit();
         }
@@ -174,8 +171,7 @@ public partial class SnapServerDatabase<TKey, TValue>
 
         public TreeStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions, SeekFilterBase<TKey>? keySeekFilter, MatchFilterBase<TKey, TValue>? keyMatchFilter, WorkerThreadSynchronization? workerThreadSynchronization)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             SequentialReaderStream<TKey, TValue> stream = m_server.Read(readerOptions, keySeekFilter, keyMatchFilter, workerThreadSynchronization);
 
@@ -196,8 +192,7 @@ public partial class SnapServerDatabase<TKey, TValue>
         /// <param name="stream">all of the key/value pairs to add to the database.</param>
         public override void Write(TreeStream<TKey, TValue> stream)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             m_server.Write(stream);
         }
@@ -209,8 +204,7 @@ public partial class SnapServerDatabase<TKey, TValue>
         /// <param name="value"></param>
         public override void Write(TKey key, TValue value)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             m_server.Write(key, value);
         }

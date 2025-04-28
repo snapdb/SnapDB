@@ -89,7 +89,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
 
         m_snapshot = archiveList.CreateNewClientResources();
         m_snapshot.UpdateSnapshot();
-        m_tablesOrigList = new List<BufferedArchiveStream<TKey, TValue>>();
+        m_tablesOrigList = [];
 
         for (int x = 0; x < m_snapshot.Tables!.Count(); x++)
         {

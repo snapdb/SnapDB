@@ -135,7 +135,7 @@ public class WorkerThreadSynchronization : DisposableLoggingClassBase
         m_isSafeToCallback = false;
         m_isCallbackWaiting = false;
         m_isRequestCallbackMethodProcessing = false;
-        m_pendingCallbacks = new List<CallbackRequest>();
+        m_pendingCallbacks = [];
     }
 
     #endregion

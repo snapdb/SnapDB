@@ -131,7 +131,7 @@ internal class MemoryPoolPageList : IDisposable
         m_pagesPerMemoryBlockMask = m_pagesPerMemoryBlock - 1;
         m_pagesPerMemoryBlockShiftBits = BitMath.CountBitsSet((uint)m_pagesPerMemoryBlockMask);
         m_isPageFree = new BitArray(false);
-        m_memoryBlocks = new List<Memory?>();
+        m_memoryBlocks = [];
     }
 
 #if DEBUG
@@ -217,8 +217,7 @@ internal class MemoryPoolPageList : IDisposable
     {
         lock (m_syncRoot)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             index = m_isPageFree.FindSetBit();
 
@@ -269,8 +268,7 @@ internal class MemoryPoolPageList : IDisposable
 
             lock (m_syncRoot)
             {
-                if (m_disposed)
-                    throw new ObjectDisposedException(GetType().FullName);
+                ObjectDisposedException.ThrowIf(m_disposed, this);
 
                 if (m_isPageFree.TrySetBit(index))
                 {
@@ -298,8 +296,7 @@ internal class MemoryPoolPageList : IDisposable
     {
         lock (m_syncRoot)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             if (CurrentCapacity <= size)
                 return CurrentCapacity;
@@ -332,8 +329,7 @@ internal class MemoryPoolPageList : IDisposable
     {
         lock (m_syncRoot)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             MaximumPoolSize = Math.Max(Math.Min(MemoryPoolCeiling, value), MemoryPool.MinimumTestedSupportedMemoryFloor);
 
@@ -351,8 +347,7 @@ internal class MemoryPoolPageList : IDisposable
 
         lock (m_syncRoot)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             sizeBefore = CurrentCapacity;
 

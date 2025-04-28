@@ -53,7 +53,7 @@ public partial class PointIDMatchFilter
         public UIntHashSet(BinaryStreamBase stream, int pointCount, ulong maxValue)
         {
             m_maxValue = maxValue;
-            m_points = new HashSet<uint>();
+            m_points = [];
 
             while (pointCount > 0)
             {
@@ -70,7 +70,7 @@ public partial class PointIDMatchFilter
         public UIntHashSet(IEnumerable<ulong> points, ulong maxValue)
         {
             m_maxValue = maxValue;
-            m_points = new HashSet<uint>();
+            m_points = [];
             m_points.UnionWith(points.Select(x => (uint)x));
         }
 

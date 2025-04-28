@@ -124,8 +124,7 @@ public partial class SortedTreeTable<TKey, TValue> : IDisposable where TKey : Sn
     /// </remarks>
     public SortedTreeTableSnapshotInfo<TKey, TValue> AcquireReadSnapshot()
     {
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         return new SortedTreeTableSnapshotInfo<TKey, TValue>(m_fileStructure, m_fileName);
     }
@@ -162,8 +161,7 @@ public partial class SortedTreeTable<TKey, TValue> : IDisposable where TKey : Sn
     /// <returns>The current status of the edit of the archive table.</returns>
     public SortedTreeTableEditor<TKey, TValue> BeginEdit()
     {
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         if (m_activeEditor is not null)
             throw new Exception("Only one concurrent edit is supported");

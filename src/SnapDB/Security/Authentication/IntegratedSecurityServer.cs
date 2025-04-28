@@ -76,7 +76,7 @@ public class IntegratedSecurityServer : DisposableLoggingClassBase
     public bool TryAuthenticateAsServer(Stream stream, out Guid userToken, byte[]? additionalChallenge = null)
     {
         userToken = Guid.Empty;
-        additionalChallenge ??= Array.Empty<byte>();
+        additionalChallenge ??= [];
 
         if (additionalChallenge.Length > short.MaxValue)
             throw new ArgumentOutOfRangeException(nameof(additionalChallenge), "Must be less than 32767 bytes");
@@ -108,7 +108,7 @@ public class IntegratedSecurityServer : DisposableLoggingClassBase
             return false;
         }
 
-        byte[] remoteChallenge = len == 0 ? Array.Empty<byte>() : negotiateStream.ReadBytes(len);
+        byte[] remoteChallenge = len == 0 ? [] : negotiateStream.ReadBytes(len);
 
         if (remoteChallenge.SecureEquals(additionalChallenge))
         {

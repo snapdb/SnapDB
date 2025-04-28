@@ -56,7 +56,7 @@ public class TimestampSeekFilterDefinition : SeekFilterDefinitionBase
     {
         MethodInfo? method = typeof(TimestampSeekFilter).GetMethod("CreateFromStream", BindingFlags.NonPublic | BindingFlags.Static);
         MethodInfo generic = method.MakeGenericMethod(typeof(TKey));
-        object? rv = generic.Invoke(null, new[] { stream });
+        object? rv = generic.Invoke(null, [stream]);
         return (SeekFilterBase<TKey>)rv;
     }
 

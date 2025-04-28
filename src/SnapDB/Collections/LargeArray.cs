@@ -69,7 +69,7 @@ public class LargeArray<T>
         m_size = (int)BitMath.RoundUpToNearestPowerOfTwo((uint)jaggedArrayDepth);
         m_mask = m_size - 1;
         m_bitShift = BitMath.CountBitsSet((uint)m_mask);
-        m_array = Array.Empty<T[]?>();
+        m_array = [];
         Capacity = 0;
     }
 

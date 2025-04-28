@@ -116,8 +116,8 @@ public class TransactionTracker<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     /// <param name="firstStageWriter">The first stage writer to monitor for transaction commits.</param>
     public TransactionTracker(PrebufferWriter<TKey, TValue> prebuffer, FirstStageWriter<TKey, TValue> firstStageWriter)
     {
-        m_waitingForHardCommit = new List<WaitForCommit>();
-        m_waitingForSoftCommit = new List<WaitForCommit>();
+        m_waitingForHardCommit = [];
+        m_waitingForSoftCommit = [];
 
         m_syncRoot = new Lock();
         m_transactionSoftCommitted = 0;

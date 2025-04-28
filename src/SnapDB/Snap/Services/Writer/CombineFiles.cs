@@ -73,7 +73,7 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
         m_syncRoot = new Lock();
         m_rolloverTask = new ScheduledTask(ThreadingMode.DedicatedForeground, ThreadPriority.BelowNormal);
         m_rolloverTask.Running += OnExecute;
-        //m_rolloverTask.UnhandledException += OnException;
+        m_rolloverTask.UnhandledException += OnException;
         m_rolloverTask.Start(m_settings.ExecuteTimer);
     }
 
@@ -101,11 +101,10 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
         base.Dispose(disposing);
     }
 
-    // TODO: JRC - think about custom exception handling messages with SafeInvoke for missing UnhandledException above
-    //private void OnException(object sender, EventArgs<Exception> e)
-    //{
-    //    Log.Publish(MessageLevel.Error, "Unexpected Error when rolling over a file", null, null, e.Argument);
-    //}
+    private void OnException(object sender, EventArgs<Exception> e)
+    {
+        Log.Publish(MessageLevel.Error, "Unexpected Error when rolling over a file", null, null, e.Argument);
+    }
 
     private void OnExecute(object sender, EventArgs<ScheduledTaskRunningReason> e)
     {
@@ -129,8 +128,8 @@ public class CombineFiles<TKey, TValue> : DisposableLoggingClassBase where TKey 
             {
                 resource.UpdateSnapshot();
 
-                List<ArchiveTableSummary<TKey, TValue>> list = new();
-                List<Guid> listIds = new();
+                List<ArchiveTableSummary<TKey, TValue>> list = [];
+                List<Guid> listIds = [];
 
                 for (int x = 0; x < resource.Tables.Length; x++)
                 {

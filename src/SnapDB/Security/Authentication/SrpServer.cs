@@ -67,7 +67,7 @@ public class SrpServer
     /// <returns>A <see cref="SrpServerSession"/> representing the authenticated server session, or null if authentication fails.</returns>
     public SrpServerSession? AuthenticateAsServer(Stream stream, byte[]? additionalChallenge = null)
     {
-        additionalChallenge ??= Array.Empty<byte>();
+        additionalChallenge ??= [];
 
         // Header
         //  C => S

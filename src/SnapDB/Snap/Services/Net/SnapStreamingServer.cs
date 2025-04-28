@@ -277,7 +277,7 @@ public class SnapStreamingServer : DisposableLoggingClassBase
                     Type type = typeof(SnapStreamingServer);
                     MethodInfo method = type.GetMethod(nameof(ConnectToDatabase), BindingFlags.NonPublic | BindingFlags.Instance);
                     MethodInfo reflectionMethod = method?.MakeGenericMethod(database.Info.KeyType, database.Info.ValueType);
-                    bool success = (bool?)reflectionMethod?.Invoke(this, new object[] { database, User, UserCanSeek!, UserCanMatch!, UserCanWrite! }) ?? false;
+                    bool success = (bool?)reflectionMethod?.Invoke(this, [database, User, UserCanSeek!, UserCanMatch!, UserCanWrite!]) ?? false;
 
                     if (!success)
                         return;

@@ -47,7 +47,7 @@ internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey :
 
     public UnionReader(List<ArchiveTableSummary<TKey, TValue>> tables)
     {
-        m_tablesOrigList = new List<BufferedArchiveStream<TKey, TValue>>();
+        m_tablesOrigList = [];
 
         foreach (ArchiveTableSummary<TKey, TValue> table in tables)
             m_tablesOrigList.Add(new BufferedArchiveStream<TKey, TValue>(0, table));

@@ -158,7 +158,7 @@ public class SnapSocketListenerSettings : SettingsBase<SnapSocketListenerSetting
     /// <summary>
     /// A list of all users that are allowed to connect to the historian.
     /// </summary>
-    public ImmutableList<string> Users { get; } = new();
+    public ImmutableList<string> Users { get; } = [];
 
     /// <summary>
     /// Gets or sets any defined user read access control function for seek filters.

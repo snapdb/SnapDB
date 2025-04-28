@@ -120,7 +120,7 @@ public class PrebufferWriter<TKey, TValue> : DisposableLoggingClassBase where TK
         m_waitForEmptyActiveQueue = new SafeManualResetEvent(false);
         m_rolloverTask = new ScheduledTask(ThreadingMode.DedicatedForeground, ThreadPriority.AboveNormal);
         m_rolloverTask.Running += m_rolloverTask_Running;
-        //m_rolloverTask.UnhandledException += OnProcessException;
+        m_rolloverTask.UnhandledException += OnProcessException;
     }
 
     #endregion
@@ -320,11 +320,10 @@ public class PrebufferWriter<TKey, TValue> : DisposableLoggingClassBase where TK
         m_currentlyRollingOverFullQueue = false;
     }
 
-    #endregion
+    private void OnProcessException(object sender, EventArgs<Exception> e)
+    {
+        Log.Publish(MessageLevel.Critical, "Unhandled exception", "The worker thread threw an unhandled exception", null, e.Argument);
+    }
 
-    // TODO: JRC - think about custom exception handling messages with SafeInvoke for missing UnhandledException above
-    //private void OnProcessException(object sender, EventArgs<Exception> e)
-    //{
-    //    Log.Publish(MessageLevel.Critical, "Unhandled exception", "The worker thread threw an unhandled exception", null, e.Argument);
-    //}
+    #endregion
 }

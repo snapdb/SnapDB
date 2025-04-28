@@ -54,7 +54,7 @@ public class WeakEventHandler<T> : WeakDelegateBase<EventHandler<T>> where T : E
     /// <returns><c>true</c> if successful, <c>false</c> if the event handler has been garbage collected.</returns>
     public bool TryInvoke(object sender, T e)
     {
-        return TryInvokeInternal(new[] { sender, e });
+        return TryInvokeInternal([sender, e]);
     }
 
     #endregion

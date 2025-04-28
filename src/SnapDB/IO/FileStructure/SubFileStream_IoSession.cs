@@ -126,16 +126,14 @@ public partial class SubFileStream
         /// </summary>
         public override void Clear()
         {
-            if (IsDisposed || m_ioSessions.IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed || m_ioSessions.IsDisposed, this);
 
             m_ioSessions.Clear();
         }
 
         public void ClearIndexCache(IndexParser mostRecentParser)
         {
-            if (IsDisposed || m_ioSessions.IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed || m_ioSessions.IsDisposed, this);
 
             m_parser.ClearIndexCache(mostRecentParser);
         }
@@ -145,8 +143,7 @@ public partial class SubFileStream
             int blockDataLength = m_blockDataLength;
             long pos = args.Position;
 
-            if (IsDisposed || m_ioSessions.IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed || m_ioSessions.IsDisposed, this);
 
             if (pos < 0)
                 throw new ArgumentOutOfRangeException(nameof(args), "position cannot be negative");

@@ -60,7 +60,7 @@ public class WriteProcessor<TKey, TValue> : DisposableLoggingClassBase where TKe
         m_settings = settings.CloneReadonly();
         m_settings.Validate();
 
-        m_stagingRollovers = new List<CombineFiles<TKey, TValue>>();
+        m_stagingRollovers = [];
         m_firstStageWriter = new FirstStageWriter<TKey, TValue>(settings.FirstStageWriter, list);
         m_isMemoryOnly = false;
         m_prebuffer = new PrebufferWriter<TKey, TValue>(settings.PrebufferWriter, m_firstStageWriter.AppendData);

@@ -74,7 +74,7 @@ public sealed class TransactionalEdit : IDisposable
         if (dataReader is null)
             throw new ArgumentNullException(nameof(dataReader));
 
-        m_openedFiles = new List<SubFileStream?>();
+        m_openedFiles = [];
         m_disposed = false;
         m_fileHeaderBlock = dataReader.LastCommittedHeader.CloneEditable();
         m_dataReader = dataReader;
@@ -116,8 +116,7 @@ public sealed class TransactionalEdit : IDisposable
     {
         get
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             return m_fileHeaderBlock.Files;
         }
@@ -149,8 +148,7 @@ public sealed class TransactionalEdit : IDisposable
     /// </returns>
     public SubFileStream CreateFile(SubFileName fileName)
     {
-        if (m_disposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(m_disposed, this);
 
         m_fileHeaderBlock.CreateNewFile(fileName);
 
@@ -164,8 +162,7 @@ public sealed class TransactionalEdit : IDisposable
     /// <returns>A SubFileStream representing the opened file.</returns>
     public SubFileStream OpenFile(int fileIndex)
     {
-        if (m_disposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(m_disposed, this);
 
         if (fileIndex < 0 || fileIndex >= m_fileHeaderBlock.Files.Count)
             throw new ArgumentOutOfRangeException(nameof(fileIndex), "The file index provided could not be found in the header.");
@@ -185,8 +182,7 @@ public sealed class TransactionalEdit : IDisposable
     /// <returns>Exception if file does not exist, otherwise, the file passed to the function.</returns>
     public SubFileStream OpenFile(SubFileName fileName)
     {
-        if (m_disposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(m_disposed, this);
 
         for (int x = 0; x < Files.Count; x++)
         {
@@ -208,8 +204,7 @@ public sealed class TransactionalEdit : IDisposable
     /// </remarks>
     public void CommitAndDispose()
     {
-        if (m_disposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(m_disposed, this);
 
         foreach (SubFileStream? file in m_openedFiles)
         {
@@ -239,8 +234,7 @@ public sealed class TransactionalEdit : IDisposable
     /// <remarks>Duplicate calls to this function, or subsequent calls to CommitTransaction will throw an exception.</remarks>
     public void RollbackAndDispose()
     {
-        if (m_disposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(m_disposed, this);
 
         foreach (SubFileStream? file in m_openedFiles)
         {

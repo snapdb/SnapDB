@@ -144,8 +144,7 @@ public abstract class TreeStream<TKey, TValue> : IDisposable where TKey : class,
     /// </exception>
     protected void SetEos(bool value)
     {
-        if (m_disposed && !value)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(m_disposed && !value, this);
         Eos = value;
     }
 

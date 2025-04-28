@@ -81,7 +81,7 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable where TKey : SnapTy
         m_syncDisposing = new Lock();
         m_onDisposed = onDisposed;
         m_acquireResources = acquireResources;
-        m_tables = Array.Empty<ArchiveTableSummary<TKey, TValue>>();
+        m_tables = [];
         m_connectionDisposed = new ManualResetEvent(false);
     }
 
@@ -109,17 +109,15 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable where TKey : SnapTy
     {
         get
         {
-            if (IsDisposed)
-               throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed, this);
 
             return m_tables;
         }
         set
         {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed, this);
 
-            m_tables = value ?? Array.Empty<ArchiveTableSummary<TKey, TValue>>();
+            m_tables = value ?? [];
         }
     }
 
@@ -158,8 +156,7 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable where TKey : SnapTy
     /// <exception cref="ObjectDisposedException">Thrown if object has been disposed.</exception>
     public ArchiveTableSummary<TKey, TValue>? TryGetFile(Guid fileId)
     {
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         return m_tables.Where(table => table is not null).FirstOrDefault(table => table!.FileId == fileId);
     }
@@ -169,8 +166,7 @@ public class ArchiveListSnapshot<TKey, TValue> : IDisposable where TKey : SnapTy
     /// </summary>
     public void UpdateSnapshot()
     {
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         m_acquireResources.Invoke(this);
     }

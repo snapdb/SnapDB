@@ -321,7 +321,7 @@ public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSetting
             PathHelpers.ValidatePathName(x);
             return x;
         });
-        Flags = new ImmutableList<Guid>();
+        Flags = [];
     }
 
     #endregion

@@ -83,7 +83,7 @@ public class IntegratedSecurityClient : DisposableLoggingClassBase
     /// </returns>
     public bool TryAuthenticateAsClient(Stream stream, byte[]? additionalChallenge = null)
     {
-        additionalChallenge ??= Array.Empty<byte>();
+        additionalChallenge ??= [];
 
         if (additionalChallenge.Length > short.MaxValue)
             throw new ArgumentOutOfRangeException(nameof(additionalChallenge), "Must be less than 32767 bytes");
@@ -118,7 +118,7 @@ public class IntegratedSecurityClient : DisposableLoggingClassBase
             return false;
         }
 
-        byte[] remoteChallenge = len == 0 ? Array.Empty<byte>() : negotiateStream.ReadBytes(len);
+        byte[] remoteChallenge = len == 0 ? [] : negotiateStream.ReadBytes(len);
 
         if (remoteChallenge.SecureEquals(additionalChallenge))
             return true;

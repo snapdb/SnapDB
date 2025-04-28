@@ -94,8 +94,7 @@ public partial class SortedTreeTable<TKey, TValue>
         /// </summary>
         public override void Commit()
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             GetKeyRange(m_sortedTreeFile.FirstKey, m_sortedTreeFile.LastKey);
 
@@ -126,8 +125,7 @@ public partial class SortedTreeTable<TKey, TValue>
         /// </summary>
         public override void Rollback()
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             m_tree = null;
             if (m_binaryStream1 is not null)
@@ -157,8 +155,7 @@ public partial class SortedTreeTable<TKey, TValue>
         /// </remarks>
         public override void GetKeyRange(TKey firstKey, TKey lastKey)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
             m_tree.GetKeyRange(firstKey, lastKey);
         }
 
@@ -169,8 +166,7 @@ public partial class SortedTreeTable<TKey, TValue>
         /// <param name="value">the value</param>
         public override void AddPoint(TKey key, TValue value)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
             m_tree.TryAdd(key, value);
         }
 
@@ -180,8 +176,7 @@ public partial class SortedTreeTable<TKey, TValue>
         /// <param name="stream"></param>
         public override void AddPoints(TreeStream<TKey, TValue> stream)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
             m_tree.TryAddRange(stream);
         }
 
@@ -196,8 +191,7 @@ public partial class SortedTreeTable<TKey, TValue>
         /// </returns>
         public override SortedTreeScannerBase<TKey, TValue> GetRange()
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             return m_tree.CreateTreeScanner();
         }

@@ -42,7 +42,7 @@ public class SnapSocketListener : DisposableLoggingClassBase
     #region [ Members ]
 
     private readonly SecureStreamServer<SocketUserPermissions> m_authenticator;
-    private readonly List<SnapNetworkServer> m_clients = new();
+    private readonly List<SnapNetworkServer> m_clients = [];
     private volatile bool m_isRunning;
     private readonly TcpListener m_listener;
     private SnapServer m_server;

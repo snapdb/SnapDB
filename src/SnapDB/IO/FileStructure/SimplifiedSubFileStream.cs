@@ -90,8 +90,7 @@ internal sealed class SimplifiedSubFileStream : ISupportsBinaryStream
     {
         get
         {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed, this);
 
             return false;
         }
@@ -108,8 +107,7 @@ internal sealed class SimplifiedSubFileStream : ISupportsBinaryStream
     {
         get
         {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed, this);
 
             int count = 0;
 
@@ -156,8 +154,7 @@ internal sealed class SimplifiedSubFileStream : ISupportsBinaryStream
     // Acquire an IO Session.
     BinaryStreamIoSessionBase ISupportsBinaryStream.CreateIoSession()
     {
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         if (RemainingSupportedIoSessions == 0)
             throw new Exception("There are not any remaining IO Sessions");

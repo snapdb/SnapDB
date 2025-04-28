@@ -40,7 +40,7 @@ public static class StepTimer
     {
         #region [ Members ]
 
-        public readonly List<double> RunResults = new();
+        public readonly List<double> RunResults = [];
         public readonly Stopwatch Sw = new();
 
         #endregion
@@ -194,7 +194,7 @@ public static class StepTimer
         while (TimeLoop(sw, del, innerLoopCount) < 3)
             innerLoopCount *= 2;
 
-        List<double> list = new();
+        List<double> list = [];
 
         for (int x = 0; x < 100; x++)
         {
@@ -244,7 +244,7 @@ public static class StepTimer
         while (TimeLoop(sw, del, innerLoopCount) < 3)
             innerLoopCount *= 2;
 
-        List<double> list = new();
+        List<double> list = [];
 
         for (int x = 0; x < 100; x++)
         {

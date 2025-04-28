@@ -54,7 +54,7 @@ public class ImmutableList<T> : ImmutableObjectBase<ImmutableList<T>>, IList<T>
     {
         m_formatter = formatter;
         m_isISupportsReadonlyType = typeof(IImmutableObject).IsAssignableFrom(typeof(T));
-        m_list = new List<T>();
+        m_list = [];
     }
 
     /// <summary>

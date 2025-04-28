@@ -169,7 +169,7 @@ public class MemoryPool : IDisposable
         PageShiftBits = BitMath.CountBitsSet((uint)PageMask);
 
         m_pageList = new MemoryPoolPageList(PageSize, maximumBufferSize);
-        m_requestCollectionEvent = new ThreadSafeList<WeakEventHandler<CollectionEventArgs>>();
+        m_requestCollectionEvent = [];
 
         SetTargetUtilizationLevel(utilizationLevel);
     }
@@ -334,8 +334,7 @@ public class MemoryPool : IDisposable
     {
         lock (m_syncRoot)
         {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed, this);
 
             long rv = m_pageList.SetMaximumPoolSize(value);
             CalculateThresholds(rv, TargetUtilizationLevel);
@@ -354,8 +353,7 @@ public class MemoryPool : IDisposable
     {
         lock (m_syncRoot)
         {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed, this);
 
             TargetUtilizationLevel = utilizationLevel;
             CalculateThresholds(MaximumPoolSize, utilizationLevel);
@@ -373,7 +371,7 @@ public class MemoryPool : IDisposable
         StringBuilder sb = new();
         sb.AppendLine("Collection Cycle Started");
 
-        Monitor.Enter(m_syncRoot);
+        m_syncRoot.Enter();
         bool lockTaken = true;
 
         try
@@ -394,13 +392,13 @@ public class MemoryPool : IDisposable
                     break;
 
                 CollectionEventArgs eventArgs = new(ReleasePage, MemoryPoolCollectionMode.Normal, 0);
-                Monitor.Exit(m_syncRoot);
+                m_syncRoot.Exit();
                 lockTaken = false;
 
                 foreach (WeakEventHandler<CollectionEventArgs> c in m_requestCollectionEvent)
                     c.TryInvoke(this, eventArgs);
 
-                Monitor.Enter(m_syncRoot);
+                m_syncRoot.Enter();
                 lockTaken = true;
 
                 sb.AppendFormat("Pass {0} Usage: {1}/{2}MB", x + 1, CurrentAllocatedSize >> 20, CurrentCapacity >> 20);
@@ -430,7 +428,7 @@ public class MemoryPool : IDisposable
 
                 CollectionEventArgs eventArgs = new(ReleasePage, MemoryPoolCollectionMode.Emergency, pagesToBeReleased);
 
-                Monitor.Exit(m_syncRoot);
+                m_syncRoot.Exit();
                 lockTaken = false;
 
                 foreach (WeakEventHandler<CollectionEventArgs> c in m_requestCollectionEvent)
@@ -441,7 +439,7 @@ public class MemoryPool : IDisposable
                     c.TryInvoke(this, eventArgs);
                 }
 
-                Monitor.Enter(m_syncRoot);
+                m_syncRoot.Enter();
                 lockTaken = true;
 
                 if (eventArgs.DesiredPageReleaseCount > 0)
@@ -453,7 +451,7 @@ public class MemoryPool : IDisposable
 
                     eventArgs = new CollectionEventArgs(ReleasePage, MemoryPoolCollectionMode.Critical, eventArgs.DesiredPageReleaseCount);
 
-                    Monitor.Exit(m_syncRoot);
+                    m_syncRoot.Exit();
                     lockTaken = false;
 
                     foreach (WeakEventHandler<CollectionEventArgs> c in m_requestCollectionEvent)
@@ -463,7 +461,7 @@ public class MemoryPool : IDisposable
                         c.TryInvoke(this, eventArgs);
                     }
 
-                    Monitor.Enter(m_syncRoot);
+                    m_syncRoot.Enter();
                     lockTaken = true;
                 }
             }
@@ -477,7 +475,7 @@ public class MemoryPool : IDisposable
         finally
         {
             if (lockTaken)
-                Monitor.Exit(m_syncRoot);
+                m_syncRoot.Exit();
         }
     }
 

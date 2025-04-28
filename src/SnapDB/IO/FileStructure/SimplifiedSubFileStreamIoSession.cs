@@ -120,8 +120,7 @@ internal unsafe class SimplifiedSubFileStreamIoSession : BinaryStreamIoSessionBa
     /// </summary>
     public override void Clear()
     {
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         Flush();
     }
@@ -133,8 +132,7 @@ internal unsafe class SimplifiedSubFileStreamIoSession : BinaryStreamIoSessionBa
 
         long pos = args.Position;
 
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         if (pos < 0)
             throw new ArgumentOutOfRangeException(nameof(args), "position cannot be negative");

@@ -119,8 +119,7 @@ public sealed partial class SubFileStream : ISupportsBinaryStream
     {
         get
         {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed, this);
 
             return m_isReadOnly;
         }
@@ -138,8 +137,7 @@ public sealed partial class SubFileStream : ISupportsBinaryStream
         {
             int count = 0;
 
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed, this);
 
             if (m_ioStream1 is null || m_ioStream1.IsDisposed)
                 count++;
@@ -206,8 +204,7 @@ public sealed partial class SubFileStream : ISupportsBinaryStream
     /// </summary>
     BinaryStreamIoSessionBase ISupportsBinaryStream.CreateIoSession()
     {
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         if (RemainingSupportedIoSessions == 0)
             throw new Exception("There are not any remaining IO Sessions");

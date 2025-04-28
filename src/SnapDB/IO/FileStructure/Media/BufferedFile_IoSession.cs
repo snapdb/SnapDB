@@ -96,8 +96,7 @@ internal partial class BufferedFile
         /// <param name="args">The <see cref="BlockArguments"/> to use to read and write to a block.</param>
         public override void GetBlock(BlockArguments args)
         {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(IsDisposed, this);
 
             m_stream.GetBlock(this, args);
         }

@@ -114,7 +114,7 @@ public abstract class SnapServerDatabaseBase : DisposableLoggingClassBase
         MethodInfo method = type.GetMethod("CreateDatabase", BindingFlags.NonPublic | BindingFlags.Static);
         MethodInfo reflectionMethod = method?.MakeGenericMethod(keyType, valueType);
 
-        return (SnapServerDatabaseBase)reflectionMethod?.Invoke(null, new object[] { databaseConfig });
+        return (SnapServerDatabaseBase)reflectionMethod?.Invoke(null, [databaseConfig]);
     }
 
     // Called through reflection. Its the only way to call a generic function only knowing the Types

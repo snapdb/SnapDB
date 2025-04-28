@@ -134,8 +134,7 @@ internal sealed unsafe class PageList : IDisposable
     /// <returns><c>true</c> if found, <c>false</c> if not found.</returns>
     public bool TryGetPageIndex(int positionIndex, out int pageIndex)
     {
-        if (m_disposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(m_disposed, this);
 
         return m_pageIndexLookupByPositionIndex.TryGetValue(positionIndex, out pageIndex);
     }
@@ -156,8 +155,7 @@ internal sealed unsafe class PageList : IDisposable
     /// </remarks>
     public int AddNewPage(int positionIndex, nint locationOfPage, int memoryPoolIndex)
     {
-        if (m_disposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(m_disposed, this);
 
         InternalPageMetaData cachePage;
         cachePage.MemoryPoolIndex = memoryPoolIndex;
@@ -188,8 +186,7 @@ internal sealed unsafe class PageList : IDisposable
     /// </remarks>
     public nint GetPointerToPage(int pageIndex, int incrementReferencedCount)
     {
-        if (m_disposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(m_disposed, this);
 
         InternalPageMetaData metaData = m_listOfPages.GetValue(pageIndex);
 
@@ -230,8 +227,7 @@ internal sealed unsafe class PageList : IDisposable
     /// </remarks>
     public int DoCollection(int shiftLevel, HashSet<int> excludedList, CollectionEventArgs e)
     {
-        if (m_disposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(m_disposed, this);
 
         if (shiftLevel < 0)
             throw new ArgumentOutOfRangeException(nameof(shiftLevel), "must be non negative");

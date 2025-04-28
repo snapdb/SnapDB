@@ -71,8 +71,8 @@ public static class Library
     {
         try
         {
-            s_filterAssemblyNames = new HashSet<string>();
-            s_loadedAssemblies = new HashSet<Assembly>();
+            s_filterAssemblyNames = [];
+            s_loadedAssemblies = [];
             Encodings = new EncodingLibrary();
             Filters = new FilterLibrary();
             s_syncRoot = new Lock();

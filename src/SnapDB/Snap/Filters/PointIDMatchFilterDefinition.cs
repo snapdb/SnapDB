@@ -60,7 +60,7 @@ public class PointIDMatchFilterDefinition : MatchFilterDefinitionBase
         if(method != null)
         {
             MethodInfo generic = method.MakeGenericMethod(typeof(TKey), typeof(TValue));
-            object? rv = generic.Invoke(null, new[] { stream });
+            object? rv = generic.Invoke(null, [stream]);
 
             if(rv != null)
                 return (MatchFilterBase<TKey, TValue>)rv;

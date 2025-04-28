@@ -89,7 +89,7 @@ public abstract class SecureStreamClientBase : DisposableLoggingClassBase
         else
         {
             stream2 = stream;
-            certSignatures = Array.Empty<byte>();
+            certSignatures = [];
         }
 
         try

@@ -53,7 +53,7 @@ public partial class PointIDMatchFilter
         public ULongHashSet(BinaryStreamBase stream, int pointCount, ulong maxValue)
         {
             m_maxValue = maxValue;
-            m_points = new HashSet<ulong>();
+            m_points = [];
 
             while (pointCount > 0)
             {

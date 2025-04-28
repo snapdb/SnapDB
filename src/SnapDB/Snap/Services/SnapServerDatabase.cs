@@ -205,8 +205,7 @@ public partial class SnapServerDatabase<TKey, TValue> : SnapServerDatabaseBase w
 
     private void Write(TKey key, TValue value)
     {
-        if (m_disposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(m_disposed, this);
 
         if (m_archiveWriter is null)
             throw new Exception("Writing is not configured on this historian");
@@ -226,8 +225,7 @@ public partial class SnapServerDatabase<TKey, TValue> : SnapServerDatabaseBase w
 
     private SequentialReaderStream<TKey, TValue> Read(SortedTreeEngineReaderOptions? readerOptions, SeekFilterBase<TKey>? keySeekFilter, MatchFilterBase<TKey, TValue>? keyMatchFilter, WorkerThreadSynchronization workerThreadSynchronization)
     {
-        if (m_disposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(m_disposed, this);
 
         Stats.QueriesExecuted++;
         return new SequentialReaderStream<TKey, TValue>(m_archiveList, readerOptions, keySeekFilter, keyMatchFilter, workerThreadSynchronization);

@@ -71,10 +71,10 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
         m_intermediateFileExtension = ".d2i";
         m_finalFileExtension = ".d2";
         ImportAttachedPathsAtStartup = true;
-        ImportPaths = new List<string>();
-        FinalWritePaths = new List<string>();
+        ImportPaths = [];
+        FinalWritePaths = [];
         ArchiveEncodingMethod = EncodingDefinition.FixedSizeCombinedEncoding;
-        StreamingEncodingMethods = new List<EncodingDefinition>();
+        StreamingEncodingMethods = [];
         TargetFileSize = 2L * SI2.Giga;
         DesiredRemainingSpace = 5L * SI2.Giga;
         StagingCount = 3;
@@ -203,7 +203,7 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
         ValidateExtension(IntermediateFileExtension, out string intermediateFilePendingExtension, out string intermediateFileFinalExtension);
         ValidateExtension(FinalFileExtension, out string finalFilePendingExtension, out string finalFileFinalExtension);
 
-        List<string> finalPaths = new();
+        List<string> finalPaths = [];
 
         if (FinalWritePaths.Count > 0)
             finalPaths.AddRange(FinalWritePaths);
@@ -222,7 +222,7 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
         settings.FirstStageWriter.RolloverSizeMb = 100; // about 10 million points
         settings.FirstStageWriter.RolloverInterval = DiskFlushInterval; // 10 seconds
         settings.FirstStageWriter.EncodingMethod = ArchiveEncodingMethod;
-        settings.FirstStageWriter.FinalSettings.ConfigureOnDisk(new[] { m_mainPath }, SI2.Giga, ArchiveDirectoryMethod.TopDirectoryOnly, ArchiveEncodingMethod, "stage1", intermediateFilePendingExtension, intermediateFileFinalExtension, FileFlags.Stage1, FileFlags.IntermediateFile);
+        settings.FirstStageWriter.FinalSettings.ConfigureOnDisk([m_mainPath], SI2.Giga, ArchiveDirectoryMethod.TopDirectoryOnly, ArchiveEncodingMethod, "stage1", intermediateFilePendingExtension, intermediateFileFinalExtension, FileFlags.Stage1, FileFlags.IntermediateFile);
         settings.FirstStageWriter.FinalSettings.Metadata = Metadata;
 
         for (int stage = 2; stage <= StagingCount; stage++)
@@ -232,7 +232,7 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
             CombineFilesSettings rollover = new();
 
             if (remainingStages > 0)
-                rollover.ArchiveSettings.ConfigureOnDisk(new[] { m_mainPath }, SI2.Giga, ArchiveDirectoryMethod.TopDirectoryOnly, ArchiveEncodingMethod, "stage" + stage, intermediateFilePendingExtension, intermediateFileFinalExtension, FileFlags.GetStage(stage), FileFlags.IntermediateFile);
+                rollover.ArchiveSettings.ConfigureOnDisk([m_mainPath], SI2.Giga, ArchiveDirectoryMethod.TopDirectoryOnly, ArchiveEncodingMethod, "stage" + stage, intermediateFilePendingExtension, intermediateFileFinalExtension, FileFlags.GetStage(stage), FileFlags.IntermediateFile);
             else
                 // Final staging file
                 rollover.ArchiveSettings.ConfigureOnDisk(finalPaths, DesiredRemainingSpace, DirectoryMethod, ArchiveEncodingMethod, DatabaseName.ToNonNullNorEmptyString("stage" + stage).RemoveInvalidFileNameCharacters(), finalFilePendingExtension, finalFileFinalExtension, FileFlags.GetStage(stage));

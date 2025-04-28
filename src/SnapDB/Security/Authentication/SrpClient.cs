@@ -90,7 +90,7 @@ public class SrpClient
     /// <returns><c>true</c> if authentication succeeds; otherwise, <c>false</c>.</returns>
     public bool AuthenticateAsClient(Stream stream, byte[]? additionalChallenge = null)
     {
-        additionalChallenge ??= Array.Empty<byte>();
+        additionalChallenge ??= [];
 
         stream.Write((short)m_credentials.UsernameBytes.Length);
         stream.Write(m_credentials.UsernameBytes);

@@ -38,7 +38,7 @@ internal class ArchiveListLog : DisposableLoggingClassBase
 
     private HashSet<Guid>? m_allFilesToDelete;
 
-    private readonly List<ArchiveListLogFile> m_files = new();
+    private readonly List<ArchiveListLogFile> m_files = [];
 
     private ArchiveListLogFile m_pendingFile;
     private readonly ArchiveListLogSettings m_settings;
@@ -121,8 +121,7 @@ internal class ArchiveListLog : DisposableLoggingClassBase
 
         lock (m_syncRoot)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             if (m_pendingFile.FilesToDelete.Count <= 0)
                 return;
@@ -142,8 +141,7 @@ internal class ArchiveListLog : DisposableLoggingClassBase
     {
         lock (m_syncRoot)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             m_allFilesToDelete = null;
             m_pendingFile.RemoveDeletedFiles(allFiles);
@@ -172,8 +170,7 @@ internal class ArchiveListLog : DisposableLoggingClassBase
 
         lock (m_syncRoot)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             m_pendingFile.FilesToDelete.Add(archiveId);
             m_allFilesToDelete?.Add(archiveId);
@@ -189,8 +186,7 @@ internal class ArchiveListLog : DisposableLoggingClassBase
     {
         lock (m_syncRoot)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             m_allFilesToDelete ??= GetAllFilesToDelete();
 
@@ -203,7 +199,7 @@ internal class ArchiveListLog : DisposableLoggingClassBase
     /// </summary>
     private HashSet<Guid> GetAllFilesToDelete()
     {
-        HashSet<Guid> allFiles = new();
+        HashSet<Guid> allFiles = [];
 
         if (m_pendingFile.IsValid)
             allFiles.UnionWith(m_pendingFile.FilesToDelete);

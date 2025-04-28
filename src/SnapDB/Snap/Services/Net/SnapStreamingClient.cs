@@ -129,7 +129,7 @@ public class SnapStreamingClient : SnapClient
 
         // ReSharper disable once PossibleNullReferenceException
         MethodInfo reflectionMethod = method.MakeGenericMethod(info.KeyType, info.ValueType);
-        ClientDatabaseBase db = (ClientDatabaseBase)reflectionMethod.Invoke(this, new object[] { databaseName });
+        ClientDatabaseBase db = (ClientDatabaseBase)reflectionMethod.Invoke(this, [databaseName]);
 
         return db;
     }

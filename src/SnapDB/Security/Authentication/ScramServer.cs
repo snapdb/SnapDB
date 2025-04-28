@@ -68,7 +68,7 @@ public class ScramServer
     /// <returns>The authenticated stream.</returns>
     public ScramServerSession? AuthenticateAsServer(Stream stream, byte[]? additionalChallenge = null)
     {
-        additionalChallenge ??= Array.Empty<byte>();
+        additionalChallenge ??= [];
 
         byte[] usernameBytes = stream.ReadBytes();
         byte[] clientNonce = stream.ReadBytes();

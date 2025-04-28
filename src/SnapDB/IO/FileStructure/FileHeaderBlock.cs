@@ -439,7 +439,7 @@ public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
         for (int x = 0; x < fileCount; x++)
             Files.Add(new SubFileHeader(dataReader, true, IsSimplifiedFileFormat));
 
-        Flags = new ImmutableList<Guid>();
+        Flags = [];
 
         FileHeaderAttributes tag = (FileHeaderAttributes)Encoding7Bit.ReadInt15(dataReader.ReadByte);
 
@@ -528,7 +528,7 @@ public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
         }
         else
         {
-            Flags = new ImmutableList<Guid>();
+            Flags = [];
         }
 
         if (!IsFileAllocationTableValid())
@@ -601,8 +601,8 @@ public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
             SnapshotSequenceNumber = 1,
             m_nextFileId = 0,
             LastAllocatedBlock = 9,
-            Files = new ImmutableList<SubFileHeader?>(),
-            Flags = new ImmutableList<Guid>(),
+            Files = [],
+            Flags = [],
             m_archiveType = Guid.Empty
         };
 
@@ -634,8 +634,8 @@ public class FileHeaderBlock : ImmutableObjectBase<FileHeaderBlock>
             SnapshotSequenceNumber = 1,
             m_nextFileId = 0,
             LastAllocatedBlock = 0,
-            Files = new ImmutableList<SubFileHeader?>(),
-            Flags = new ImmutableList<Guid>(),
+            Files = [],
+            Flags = [],
             m_archiveType = Guid.Empty
         };
 

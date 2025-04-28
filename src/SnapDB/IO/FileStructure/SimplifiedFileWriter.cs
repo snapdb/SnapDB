@@ -146,8 +146,7 @@ public class SimplifiedFileWriter : IDisposable
     /// <returns>The <see cref="ISupportsBinaryStream"/> representing the newly created file.</returns>
     public ISupportsBinaryStream CreateFile(SubFileName fileName)
     {
-        if (m_disposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(m_disposed, this);
 
         CloseCurrentFile();
 

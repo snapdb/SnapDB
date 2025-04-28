@@ -83,7 +83,7 @@ public class ScramClient
     /// <returns>True if authentication is successful, otherwise false.</returns>
     public bool AuthenticateAsClient(Stream stream, byte[]? additionalChallenge = null)
     {
-        additionalChallenge ??= Array.Empty<byte>();
+        additionalChallenge ??= [];
 
         byte[] clientNonce = m_nonce.Next();
         stream.WriteWithLength(m_usernameBytes);

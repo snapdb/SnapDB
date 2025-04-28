@@ -221,7 +221,7 @@ public class SecureStreamServer<T> : DisposableLoggingClassBase where T : IUserT
             }
             else
             {
-                certSignatures = Array.Empty<byte>();
+                certSignatures = [];
                 stream2 = stream;
             }
 

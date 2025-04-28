@@ -84,7 +84,7 @@ internal partial class PageReplacementAlgorithm : IDisposable
         m_memoryPageSizeMask = pool.PageSize - 1;
         m_memoryPageSizeShiftBits = BitMath.CountBitsSet((uint)m_memoryPageSizeMask);
         m_pageList = new PageList(pool);
-        m_arrayIndexLocks = new WeakList<PageLock>();
+        m_arrayIndexLocks = [];
     }
 
 #if DEBUG
@@ -137,8 +137,7 @@ internal partial class PageReplacementAlgorithm : IDisposable
     {
         lock (m_syncRoot)
         {
-            if (m_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            ObjectDisposedException.ThrowIf(m_disposed, this);
 
             if (position < 0)
                 throw new ArgumentOutOfRangeException(nameof(position), "Cannot be negative");

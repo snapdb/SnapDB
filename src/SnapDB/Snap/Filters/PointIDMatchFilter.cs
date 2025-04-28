@@ -55,9 +55,9 @@ public partial class PointIDMatchFilter
         return pointId switch
         {
             // 64KB of space, 524288
-            < 8 * 1024 * 64 => new BitArrayFilter<TKey, TValue>(new[] { pointId }, pointId),
-            <= uint.MaxValue => new UIntHashSet<TKey, TValue>(new[] { pointId }, pointId),
-            _ => new ULongHashSet<TKey, TValue>(new[] { pointId }, pointId)
+            < 8 * 1024 * 64 => new BitArrayFilter<TKey, TValue>([pointId], pointId),
+            <= uint.MaxValue => new UIntHashSet<TKey, TValue>([pointId], pointId),
+            _ => new ULongHashSet<TKey, TValue>([pointId], pointId)
         };
     }
 

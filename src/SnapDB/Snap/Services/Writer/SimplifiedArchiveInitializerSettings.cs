@@ -296,7 +296,7 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
 
             return x;
         });
-        Flags = new ImmutableList<Guid>();
+        Flags = [];
     }
 
     #endregion

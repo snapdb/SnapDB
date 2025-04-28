@@ -118,7 +118,7 @@ public static class GenerateCertificate
 
         X509CertificateEntry certificateEntry = new(selfSignedCert);
         store.SetCertificateEntry(friendlyName, certificateEntry);
-        store.SetKeyEntry(friendlyName, new AsymmetricKeyEntry(encryptionKeys.Private), new[] { certificateEntry });
+        store.SetKeyEntry(friendlyName, new AsymmetricKeyEntry(encryptionKeys.Private), [certificateEntry]);
 
         MemoryStream stream = new();
         store.Save(stream, password.ToCharArray(), random);
@@ -187,7 +187,7 @@ public static class GenerateCertificate
 
         X509CertificateEntry certificateEntry = new(selfSignedCert);
         store.SetCertificateEntry(friendlyName, certificateEntry);
-        store.SetKeyEntry(friendlyName, new AsymmetricKeyEntry(encryptionKeys.Private), new[] { certificateEntry });
+        store.SetKeyEntry(friendlyName, new AsymmetricKeyEntry(encryptionKeys.Private), [certificateEntry]);
 
         MemoryStream stream = new();
         store.Save(stream, "".ToCharArray(), random);

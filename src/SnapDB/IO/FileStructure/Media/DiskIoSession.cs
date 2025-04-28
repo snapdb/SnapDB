@@ -68,8 +68,7 @@ internal unsafe class DiskIoSession : IDisposable
         if (diskIo is null)
             throw new ArgumentNullException(nameof(diskIo));
 
-        if (diskIo.IsDisposed)
-            throw new ObjectDisposedException(diskIo.GetType().FullName);
+        ObjectDisposedException.ThrowIf(diskIo.IsDisposed, diskIo);
 
         if (file is null)
             throw new ArgumentNullException(nameof(file));
@@ -174,8 +173,7 @@ internal unsafe class DiskIoSession : IDisposable
         WriteCount++;
         ReadCount++;
 
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         if (m_diskIo.IsDisposed)
             throw new ObjectDisposedException(typeof(DiskIo).FullName);
@@ -213,8 +211,7 @@ internal unsafe class DiskIoSession : IDisposable
         WriteCount++;
         ReadCount++;
 
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         if (m_diskIo.IsDisposed)
             throw new ObjectDisposedException(typeof(DiskIo).FullName);
@@ -254,8 +251,7 @@ internal unsafe class DiskIoSession : IDisposable
 
         ReadCount++;
 
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         if (m_diskIo.IsDisposed)
             throw new ObjectDisposedException(typeof(DiskIo).FullName);
@@ -289,8 +285,7 @@ internal unsafe class DiskIoSession : IDisposable
 
         ReadCount++;
 
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         if (m_diskIo.IsDisposed)
             throw new ObjectDisposedException(typeof(DiskIo).FullName);
@@ -314,8 +309,7 @@ internal unsafe class DiskIoSession : IDisposable
     /// <exception cref="ObjectDisposedException">Thrown if this <see cref="DiskIoSession"/> instance, its parent <see cref="DiskIo"/> instance, or the underlying I/O session instance is disposed.</exception>
     public void Clear()
     {
-        if (IsDisposed)
-            throw new ObjectDisposedException(GetType().FullName);
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
 
         if (m_diskIo.IsDisposed)
             throw new ObjectDisposedException(typeof(DiskIo).FullName);

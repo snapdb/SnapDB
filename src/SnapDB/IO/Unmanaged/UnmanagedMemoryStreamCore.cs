@@ -175,7 +175,7 @@ public class UnmanagedMemoryStreamCore : IDisposable
         m_invertMask = ~(allocationSize - 1);
         m_settings = new Settings();
         m_syncRoot = new Lock();
-        m_memoryBlocks = new List<Memory>();
+        m_memoryBlocks = [];
     }
 
     #endregion
