@@ -24,6 +24,8 @@
 //
 //******************************************************************************************************
 
+using System.Diagnostics;
+
 namespace SnapDB;
 
 /// <summary>
@@ -79,7 +81,9 @@ public static class BitConvert
     /// </returns>
     public static unsafe (ulong value1, ulong value2) ToUInt64Pair(Guid value)
     {
-        byte[] bytes = value.ToByteArray();
+        Span<byte> bytes = stackalloc byte[16];
+        value.TryWriteBytes(bytes);
+
         ulong value1;
         ulong value2;
         
@@ -104,7 +108,7 @@ public static class BitConvert
     /// </returns>
     public static unsafe Guid ToGuid(ulong value1, ulong value2)
     {
-        ReadOnlySpan<byte> bytes = new byte[16];
+        ReadOnlySpan<byte> bytes = stackalloc byte[16];
 
         fixed (byte* ptr = bytes)
         {
