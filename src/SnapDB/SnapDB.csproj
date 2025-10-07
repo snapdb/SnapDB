@@ -30,6 +30,7 @@
     <InformationalVersion Condition="'$(Configuration)'!='Release'">1.0.101 -- Debug Build</InformationalVersion>
     <Configurations>Debug;Release;Development</Configurations>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
   <PropertyGroup>
