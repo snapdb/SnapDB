@@ -23,6 +23,7 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
+// ReSharper disable UnusedMethodReturnValue.Local
 
 using System.Text;
 using Gemstone.Diagnostics;
@@ -36,10 +37,10 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
 {
     #region [ Members ]
 
-    public event Action<SequentialReaderStream<TKey, TValue>> Disposed;
+    public event Action<SequentialReaderStream<TKey, TValue>>? Disposed;
 
-    private BufferedArchiveStream<TKey, TValue> m_firstTable;
-    private SortedTreeScannerBase<TKey, TValue> m_firstTableScanner;
+    private BufferedArchiveStream<TKey, TValue>? m_firstTable;
+    private SortedTreeScannerBase<TKey, TValue>? m_firstTableScanner;
 
     private readonly MatchFilterBase<TKey, TValue>? m_keyMatchFilter;
 
@@ -51,13 +52,13 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
     private long m_pointCount;
     private readonly TKey m_readWhileUpperBounds = new();
 
-    private ArchiveListSnapshot<TKey, TValue> m_snapshot;
+    private ArchiveListSnapshot<TKey, TValue>? m_snapshot;
     private readonly CustomSortHelper<BufferedArchiveStream<TKey, TValue>> m_sortedArchiveStreams;
-    private List<BufferedArchiveStream<TKey, TValue>> m_tablesOrigList;
+    private List<BufferedArchiveStream<TKey, TValue>>? m_tablesOrigList;
     private volatile bool m_timedOut;
 
-    private TimeoutOperation m_timeout;
-    private WorkerThreadSynchronization m_workerThreadSynchronization;
+    private TimeoutOperation? m_timeout;
+    private WorkerThreadSynchronization? m_workerThreadSynchronization;
 
     #endregion
 
@@ -91,13 +92,13 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
         m_snapshot.UpdateSnapshot();
         m_tablesOrigList = [];
 
-        for (int x = 0; x < m_snapshot.Tables!.Count(); x++)
+        for (int x = 0; x < m_snapshot.Tables!.Length; x++)
         {
-            ArchiveTableSummary<TKey, TValue>? table = m_snapshot.Tables[x];
+            ArchiveTableSummary<TKey, TValue>? table = m_snapshot.Tables![x];
 
             if (table is null)
                 continue;
-            
+
             if (table.Contains(keySeekFilter.StartOfRange, keySeekFilter.EndOfRange))
             {
                 try
@@ -118,7 +119,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
             }
             else
             {
-                m_snapshot.Tables[x] = null;
+                m_snapshot.Tables![x] = null;
             }
         }
 
@@ -172,7 +173,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
         {
             m_tablesOrigList.ForEach(x => x.Dispose());
             m_tablesOrigList = null;
-            Array.Clear(m_snapshot.Tables, 0, m_snapshot.Tables.Length);
+            Array.Clear(m_snapshot!.Tables!, 0, m_snapshot.Tables!.Length);
         }
 
         m_timedOut = true;
@@ -196,7 +197,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
     public void CancelReader()
     {
         m_timedOut = true;
-        m_workerThreadSynchronization.RequestCallback(Dispose);
+        m_workerThreadSynchronization!.RequestCallback(Dispose);
     }
 
     protected override bool ReadNext(TKey key, TValue value)
@@ -210,7 +211,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
                     m_pointCount++;
                     if (m_pointCount > 10000)
                     {
-                        m_workerThreadSynchronization.PulseSafeToCallback();
+                        m_workerThreadSynchronization!.PulseSafeToCallback();
                         Interlocked.Add(ref Stats.PointsReturned, m_pointCount);
                         m_pointCount = 0;
                     }
@@ -225,7 +226,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
                     m_pointCount++;
                     if (m_pointCount > 10000)
                     {
-                        m_workerThreadSynchronization.PulseSafeToCallback();
+                        m_workerThreadSynchronization!.PulseSafeToCallback();
                         Interlocked.Add(ref Stats.PointsReturned, m_pointCount);
                         m_pointCount = 0;
                     }
@@ -240,16 +241,29 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
 
     private bool ReadCatchAll(TKey key, TValue value)
     {
-        m_workerThreadSynchronization.PulseSafeToCallback();
+        m_workerThreadSynchronization!.PulseSafeToCallback();
+
         if (m_pointCount > 10000)
         {
             Interlocked.Add(ref Stats.PointsReturned, m_pointCount);
             m_pointCount = 0;
         }
 
+        long retries = 0;
+
     TryAgain:
+
         if (!m_timedOut)
         {
+            retries++;
+
+            if (retries >= 10000)
+            {
+                m_workerThreadSynchronization.PulseSafeToCallback();
+                Interlocked.Add(ref Stats.PointsScanned, retries);
+                retries = 0;
+            }
+
             if (m_keyMatchIsUniverse)
             {
                 if (m_firstTableScanner is null)
@@ -277,6 +291,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
         }
 
         Dispose();
+        
         return false;
     }
 
@@ -304,7 +319,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
         //
 
         //Update the cached values for the table so proper analysis can be done.
-        m_firstTable.UpdateCachedValue();
+        m_firstTable!.UpdateCachedValue();
 
         //Check Condition 1
         if (m_firstTable.CacheIsValid && m_firstTable.CacheKey.IsLessThan(m_readWhileUpperBounds))
@@ -317,7 +332,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
             return false;
 
         //Check if Condition 3's exception occured.
-        if (m_firstTable.CacheKey.IsEqualTo(m_keySeekFilter.EndOfFrame))
+        if (m_firstTable.CacheKey.IsEqualTo(m_keySeekFilter!.EndOfFrame))
         {
             //This is the exception clause. I will advance the frame, but will still need to return the current point.
             m_firstTable.Scanner.Read(key, value);
@@ -427,7 +442,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
         return false;
     }
 
-    private bool IsLessThan(BufferedArchiveStream<TKey, TValue> item1, BufferedArchiveStream<TKey, TValue> item2)
+    private static bool IsLessThan(BufferedArchiveStream<TKey, TValue> item1, BufferedArchiveStream<TKey, TValue> item2)
     {
         if (!item1.CacheIsValid && !item2.CacheIsValid)
             return false;
@@ -456,7 +471,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
     /// The <see cref="CompareStreams"/> method is used to compare two <see cref="BufferedArchiveStream{TKey,TValue}"/>
     /// instances based on their cache keys. If both streams have invalid caches, they are considered equal.
     /// </remarks>
-    private int CompareStreams(BufferedArchiveStream<TKey, TValue> item1, BufferedArchiveStream<TKey, TValue> item2)
+    private static int CompareStreams(BufferedArchiveStream<TKey, TValue> item1, BufferedArchiveStream<TKey, TValue> item2)
     {
         if (!item1.CacheIsValid && !item2.CacheIsValid)
             return 0;
@@ -547,7 +562,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
     /// <summary>
     /// Call this function when the same point exists in multiple archive files. It will
     /// read past the duplicate point in all other archive files and then resort the tables.
-    /// Assums that the archiveStream's cached value is current.
+    /// Assumes that the archiveStream's cached value is current.
     /// </summary>
     private void RemoveDuplicatesFromList()
     {
@@ -590,7 +605,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
         // If there is a key seek filter. adjust this bounds if necessary
         if (m_keySeekFilter is null)
             return;
-        
+
         if (m_keySeekFilter.EndOfFrame.IsLessThan(m_readWhileUpperBounds))
             m_keySeekFilter.EndOfFrame.CopyTo(m_readWhileUpperBounds);
     }
