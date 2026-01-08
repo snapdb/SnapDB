@@ -1,7 +1,5 @@
 <Project>
-  
   <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" />
-
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -14,7 +12,7 @@
     <PackageIcon>gemstone-square-128.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Description>GPA Gemstone SnapDB Library</Description>
-    <Copyright>Copyright © 2024</Copyright>
+    <Copyright>Copyright Â© 2024</Copyright>
     <PackageProjectUrl>https://github.com/snapdb</PackageProjectUrl>
     <RepositoryUrl>https://github.com/snapdb/SnapDB</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -32,18 +30,15 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
-
   <PropertyGroup>
     <OutputPath>..\..\build\$(Configuration)</OutputPath>
     <DocumentationFile>..\..\build\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)'=='Development'">
     <DebugType>Full</DebugType>
     <Optimize>False</Optimize>
     <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="..\..\docs\README.md" Link="README.md" Visible="false">
       <Pack>True</Pack>
@@ -54,41 +49,30 @@
       <PackagePath />
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <Compile Remove="Security\Authentication\CertificateClient.cs" />
     <Compile Remove="Security\Authentication\CertificateServer.cs" />
     <Compile Remove="Security\Authentication\CertificateUserCredential.cs" />
     <Compile Remove="Security\Authentication\CertificateUserCredentials.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\gemstone\common\src\Gemstone\Gemstone.Common.csproj" Condition="'$(Configuration)'=='Development'" />
-    <PackageReference Include="Gemstone.Common" Version="1.0.149" Condition="'$(Configuration)'!='Development'" />
-
+    <PackageReference Include="Gemstone.Common" Version="1.0.159" Condition="'$(Configuration)'!='Development'" />
     <ProjectReference Include="..\..\..\..\gemstone\communication\src\Gemstone.Communication\Gemstone.Communication.csproj" Condition="'$(Configuration)'=='Development'" />
-    <PackageReference Include="Gemstone.Communication" Version="1.0.149" Condition="'$(Configuration)'!='Development'" />
-
+    <PackageReference Include="Gemstone.Communication" Version="1.0.159" Condition="'$(Configuration)'!='Development'" />
     <ProjectReference Include="..\..\..\..\gemstone\diagnostics\src\Gemstone.Diagnostics\Gemstone.Diagnostics.csproj" Condition="'$(Configuration)'=='Development'" />
-    <PackageReference Include="Gemstone.Diagnostics" Version="1.0.149" Condition="'$(Configuration)'!='Development'" />
-
+    <PackageReference Include="Gemstone.Diagnostics" Version="1.0.159" Condition="'$(Configuration)'!='Development'" />
     <ProjectReference Include="..\..\..\..\gemstone\io\src\Gemstone.IO\Gemstone.IO.csproj" Condition="'$(Configuration)'=='Development'" />
-    <PackageReference Include="Gemstone.IO" Version="1.0.149" Condition="'$(Configuration)'!='Development'" />
-
+    <PackageReference Include="Gemstone.IO" Version="1.0.159" Condition="'$(Configuration)'!='Development'" />
     <ProjectReference Include="..\..\..\..\gemstone\numeric\src\Gemstone.Numeric\Gemstone.Numeric.csproj" Condition="'$(Configuration)'=='Development'" />
-    <PackageReference Include="Gemstone.Numeric" Version="1.0.149" Condition="'$(Configuration)'!='Development'" />
-
+    <PackageReference Include="Gemstone.Numeric" Version="1.0.159" Condition="'$(Configuration)'!='Development'" />
     <ProjectReference Include="..\..\..\..\gemstone\security\src\Gemstone.Security\Gemstone.Security.csproj" Condition="'$(Configuration)'=='Development'" />
-    <PackageReference Include="Gemstone.Security" Version="1.0.149" Condition="'$(Configuration)'!='Development'" />
-
+    <PackageReference Include="Gemstone.Security" Version="1.0.159" Condition="'$(Configuration)'!='Development'" />
     <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
     <PackageReference Include="JetBrains.Annotations" Version="2023.2.0" />
   </ItemGroup>
-
   <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" />
-
   <PropertyGroup Condition="'$(SIGNTOOL)' != ''">
     <PostBuildEvent>$(SIGNTOOL) $(TargetPath)</PostBuildEvent>
   </PropertyGroup>
-
 </Project>
