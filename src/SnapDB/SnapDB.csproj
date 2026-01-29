@@ -69,7 +69,7 @@
     <ProjectReference Include="..\..\..\..\gemstone\security\src\Gemstone.Security\Gemstone.Security.csproj" Condition="'$(Configuration)'=='Development'" />
     <PackageReference Include="Gemstone.Security" Version="1.0.164" Condition="'$(Configuration)'!='Development'" />
     <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
-    <PackageReference Include="JetBrains.Annotations" Version="2023.2.0" />
+    <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
   </ItemGroup>
   <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" />
   <PropertyGroup Condition="'$(SIGNTOOL)' != ''">
