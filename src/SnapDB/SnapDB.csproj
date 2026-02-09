@@ -57,9 +57,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\gemstone\common\src\Gemstone\Gemstone.Common.csproj" Condition="'$(Configuration)'=='Development'" />
-    <PackageReference Include="Gemstone.Common" Version="1.0.164" Condition="'$(Configuration)'!='Development'" />
+    <PackageReference Include="Gemstone.Common" Version="1.0.165" Condition="'$(Configuration)'!='Development'" />
     <ProjectReference Include="..\..\..\..\gemstone\communication\src\Gemstone.Communication\Gemstone.Communication.csproj" Condition="'$(Configuration)'=='Development'" />
-    <PackageReference Include="Gemstone.Communication" Version="1.0.164" Condition="'$(Configuration)'!='Development'" />
+    <PackageReference Include="Gemstone.Communication" Version="1.0.165" Condition="'$(Configuration)'!='Development'" />
     <ProjectReference Include="..\..\..\..\gemstone\diagnostics\src\Gemstone.Diagnostics\Gemstone.Diagnostics.csproj" Condition="'$(Configuration)'=='Development'" />
     <PackageReference Include="Gemstone.Diagnostics" Version="1.0.164" Condition="'$(Configuration)'!='Development'" />
     <ProjectReference Include="..\..\..\..\gemstone\io\src\Gemstone.IO\Gemstone.IO.csproj" Condition="'$(Configuration)'=='Development'" />
