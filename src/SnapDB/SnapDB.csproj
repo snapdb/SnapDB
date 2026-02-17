@@ -1,44 +1,55 @@
 <Project>
+  
   <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" />
+
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>SnapDB</RootNamespace>
-    <PackageId>SnapDB</PackageId>
+    <PackageId>Gemstone.SnapDB</PackageId>
     <Authors>Grid Protection Alliance</Authors>
     <Company>Grid Protection Alliance</Company>
-    <Product>SnapDB</Product>
-    <PackageDescription>GPA SnapDB Library</PackageDescription>
+    <Product>Gemstone</Product>
+    <PackageDescription>GPA Gemstone SnapDB Library</PackageDescription>
     <PackageIcon>gemstone-square-128.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Description>GPA Gemstone SnapDB Library</Description>
-    <Copyright>Copyright Ãƒâ€šÃ‚Â© 2024</Copyright>
+    <Description>$(PackageDescription)</Description>
+    <Copyright>Copyright © 2025</Copyright>
     <PackageProjectUrl>https://github.com/snapdb</PackageProjectUrl>
     <RepositoryUrl>https://github.com/snapdb/SnapDB</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>GPA;SnapDB;library;timeseries</PackageTags>
+    <PackageTags>GPA;Gemstone;SnapDB;library;timeseries</PackageTags>
     <LangVersion>latest</LangVersion>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Nullable>enable</Nullable>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <Version>1.0.101</Version>
-    <InformationalVersion Condition="'$(Configuration)'=='Release'">1.0.101 -- Release Build</InformationalVersion>
-    <InformationalVersion Condition="'$(Configuration)'!='Release'">1.0.101 -- Debug Build</InformationalVersion>
     <Configurations>Debug;Release;Development</Configurations>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <VersionFile>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/../../build/scripts/SnapDB.version'))</VersionFile>
+    <Version>$([System.IO.File]::ReadAllText('$(VersionFile)').Trim())</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <FileVersion>$(Version)</FileVersion>
+    <InformationalVersion Condition="'$(Configuration)'=='Release'">$(Version) -- Release Build</InformationalVersion>
+    <InformationalVersion Condition="'$(Configuration)'!='Release'">$(Version) -- Debug Build</InformationalVersion>
+  </PropertyGroup>
+
   <PropertyGroup>
     <OutputPath>..\..\build\$(Configuration)</OutputPath>
     <DocumentationFile>..\..\build\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)'=='Development'">
     <DebugType>Full</DebugType>
     <Optimize>False</Optimize>
     <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
   </PropertyGroup>
+
   <ItemGroup>
     <None Include="..\..\docs\README.md" Link="README.md" Visible="false">
       <Pack>True</Pack>
@@ -49,12 +60,14 @@
       <PackagePath />
     </None>
   </ItemGroup>
+
   <ItemGroup>
     <Compile Remove="Security\Authentication\CertificateClient.cs" />
     <Compile Remove="Security\Authentication\CertificateServer.cs" />
     <Compile Remove="Security\Authentication\CertificateUserCredential.cs" />
     <Compile Remove="Security\Authentication\CertificateUserCredentials.cs" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\gemstone\common\src\Gemstone\Gemstone.Common.csproj" Condition="'$(Configuration)'=='Development'" />
     <PackageReference Include="Gemstone.Common" Version="1.0.164" Condition="'$(Configuration)'!='Development'" />
@@ -71,8 +84,11 @@
     <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
     <PackageReference Include="JetBrains.Annotations" Version="2023.2.0" />
   </ItemGroup>
+
   <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" />
+
   <PropertyGroup Condition="'$(SIGNTOOL)' != ''">
     <PostBuildEvent>$(SIGNTOOL) $(TargetPath)</PostBuildEvent>
   </PropertyGroup>
+
 </Project>
