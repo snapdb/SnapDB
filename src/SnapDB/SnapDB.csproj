@@ -14,7 +14,7 @@
     <PackageIcon>gemstone-square-128.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Description>$(PackageDescription)</Description>
-    <Copyright>Copyright Â© 2025</Copyright>
+    <Copyright>Copyright © 2025</Copyright>
     <PackageProjectUrl>https://github.com/snapdb</PackageProjectUrl>
     <RepositoryUrl>https://github.com/snapdb/SnapDB</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
