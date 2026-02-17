@@ -28,6 +28,26 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\LICENSE = ..\LICENSE
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		..\build\scripts\BuildBeta.bat = ..\build\scripts\BuildBeta.bat
+		..\build\scripts\BuildNightly.bat = ..\build\scripts\BuildNightly.bat
+		..\build\scripts\MasterBuild.buildproj = ..\build\scripts\MasterBuild.buildproj
+		..\build\scripts\publish-packages.ps1 = ..\build\scripts\publish-packages.ps1
+		..\build\scripts\SnapDB.buildproj = ..\build\scripts\SnapDB.buildproj
+		..\build\scripts\update-gemstone-packages.ps1 = ..\build\scripts\update-gemstone-packages.ps1
+		..\build\scripts\SnapDB.version = ..\build\scripts\SnapDB.version
+		..\build\scripts\update-version.ps1 = ..\build\scripts\update-version.ps1
+		..\build\scripts\UpdateDependencies.bat = ..\build\scripts\UpdateDependencies.bat
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Targets", "Targets", "{80804E51-88E5-4720-A716-95D5FB62F4C4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Inline", "Inline", "{360488BC-689E-44E2-9D26-3D79C2C16931}"
+	ProjectSection(SolutionItems) = preProject
+		..\build\scripts\Targets\Inline\GitHistory.targets = ..\build\scripts\Targets\Inline\GitHistory.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +81,8 @@ Global
 		{AB3102F3-053C-4505-928D-C90078B6FE03} = {5D08D933-6481-4890-80E9-DB8522DDE3B0}
 		{E0CCFF2A-C2DF-436C-B34C-A20215DA227A} = {FB2D68F7-E6B1-4A7E-8B90-9D472CEFB887}
 		{AF7B7022-7F26-4EEE-AECA-81D3C9ECA505} = {72BFFD41-57CE-46E7-A81B-9E5F605EF8BE}
+		{80804E51-88E5-4720-A716-95D5FB62F4C4} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{360488BC-689E-44E2-9D26-3D79C2C16931} = {80804E51-88E5-4720-A716-95D5FB62F4C4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7E46A9C7-6A36-42E7-B47C-083F3F9F5373}
