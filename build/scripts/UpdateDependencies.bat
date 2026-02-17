@@ -52,7 +52,7 @@ GOTO UpdateDependencies
 ECHO.
 ECHO Updating to latest version...
 "%git%" fetch
-"%git%" reset --hard origin/master
+"%git%" reset --hard origin/main
 "%git%" clean -f -d -x
 GOTO UpdateDependencies
 

@@ -2,7 +2,7 @@
 
 <!--
 *******************************************************************************************************
-**  MasterBuild.buildproj - Gbtc
+**  mainBuild.buildproj - Gbtc
 **
 **  Copyright © 2013, Grid Protection Alliance.  All Rights Reserved.
 **
@@ -294,7 +294,7 @@
       <VersionFile Condition="'$(VersionFile)' == ''">$(LocalFolder)\Build\Scripts\$(ProjectName).version</VersionFile>
       <NuGet Condition="'$(NuGet)' == ''">$(ProgramFiles64)\NuGet\nuget.exe</NuGet>
       <GitClient Condition="'$(GitClient)' == ''">$(ProgramFiles32)\Git\cmd\git.exe</GitClient>
-      <GitBranch Condition="'$(GitBranch)' == ''">master</GitBranch>
+      <GitBranch Condition="'$(GitBranch)' == ''">main</GitBranch>
 	  <SetUpWorkspace Condition="'$(SetUpWorkspace)' == ''">True</SetUpWorkspace>
       <MSTest Condition="'$(MSTest)' == ''">$(VS140COMNTOOLS)\..\IDE\mstest.exe</MSTest>
       <!-- <SandcastleBuilder Condition="'$(SandcastleBuilder)' == ''">$(SHFBROOT)\SandcastleBuilderGUI.exe</SandcastleBuilder> -->
