@@ -64,7 +64,7 @@ ECHO.
 ECHO Updating Gemstone package versions...
 SET scriptdir=%~dp0
 SET gemstonecsproj=%scriptdir%..\..\..\gemstone\common\src\Gemstone\Gemstone.Common.csproj
-SET targetcsproj=%target%\SnapDB\src\SnapDB\SnapDB.csproj
+SET targetcsproj=%target%\src\SnapDB\SnapDB.csproj
 PowerShell -ExecutionPolicy Bypass -File "%scriptdir%update-gemstone-packages.ps1" -SourceCsprojPath "%gemstonecsproj%" -TargetCsprojPath "%targetcsproj%"
 
 :CommitChanges
