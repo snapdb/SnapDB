@@ -35,8 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{02EA681E
 		..\build\scripts\MasterBuild.buildproj = ..\build\scripts\MasterBuild.buildproj
 		..\build\scripts\publish-packages.ps1 = ..\build\scripts\publish-packages.ps1
 		..\build\scripts\SnapDB.buildproj = ..\build\scripts\SnapDB.buildproj
-		..\build\scripts\update-gemstone-packages.ps1 = ..\build\scripts\update-gemstone-packages.ps1
 		..\build\scripts\SnapDB.version = ..\build\scripts\SnapDB.version
+		..\build\scripts\update-gemstone-packages.ps1 = ..\build\scripts\update-gemstone-packages.ps1
 		..\build\scripts\update-version.ps1 = ..\build\scripts\update-version.ps1
 		..\build\scripts\UpdateDependencies.bat = ..\build\scripts\UpdateDependencies.bat
 	EndProjectSection
