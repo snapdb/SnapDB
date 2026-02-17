@@ -97,7 +97,7 @@ $regexes = @(
 )
 
 foreach ($f in $files) {
-    $text = Get-Content -LiteralPath $f.FullName -Raw
+    $text = Get-Content -LiteralPath $f.FullName -Raw -Encoding UTF8
     $updated = $false
 
     foreach ($rx in $regexes) {
