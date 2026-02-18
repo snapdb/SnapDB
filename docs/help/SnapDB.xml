@@ -10,6 +10,16 @@
             and from unsigned 64-bit integers to floating-points.
             </summary>
     </member>
+    <member name="M:SnapDB.BitConvert.ToGuid(System.UInt64,System.UInt64)">
+      <summary>
+            Converts two unsigned 64-bit integers into a Guid.
+            </summary>
+      <param name="value1">Value1 of the Guid.</param>
+      <param name="value2">Value2 of the Guid.</param>
+      <returns>
+            A Guid representation of the input unsigned 64-bit integers.
+            </returns>
+    </member>
     <member name="M:SnapDB.BitConvert.ToSingle(System.UInt64)">
       <summary>
             Converts an unsigned 64-bit integer to a single-precision floating-point number.
@@ -19,7 +29,7 @@
             A single-precision floating-point number representing the input unsigned 64-bit integer.
             </returns>
       <remarks>
-            This method performs an unsafe conversion by first casting the input ulong to a uint
+            This method performs an unsafe conversion by first casting the input ulong to an uint
             and then treating it as a float.
             </remarks>
     </member>
@@ -32,9 +42,18 @@
             An unsigned 64-bit integer representation of the input single-precision floating-point number.
             </returns>
       <remarks>
-            This method performs an unsafe conversion by treating the input float as a uint and
+            This method performs an unsafe conversion by treating the input float as an uint and
             then casting it to ulong.
             </remarks>
+    </member>
+    <member name="M:SnapDB.BitConvert.ToUInt64Pair(System.Guid)">
+      <summary>
+            Converts a Guid value into two unsigned 64-bit integers.
+            </summary>
+      <param name="value">Guid value to convert.</param>
+      <returns>
+            Two unsigned 64-bit integers representing the input Guid value.
+            </returns>
     </member>
     <member name="T:SnapDB.DateTimeExtensions">
       <summary>
@@ -451,7 +470,7 @@
       <typeparam name="TValue">The type of values in the dictionary.</typeparam>
       <remarks>
             This is a special purpose class that supports only the "add" and "get" operations.
-            It is designed for indexing and dicitionary lookup capabilities.
+            It is designed for indexing and dictionary lookup capabilities.
             </remarks>
     </member>
     <member name="M:SnapDB.Collections.ConcurrentIndexedDictionary`2.#ctor">
@@ -4262,6 +4281,11 @@
       <returns>
         <c>true</c> if successful, <c>false</c> otherwise</returns>
     </member>
+    <member name="P:SnapDB.Security.SecureStreamServer`1.Users">
+      <summary>
+            Gets all authenticated users.
+            </summary>
+    </member>
     <member name="T:SnapDB.Security.SecurityExtensions">
       <summary>
             Provides extension methods for enhancing security-related operations.
@@ -4419,8 +4443,11 @@
     </member>
     <member name="F:SnapDB.Security.Authentication.IntegratedSecurityUserCredential.UserId">
       <summary>
-            The security identifier for the username
+            The security identifier (SID) for the username.
             </summary>
+      <remarks>
+            This value is automatically looked by username for the target OS.
+            </remarks>
     </member>
     <member name="F:SnapDB.Security.Authentication.IntegratedSecurityUserCredential.Username">
       <summary>
@@ -5355,12 +5382,12 @@
     </member>
     <member name="M:SnapDB.Snap.SnapTypeBase.SetMax">
       <summary>
-            Sets the privided key to it's maximum value.
+            Sets the provided key to its maximum value.
             </summary>
     </member>
     <member name="M:SnapDB.Snap.SnapTypeBase.SetMin">
       <summary>
-            Sets the provided key to it's minimum value.
+            Sets the provided key to its minimum value.
             </summary>
     </member>
     <member name="P:SnapDB.Snap.SnapTypeBase.Size">
@@ -5727,6 +5754,31 @@
       <param name="value">The value associated with the key to be advanced to.</param>
       <returns>
         <c>true</c> if the advance was successful; otherwise, <c>false</c> if the end of the stream was reached.</returns>
+    </member>
+    <member name="M:SnapDB.Snap.TreeStream`2.ReadAsync(`0,`1)">
+      <summary>
+            Advances the stream to the next value. 
+            If before the beginning of the stream, advances to the first value
+            </summary>
+      <param name="key">
+        <markup>
+          <include item="SMCMissingParamTag">
+            <parameter>param</parameter>
+            <parameter>key</parameter>
+            <parameter>M:SnapDB.Snap.TreeStream`2.ReadAsync(`0,`1)</parameter>
+          </include>
+        </markup>
+      </param>
+      <param name="value">
+        <markup>
+          <include item="SMCMissingParamTag">
+            <parameter>param</parameter>
+            <parameter>value</parameter>
+            <parameter>M:SnapDB.Snap.TreeStream`2.ReadAsync(`0,`1)</parameter>
+          </include>
+        </markup>
+      </param>
+      <returns>True if the advance was successful. False if the end of the stream was reached.</returns>
     </member>
     <member name="M:SnapDB.Snap.TreeStream`2.ReadNext(`0,`1)">
       <summary>
@@ -6242,6 +6294,21 @@
             in a parameters to the encoding.
             </summary>
     </member>
+    <member name="T:SnapDB.Snap.Filters.AccessControlSeekPosition">
+      <summary>
+            Enumeration of seek positions for any access control seek filter.
+            </summary>
+    </member>
+    <member name="F:SnapDB.Snap.Filters.AccessControlSeekPosition.Start">
+      <summary>
+            Access control check is for key at start of seek.
+            </summary>
+    </member>
+    <member name="F:SnapDB.Snap.Filters.AccessControlSeekPosition.End">
+      <summary>
+            Access control check is for key at end of seek.
+            </summary>
+    </member>
     <member name="T:SnapDB.Snap.Filters.FilterLibrary">
       <summary>
             Contains all of the filters for the <see cref="N:SnapDB.Snap" />.
@@ -6489,9 +6556,9 @@
     </member>
     <member name="T:SnapDB.Snap.Filters.SeekFilterBase`1">
       <summary>
-            Represents a filter that is based on a series of ranges of the key value
+            Represents a filter that is based on a series of ranges of the key value.
             </summary>
-      <typeparam name="TKey"></typeparam>
+      <typeparam name="TKey">The key to seek.</typeparam>
     </member>
     <member name="M:SnapDB.Snap.Filters.SeekFilterBase`1.#ctor">
       <summary>
@@ -6504,24 +6571,25 @@
     </member>
     <member name="P:SnapDB.Snap.Filters.SeekFilterBase`1.EndOfFrame">
       <summary>
-            the end of the frame to search [Inclusive]
+            Gets the end of the frame to search [Inclusive].
             </summary>
     </member>
     <member name="P:SnapDB.Snap.Filters.SeekFilterBase`1.EndOfRange">
       <summary>
-            the end of the entire range to search [Inclusive]
+            Gets the end of the entire range to search [Inclusive].
             </summary>
     </member>
     <member name="P:SnapDB.Snap.Filters.SeekFilterBase`1.FilterType">
       <summary>
-            The filter guid
+            Gets the filter type identifier.
             </summary>
     </member>
     <member name="M:SnapDB.Snap.Filters.SeekFilterBase`1.NextWindow">
       <summary>
             Gets the next search window.
             </summary>
-      <returns>true if window exists, false if finished.</returns>
+      <returns>
+        <c>true</c>if window exists; otherwise, <c>false</c> if finished.</returns>
     </member>
     <member name="M:SnapDB.Snap.Filters.SeekFilterBase`1.Reset">
       <summary>
@@ -6534,18 +6602,18 @@
     </member>
     <member name="M:SnapDB.Snap.Filters.SeekFilterBase`1.Save(SnapDB.IO.BinaryStreamBase)">
       <summary>
-            Serializes the filter to a stream
+            Serializes the filter to a stream.
             </summary>
-      <param name="stream">the stream to write to</param>
+      <param name="stream">Target stream for writing.</param>
     </member>
     <member name="P:SnapDB.Snap.Filters.SeekFilterBase`1.StartOfFrame">
       <summary>
-            the start of the frame to search [Inclusive]
+            Gets the start of the frame to search [Inclusive].
             </summary>
     </member>
     <member name="P:SnapDB.Snap.Filters.SeekFilterBase`1.StartOfRange">
       <summary>
-            the start of the entire range to search [Inclusive]
+            Gets the start of the entire range to search [Inclusive].
             </summary>
     </member>
     <member name="T:SnapDB.Snap.Filters.SeekFilterUniverse`1">
@@ -6786,7 +6854,7 @@
     </member>
     <member name="P:SnapDB.Snap.Services.ArchiveDetails.FileName">
       <summary>
-            The name of the file
+            The name of the file.
             </summary>
     </member>
     <member name="P:SnapDB.Snap.Services.ArchiveDetails.FileSize">
@@ -6799,9 +6867,14 @@
             Gets the first key as a string.
             </summary>
     </member>
+    <member name="P:SnapDB.Snap.Services.ArchiveDetails.Flags">
+      <summary>
+            Gets the flags for the archive file.
+            </summary>
+    </member>
     <member name="P:SnapDB.Snap.Services.ArchiveDetails.Id">
       <summary>
-            The ID for the file
+            The ID for the file.
             </summary>
     </member>
     <member name="P:SnapDB.Snap.Services.ArchiveDetails.IsEmpty">
@@ -6829,22 +6902,22 @@
     </member>
     <member name="F:SnapDB.Snap.Services.ArchiveDirectoryMethod.TopDirectoryOnly">
       <summary>
-            Writes all files in the top directory
+            Writes all files in the top directory.
             </summary>
     </member>
     <member name="F:SnapDB.Snap.Services.ArchiveDirectoryMethod.Year">
       <summary>
-            Writes all files based on the starting year
+            Writes all files based on the starting year.
             </summary>
     </member>
     <member name="F:SnapDB.Snap.Services.ArchiveDirectoryMethod.YearMonth">
       <summary>
-            Writes all files based on 'YearMonth'
+            Writes all files based on 'YearMonth'.
             </summary>
     </member>
     <member name="F:SnapDB.Snap.Services.ArchiveDirectoryMethod.YearThenMonth">
       <summary>
-            Writes all files based on 'Year\Month'
+            Writes all files based on 'Year\Month'.
             </summary>
     </member>
     <member name="T:SnapDB.Snap.Services.ArchiveList">
@@ -6939,7 +7012,7 @@
       <summary>
             Creates an object that can be used to get updated snapshots from this archive list.
             Client must call <see cref="M:System.IDisposable.Dispose" /> method when finished with these resources as they will not
-            automatically be reclaimed by the garbage collector. Class will not be initiallized until calling <see cref="M:SnapDB.Snap.Services.ArchiveListSnapshot`2.UpdateSnapshot" />.
+            automatically be reclaimed by the garbage collector. Class will not be initialized until calling <see cref="M:SnapDB.Snap.Services.ArchiveListSnapshot`2.UpdateSnapshot" />.
             </summary>
       <returns>
             A new <see cref="T:SnapDB.Snap.Services.ArchiveListSnapshot`2" /> instance for client resources.
@@ -6961,7 +7034,7 @@
       <summary>
             Gets a complete list of all archive files.
             </summary>
-      <returns>All of the attached archive files.</returns>
+      <returns>All the attached archive files.</returns>
     </member>
     <member name="M:SnapDB.Snap.Services.ArchiveList`2.GetFullStatus(System.Text.StringBuilder,System.Int32)">
       <summary>
@@ -7725,7 +7798,7 @@
       <summary>
             Gets the database that matches <paramref name="databaseName" />.
             </summary>
-      <param name="databaseName">The case insensitive name of the database to retrieve.</param>
+      <param name="databaseName">The case-insensitive name of the database to retrieve.</param>
       <returns>
             A <see cref="T:SnapDB.Snap.Services.ClientDatabaseBase" /> instance representing the requested client database.
             </returns>
@@ -8012,6 +8085,11 @@
             The extension to use for the intermediate files
             </summary>
     </member>
+    <member name="P:SnapDB.Snap.Services.Configuration.AdvancedServerDatabaseConfig`2.Metadata">
+      <summary>
+            Gets or sets the metadata to be written to the archive.
+            </summary>
+    </member>
     <member name="P:SnapDB.Snap.Services.Configuration.AdvancedServerDatabaseConfig`2.StagingCount">
       <summary>
             The number of stages.
@@ -8272,6 +8350,11 @@
             A server name that must be supplied at startup before a key exchange occurs.
             </summary>
     </member>
+    <member name="P:SnapDB.Snap.Services.Net.SnapSocketListenerSettings.DefaultUser">
+      <summary>
+            Gets or sets any default user name that should be used if no other user name can be determined.
+            </summary>
+    </member>
     <member name="F:SnapDB.Snap.Services.Net.SnapSocketListenerSettings.DefaultUserCanRead">
       <summary>
             Gets or sets a value indicating whether the default user has read access.
@@ -8319,15 +8402,79 @@
             </summary>
       <param name="stream">The stream to which data is saved.</param>
     </member>
+    <member name="P:SnapDB.Snap.Services.Net.SnapSocketListenerSettings.UserCanMatch">
+      <summary>
+            Gets or sets any defined user read access control function for match filters.
+            </summary>
+      <remarks>
+            Function parameters are: <br /><c>string UserId</c> - The user security ID (SID) of the user attempting to match.<br /><c>TKey instance</c> - The key of the record being matched.<br /><c>TValue instance</c> - The value of the record being matched.<br /><c>bool</c> - Return <c>true</c> if user is allowed to match; otherwise, <c>false</c>.
+            </remarks>
+    </member>
+    <member name="P:SnapDB.Snap.Services.Net.SnapSocketListenerSettings.UserCanSeek">
+      <summary>
+            Gets or sets any defined user read access control function for seek filters.
+            </summary>
+      <remarks>
+            Function parameters are: <br /><c>string UserId</c> - The user security ID (SID) of the user attempting to seek.<br /><c>TKey instance</c> - The key of the record being sought.<br /><c>AccessControlSeekPosition</c> - The position of the seek. i.e., <c>Start</c> or <c>End</c>.<br /><c>bool</c> - Return <c>true</c> if user is allowed to seek; otherwise, <c>false</c>.
+            </remarks>
+    </member>
+    <member name="P:SnapDB.Snap.Services.Net.SnapSocketListenerSettings.UserCanWrite">
+      <summary>
+            Gets or sets any defined user write access control function.
+            </summary>
+      <remarks>
+            Function parameters are: <br /><c>string UserId</c> - The user security ID (SID) of the user attempting to write.<br /><c>TKey instance</c> - The key of the record being written.<br /><c>TValue instance</c> - The value of the record being written.<br /><c>bool</c> - Return <c>true</c> if user is allowed to write; otherwise, <c>false</c>.
+            </remarks>
+    </member>
     <member name="P:SnapDB.Snap.Services.Net.SnapSocketListenerSettings.Users">
       <summary>
-            A list of all Windows users that are allowed to connect to the historian.
+            A list of all users that are allowed to connect to the historian.
             </summary>
     </member>
     <member name="M:SnapDB.Snap.Services.Net.SnapSocketListenerSettings.Validate">
       <summary>
             Validates the object's state.
             </summary>
+    </member>
+    <member name="T:SnapDB.Snap.Services.Net.SnapSocketListenerSettings`2">
+      <summary>
+            Contains the typed basic config for a socket interface.
+            </summary>
+      <typeparam name="TKey">The type of keys used in the socket interface.</typeparam>
+      <typeparam name="TValue">The type of values used in the socket interface.</typeparam>
+    </member>
+    <member name="M:SnapDB.Snap.Services.Net.SnapSocketListenerSettings`2.#ctor">
+      <summary>
+        <markup>
+          <include item="SMCAutoDocConstructor">
+            <parameter>SnapDB.Snap.Services.Net.SnapSocketListenerSettings`2</parameter>
+          </include>
+        </markup>
+      </summary>
+    </member>
+    <member name="P:SnapDB.Snap.Services.Net.SnapSocketListenerSettings`2.UserCanMatch">
+      <summary>
+            Gets or sets any defined user read access control function for match filters.
+            </summary>
+      <remarks>
+            Function parameters are: <br /><c>string UserId</c> - The user security ID (SID) of the user attempting to match.<br /><c>TKey instance</c> - The key of the record being matched.<br /><c>TValue instance</c> - The value of the record being matched.<br /><c>bool</c> - Return <c>true</c> if user is allowed to match; otherwise, <c>false</c>.
+            </remarks>
+    </member>
+    <member name="P:SnapDB.Snap.Services.Net.SnapSocketListenerSettings`2.UserCanSeek">
+      <summary>
+            Gets or sets any defined user read access control function for seek filters.
+            </summary>
+      <remarks>
+            Function parameters are: <br /><c>string UserId</c> - The user security ID (SID) of the user attempting to seek.<br /><c>TKey instance</c> - The key of the record being sought.<br /><c>AccessControlSeekPosition</c> - The position of the seek. i.e., <c>Start</c> or <c>End</c>.<br /><c>bool</c> - Return <c>true</c> if user is allowed to seek; otherwise, <c>false</c>.
+            </remarks>
+    </member>
+    <member name="P:SnapDB.Snap.Services.Net.SnapSocketListenerSettings`2.UserCanWrite">
+      <summary>
+            Gets or sets any defined user write access control function.
+            </summary>
+      <remarks>
+            Function parameters are: <br /><c>string UserId</c> - The user security ID (SID) of the user attempting to write.<br /><c>TKey instance</c> - The key of the record being written.<br /><c>TValue instance</c> - The value of the record being written.<br /><c>bool</c> - Return <c>true</c> if user is allowed to write; otherwise, <c>false</c>.
+            </remarks>
     </member>
     <member name="T:SnapDB.Snap.Services.Net.SnapStreamingClient">
       <summary>
@@ -8446,6 +8593,35 @@
       <summary>
             Gets or sets a flag indicating whether SSL (Secure Sockets Layer) is required for communication.
             </summary>
+    </member>
+    <member name="P:SnapDB.Snap.Services.Net.SnapStreamingServer.User">
+      <summary>
+            Gets or sets user associated with this streaming server.
+            </summary>
+    </member>
+    <member name="P:SnapDB.Snap.Services.Net.SnapStreamingServer.UserCanMatch">
+      <summary>
+            Gets or sets any defined user read access control function for match filters.
+            </summary>
+      <remarks>
+            Function parameters are: <br /><c>string UserId</c> - The user security ID (SID) of the user attempting to match.<br /><c>TKey instance</c> - The key of the record being matched.<br /><c>TValue instance</c> - The value of the record being matched.<br /><c>bool</c> - Return <c>true</c> if user is allowed to match; otherwise, <c>false</c>.
+            </remarks>
+    </member>
+    <member name="P:SnapDB.Snap.Services.Net.SnapStreamingServer.UserCanSeek">
+      <summary>
+            Gets or sets any defined user read access control function for seek filters.
+            </summary>
+      <remarks>
+            Function parameters are: <br /><c>string UserId</c> - The user security ID (SID) of the user attempting to seek.<br /><c>TKey instance</c> - The key of the record being sought.<br /><c>AccessControlSeekPosition</c> - The position of the seek. i.e., <c>Start</c> or <c>End</c>.<br /><c>bool</c> - Return <c>true</c> if user is allowed to seek; otherwise, <c>false</c>.
+            </remarks>
+    </member>
+    <member name="P:SnapDB.Snap.Services.Net.SnapStreamingServer.UserCanWrite">
+      <summary>
+            Gets or sets any defined user write access control function.
+            </summary>
+      <remarks>
+            Function parameters are: <br /><c>string UserId</c> - The user security ID (SID) of the user attempting to write.<br /><c>TKey instance</c> - The key of the record being written.<br /><c>TValue instance</c> - The value of the record being written.<br /><c>bool</c> - Return <c>true</c> if user is allowed to write; otherwise, <c>false</c>.
+            </remarks>
     </member>
     <member name="T:SnapDB.Snap.Services.Net.SocketUserPermissions">
       <summary>
@@ -9059,10 +9235,10 @@
     </member>
     <member name="P:SnapDB.Snap.Services.Writer.CombineFilesSettings.CombineOnFileSize">
       <summary>
-            The size at which to create a rolled over file
+            The size at which to create a rolled over file.
             </summary>
       <remarks>
-            Must be between 1MB and 100GB
+            Must be between 1MB and 100GB.
             </remarks>
     </member>
     <member name="P:SnapDB.Snap.Services.Writer.CombineFilesSettings.ExecuteTimer">
@@ -9609,6 +9785,11 @@
             </summary>
       <param name="stream">The stream from which the configuration data will be loaded.</param>
     </member>
+    <member name="P:SnapDB.Snap.Services.Writer.SimplifiedArchiveInitializerSettings.Metadata">
+      <summary>
+            Gets or sets the metadata to be written to the archive.
+            </summary>
+    </member>
     <member name="P:SnapDB.Snap.Services.Writer.SimplifiedArchiveInitializerSettings.PendingExtension">
       <summary>
             The extension to name the file.
@@ -9769,7 +9950,7 @@
     </member>
     <member name="M:SnapDB.Snap.Storage.FileFlags.GetStage(System.Int32)">
       <summary>
-            Gets the flag associated with the supplied stage
+            Gets the flag associated with the supplied stage.
             </summary>
       <param name="stageNumber">The stage number for which to retrieve the <see cref="T:System.Guid" />.</param>
       <returns>
@@ -9783,10 +9964,41 @@
             Thrown when the <paramref name="stageNumber" /> is not between 0 and 9.
             </exception>
     </member>
+    <member name="M:SnapDB.Snap.Storage.FileFlags.GetStageNumber(System.Guid)">
+      <summary>
+            Gets the number of the supplied stage <paramref name="flag" />.
+            </summary>
+      <param name="flag">Stage flag.</param>
+      <returns>Number of specified stage <paramref name="flag" />; otherwise, -1 if flag is not a stage flag.</returns>
+    </member>
+    <member name="M:SnapDB.Snap.Storage.FileFlags.GetStageNumber(System.Guid[])">
+      <summary>
+            Gets the stage number from the set of supplied file <paramref name="flags" />.
+            </summary>
+      <param name="flag">File flags.</param>
+      <param name="flags">
+        <markup>
+          <include item="SMCMissingParamTag">
+            <parameter>param</parameter>
+            <parameter>flags</parameter>
+            <parameter>M:SnapDB.Snap.Storage.FileFlags.GetStageNumber(System.Guid[])</parameter>
+          </include>
+        </markup>
+      </param>
+      <returns>Stage number from the set of supplied file <paramref name="flags" />; otherwise, -1 if none of the flags is a stage flag.</returns>
+    </member>
     <member name="F:SnapDB.Snap.Storage.FileFlags.IntermediateFile">
       <summary>
             Indicates that this is an intermediate file that can still be automatically rolled over.
             </summary>
+    </member>
+    <member name="M:SnapDB.Snap.Storage.FileFlags.IsStageFlag(System.Guid)">
+      <summary>
+            Determines if the supplied flag is a stage flag.
+            </summary>
+      <param name="flag">Flag to test.</param>
+      <returns>
+        <c>true</c> if <paramref name="flag" /> is a stage flag; otherwise, <c>false</c>.</returns>
     </member>
     <member name="F:SnapDB.Snap.Storage.FileFlags.ManualRollover">
       <summary>
@@ -9912,6 +10124,14 @@
             This is the name of the entire path.
             </summary>
     </member>
+    <member name="M:SnapDB.Snap.Storage.SortedTreeFile.GetMetadata``2">
+      <summary>
+            Gets the metadata from the archive file associated with the specified key and value types.
+            </summary>
+      <typeparam name="TKey">The type parameter specifying the data type for keys.</typeparam>
+      <typeparam name="TValue">The type parameter specifying the data type for values.</typeparam>
+      <returns>Metadata extracted from archive file; otherwise, <c>null</c> if no metadata exists.</returns>
+    </member>
     <member name="P:SnapDB.Snap.Storage.SortedTreeFile.IsDisposed">
       <summary>
             Determines if the archive file has been disposed.
@@ -10018,6 +10238,19 @@
       <param name="archiveIdCallback">An optional callback to invoke with the archive ID.</param>
       <param name="treeNodeType">The encoding definition for tree nodes.</param>
       <param name="treeStream">The tree stream containing non-sequential data to be written to the archive.</param>
+      <param name="flags">Optional flags associated with the archive.</param>
+    </member>
+    <member name="M:SnapDB.Snap.Storage.SortedTreeFileSimpleWriter`2.CreateWithMetadata(System.String,System.String,System.Int32,System.Action{System.Guid},SnapDB.Snap.EncodingDefinition,SnapDB.Snap.TreeStream{`0,`1},System.Byte[],System.Guid[])">
+      <summary>
+            Creates a new archive file using the specified parameters and writes data to it.
+            </summary>
+      <param name="pendingFileName">The name of the pending archive file.</param>
+      <param name="completeFileName">The name of the complete archive file.</param>
+      <param name="blockSize">The size of data blocks in the archive.</param>
+      <param name="archiveIdCallback">An optional callback to invoke with the archive ID.</param>
+      <param name="treeNodeType">The encoding definition for tree nodes.</param>
+      <param name="treeStream">The tree stream containing data to be written to the archive.</param>
+      <param name="metadata">The metadata to be written to the archive.</param>
       <param name="flags">Optional flags associated with the archive.</param>
     </member>
     <member name="T:SnapDB.Snap.Storage.SortedTreeTable`2">

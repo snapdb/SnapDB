@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <Configurations>Debug;Release;Development</Configurations>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -25,13 +25,19 @@
     <Compile Remove="WinApiTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\gemstone\common\src\Gemstone\Gemstone.Common.csproj" Condition="'$(Configuration)'=='Development'" />
+    <PackageReference Include="Gemstone.Common" Version="$(GemstoneVersion)" Condition="'$(Configuration)'!='Development'" />
+
     <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
-    <PackageReference Include="Gemstone.Common" Version="1.0.164" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
-    <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="coverlet.collector" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
     <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SnapDB\SnapDB.csproj" />

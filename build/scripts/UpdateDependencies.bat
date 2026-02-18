@@ -58,14 +58,16 @@ GOTO UpdateDependencies
 
 :UpdateDependencies
 
-REM Gemstone package versions are controlled by the Gemstone.Common.csproj file, we set the SnapDB.csproj
-REM file to reference the package version parsed from the previously updated Gemstone.Common.csproj file:
+REM Gemstone package versions are controlled by the Gemstone.Common.csproj file, we set the
+REM Directory.Build.props file to reference the package version parsed from the previously
+REM updated Gemstone.Common.csproj file. All projects in the solution use the GemstoneVersion
+REM MSBuild property defined in Directory.Build.props to stay in sync:
 ECHO.
 ECHO Updating Gemstone package versions...
 SET scriptdir=%~dp0
 SET gemstonecsproj=%scriptdir%..\..\..\gemstone\common\src\Gemstone\Gemstone.Common.csproj
-SET targetcsproj=%target%\src\SnapDB\SnapDB.csproj
-PowerShell -ExecutionPolicy Bypass -File "%scriptdir%update-gemstone-packages.ps1" -SourceCsprojPath "%gemstonecsproj%" -TargetCsprojPath "%targetcsproj%"
+SET targetprops=%target%\src\Directory.Build.props
+PowerShell -ExecutionPolicy Bypass -File "%scriptdir%update-gemstone-packages.ps1" -SourceCsprojPath "%gemstonecsproj%" -TargetPropsPath "%targetprops%"
 
 :CommitChanges
 ECHO.

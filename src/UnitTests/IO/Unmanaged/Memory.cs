@@ -29,6 +29,7 @@
 
 using System;
 using System.Collections.Generic;
+using Gemstone;
 using NUnit.Framework;
 using SnapDB.IO.Unmanaged;
 
@@ -63,7 +64,7 @@ public class MemoryTest
         GC.Collect();
         GC.WaitForPendingFinalizers();
 
-        long mem = (long)MemoryPoolPageList.GetAvailablePhysicalMemory();
+        long mem = (long)Common.GetAvailablePhysicalMemory();
 
         // Allocate 100MB
         List<Memory> blocks = new();
@@ -74,7 +75,7 @@ public class MemoryTest
         GC.Collect();
         GC.WaitForPendingFinalizers();
 
-        long mem2 = (long)MemoryPoolPageList.GetAvailablePhysicalMemory();
+        long mem2 = (long)Common.GetAvailablePhysicalMemory();
 
         // Verify that it increased by more than 50MB
         if (mem2 > mem + 1000000 * 50)
@@ -86,7 +87,7 @@ public class MemoryTest
         GC.WaitForPendingFinalizers();
 
         // Verify that the difference between the start and the end is less than 50MB
-        long mem3 = (long)MemoryPoolPageList.GetAvailablePhysicalMemory();
+        long mem3 = (long)Common.GetAvailablePhysicalMemory();
 
         if (Math.Abs(mem3 - mem) > 1000000 * 50)
             throw new Exception();

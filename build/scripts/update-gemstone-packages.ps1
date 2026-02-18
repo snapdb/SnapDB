@@ -26,7 +26,7 @@ param(
     [string]$SourceCsprojPath,
 
     [Parameter(Mandatory=$true)]
-    [string]$TargetCsprojPath
+    [string]$TargetPropsPath
 )
 
 Set-StrictMode -Version Latest
@@ -38,9 +38,9 @@ if (!(Test-Path -LiteralPath $SourceCsprojPath)) {
     exit 1
 }
 
-# Validate that target csproj exists
-if (!(Test-Path -LiteralPath $TargetCsprojPath)) {
-    Write-Error "Target csproj not found: $TargetCsprojPath"
+# Validate that target Directory.Build.props exists
+if (!(Test-Path -LiteralPath $TargetPropsPath)) {
+    Write-Error "Target props not found: $TargetPropsPath"
     exit 1
 }
 
@@ -57,16 +57,16 @@ if ($null -eq $versionNode -or [string]::IsNullOrWhiteSpace($versionNode.InnerTe
 $version = $versionNode.InnerText.Trim()
 Write-Host "Gemstone version extracted: $version"
 
-# Read target csproj and update Gemstone PackageReference versions
-$content = Get-Content -LiteralPath $TargetCsprojPath -Raw -Encoding UTF8
+# Read target Directory.Build.props and update GemstoneVersion property
+$content = Get-Content -LiteralPath $TargetPropsPath -Raw -Encoding UTF8
 
-# Match PackageReference lines for Gemstone.* packages and update the Version attribute
-$pattern = '(<PackageReference\s+Include="Gemstone\.[^"]*"\s+Version=")([^"]+)(")'
+# Match the GemstoneVersion element and update its value
+$pattern = '(<GemstoneVersion>)([^<]+)(</GemstoneVersion>)'
 $newContent = [regex]::Replace($content, $pattern, "`${1}$version`${3}")
 
 if ($newContent -eq $content) {
-    Write-Host "No Gemstone PackageReference updates needed in $TargetCsprojPath"
+    Write-Host "No GemstoneVersion update needed in $TargetPropsPath"
 } else {
-    Set-Content -LiteralPath $TargetCsprojPath -Value $newContent -Encoding UTF8 -NoNewline
-    Write-Host "Updated Gemstone PackageReference versions to $version in $TargetCsprojPath"
+    Set-Content -LiteralPath $TargetPropsPath -Value $newContent -Encoding UTF8 -NoNewline
+    Write-Host "Updated GemstoneVersion to $version in $TargetPropsPath"
 }
