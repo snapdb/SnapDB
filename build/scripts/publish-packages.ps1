@@ -34,7 +34,7 @@ function Publish-Package([string]$package) {
 # --------- Start Script ---------
 
 $versionPath = Join-Path $projectDir $versionFile
-$buildPath   = Join-Path $projectDir $libBuildFolder
+$buildPath   = Join-Path $projectDir $buildFolder
 
 # Get current SnapDB version (expects a.b.c.d)
 $fullVersion = (Get-Content -Path $versionPath -TotalCount 1).Trim()
