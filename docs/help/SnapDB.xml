@@ -2611,15 +2611,6 @@
       <param name="disposing">
         <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     </member>
-    <member name="M:SnapDB.IO.FileStructure.SimplifiedFileWriter.Finalize">
-      <summary>
-            Finalizes an instance of the <see cref="T:SnapDB.IO.FileStructure.SimplifiedFileWriter" /> class.
-            </summary>
-      <remarks>
-            This finalizer is automatically called by the garbage collector during object cleanup.
-            It publishes an informational log message indicating that the finalizer has been called.
-            </remarks>
-    </member>
     <member name="F:SnapDB.IO.FileStructure.SimplifiedFileWriter.Stream">
       <summary>
             Defines the file stream for this <see cref="T:SnapDB.IO.FileStructure.SimplifiedFileWriter" />.
@@ -2896,15 +2887,6 @@
             A list of all of the files in this collection.
             </summary>
     </member>
-    <member name="M:SnapDB.IO.FileStructure.TransactionalEdit.Finalize">
-      <summary>
-            Finalizes an instance of the <see cref="T:SnapDB.IO.FileStructure.TransactionalEdit" /> class.
-            </summary>
-      <remarks>
-            This finalizer is automatically called by the garbage collector during object cleanup.
-            It publishes an informational log message indicating that the finalizer has been called.
-            </remarks>
-    </member>
     <member name="M:SnapDB.IO.FileStructure.TransactionalEdit.OpenFile(SnapDB.IO.FileStructure.SubFileName)">
       <summary>
             Opens a ArchiveFileStream that can be used to read and write to the file passed to this function.
@@ -2987,15 +2969,6 @@
     <member name="P:SnapDB.IO.FileStructure.TransactionalFileStructure.FileName">
       <summary>
             Gets the file name for the <see cref="T:SnapDB.IO.FileStructure.TransactionalFileStructure" /></summary>
-    </member>
-    <member name="M:SnapDB.IO.FileStructure.TransactionalFileStructure.Finalize">
-      <summary>
-            Finalizes an instance of the <see cref="T:SnapDB.IO.FileStructure.TransactionalFileStructure" /> class.
-            </summary>
-      <remarks>
-            This finalizer is automatically called by the garbage collector during object cleanup.
-            It publishes an informational log message indicating that the finalizer has been called.
-            </remarks>
     </member>
     <member name="M:SnapDB.IO.FileStructure.TransactionalFileStructure.OpenFile(System.String,System.Boolean)">
       <summary>
@@ -3389,12 +3362,6 @@
     <member name="M:SnapDB.IO.Unmanaged.MemoryPool.Dispose">
       <summary>
             Releases all the resources used by the <see cref="T:SnapDB.IO.Unmanaged.MemoryPool" /> object.
-            </summary>
-    </member>
-    <member name="M:SnapDB.IO.Unmanaged.MemoryPool.Finalize">
-      <summary>
-            Finalizes an instance of the <see cref="T:SnapDB.IO.Unmanaged.MemoryPool" /> class.
-            This finalizer logs an informational message when called.
             </summary>
     </member>
     <member name="P:SnapDB.IO.Unmanaged.MemoryPool.IsDisposed">
