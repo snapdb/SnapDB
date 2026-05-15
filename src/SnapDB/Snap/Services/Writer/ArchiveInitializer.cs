@@ -211,13 +211,133 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
 
         long remainingSpace = Settings.DesiredRemainingSpace;
 
-        foreach (string path in Settings.WritePath)
+        if (Settings.BalancingMethod == BalancingMethod.FillToDesired)
         {
-            FilePath.GetAvailableFreeSpace(path, out long freeSpace, out _);
+            foreach (string path in Settings.WritePath)
+            {
+                FilePath.GetAvailableFreeSpace(path, out long freeSpace, out _);
 
-            if (freeSpace - estimatedSize > remainingSpace)
-                return path;
+                //If there is space, fill it.
+                if (freeSpace - estimatedSize > remainingSpace)
+                    return path;
+
+            }
         }
+
+        if (Settings.BalancingMethod == BalancingMethod.FillSmallestAvailable)
+        {
+            long current = 0;
+            string smallest = null;
+
+            foreach (string path in Settings.WritePath)
+            {
+                FilePath.GetAvailableFreeSpace(path, out long freeSpace, out _);
+
+                // Checks to ensure that this path has enough available space to write to
+                if (freeSpace - estimatedSize < remainingSpace)
+                    continue;
+
+                // If the path we are checking has less free space than the previous path, that becomes the path with the least available space.
+                if (freeSpace < current)
+                {
+                smallest = path;
+                current = freeSpace;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(smallest))
+                return smallest;
+        }
+
+        if (Settings.BalancingMethod == BalancingMethod.FillLargestAvailable)
+        {
+            long current = 0;
+            string largest = null;
+
+            foreach (string path in Settings.WritePath)
+            {
+                FilePath.GetAvailableFreeSpace(path, out long freeSpace, out _);
+
+                if (freeSpace - estimatedSize < remainingSpace)
+                    continue;
+
+                // If the path we are checking has more free space than the previous path, that becomes the path with the most available space.
+                if (freeSpace > current)
+                {
+                    largest = path;
+                    current = freeSpace;
+                }
+            }
+
+            if(!string.IsNullOrEmpty(largest)) 
+                return largest;
+
+        }
+
+        if (Settings.BalancingMethod == BalancingMethod.FillLargestTotal)
+        {
+            long current = 0;
+            
+            string largestTotal = null;
+
+            foreach (string path in Settings.WritePath)
+            {
+                FilePath.GetAvailableFreeSpace(path, out long freeSpace, out long totalSize);
+
+                if (freeSpace - estimatedSize < remainingSpace)
+                    continue;
+
+                // If the path we are looking at has a greater total size than the previous one, it becomes the largestTotal.
+                if (totalSize > current)
+                {
+                    largestTotal = path;
+                    current = freeSpace;
+                }
+                
+            }
+
+            if (!string.IsNullOrEmpty(largestTotal))
+                return largestTotal;
+        }
+
+        if (Settings.BalancingMethod == BalancingMethod.FillToMatchingPercentage)
+        {
+            // what percentage of the current path is left free
+            long currentRemainingPercentage;
+            // the occupancy percentage of the most empty space
+            long fullestPercentage = 0;
+            // the location that needs to be filled, i.e. the location with the emptiestPercentage
+            string toFill = null;
+
+            foreach (string path in Settings.WritePath)
+            {
+                FilePath.GetAvailableFreeSpace(path, out long freeSpace, out long totalSize);
+
+                if (freeSpace - estimatedSize < remainingSpace)
+                    continue;
+
+                currentRemainingPercentage = freeSpace / totalSize;
+
+                // Compares the percentage that is free to the fullestPercentage
+                if (currentRemainingPercentage == fullestPercentage)
+                    continue;
+
+                // If the remaining percentage of available space for this path is greater than the remaining percentage of the 
+                // previous one, this occupancy percentage becomes the standard for the rest to be compared to.
+                if (currentRemainingPercentage > fullestPercentage)
+                    fullestPercentage = currentRemainingPercentage;
+
+                // If the remaining percentage of available space for this path is smaller than the remaining percentage of the
+                // fullest path, this path must be filled to that standard.
+                if (currentRemainingPercentage < fullestPercentage)
+                    toFill = path;
+            }
+
+            if (!string.IsNullOrEmpty(toFill))
+                return toFill;
+        }
+
+        //for pct, calculate percentage as freespace/totalspace then pick the largest to fill to a point
 
         throw new InvalidOperationException("Out of free space");
     }
