@@ -176,6 +176,54 @@ public class SnapStreamingClient : SnapClient
     }
 
     /// <summary>
+    /// Invokes a named, server-registered custom command at the connection root level.
+    /// </summary>
+    /// <param name="command">The case-insensitive name of the custom command to invoke.</param>
+    /// <param name="request">The opaque request payload; may be empty.</param>
+    /// <returns>The opaque response payload produced by the server-side handler.</returns>
+    /// <exception cref="CustomCommandNotSupportedException">
+    /// The server is an older version that does not recognize the custom-command protocol, or no handler is
+    /// registered for <paramref name="command"/>.
+    /// </exception>
+    public override byte[] RunCustomCommand(string command, byte[] request)
+    {
+        if (m_sortedTreeEngine is not null)
+            throw new InvalidOperationException("Cannot run a custom command while connected to a database; use a dedicated connection for custom commands.");
+
+        request ??= [];
+
+        m_stream.Write((byte)ServerCommand.RunCustomCommand);
+        m_stream.Write(command);
+        m_stream.Write(request.Length);
+
+        if (request.Length > 0)
+            m_stream.Write(request, 0, request.Length);
+
+        m_stream.Flush();
+
+        ServerResponse response = (ServerResponse)m_stream.ReadUInt8();
+
+        switch (response)
+        {
+            case ServerResponse.UnhandledException:
+                throw new Exception($"Server UnhandledException: \n{m_stream.ReadString()}");
+            case ServerResponse.CustomCommandResult:
+                int length = m_stream.ReadInt32();
+                return length > 0 ? m_stream.ReadBytes(length) : [];
+            case ServerResponse.CustomCommandNotSupported:
+                throw new CustomCommandNotSupportedException(m_stream.ReadString());
+            case ServerResponse.CustomCommandError:
+                throw new Exception($"Server custom command error: {m_stream.ReadString()}");
+            case ServerResponse.UnknownCommand:
+                // Older server that does not recognize the custom-command protocol; it echoes the command byte and drops the connection
+                m_stream.ReadUInt8();
+                throw new CustomCommandNotSupportedException(command);
+            default:
+                throw new Exception($"Unknown server response: {response}");
+        }
+    }
+
+    /// <summary>
     /// Creates a <see cref="SnapStreamingClient"/>
     /// </summary>
     /// <param name="stream">The config to use for the client</param>
