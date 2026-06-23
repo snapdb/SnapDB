@@ -79,6 +79,7 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
         DesiredRemainingSpace = 5L * SI2.Giga;
         StagingCount = 3;
         DirectoryMethod = ArchiveDirectoryMethod.TopDirectoryOnly;
+        FillMethod = ArchiveDirectoryFillMethod.Sequential;
         DiskFlushInterval = 10000;
         CacheFlushInterval = 100;
     }
@@ -119,6 +120,12 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
     /// top directory only.
     /// </summary>
     public ArchiveDirectoryMethod DirectoryMethod { get; set; }
+
+    /// <summary>
+    /// Gets or sets how a write path is selected from the final write paths when more than one is configured.
+    /// Defaults to <see cref="ArchiveDirectoryFillMethod.Sequential"/>.
+    /// </summary>
+    public ArchiveDirectoryFillMethod FillMethod { get; set; }
 
     /// <summary>
     /// The number of milliseconds before data is automatically flushed to the disk.
@@ -234,8 +241,12 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
             if (remainingStages > 0)
                 rollover.ArchiveSettings.ConfigureOnDisk([m_mainPath], SI2.Giga, ArchiveDirectoryMethod.TopDirectoryOnly, ArchiveEncodingMethod, "stage" + stage, intermediateFilePendingExtension, intermediateFileFinalExtension, FileFlags.GetStage(stage), FileFlags.IntermediateFile);
             else
-                // Final staging file
+            {
+                // Final staging file - this is the only stage that writes across the configured final paths, so the
+                // fill method (sequential vs round-robin) applies here
                 rollover.ArchiveSettings.ConfigureOnDisk(finalPaths, DesiredRemainingSpace, DirectoryMethod, ArchiveEncodingMethod, DatabaseName.ToNonNullNorEmptyString("stage" + stage).RemoveInvalidFileNameCharacters(), finalFilePendingExtension, finalFileFinalExtension, FileFlags.GetStage(stage));
+                rollover.ArchiveSettings.FillMethod = FillMethod;
+            }
 
             rollover.ArchiveSettings.Metadata = Metadata;
 

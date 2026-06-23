@@ -24,6 +24,8 @@
 //
 //******************************************************************************************************
 
+using SnapDB.Snap.Services.Net;
+
 namespace SnapDB.Snap.Services;
 
 public partial class SnapServer
@@ -142,6 +144,23 @@ public partial class SnapServer
             ObjectDisposedException.ThrowIf(m_disposed, this);
 
             return m_server.GetDatabaseInfo();
+        }
+
+        /// <summary>
+        /// Invokes a named, server-registered custom command directly against the in-process server.
+        /// </summary>
+        /// <param name="command">The case-insensitive name of the custom command to invoke.</param>
+        /// <param name="request">The opaque request payload; may be empty.</param>
+        /// <returns>The opaque response payload produced by the server-side handler.</returns>
+        /// <exception cref="CustomCommandNotSupportedException">No handler is registered for <paramref name="command"/>.</exception>
+        public override byte[] RunCustomCommand(string command, byte[] request)
+        {
+            ObjectDisposedException.ThrowIf(m_disposed, this);
+
+            if (!m_server.TryGetCustomCommand(command, out Func<byte[], byte[]>? handler) || handler is null)
+                throw new CustomCommandNotSupportedException(command);
+
+            return handler(request ?? []) ?? [];
         }
 
         /// <summary>
