@@ -28,6 +28,7 @@ using System.Data;
 using Gemstone.IO.StreamExtensions;
 using SnapDB.Immutables;
 using SnapDB.IO;
+using SnapDB.Snap.Storage;
 
 namespace SnapDB.Snap.Services.Writer;
 
@@ -37,6 +38,16 @@ namespace SnapDB.Snap.Services.Writer;
 public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchiveInitializerSettings>
 {
     #region [ Members ]
+
+    private bool m_enablePointIDIndex = true;
+    /// <summary>Whether newly finalized timestamp archives receive exact ID-presence indexes.</summary>
+    public bool EnablePointIDIndex
+    {
+        get => m_enablePointIDIndex;
+        set { TestForEditable(); m_enablePointIDIndex = value; }
+    }
+
+    private TimeBucketBloomFilterSettings m_bloomFilter = new TimeBucketBloomFilterSettings();
 
     private long m_desiredRemainingSpace;
     private ArchiveDirectoryMethod m_directoryMethod;
@@ -60,6 +71,14 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
     #endregion
 
     #region [ Properties ]
+
+    /// <summary>Options for optional time-bucket Bloom sidecars.</summary>
+    public TimeBucketBloomFilterSettings BloomFilter
+    {
+        get => m_bloomFilter;
+        set { TestForEditable(); m_bloomFilter = value ?? throw new ArgumentNullException(nameof(value)); }
+    }
+
 
     /// <summary>
     /// The desired number of bytes to leave on the disk after a rollover has completed.
@@ -212,7 +231,9 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
     /// <param name="stream">The stream to which the configuration will be saved.</param>
     public override void Save(Stream stream)
     {
-        stream.Write((byte)1);
+        bool controls = !m_enablePointIDIndex || m_bloomFilter.MaximumIndexSizeMiB != 64;
+        bool extended = controls || m_bloomFilter.Enabled || m_bloomFilter.BucketDurationSeconds != 900 || m_bloomFilter.FalsePositiveProbability != 0.01;
+        stream.Write((byte)(controls ? 3 : extended ? 2 : 1));
         stream.Write((int)m_directoryMethod);
         stream.Write(m_prefix);
         stream.Write(m_pendingExtension);
@@ -228,6 +249,18 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
 
         foreach (Guid flag in Flags)
             stream.Write(flag);
+
+        if (extended)
+        {
+            stream.Write(m_bloomFilter.Enabled);
+            stream.Write(m_bloomFilter.BucketDurationSeconds);
+            stream.Write(m_bloomFilter.FalsePositiveProbability);
+            if (controls)
+            {
+                stream.Write(m_enablePointIDIndex);
+                stream.Write(m_bloomFilter.MaximumIndexSizeMiB);
+            }
+        }
     }
 
     /// <summary>
@@ -241,6 +274,8 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
 
         switch (version)
         {
+            case 3:
+            case 2:
             case 1:
                 m_directoryMethod = (ArchiveDirectoryMethod)stream.ReadInt32();
                 m_prefix = stream.ReadString();
@@ -266,6 +301,21 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
                     Flags.Add(stream.ReadGuid());
                 }
 
+                m_enablePointIDIndex = true;
+                m_bloomFilter = new TimeBucketBloomFilterSettings();
+                if (version >= 2)
+                {
+                    bool enabled = stream.ReadBoolean();
+                    int seconds = stream.ReadInt32();
+                    double probability = stream.ReadDouble();
+                    int maximumMiB = 64;
+                    if (version >= 3)
+                    {
+                        m_enablePointIDIndex = stream.ReadBoolean();
+                        maximumMiB = stream.ReadInt32();
+                    }
+                    m_bloomFilter = new TimeBucketBloomFilterSettings(enabled, seconds, probability, maximumMiB);
+                }
                 break;
 
             default:
@@ -284,6 +334,8 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
 
     private void Initialize()
     {
+        m_bloomFilter = new TimeBucketBloomFilterSettings();
+        m_enablePointIDIndex = true;
         m_directoryMethod = ArchiveDirectoryMethod.TopDirectoryOnly;
         m_prefix = string.Empty;
         m_pendingExtension = ".~d2i";

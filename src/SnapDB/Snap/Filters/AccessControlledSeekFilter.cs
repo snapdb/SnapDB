@@ -131,6 +131,8 @@ internal sealed class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> wh
         }
     }
 
+    internal SeekFilterBase<TKey> InnerFilter => m_seekFilter;
+
     public override Guid FilterType => m_seekFilter.FilterType;
 
     public override void Save(BinaryStreamBase stream)
@@ -145,6 +147,12 @@ internal sealed class AccessControlledSeekFilter<TKey> : SeekFilterBase<TKey> wh
 
     public override bool NextWindow()
     {
-        return m_seekFilter.NextWindow();
+        bool result = m_seekFilter.NextWindow();
+        if (result && m_seekFilter.FilterType == NearestTimestampSeekFilterDefinition.FilterGuid)
+        {
+            StartOfFrame = StartOfFrame;
+            EndOfFrame = EndOfFrame;
+        }
+        return result;
     }
 }

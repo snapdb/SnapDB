@@ -132,6 +132,15 @@ public static class TimestampPointIDSeekFilter
 
     #region [ Static ]
 
+    /// <summary>Finds the nearest sample for an ID within the inclusive distance, or the first at/after the timestamp in AtOrAfter mode.</summary>
+    public static SeekFilterBase<TKey> FindNearestKey<TKey>(ulong timestamp, ulong pointID, ulong maximumDistance,
+        TimestampSearchMode searchMode = TimestampSearchMode.Nearest)
+        where TKey : TimestampPointIDBase<TKey>, new()
+    {
+        return new NearestTimestampSeekFilter<TKey>(timestamp, pointID, maximumDistance, searchMode);
+    }
+
+
     /// <summary>
     /// Creates a new SeekFilterBase instance for finding a key based on a timestamp and point ID.
     /// </summary>

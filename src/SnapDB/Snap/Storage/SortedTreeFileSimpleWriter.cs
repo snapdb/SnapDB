@@ -53,14 +53,28 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue> where TKey : SnapTy
     /// <param name="flags">Optional flags associated with the archive.</param>
     public static void Create(string pendingFileName, string completeFileName, int blockSize, Action<Guid>? archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, params Guid[] flags)
     {
+        CreateWithBloomFilter(pendingFileName, completeFileName, blockSize, archiveIdCallback, treeNodeType, treeStream, new TimeBucketBloomFilterSettings(), flags);
+    }
+
+    /// <summary>Writes a finalized archive with optional time-bucket Bloom indexing.</summary>
+    public static void CreateWithBloomFilter(string pendingFileName, string completeFileName, int blockSize, Action<Guid>? archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, TimeBucketBloomFilterSettings bloomFilter, params Guid[] flags)
+    {
+        CreateWithIndexes(pendingFileName, completeFileName, blockSize, archiveIdCallback, treeNodeType, treeStream, bloomFilter, true, flags);
+    }
+
+    /// <summary>Writes a finalized archive with independently controlled presence and Bloom indexes.</summary>
+    public static void CreateWithIndexes(string pendingFileName, string completeFileName, int blockSize, Action<Guid>? archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, TimeBucketBloomFilterSettings bloomFilter, bool enablePointIDIndex, params Guid[] flags)
+    {
+        PointIDCollectingStream<TKey, TValue> indexedStream = new(treeStream, bloomFilter, enablePointIDIndex);
         using SimplifiedFileWriter writer = new(pendingFileName, completeFileName, blockSize, flags);
         archiveIdCallback?.Invoke(writer.ArchiveId);
 
         using (ISupportsBinaryStream file = writer.CreateFile(GetArchiveFileName()))
         using (BinaryStream bs = new(file))
-            SequentialSortedTreeWriter<TKey, TValue>.Create(bs, blockSize - 32, treeNodeType, treeStream);
+            SequentialSortedTreeWriter<TKey, TValue>.Create(bs, blockSize - 32, treeNodeType, indexedStream);
 
         writer.Commit();
+        indexedStream.Publish(completeFileName, writer.ArchiveId, writer.SnapshotSequenceNumber);
     }
 
     /// <summary>
@@ -76,12 +90,25 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue> where TKey : SnapTy
     /// <param name="flags">Optional flags associated with the archive.</param>
     public static void CreateWithMetadata(string pendingFileName, string completeFileName, int blockSize, Action<Guid>? archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, byte[]? metadata, params Guid[] flags)
     {
+        CreateWithMetadataAndBloomFilter(pendingFileName, completeFileName, blockSize, archiveIdCallback, treeNodeType, treeStream, metadata, new TimeBucketBloomFilterSettings(), flags);
+    }
+
+    /// <summary>Writes a finalized archive with optional time-bucket Bloom indexing.</summary>
+    public static void CreateWithMetadataAndBloomFilter(string pendingFileName, string completeFileName, int blockSize, Action<Guid>? archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, byte[]? metadata, TimeBucketBloomFilterSettings bloomFilter, params Guid[] flags)
+    {
+        CreateWithMetadataAndIndexes(pendingFileName, completeFileName, blockSize, archiveIdCallback, treeNodeType, treeStream, metadata, bloomFilter, true, flags);
+    }
+
+    /// <summary>Writes a finalized archive with independently controlled presence and Bloom indexes.</summary>
+    public static void CreateWithMetadataAndIndexes(string pendingFileName, string completeFileName, int blockSize, Action<Guid>? archiveIdCallback, EncodingDefinition treeNodeType, TreeStream<TKey, TValue> treeStream, byte[]? metadata, TimeBucketBloomFilterSettings bloomFilter, bool enablePointIDIndex, params Guid[] flags)
+    {
         if (metadata is null)
         {
-            Create(pendingFileName, completeFileName, blockSize, archiveIdCallback, treeNodeType, treeStream, flags);
+            CreateWithIndexes(pendingFileName, completeFileName, blockSize, archiveIdCallback, treeNodeType, treeStream, bloomFilter, enablePointIDIndex, flags);
             return;
         }
 
+        PointIDCollectingStream<TKey, TValue> indexedStream = new(treeStream, bloomFilter, enablePointIDIndex);
         using SimplifiedFileWriter writer = new(pendingFileName, completeFileName, blockSize, flags);
         archiveIdCallback?.Invoke(writer.ArchiveId);
 
@@ -91,9 +118,10 @@ public static class SortedTreeFileSimpleWriter<TKey, TValue> where TKey : SnapTy
 
         using (ISupportsBinaryStream file = writer.CreateFile(GetArchiveFileName()))
         using (BinaryStream bs = new(file))
-            SequentialSortedTreeWriter<TKey, TValue>.Create(bs, blockSize - 32, treeNodeType, treeStream);
+            SequentialSortedTreeWriter<TKey, TValue>.Create(bs, blockSize - 32, treeNodeType, indexedStream);
 
         writer.Commit();
+        indexedStream.Publish(completeFileName, writer.ArchiveId, writer.SnapshotSequenceNumber);
     }
 
     /// <summary>

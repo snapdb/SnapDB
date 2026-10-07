@@ -34,6 +34,20 @@ namespace SnapDB.Snap.Services.Reader;
 /// </summary>
 public class SortedTreeEngineReaderOptions
 {
+    /// <summary>Whether nearest reads may use exact per-file ID-presence indexes.</summary>
+    public bool UsePointIDIndex { get; } = true;
+    /// <summary>Whether nearest reads may use time-bucket Bloom indexes.</summary>
+    public bool UseTimeBucketBloomFilter { get; } = true;
+
+    /// <summary>Creates reader options with independent index bypass controls.</summary>
+    public SortedTreeEngineReaderOptions(bool usePointIDIndex, bool useTimeBucketBloomFilter,
+        TimeSpan timeout = default, long maxReturnedCount = 0, long maxScanCount = 0, long maxSeekCount = 0)
+        : this(timeout, maxReturnedCount, maxScanCount, maxSeekCount)
+    {
+        UsePointIDIndex = usePointIDIndex;
+        UseTimeBucketBloomFilter = useTimeBucketBloomFilter;
+    }
+
     #region [ Constructors ]
 
     /// <summary>
@@ -60,11 +74,17 @@ public class SortedTreeEngineReaderOptions
         byte version = stream.ReadUInt8();
         switch (version)
         {
+            case 1:
             case 0:
                 Timeout = new TimeSpan(stream.ReadInt64());
                 MaxReturnedCount = stream.ReadInt64();
                 MaxScanCount = stream.ReadInt64();
                 MaxSeekCount = stream.ReadInt64();
+                if (version == 1)
+                {
+                    UsePointIDIndex = stream.ReadBoolean();
+                    UseTimeBucketBloomFilter = stream.ReadBoolean();
+                }
                 break;
             default:
                 throw new VersionNotFoundException("Unknown Version");
@@ -106,11 +126,17 @@ public class SortedTreeEngineReaderOptions
     /// <param name="stream">the stream to write data to</param>
     public void Save(BinaryStreamBase stream)
     {
-        stream.Write((byte)0);
+        bool extended = !UsePointIDIndex || !UseTimeBucketBloomFilter;
+        stream.Write((byte)(extended ? 1 : 0));
         stream.Write(Timeout.Ticks);
         stream.Write(MaxReturnedCount);
         stream.Write(MaxScanCount);
         stream.Write(MaxSeekCount);
+        if (extended)
+        {
+            stream.Write(UsePointIDIndex);
+            stream.Write(UseTimeBucketBloomFilter);
+        }
     }
 
     #endregion

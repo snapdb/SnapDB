@@ -97,6 +97,8 @@ public class SimplifiedFileWriter : IDisposable
     /// </summary>
     public Guid ArchiveId => m_fileHeaderBlock.ArchiveId;
 
+    internal uint SnapshotSequenceNumber => m_fileHeaderBlock.SnapshotSequenceNumber;
+
     #endregion
 
     #region [ Methods ]

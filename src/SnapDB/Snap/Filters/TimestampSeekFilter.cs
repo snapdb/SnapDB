@@ -36,6 +36,25 @@ public partial class TimestampSeekFilter
     #region [ Static ]
 
     /// <summary>
+    /// Selects the nearest sample for each requested ID at each target interval. Search radius
+    /// defaults to half the interval; query bounds clip the first and last windows. AtOrAfter
+    /// mode instead chooses the first eligible sample on or after each target.
+    /// </summary>
+    public static SeekFilterBase<TKey> CreateNearestFromIntervalData<TKey>(DateTime firstTime, DateTime lastTime,
+        TimeSpan interval, System.Collections.Generic.IEnumerable<ulong> pointIDs, TimeSpan? maximumDistance = null,
+        TimestampSearchMode searchMode = TimestampSearchMode.Nearest)
+        where TKey : TimestampPointIDBase<TKey>, new()
+    {
+        if (interval.Ticks <= 0)
+            throw new ArgumentOutOfRangeException(nameof(interval));
+        if (maximumDistance.HasValue && maximumDistance.Value.Ticks < 0)
+            throw new ArgumentOutOfRangeException(nameof(maximumDistance));
+        return new NearestTimestampSeekFilter<TKey>((ulong)firstTime.Ticks, (ulong)lastTime.Ticks,
+            (ulong)interval.Ticks, pointIDs, maximumDistance.HasValue ? (ulong?)maximumDistance.Value.Ticks : null, searchMode);
+    }
+
+
+    /// <summary>
     /// Creates a seek filter that filters keys falling within a specified time range.
     /// </summary>
     /// <typeparam name="TKey">The type of keys in the seek filter.</typeparam>

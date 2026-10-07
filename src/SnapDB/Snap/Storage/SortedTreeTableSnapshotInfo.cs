@@ -24,6 +24,7 @@
 //
 //******************************************************************************************************
 
+using System;
 using SnapDB.IO.FileStructure;
 
 namespace SnapDB.Snap.Storage;
@@ -37,6 +38,12 @@ namespace SnapDB.Snap.Storage;
 public class SortedTreeTableSnapshotInfo<TKey, TValue> where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
     #region [ Members ]
+
+    private readonly Lazy<ulong[]?> m_pointIDs;
+    private readonly Lazy<ArchiveTimeBucketBloomIndex?> m_bloom;
+    internal bool HasTimeBucketBloomIndex => m_bloom.Value != null;
+    internal bool MayContainPointID(ulong id, ulong lower, ulong upper) => m_bloom.Value == null || m_bloom.Value.MayContain(id, lower, upper);
+    internal bool MayContainPointID(ulong id) => m_pointIDs.Value == null || Array.BinarySearch(m_pointIDs.Value, id) >= 0;
 
     private readonly ReadSnapshot m_currentTransaction;
     private readonly SubFileName m_fileName;
@@ -52,6 +59,21 @@ public class SortedTreeTableSnapshotInfo<TKey, TValue> where TKey : SnapTypeBase
         m_fileName = fileName;
         m_fileStructure = fileStructure;
         m_currentTransaction = m_fileStructure.Snapshot;
+        m_bloom = new Lazy<ArchiveTimeBucketBloomIndex?>(() =>
+        {
+            Guid keyType = new TKey().GenericTypeGuid, valueType = new TValue().GenericTypeGuid;
+            if (m_fileName != SubFileName.Create(SortedTreeFile.PrimaryArchiveType, keyType, valueType)) return null;
+            return ArchiveTimeBucketBloomIndex.Load(m_fileStructure.FileName, m_currentTransaction.Header.ArchiveId,
+                m_currentTransaction.Header.SnapshotSequenceNumber, keyType, valueType);
+        });
+        m_pointIDs = new Lazy<ulong[]?>(() =>
+        {
+            Guid keyType = new TKey().GenericTypeGuid;
+            Guid valueType = new TValue().GenericTypeGuid;
+            if (m_fileName != SubFileName.Create(SortedTreeFile.PrimaryArchiveType, keyType, valueType)) return null;
+            return ArchivePointIDIndex.Load(m_fileStructure.FileName, m_currentTransaction.Header.ArchiveId,
+                m_currentTransaction.Header.SnapshotSequenceNumber, keyType, valueType);
+        });
     }
 
     #endregion

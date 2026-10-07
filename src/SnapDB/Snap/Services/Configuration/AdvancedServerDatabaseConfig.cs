@@ -46,6 +46,12 @@ namespace SnapDB.Snap.Services.Configuration;
 /// <typeparam name="TValue">The value type used in the sorted tree table.</typeparam>
 public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSettings where TKey : SnapTypeBase<TKey>, new() where TValue : SnapTypeBase<TValue>, new()
 {
+    /// <summary>Whether finalized timestamp archives receive exact ID-presence indexes.</summary>
+    public bool EnablePointIDIndex { get; set; } = true;
+
+    /// <summary>Options applied to Bloom sidecars at every disk rollover stage.</summary>
+    public SnapDB.Snap.Storage.TimeBucketBloomFilterSettings BloomFilter { get; set; } = new SnapDB.Snap.Storage.TimeBucketBloomFilterSettings();
+
     #region [ Members ]
 
     private string m_finalFileExtension;
@@ -225,6 +231,9 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
         settings.FirstStageWriter.FinalSettings.ConfigureOnDisk([m_mainPath], SI2.Giga, ArchiveDirectoryMethod.TopDirectoryOnly, ArchiveEncodingMethod, "stage1", intermediateFilePendingExtension, intermediateFileFinalExtension, FileFlags.Stage1, FileFlags.IntermediateFile);
         settings.FirstStageWriter.FinalSettings.Metadata = Metadata;
 
+        settings.FirstStageWriter.FinalSettings.BloomFilter = BloomFilter;
+        settings.FirstStageWriter.FinalSettings.EnablePointIDIndex = EnablePointIDIndex;
+
         for (int stage = 2; stage <= StagingCount; stage++)
         {
             int remainingStages = StagingCount - stage;
@@ -238,6 +247,9 @@ public class AdvancedServerDatabaseConfig<TKey, TValue> : IToServerDatabaseSetti
                 rollover.ArchiveSettings.ConfigureOnDisk(finalPaths, DesiredRemainingSpace, DirectoryMethod, ArchiveEncodingMethod, DatabaseName.ToNonNullNorEmptyString("stage" + stage).RemoveInvalidFileNameCharacters(), finalFilePendingExtension, finalFileFinalExtension, FileFlags.GetStage(stage));
 
             rollover.ArchiveSettings.Metadata = Metadata;
+
+            rollover.ArchiveSettings.BloomFilter = BloomFilter;
+            rollover.ArchiveSettings.EnablePointIDIndex = EnablePointIDIndex;
 
             rollover.LogPath = m_mainPath;
             rollover.ExecuteTimer = 1000;

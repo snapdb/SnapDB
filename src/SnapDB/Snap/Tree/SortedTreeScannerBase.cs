@@ -340,6 +340,59 @@ public abstract unsafe class SortedTreeScannerBase<TKey, TValue> : SeekableTreeS
         return true;
     }
 
+    // Visit from an indexed seek without setting the stream's EOS/disposed state. Nearest
+    // queries reposition the same snapshot repeatedly, including after the last stored key.
+    internal void VisitForward(TKey start, Func<TKey, TValue, bool> visitor)
+    {
+        SeekToKey(start);
+        TKey key = new TKey();
+        TValue value = new TValue();
+        while (true)
+        {
+            while (IndexOfNextKeyValue < RecordCount)
+            {
+                InternalRead(key, value);
+                if (!visitor(key, value))
+                    return;
+            }
+            if (RightSiblingNodeIndex == uint.MaxValue)
+                return;
+            LoadNode(RightSiblingNodeIndex);
+        }
+    }
+
+    private readonly System.Collections.Generic.List<TKey> m_reverseKeys = new System.Collections.Generic.List<TKey>();
+    private readonly System.Collections.Generic.List<TValue> m_reverseValues = new System.Collections.Generic.List<TValue>();
+
+    // Compressed leaves must be decoded forwards. Decode one leaf once, then visit its
+    // buffered records backwards; memory is bounded by the largest leaf encountered.
+    internal void VisitBackward(TKey exclusiveStart, Func<TKey, TValue, bool> visitor)
+    {
+        SeekToKey(exclusiveStart);
+        int count = IndexOfNextKeyValue;
+        LoadNode(NodeIndex);
+        while (true)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                if (i == m_reverseKeys.Count)
+                {
+                    m_reverseKeys.Add(new TKey());
+                    m_reverseValues.Add(new TValue());
+                }
+                InternalRead(m_reverseKeys[i], m_reverseValues[i]);
+            }
+            for (int i = count - 1; i >= 0; i--)
+            {
+                if (!visitor(m_reverseKeys[i], m_reverseValues[i]))
+                    return;
+            }
+            if (LeftSiblingNodeIndex == uint.MaxValue)
+                return;
+            LoadNode(LeftSiblingNodeIndex);
+            count = RecordCount;
+        }
+    }
     /// <summary>
     /// Peeks at the next key and value in the node without advancing the cursor.
     /// </summary>

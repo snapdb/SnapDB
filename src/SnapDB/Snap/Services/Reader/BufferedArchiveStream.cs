@@ -104,6 +104,13 @@ public class BufferedArchiveStream<TKey, TValue> : IDisposable where TKey : Snap
         }
     }
 
+    internal bool HasTimeBucketBloomIndex => m_table.ActiveSnapshotInfo.HasTimeBucketBloomIndex;
+    internal bool MayContainPointID(ulong id, ulong lower, ulong upper) => m_table.ActiveSnapshotInfo.MayContainPointID(id, lower, upper);
+
+    internal bool MayContainPointID(ulong id) => m_table.ActiveSnapshotInfo.MayContainPointID(id);
+
+    internal bool ContainsRange(TKey lower, TKey upper) => m_table.Contains(lower, upper);
+
     /// <summary>
     /// Updates the cached value by peeking at the next key-value pair in the scanner.
     /// </summary>

@@ -129,8 +129,11 @@ public class SortedTreeFile : IDisposable
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     public void ChangeExtension(string extension, bool isReadOnly, bool isSharingEnabled)
     {
+        string oldPath = FilePath;
         m_fileStructure.ChangeExtension(extension, isReadOnly, isSharingEnabled);
         FilePath = m_fileStructure.FileName;
+        ArchivePointIDIndex.Move(oldPath, FilePath);
+        ArchiveTimeBucketBloomIndex.Move(oldPath, FilePath);
     }
 
     /// <summary>
@@ -241,7 +244,11 @@ public class SortedTreeFile : IDisposable
         Dispose();
 
         if (FilePath != string.Empty)
+        {
             File.Delete(FilePath);
+            ArchivePointIDIndex.Delete(FilePath);
+            ArchiveTimeBucketBloomIndex.Delete(FilePath);
+        }
     }
 
     /// <summary>

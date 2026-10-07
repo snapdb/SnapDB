@@ -50,6 +50,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
     private readonly TKey m_nextArchiveStreamLowerBounds = new();
     private readonly bool m_ownsWorkerThreadSynchronization;
     private long m_pointCount;
+    private NearestTimestampReader<TKey, TValue>? m_nearestReader;
     private readonly TKey m_readWhileUpperBounds = new();
 
     private ArchiveListSnapshot<TKey, TValue>? m_snapshot;
@@ -125,6 +126,22 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
 
         m_sortedArchiveStreams = new CustomSortHelper<BufferedArchiveStream<TKey, TValue>>(m_tablesOrigList, IsLessThan);
 
+        SeekFilterBase<TKey> nearestSource = keySeekFilter;
+        while (nearestSource is AccessControlledSeekFilter<TKey> controlled)
+            nearestSource = controlled.InnerFilter;
+
+        if (nearestSource is NearestTimestampSeekFilter<TKey> nearest)
+        {
+            int cancellationPoll = 0;
+            m_nearestReader = new NearestTimestampReader<TKey, TValue>(nearest, keySeekFilter,
+                m_tablesOrigList, keyMatchFilter, readerOptions, () =>
+                {
+                    if ((cancellationPoll++ & 1023) == 0)
+                        m_workerThreadSynchronization.PulseSafeToCallback();
+                    return m_timedOut;
+                });
+            return;
+        }
         m_keySeekFilter.Reset();
         if (m_keySeekFilter.NextWindow())
             SeekToKey(m_keySeekFilter.StartOfFrame);
@@ -202,6 +219,13 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
 
     protected override bool ReadNext(TKey key, TValue value)
     {
+        if (m_nearestReader != null)
+        {
+            if (m_timedOut || !m_nearestReader.Read(key, value))
+                return false;
+            m_pointCount++;
+            return true;
+        }
         if (!m_timedOut && m_firstTableScanner is not null)
         {
             if (m_keyMatchIsUniverse)
@@ -291,7 +315,7 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
         }
 
         Dispose();
-        
+
         return false;
     }
 
