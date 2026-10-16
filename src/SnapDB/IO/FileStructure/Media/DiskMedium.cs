@@ -161,6 +161,17 @@ internal class DiskMedium : IDisposable
         m_disk.ChangeShareMode(isReadOnly, isSharingEnabled);
     }
 
+    /// <summary>
+    /// Reads data directly from the underlying file, bypassing any cached pages.
+    /// </summary>
+    /// <param name="position">The starting position.</param>
+    /// <param name="buffer">The buffer to fill. Its length is the number of bytes to read.</param>
+    /// <returns><c>true</c> if the medium is backed by a file and the buffer was filled; otherwise, <c>false</c>.</returns>
+    public bool TryReadFromDisk(long position, byte[] buffer)
+    {
+        return m_disk.TryReadFromDisk(position, buffer);
+    }
+
     #endregion
 
     #region [ Static ]

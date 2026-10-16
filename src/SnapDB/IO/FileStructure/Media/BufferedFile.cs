@@ -425,6 +425,17 @@ internal partial class BufferedFile : IDiskMediumCoreFunctions
         m_queue.ChangeShareMode(isReadOnly, isSharingEnabled);
     }
 
+    /// <summary>
+    /// Reads data directly from the underlying file, bypassing any cached pages.
+    /// </summary>
+    /// <param name="position">The starting position.</param>
+    /// <param name="buffer">The buffer to fill. Its length is the number of bytes to read.</param>
+    /// <returns><c>true</c> if the buffer was filled; otherwise, <c>false</c>.</returns>
+    public bool TryReadFromDisk(long position, byte[] buffer)
+    {
+        return m_queue.ReadRaw(position, buffer, buffer.Length) == buffer.Length;
+    }
+
     #endregion
 
     #region [ Static ]

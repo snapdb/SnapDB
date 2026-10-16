@@ -248,6 +248,10 @@ internal sealed class CustomFileStream : IDisposable
 
                 if (len != 0)
                 {
+                    // A short read that does not end at the end of the file is unexpected for local files, so record it.
+                    if (position + len < m_length)
+                        s_log.Publish(MessageLevel.Warning, "Partial File Read", $"Read of {length} bytes at position {position} in {FileName} returned only {len} bytes. Reading the remainder.");
+
                     position += len;
                     length -= len; // Keep Reading
                 }
