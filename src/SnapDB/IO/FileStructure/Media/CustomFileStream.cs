@@ -232,7 +232,7 @@ internal sealed class CustomFileStream : IDisposable
                     lock (m_syncRoot)
                     {
                         m_stream!.Position = position;
-                        results = m_stream.ReadAsync(buffer, 0, length);
+                        results = m_stream.ReadAsync(buffer, totalLengthRead, length);
                     }
 
                     len = results.Result;
