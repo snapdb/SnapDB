@@ -222,6 +222,20 @@ internal sealed class DiskIo : IDisposable
         m_stream.ChangeShareMode(isReadOnly, isSharingEnabled);
     }
 
+    /// <summary>
+    /// Reads data directly from the underlying file, bypassing any cached pages.
+    /// </summary>
+    /// <param name="position">The starting position.</param>
+    /// <param name="buffer">The buffer to fill. Its length is the number of bytes to read.</param>
+    /// <returns><c>true</c> if the file is backed by a file on disk and the buffer was filled; otherwise, <c>false</c>.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the <see cref="DiskIo"/> instance is disposed.</exception>
+    public bool TryReadFromDisk(long position, byte[] buffer)
+    {
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
+
+        return m_stream.TryReadFromDisk(position, buffer);
+    }
+
     #endregion
 
     #region [ Static ]

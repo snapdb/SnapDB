@@ -81,5 +81,13 @@ internal interface IDiskMediumCoreFunctions : IDisposable
     /// <param name="isSharingEnabled">If the file should share read privileges.</param>
     void ChangeShareMode(bool isReadOnly, bool isSharingEnabled);
 
+    /// <summary>
+    /// Reads data directly from the underlying file, bypassing any cached pages.
+    /// </summary>
+    /// <param name="position">The starting position.</param>
+    /// <param name="buffer">The buffer to fill. Its length is the number of bytes to read.</param>
+    /// <returns><c>true</c> if the medium is backed by a file and the buffer was filled; otherwise, <c>false</c>.</returns>
+    bool TryReadFromDisk(long position, byte[] buffer);
+
     #endregion
 }
