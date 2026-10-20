@@ -24,8 +24,6 @@
 //
 //******************************************************************************************************
 
-using System.Diagnostics;
-
 namespace SnapDB;
 
 /// <summary>
@@ -47,7 +45,7 @@ public static class BitConvert
     /// This method performs an unsafe conversion by treating the input float as an uint and
     /// then casting it to ulong.
     /// </remarks>
-    /// <seealso cref="ToUInt64(float)"/>
+    /// <seealso cref="ToSingle(ulong)"/>
     public static unsafe ulong ToUInt64(float value)
     {
         return *(uint*)&value;
@@ -73,6 +71,38 @@ public static class BitConvert
     }
 
     /// <summary>
+    /// Converts a double-precision floating-point number to an unsigned 64-bit integer representation.
+    /// </summary>
+    /// <param name="value">The double-precision floating-point number to convert.</param>
+    /// <returns>
+    /// An unsigned 64-bit integer representation of the input double-precision floating-point number.
+    /// </returns>
+    /// <remarks>
+    /// This method performs an unsafe conversion by casting double to ulong.
+    /// </remarks>
+    /// <seealso cref="ToDouble(ulong)"/>
+    public static unsafe ulong ToUInt64(double value)
+    {
+        return *(ulong*)&value;
+    }
+
+    /// <summary>
+    /// Converts an unsigned 64-bit integer to a double-precision floating-point number.
+    /// </summary>
+    /// <param name="value">The unsigned 64-bit integer to convert.</param>
+    /// <returns>
+    /// A double-precision floating-point number representing the input unsigned 64-bit integer.
+    /// </returns>
+    /// <remarks>
+    /// This method performs an unsafe conversion by casting the input ulong as a double.
+    /// </remarks>
+    /// <seealso cref="ToUInt64(double)"/>
+    public static unsafe double ToDouble(ulong value)
+    {
+        return *(double*)&value;
+    }
+
+    /// <summary>
     /// Converts a Guid value into two unsigned 64-bit integers.
     /// </summary>
     /// <param name="value">Guid value to convert.</param>
@@ -86,7 +116,7 @@ public static class BitConvert
 
         ulong value1;
         ulong value2;
-        
+
         fixed (byte* ptr = bytes)
         {
             ulong* lptr = (ulong*)ptr;
@@ -94,7 +124,7 @@ public static class BitConvert
             lptr++;
             value2 = *lptr;
         }
-        
+
         return (value1, value2);
     }
 
@@ -120,6 +150,6 @@ public static class BitConvert
 
         return new Guid(bytes);
     }
-    
+
     #endregion
 }

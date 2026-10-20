@@ -40,6 +40,7 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
 
     private long m_desiredRemainingSpace;
     private ArchiveDirectoryMethod m_directoryMethod;
+    private ArchiveDirectoryFillMethod m_fillMethod;
     private EncodingDefinition m_encodingMethod;
     private string m_finalExtension;
     private string m_pendingExtension;
@@ -95,6 +96,20 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
         {
             TestForEditable();
             m_directoryMethod = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the method used to select a write path when more than one is configured. Defaults to
+    /// <see cref="ArchiveDirectoryFillMethod.Sequential"/>.
+    /// </summary>
+    public ArchiveDirectoryFillMethod FillMethod
+    {
+        get => m_fillMethod;
+        set
+        {
+            TestForEditable();
+            m_fillMethod = value;
         }
     }
 
@@ -212,8 +227,9 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
     /// <param name="stream">The stream to which the configuration will be saved.</param>
     public override void Save(Stream stream)
     {
-        stream.Write((byte)1);
+        stream.Write((byte)2);
         stream.Write((int)m_directoryMethod);
+        stream.Write((int)m_fillMethod);
         stream.Write(m_prefix);
         stream.Write(m_pendingExtension);
         stream.Write(m_finalExtension);
@@ -242,7 +258,12 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
         switch (version)
         {
             case 1:
+            case 2:
                 m_directoryMethod = (ArchiveDirectoryMethod)stream.ReadInt32();
+
+                // Fill method was introduced in version 2; version 1 streams default to Sequential
+                m_fillMethod = version >= 2 ? (ArchiveDirectoryFillMethod)stream.ReadInt32() : ArchiveDirectoryFillMethod.Sequential;
+
                 m_prefix = stream.ReadString();
                 m_pendingExtension = stream.ReadString();
                 m_finalExtension = stream.ReadString();
@@ -285,6 +306,7 @@ public class SimplifiedArchiveInitializerSettings : SettingsBase<SimplifiedArchi
     private void Initialize()
     {
         m_directoryMethod = ArchiveDirectoryMethod.TopDirectoryOnly;
+        m_fillMethod = ArchiveDirectoryFillMethod.Sequential;
         m_prefix = string.Empty;
         m_pendingExtension = ".~d2i";
         m_finalExtension = ".d2i";

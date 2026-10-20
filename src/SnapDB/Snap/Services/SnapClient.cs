@@ -97,6 +97,26 @@ public abstract class SnapClient : DisposableLoggingClassBase
     /// </remarks>
     public abstract bool Contains(string databaseName);
 
+    /// <summary>
+    /// Invokes a named, server-registered custom command, passing an opaque request payload and returning an
+    /// opaque response payload.
+    /// </summary>
+    /// <param name="command">The case-insensitive name of the custom command to invoke.</param>
+    /// <param name="request">The opaque request payload; may be empty.</param>
+    /// <returns>The opaque response payload produced by the server-side handler.</returns>
+    /// <exception cref="Net.CustomCommandNotSupportedException">
+    /// The server does not support the custom-command protocol, or no handler is registered for
+    /// <paramref name="command"/>.
+    /// </exception>
+    /// <remarks>
+    /// Custom commands operate at the connection root level. When using a network client, do not invoke a custom
+    /// command while connected to a database; use a dedicated connection for custom commands.
+    /// </remarks>
+    public virtual byte[] RunCustomCommand(string command, byte[] request)
+    {
+        throw new NotSupportedException("This client does not support custom commands.");
+    }
+
     #endregion
 
     #region [ Static ]

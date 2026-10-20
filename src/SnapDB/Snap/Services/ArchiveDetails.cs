@@ -23,8 +23,6 @@
 //       Converted code to .NET core.
 //
 //******************************************************************************************************
-using System.Linq;
-
 
 namespace SnapDB.Snap.Services;
 

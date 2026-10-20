@@ -66,7 +66,13 @@ public enum ServerCommand : byte
 
     /// <summary>
     /// </summary>
-    GetAllDatabases = 7
+    GetAllDatabases = 7,
+
+    /// <summary>
+    /// Invokes a named, server-registered custom command with an opaque request payload, returning an opaque
+    /// response payload. Provides a generic extension point without coupling the protocol to specific features.
+    /// </summary>
+    RunCustomCommand = 8
 }
 
 /// <summary>
@@ -184,7 +190,25 @@ public enum ServerResponse : byte
 
     /// <summary>
     /// </summary>
-    AuthenticationFailed
+    AuthenticationFailed,
+
+    /// <summary>
+    /// Returned by <see cref="ServerCommand.RunCustomCommand"/> when a registered handler produced a result. The
+    /// length-prefixed response payload follows.
+    /// </summary>
+    CustomCommandResult = 26,
+
+    /// <summary>
+    /// Returned by <see cref="ServerCommand.RunCustomCommand"/> when no handler is registered for the requested
+    /// command name. The connection remains usable.
+    /// </summary>
+    CustomCommandNotSupported = 27,
+
+    /// <summary>
+    /// Returned by <see cref="ServerCommand.RunCustomCommand"/> when a registered handler threw an exception. The
+    /// error message string follows. The connection remains usable.
+    /// </summary>
+    CustomCommandError = 28
 }
 
 #endregion

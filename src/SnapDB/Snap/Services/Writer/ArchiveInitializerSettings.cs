@@ -40,6 +40,7 @@ public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSetting
 
     private long m_desiredRemainingSpace;
     private ArchiveDirectoryMethod m_directoryMethod;
+    private ArchiveDirectoryFillMethod m_fillMethod;
     private EncodingDefinition m_encodingMethod;
     private string m_fileExtension;
     private bool m_isMemoryArchive;
@@ -95,6 +96,20 @@ public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSetting
         {
             TestForEditable();
             m_directoryMethod = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the method used to select a write path when more than one is configured. Defaults to
+    /// <see cref="ArchiveDirectoryFillMethod.Sequential"/>.
+    /// </summary>
+    public ArchiveDirectoryFillMethod FillMethod
+    {
+        get => m_fillMethod;
+        set
+        {
+            TestForEditable();
+            m_fillMethod = value;
         }
     }
 
@@ -226,8 +241,9 @@ public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSetting
     /// <param name="stream">The stream where the configuration data will be saved.</param>
     public override void Save(Stream stream)
     {
-        stream.Write((byte)1);
+        stream.Write((byte)2);
         stream.Write((int)m_directoryMethod);
+        stream.Write((int)m_fillMethod);
         stream.Write(m_isMemoryArchive);
         stream.Write(m_prefix);
         stream.Write(m_fileExtension);
@@ -256,7 +272,12 @@ public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSetting
         switch (version)
         {
             case 1:
+            case 2:
                 m_directoryMethod = (ArchiveDirectoryMethod)stream.ReadInt32();
+
+                // Fill method was introduced in version 2; version 1 streams default to Sequential
+                m_fillMethod = version >= 2 ? (ArchiveDirectoryFillMethod)stream.ReadInt32() : ArchiveDirectoryFillMethod.Sequential;
+
                 m_isMemoryArchive = stream.ReadBoolean();
                 m_prefix = stream.ReadString();
                 m_fileExtension = stream.ReadString();
@@ -311,6 +332,7 @@ public class ArchiveInitializerSettings : SettingsBase<ArchiveInitializerSetting
     private void Initialize()
     {
         m_directoryMethod = ArchiveDirectoryMethod.TopDirectoryOnly;
+        m_fillMethod = ArchiveDirectoryFillMethod.Sequential;
         m_isMemoryArchive = false;
         m_prefix = string.Empty;
         m_fileExtension = ".d2i";

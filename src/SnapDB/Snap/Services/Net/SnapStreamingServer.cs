@@ -283,6 +283,37 @@ public class SnapStreamingServer : DisposableLoggingClassBase
                         return;
 
                     break;
+                case ServerCommand.RunCustomCommand:
+                    string customCommand = m_stream.ReadString();
+                    int requestLength = m_stream.ReadInt32();
+                    byte[] request = requestLength > 0 ? m_stream.ReadBytes(requestLength) : [];
+
+                    if (!m_server.TryGetCustomCommand(customCommand, out Func<byte[], byte[]>? handler) || handler is null)
+                    {
+                        m_stream.Write((byte)ServerResponse.CustomCommandNotSupported);
+                        m_stream.Write(customCommand);
+                        m_stream.Flush();
+                        break;
+                    }
+
+                    try
+                    {
+                        byte[] response = handler(request) ?? [];
+                        m_stream.Write((byte)ServerResponse.CustomCommandResult);
+                        m_stream.Write(response.Length);
+
+                        if (response.Length > 0)
+                            m_stream.Write(response, 0, response.Length);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Publish(MessageLevel.Warning, "Custom Command Error", $"Custom command '{customCommand}' handler threw an exception.", null, ex);
+                        m_stream.Write((byte)ServerResponse.CustomCommandError);
+                        m_stream.Write(ex.Message);
+                    }
+
+                    m_stream.Flush();
+                    break;
                 case ServerCommand.Disconnect:
                     m_stream.Write((byte)ServerResponse.GoodBye);
                     m_stream.Write("Good bye!");

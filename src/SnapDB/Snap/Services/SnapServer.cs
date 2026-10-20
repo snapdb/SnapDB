@@ -24,6 +24,7 @@
 //
 //******************************************************************************************************
 
+using System.Collections.Concurrent;
 using System.Net;
 using System.Text;
 using Gemstone.Diagnostics;
@@ -58,6 +59,12 @@ public partial class SnapServer : DisposableLoggingClassBase
     /// All of the socket listener per IPEndPoint.
     /// </summary>
     private readonly Dictionary<IPEndPoint, SnapSocketListener> m_sockets;
+
+    /// <summary>
+    /// Registered custom command handlers, keyed by case-insensitive command name. Each handler maps an opaque
+    /// request payload to an opaque response payload.
+    /// </summary>
+    private readonly ConcurrentDictionary<string, Func<byte[], byte[]>> m_customCommands = new(StringComparer.OrdinalIgnoreCase);
 
     private readonly Lock m_syncRoot = new();
     private bool m_disposed;
@@ -110,6 +117,47 @@ public partial class SnapServer : DisposableLoggingClassBase
     #endregion
 
     #region [ Methods ]
+
+    /// <summary>
+    /// Registers a custom command handler that can be invoked by clients via
+    /// <see cref="SnapClient.RunCustomCommand"/>. Registering the same command name again replaces the prior handler.
+    /// </summary>
+    /// <param name="command">The case-insensitive command name.</param>
+    /// <param name="handler">
+    /// Handler mapping an opaque request payload to an opaque response payload. The handler runs on the connection's
+    /// thread; it should be thread-safe and reasonably fast.
+    /// </param>
+    public void RegisterCustomCommand(string command, Func<byte[], byte[]> handler)
+    {
+        if (string.IsNullOrEmpty(command))
+            throw new ArgumentNullException(nameof(command));
+
+        m_customCommands[command] = handler ?? throw new ArgumentNullException(nameof(handler));
+    }
+
+    /// <summary>
+    /// Removes a previously registered custom command handler.
+    /// </summary>
+    /// <param name="command">The case-insensitive command name.</param>
+    /// <returns><c>true</c> if a handler was removed; otherwise, <c>false</c>.</returns>
+    public bool UnregisterCustomCommand(string command)
+    {
+        return command is not null && m_customCommands.TryRemove(command, out _);
+    }
+
+    /// <summary>
+    /// Attempts to get the registered handler for the specified custom command name.
+    /// </summary>
+    internal bool TryGetCustomCommand(string command, out Func<byte[], byte[]>? handler)
+    {
+        if (command is null)
+        {
+            handler = null;
+            return false;
+        }
+
+        return m_customCommands.TryGetValue(command, out handler);
+    }
 
     /// <summary>
     /// Releases the unmanaged resources used by the <see cref="SnapServer"/> object and optionally releases the managed resources.

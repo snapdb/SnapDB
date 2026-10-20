@@ -24,7 +24,6 @@
 //
 //******************************************************************************************************
 
-using Gemstone.IO;
 using SnapDB.Snap.Storage;
 using SnapDB.Snap.Types;
 using SnapDB.Threading;
@@ -41,6 +40,7 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     #region [ Members ]
 
     private readonly ReaderWriterLockEasy m_lock;
+    private int m_writePathSeed;
 
     #endregion
 
@@ -148,6 +148,10 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
     }
 
     /// <summary>
+    /// Selects a write path with enough free space, distributing selections across the configured write paths in
+    /// round-robin order. See <see cref="ArchivePathHelper.GetPathWithEnoughSpace"/>.
+    /// </summary>
+    /// <summary>
     /// Creates a new random file in one of the provided folders in a round robin fashion.
     /// </summary>
     /// <param name="path">The base path where the archive file will be created.</param>
@@ -183,43 +187,14 @@ public class ArchiveInitializer<TKey, TValue> where TKey : SnapTypeBase<TKey>, n
 
     private string GetPath(string rootPath, DateTime time)
     {
-        switch (Settings.DirectoryMethod)
-        {
-            case ArchiveDirectoryMethod.TopDirectoryOnly:
-                break;
-            case ArchiveDirectoryMethod.Year:
-                rootPath = Path.Combine(rootPath, time.Year.ToString());
-                break;
-            case ArchiveDirectoryMethod.YearMonth:
-                rootPath = Path.Combine(rootPath, time.Year + time.Month.ToString("00"));
-                break;
-            case ArchiveDirectoryMethod.YearThenMonth:
-                rootPath = Path.Combine(rootPath, time.Year.ToString() + '\\' + time.Month.ToString("00"));
-                break;
-        }
-
-        if (!Directory.Exists(rootPath))
-            Directory.CreateDirectory(rootPath);
-
-        return rootPath;
+        return ArchivePathHelper.GetPath(rootPath, time, Settings.DirectoryMethod);
     }
 
+    // Selects a write path with enough free space, distributing selections across the configured write paths in
+    // round-robin order via a per-instance interlocked seed.
     private string GetPathWithEnoughSpace(long estimatedSize)
     {
-        if (estimatedSize < 0)
-            return Settings.WritePath.FirstOrDefault() ?? throw new InvalidOperationException("No write path defined");
-
-        long remainingSpace = Settings.DesiredRemainingSpace;
-
-        foreach (string path in Settings.WritePath)
-        {
-            FilePath.GetAvailableFreeSpace(path, out long freeSpace, out _);
-
-            if (freeSpace - estimatedSize > remainingSpace)
-                return path;
-        }
-
-        throw new InvalidOperationException("Out of free space");
+        return ArchivePathHelper.GetPathWithEnoughSpace(Settings.WritePath, estimatedSize, Settings.DesiredRemainingSpace, Settings.FillMethod, Interlocked.Increment(ref m_writePathSeed) - 1);
     }
 
     #endregion
