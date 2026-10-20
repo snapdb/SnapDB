@@ -150,5 +150,16 @@ internal partial class MemoryPoolFile : MemoryPoolStreamCore, IDiskMediumCoreFun
         m_isReadOnly = isReadOnly;
     }
 
+    /// <summary>
+    /// Always returns <c>false</c> since an in-memory file has no underlying file to read from.
+    /// </summary>
+    /// <param name="position">The starting position.</param>
+    /// <param name="buffer">The buffer to fill.</param>
+    /// <returns><c>false</c>.</returns>
+    public bool TryReadFromDisk(long position, byte[] buffer)
+    {
+        return false;
+    }
+
     #endregion
 }

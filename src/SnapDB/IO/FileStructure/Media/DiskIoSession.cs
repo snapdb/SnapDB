@@ -232,6 +232,7 @@ internal unsafe class DiskIoSession : IDisposable
             return;
 
         IsValid = false;
+        LogFooterMismatch(readState);
         throw new Exception("Read Error: " + readState);
     }
 
@@ -266,6 +267,7 @@ internal unsafe class DiskIoSession : IDisposable
             return;
 
         IsValid = false;
+        LogFooterMismatch(readState);
         throw new Exception("Read Error: " + readState);
     }
 
@@ -300,6 +302,7 @@ internal unsafe class DiskIoSession : IDisposable
             return;
 
         IsValid = false;
+        LogFooterMismatch(readState);
         throw new Exception("Read Error: " + readState);
     }
 
@@ -454,6 +457,61 @@ internal unsafe class DiskIoSession : IDisposable
         ptr[1] = 0;
         ptr[2] = 0;
         ptr[3] = 0;
+    }
+
+    /// <summary>
+    /// Logs the expected footer of a block that failed validation alongside the footers found in memory and on disk.
+    /// </summary>
+    /// <param name="readState">The reason the block failed validation.</param>
+    private void LogFooterMismatch(IoReadState readState)
+    {
+        try
+        {
+            string diskFooter = "not checked";
+
+            // Only committed blocks have a copy on disk to compare against.
+            if (BlockIndex <= m_lastReadonlyBlock)
+            {
+                byte[] block = new byte[m_blockSize];
+
+                if (m_diskIo.TryReadFromDisk(BlockIndex * (long)m_blockSize, block))
+                {
+                    fixed (byte* ptr = block)
+                    {
+                        Footer.WriteChecksumResultsToFooter((nint)ptr, m_blockSize);
+                        diskFooter = DescribeFooter(ptr);
+                    }
+                }
+                else
+                {
+                    diskFooter = "unavailable";
+                }
+            }
+
+            s_log.Publish(MessageLevel.Warning, "Block Footer Mismatch", $"Read Error: {readState} in {m_diskIo.FileName}, block {BlockIndex}. " +
+                $"Expected type {BlockType}, index {IndexValue}, file ID {m_fileIdNumber}, snapshot {m_snapshotSequenceNumber}. " +
+                $"In memory: {DescribeFooter(Pointer)}. On disk: {diskFooter}.");
+        }
+        catch (Exception ex)
+        {
+            s_log.Publish(MessageLevel.Info, "Block Footer Mismatch", "Unable to log block footer details", null, ex);
+        }
+    }
+
+    private string DescribeFooter(byte* block)
+    {
+        byte* data = block + m_blockSize - 32;
+        int checksumState = data[28];
+
+        string checksum = checksumState switch
+        {
+            Footer.ChecksumIsValid => "valid",
+            Footer.ChecksumIsNotValid => "invalid",
+            Footer.ChecksumMustBeRecomputed => "pending",
+            _ => "not computed"
+        };
+
+        return $"type {data[0]}, index {*(uint*)(data + 4)}, file ID {*(ushort*)(data + 2)}, snapshot {*(uint*)(data + 8)}, checksum {checksum}";
     }
 
     #endregion
