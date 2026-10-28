@@ -24,6 +24,8 @@
 //
 //******************************************************************************************************
 
+using Gemstone.Diagnostics;
+
 namespace SnapDB.IO.Unmanaged;
 
 /// <summary>
@@ -117,7 +119,17 @@ public unsafe class BinaryStream : BinaryStreamPointerBase
     /// </remarks>
     ~BinaryStream()
     {
-        Dispose(false);
+        // A leaked stream can be finalized after the file beneath it was disposed, and an exception
+        // escaping the finalizer thread terminates the process, so contain any failure here.
+        try
+        {
+            Dispose(false);
+        }
+        catch (Exception ex)
+        {
+            s_log.Publish(MessageLevel.Error, "Unexpected Exception while finalizing binary stream", null, null, ex);
+        }
+
         GC.SuppressFinalize(this);
     }
 
@@ -230,6 +242,8 @@ public unsafe class BinaryStream : BinaryStreamPointerBase
 
         return new MemoryPoolStream();
     }
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(BinaryStream), MessageClass.Component);
 
     #endregion
 }

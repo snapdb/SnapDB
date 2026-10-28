@@ -24,6 +24,7 @@
 //
 //******************************************************************************************************
 
+using Gemstone.Diagnostics;
 using SnapDB.Snap.Tree;
 
 namespace SnapDB.Snap.Services.Reader;
@@ -84,7 +85,20 @@ internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey :
     {
         if (m_tablesOrigList is not null)
         {
-            m_tablesOrigList.ForEach(x => x.Dispose());
+            // Dispose each stream on its own so one failure cannot leak the rest or, when called from
+            // the constructor, replace the exception that caused the cleanup.
+            foreach (BufferedArchiveStream<TKey, TValue> table in m_tablesOrigList)
+            {
+                try
+                {
+                    table.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    s_log.Publish(MessageLevel.Error, "Unexpected Exception while disposing archive stream", null, null, ex);
+                }
+            }
+
             m_tablesOrigList = null!;
         }
 
@@ -325,6 +339,12 @@ internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey :
 
         m_nextArchiveStreamLowerBounds.CopyTo(m_readWhileUpperBounds);
     }
+
+    #endregion
+
+    #region [ Static ]
+
+    private static readonly LogPublisher s_log = Logger.CreatePublisher(typeof(UnionReader<TKey, TValue>), MessageClass.Framework);
 
     #endregion
 }

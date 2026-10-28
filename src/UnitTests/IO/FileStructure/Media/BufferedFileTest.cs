@@ -39,13 +39,15 @@ public class BufferedFileTest
     public void IoSessionDisposeAfterFileDisposeDoesNotThrow()
     {
         string fileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.d2i");
+        BufferedFile file = null;
+        BinaryStreamIoSessionBase session = null;
 
         try
         {
             FileHeaderBlock header = FileHeaderBlock.CreateNew(4096);
             CustomFileStream stream = CustomFileStream.CreateFile(fileName, Globals.MemoryPool.PageSize, header.BlockSize);
-            BufferedFile file = new(stream, Globals.MemoryPool, header, true);
-            BinaryStreamIoSessionBase session = file.CreateIoSession();
+            file = new BufferedFile(stream, Globals.MemoryPool, header, true);
+            session = file.CreateIoSession();
 
             // A leaked reader can be finalized after its file was deleted, so the session must tolerate this order.
             file.Dispose();
@@ -54,6 +56,9 @@ public class BufferedFileTest
         }
         finally
         {
+            // Release the file before deleting it so a failure above is not hidden by a "file in use" error.
+            session?.Dispose();
+            file?.Dispose();
             File.Delete(fileName);
         }
     }

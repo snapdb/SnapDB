@@ -26,7 +26,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using NUnit.Framework;
 using SnapDB.Snap;
 using SnapDB.Snap.Services;
@@ -87,25 +86,31 @@ public class UnionReaderTest
     {
         string firstFileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.d2i");
         string secondFileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.d2i");
+        SortedTreeFile first = null;
+        SortedTreeFile second = null;
 
         try
         {
-            using SortedTreeTable<HistorianKey, HistorianValue> first = CreateTable(firstFileName);
-            using SortedTreeTable<HistorianKey, HistorianValue> second = CreateTable(secondFileName);
-            List<ArchiveTableSummary<HistorianKey, HistorianValue>> tables = [new(first), new(second)];
+            SortedTreeTable<HistorianKey, HistorianValue> firstTable = CreateTable(firstFileName);
+            first = firstTable.BaseFile;
+            SortedTreeTable<HistorianKey, HistorianValue> secondTable = CreateTable(secondFileName);
+            second = secondTable.BaseFile;
+            List<ArchiveTableSummary<HistorianKey, HistorianValue>> tables = [new(firstTable), new(secondTable)];
 
-            // Disposing the second table makes its stream fail to open part way through the constructor.
+            // Disposing the second file makes its stream fail to open part way through the constructor.
             second.Dispose();
 
             Assert.Catch(() => new UnionReader<HistorianKey, HistorianValue>(tables));
 
-            // A leaked I/O session on the first table would still be counted as a user of its file.
-            Assert.That(GetStreamUsers(first), Is.Zero);
+            // A leaked I/O session keeps its file open.
+            Assert.That(IsFileOpen(firstFileName), Is.False);
         }
         finally
         {
-            File.Delete(firstFileName);
-            File.Delete(secondFileName);
+            first?.Dispose();
+            second?.Dispose();
+            TryDeleteFile(firstFileName);
+            TryDeleteFile(secondFileName);
         }
     }
 
@@ -132,20 +137,29 @@ public class UnionReaderTest
         return table;
     }
 
-    private static int GetStreamUsers(SortedTreeTable<HistorianKey, HistorianValue> table)
+    private static bool IsFileOpen(string fileName)
     {
-        object fileStructure = GetPrivateField(table.BaseFile, "m_fileStructure");
-        object diskIo = GetPrivateField(fileStructure, "m_diskIo");
-        object diskMedium = GetPrivateField(diskIo, "m_stream");
-        object bufferedFile = GetPrivateField(diskMedium, "m_disk");
-        object queue = GetPrivateField(bufferedFile, "m_queue");
-
-        return (int)GetPrivateField(queue, "m_streamUsers");
+        try
+        {
+            using FileStream stream = new(fileName, FileMode.Open, FileAccess.Read, FileShare.None);
+            return false;
+        }
+        catch (IOException)
+        {
+            return true;
+        }
     }
 
-    private static object GetPrivateField(object instance, string name)
+    private static void TryDeleteFile(string fileName)
     {
-        return instance.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(instance)!;
+        // Cleanup must not replace the test's own failure.
+        try
+        {
+            File.Delete(fileName);
+        }
+        catch (IOException)
+        {
+        }
     }
 
     #endregion
