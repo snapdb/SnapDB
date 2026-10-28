@@ -83,7 +83,8 @@ internal partial class BufferedFile
             {
                 m_disposed = true;
 
-                if (disposing)
+                // The file can already be disposed when a leaked reader is finalized after its file was deleted.
+                if (disposing && !m_stream.m_disposed)
                     m_stream.m_queue.Close();
             }
 

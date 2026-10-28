@@ -24,9 +24,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using SnapDB.Snap;
+using SnapDB.Snap.Services;
 using SnapDB.Snap.Services.Reader;
 using SnapDB.Snap.Storage;
 using SnapDB.UnitTests.Snap;
@@ -79,13 +82,39 @@ public class UnionReaderTest
         lst.ForEach(x => x.Dispose());
     }
 
+    [Test]
+    public void ConstructorFailureDisposesOpenedStreams()
+    {
+        string firstFileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.d2i");
+        string secondFileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.d2i");
 
-    private SortedTreeTable<HistorianKey, HistorianValue> CreateTable()
+        try
+        {
+            using SortedTreeTable<HistorianKey, HistorianValue> first = CreateTable(firstFileName);
+            using SortedTreeTable<HistorianKey, HistorianValue> second = CreateTable(secondFileName);
+            List<ArchiveTableSummary<HistorianKey, HistorianValue>> tables = [new(first), new(second)];
+
+            // Disposing the second table makes its stream fail to open part way through the constructor.
+            second.Dispose();
+
+            Assert.Catch(() => new UnionReader<HistorianKey, HistorianValue>(tables));
+
+            // A leaked I/O session on the first table would still be counted as a user of its file.
+            Assert.That(GetStreamUsers(first), Is.Zero);
+        }
+        finally
+        {
+            File.Delete(firstFileName);
+            File.Delete(secondFileName);
+        }
+    }
+
+    private SortedTreeTable<HistorianKey, HistorianValue> CreateTable(string fileName = null)
     {
         Random r = new(m_seed++);
         HistorianKey key = new();
         HistorianValue value = new();
-        SortedTreeFile file = SortedTreeFile.CreateInMemory();
+        SortedTreeFile file = fileName is null ? SortedTreeFile.CreateInMemory() : SortedTreeFile.CreateFile(fileName);
         SortedTreeTable<HistorianKey, HistorianValue> table = file.OpenOrCreateTable<HistorianKey, HistorianValue>(EncodingDefinition.FixedSizeCombinedEncoding);
 
         using SortedTreeTableEditor<HistorianKey, HistorianValue> edit = table.BeginEdit();
@@ -101,6 +130,22 @@ public class UnionReaderTest
 
 
         return table;
+    }
+
+    private static int GetStreamUsers(SortedTreeTable<HistorianKey, HistorianValue> table)
+    {
+        object fileStructure = GetPrivateField(table.BaseFile, "m_fileStructure");
+        object diskIo = GetPrivateField(fileStructure, "m_diskIo");
+        object diskMedium = GetPrivateField(diskIo, "m_stream");
+        object bufferedFile = GetPrivateField(diskMedium, "m_disk");
+        object queue = GetPrivateField(bufferedFile, "m_queue");
+
+        return (int)GetPrivateField(queue, "m_streamUsers");
+    }
+
+    private static object GetPrivateField(object instance, string name)
+    {
+        return instance.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(instance)!;
     }
 
     #endregion

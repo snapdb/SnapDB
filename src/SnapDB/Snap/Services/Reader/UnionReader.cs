@@ -49,13 +49,23 @@ internal class UnionReader<TKey, TValue> : TreeStream<TKey, TValue> where TKey :
     {
         m_tablesOrigList = [];
 
-        foreach (ArchiveTableSummary<TKey, TValue> table in tables)
-            m_tablesOrigList.Add(new BufferedArchiveStream<TKey, TValue>(0, table));
+        try
+        {
+            foreach (ArchiveTableSummary<TKey, TValue> table in tables)
+                m_tablesOrigList.Add(new BufferedArchiveStream<TKey, TValue>(0, table));
 
-        m_sortedArchiveStreams = new CustomSortHelper<BufferedArchiveStream<TKey, TValue>>(m_tablesOrigList, IsLessThan);
+            m_sortedArchiveStreams = new CustomSortHelper<BufferedArchiveStream<TKey, TValue>>(m_tablesOrigList, IsLessThan);
 
-        m_readWhileUpperBounds.SetMin();
-        SeekToKey(m_readWhileUpperBounds);
+            m_readWhileUpperBounds.SetMin();
+            SeekToKey(m_readWhileUpperBounds);
+        }
+        catch
+        {
+            // The caller never receives an instance to dispose when the constructor throws,
+            // so release the streams that were opened before the failure.
+            Dispose();
+            throw;
+        }
     }
 
     #endregion
