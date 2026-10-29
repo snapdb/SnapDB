@@ -83,8 +83,10 @@ internal partial class BufferedFile
             {
                 m_disposed = true;
 
+                // The file can already be disposed when a leaked reader is finalized after its file was deleted,
+                // possibly concurrently, so read m_queue only once. Closing an already disposed queue is harmless.
                 if (disposing)
-                    m_stream.m_queue.Close();
+                    m_stream.m_queue?.Close();
             }
 
             base.Dispose(disposing);

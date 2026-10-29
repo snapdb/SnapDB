@@ -70,71 +70,90 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
         keySeekFilter ??= new SeekFilterUniverse<TKey>();
         keyMatchFilter ??= new MatchFilterUniverse<TKey, TValue>();
 
-        if (workerThreadSynchronization is null)
+        try
         {
-            m_ownsWorkerThreadSynchronization = true;
-            workerThreadSynchronization = new WorkerThreadSynchronization();
-        }
-
-        m_workerThreadSynchronization = workerThreadSynchronization;
-        m_pointCount = 0;
-        m_keySeekFilter = keySeekFilter;
-        m_keyMatchFilter = keyMatchFilter;
-        m_keyMatchIsUniverse = m_keyMatchFilter is MatchFilterUniverse<TKey, TValue>;
-
-        if (readerOptions!.Timeout.Ticks > 0)
-        {
-            m_timeout = new TimeoutOperation();
-            m_timeout.RegisterTimeout(readerOptions.Timeout, () => m_timedOut = true);
-        }
-
-        m_snapshot = archiveList.CreateNewClientResources();
-        m_snapshot.UpdateSnapshot();
-        m_tablesOrigList = [];
-
-        for (int x = 0; x < m_snapshot.Tables!.Length; x++)
-        {
-            ArchiveTableSummary<TKey, TValue>? table = m_snapshot.Tables![x];
-
-            if (table is null)
-                continue;
-
-            if (table.Contains(keySeekFilter.StartOfRange, keySeekFilter.EndOfRange))
+            if (workerThreadSynchronization is null)
             {
-                try
+                m_ownsWorkerThreadSynchronization = true;
+                workerThreadSynchronization = new WorkerThreadSynchronization();
+            }
+
+            m_workerThreadSynchronization = workerThreadSynchronization;
+            m_pointCount = 0;
+            m_keySeekFilter = keySeekFilter;
+            m_keyMatchFilter = keyMatchFilter;
+            m_keyMatchIsUniverse = m_keyMatchFilter is MatchFilterUniverse<TKey, TValue>;
+
+            if (readerOptions!.Timeout.Ticks > 0)
+            {
+                m_timeout = new TimeoutOperation();
+                m_timeout.RegisterTimeout(readerOptions.Timeout, () => m_timedOut = true);
+            }
+
+            m_snapshot = archiveList.CreateNewClientResources();
+            m_snapshot.UpdateSnapshot();
+            m_tablesOrigList = [];
+
+            for (int x = 0; x < m_snapshot.Tables!.Length; x++)
+            {
+                ArchiveTableSummary<TKey, TValue>? table = m_snapshot.Tables![x];
+
+                if (table is null)
+                    continue;
+
+                if (table.Contains(keySeekFilter.StartOfRange, keySeekFilter.EndOfRange))
                 {
-                    m_tablesOrigList.Add(new BufferedArchiveStream<TKey, TValue>(x, table));
+                    try
+                    {
+                        m_tablesOrigList.Add(new BufferedArchiveStream<TKey, TValue>(x, table));
+                    }
+                    catch (Exception ex)
+                    {
+                        // TODO: Make sure firstkey.tostring doesn't ever throw an exception.
+                        StringBuilder sb = new();
+                        sb.AppendLine($"Archive ID {table.FileId}");
+                        sb.AppendLine($"First Key {table.FirstKey.ToString()}");
+                        sb.AppendLine($"Last Key {table.LastKey.ToString()}");
+                        sb.AppendLine($"File Size {table.SortedTreeTable.BaseFile.ArchiveSize}");
+                        sb.AppendLine($"File Name {table.SortedTreeTable.BaseFile.FilePath}");
+                        s_log.Publish(MessageLevel.Error, "Error while reading file", sb.ToString(), null, ex);
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    // TODO: Make sure firstkey.tostring doesn't ever throw an exception.
-                    StringBuilder sb = new();
-                    sb.AppendLine($"Archive ID {table.FileId}");
-                    sb.AppendLine($"First Key {table.FirstKey.ToString()}");
-                    sb.AppendLine($"Last Key {table.LastKey.ToString()}");
-                    sb.AppendLine($"File Size {table.SortedTreeTable.BaseFile.ArchiveSize}");
-                    sb.AppendLine($"File Name {table.SortedTreeTable.BaseFile.FilePath}");
-                    s_log.Publish(MessageLevel.Error, "Error while reading file", sb.ToString(), null, ex);
+                    m_snapshot.Tables![x] = null;
                 }
             }
+
+            m_sortedArchiveStreams = new CustomSortHelper<BufferedArchiveStream<TKey, TValue>>(m_tablesOrigList, IsLessThan);
+
+            m_keySeekFilter.Reset();
+            if (m_keySeekFilter.NextWindow())
+                SeekToKey(m_keySeekFilter.StartOfFrame);
             else
-            {
-                m_snapshot.Tables![x] = null;
-            }
+                Dispose();
         }
-
-        m_sortedArchiveStreams = new CustomSortHelper<BufferedArchiveStream<TKey, TValue>>(m_tablesOrigList, IsLessThan);
-
-        m_keySeekFilter.Reset();
-        if (m_keySeekFilter.NextWindow())
-            SeekToKey(m_keySeekFilter.StartOfFrame);
-        else
+        catch
+        {
+            // The caller never receives an instance to dispose when the constructor throws, so release the
+            // streams, snapshot, timeout and worker thread synchronization that were acquired before the failure.
             Dispose();
+            throw;
+        }
     }
 
     ~SequentialReaderStream()
     {
-        Dispose(false);
+        // A leaked reader can be finalized after its files were removed from the archive list, and an exception
+        // escaping the finalizer thread terminates the process, so contain any failure here.
+        try
+        {
+            Dispose(false);
+        }
+        catch (Exception ex)
+        {
+            s_log.Publish(MessageLevel.Error, "Unexpected Exception while finalizing reader", null, null, ex);
+        }
     }
 
     #endregion
@@ -163,15 +182,19 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
         Interlocked.Add(ref Stats.PointsReturned, m_pointCount);
         m_pointCount = 0;
 
+        // Release each resource on its own so one failure cannot leak the rest or, when called from
+        // the constructor, replace the exception that caused the cleanup.
         if (m_timeout is not null)
         {
-            m_timeout.Cancel();
+            TryRelease(m_timeout.Cancel);
             m_timeout = null;
         }
 
         if (m_tablesOrigList is not null)
         {
-            m_tablesOrigList.ForEach(x => x.Dispose());
+            foreach (BufferedArchiveStream<TKey, TValue> table in m_tablesOrigList)
+                TryRelease(table.Dispose);
+
             m_tablesOrigList = null;
             Array.Clear(m_snapshot!.Tables!, 0, m_snapshot.Tables!.Length);
         }
@@ -180,14 +203,26 @@ internal class SequentialReaderStream<TKey, TValue> : TreeStream<TKey, TValue> w
 
         if (m_snapshot is not null)
         {
-            m_snapshot.Dispose();
+            TryRelease(m_snapshot.Dispose);
             m_snapshot = null;
         }
 
         if (m_workerThreadSynchronization is not null && m_ownsWorkerThreadSynchronization)
         {
-            m_workerThreadSynchronization.Dispose();
+            TryRelease(m_workerThreadSynchronization.Dispose);
             m_workerThreadSynchronization = null;
+        }
+    }
+
+    private static void TryRelease(Action release)
+    {
+        try
+        {
+            release();
+        }
+        catch (Exception ex)
+        {
+            s_log.Publish(MessageLevel.Error, "Unexpected Exception while releasing reader resources", null, null, ex);
         }
     }
 
