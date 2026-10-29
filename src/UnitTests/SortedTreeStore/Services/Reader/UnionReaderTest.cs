@@ -103,14 +103,14 @@ public class UnionReaderTest
             Assert.Catch(() => new UnionReader<HistorianKey, HistorianValue>(tables));
 
             // A leaked I/O session keeps its file open.
-            Assert.That(IsFileOpen(firstFileName), Is.False);
+            Assert.That(HelperFunctions.IsFileOpen(firstFileName), Is.False);
         }
         finally
         {
             first?.Dispose();
             second?.Dispose();
-            TryDeleteFile(firstFileName);
-            TryDeleteFile(secondFileName);
+            HelperFunctions.TryDeleteFile(firstFileName);
+            HelperFunctions.TryDeleteFile(secondFileName);
         }
     }
 
@@ -135,31 +135,6 @@ public class UnionReaderTest
 
 
         return table;
-    }
-
-    private static bool IsFileOpen(string fileName)
-    {
-        try
-        {
-            using FileStream stream = new(fileName, FileMode.Open, FileAccess.Read, FileShare.None);
-            return false;
-        }
-        catch (IOException)
-        {
-            return true;
-        }
-    }
-
-    private static void TryDeleteFile(string fileName)
-    {
-        // Cleanup must not replace the test's own failure.
-        try
-        {
-            File.Delete(fileName);
-        }
-        catch (IOException)
-        {
-        }
     }
 
     #endregion
