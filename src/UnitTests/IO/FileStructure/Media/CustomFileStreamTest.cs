@@ -26,6 +26,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using SnapDB.IO.FileStructure.Media;
@@ -45,6 +46,7 @@ public class CustomFileStreamTest
         const int BlocksPerPage = PageSize / BlockSize;
         const int FullPages = 73;
         const int BlockCount = FullPages * BlocksPerPage + 4; // The last page holds only 4 blocks, so reading it is a short read.
+        const int Threads = 8;
         const int ReadsPerThread = 20000;
         string fileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.d2i");
 
@@ -69,7 +71,11 @@ public class CustomFileStreamTest
                 }
 
                 // Overlapping reads, some of them of the short last page, must each return the blocks at their own position.
-                Parallel.For(0, 8, new ParallelOptions { MaxDegreeOfParallelism = 8 }, thread =>
+                // Bad reads are counted rather than asserted, since an assertion on a worker thread stops only that thread.
+                int badReads = 0;
+                string firstBadRead = null;
+
+                Parallel.For(0, Threads, new ParallelOptions { MaxDegreeOfParallelism = Threads }, thread =>
                 {
                     byte[] buffer = new byte[PageSize];
                     Random random = new(thread);
@@ -78,14 +84,34 @@ public class CustomFileStreamTest
                     {
                         int pageIndex = random.Next(5) == 0 ? FullPages : random.Next(FullPages);
                         int firstBlock = pageIndex * BlocksPerPage;
-                        int length = stream.ReadRaw((long)firstBlock * BlockSize, buffer, PageSize);
+                        int blocks = Math.Min(BlocksPerPage, BlockCount - firstBlock);
+                        string badRead;
 
-                        Assert.That(length, Is.EqualTo(Math.Min(BlocksPerPage, BlockCount - firstBlock) * BlockSize));
+                        try
+                        {
+                            int length = stream.ReadRaw((long)firstBlock * BlockSize, buffer, PageSize);
+                            bool isCorrect = length == blocks * BlockSize;
 
-                        for (int x = 0; x < length / BlockSize; x++)
-                            Assert.That(BitConverter.ToInt32(buffer, x * BlockSize), Is.EqualTo(firstBlock + x), $"Read of block {firstBlock} returned the wrong data.");
+                            for (int x = 0; x < blocks && isCorrect; x++)
+                                isCorrect = BitConverter.ToInt32(buffer, x * BlockSize) == firstBlock + x;
+
+                            badRead = isCorrect ? null : $"Read of block {firstBlock} returned {length} bytes starting with block {BitConverter.ToInt32(buffer, 0)}.";
+                        }
+                        catch (Exception ex)
+                        {
+                            // A shifted read can also fail rather than return the wrong data.
+                            badRead = $"Read of block {firstBlock} failed: {ex.GetBaseException().Message}";
+                        }
+
+                        if (badRead is null)
+                            continue;
+
+                        Interlocked.Increment(ref badReads);
+                        Interlocked.CompareExchange(ref firstBadRead, badRead, null);
                     }
                 });
+
+                Assert.That(badReads, Is.Zero, $"{badReads} of {Threads * ReadsPerThread} reads returned the wrong data. First: {firstBadRead}");
             }
             finally
             {
