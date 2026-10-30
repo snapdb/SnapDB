@@ -19,118 +19,109 @@
 //  10/14/2026 - Preston Crawford
 //       Generated original version of source code.
 //
+//  10/30/2026 - Preston Crawford
+//       Replaced the injected short-read test, which ReadRaw no longer exercises, with a concurrent read test.
+//
 //******************************************************************************************************
 
 using System;
 using System.IO;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using SnapDB.IO.FileStructure;
 using SnapDB.IO.FileStructure.Media;
-using SnapDB.IO.Unmanaged;
-using SnapDB.Snap.Storage;
 
 namespace SnapDB.UnitTests.IO.FileStructure.Media;
 
 [TestFixture]
 public class CustomFileStreamTest
 {
-    #region [ Members ]
-
-    /// <summary>
-    /// A <see cref="FileStream"/> that returns only part of each full-page read, as the <see cref="Stream"/> contract allows.
-    /// </summary>
-    private class ShortReadFileStream : FileStream
-    {
-        private readonly int m_pageSize;
-        private readonly int m_shortReadLength;
-
-        public ShortReadFileStream(string fileName, int pageSize, int shortReadLength) : base(fileName, FileMode.Open, FileAccess.Read, FileShare.Read, 2048, true)
-        {
-            m_pageSize = pageSize;
-            m_shortReadLength = shortReadLength;
-        }
-
-        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-        {
-            if (count == m_pageSize)
-                count = m_shortReadLength;
-
-            return base.ReadAsync(buffer, offset, count, cancellationToken);
-        }
-    }
-
-    #endregion
-
     #region [ Methods ]
 
     [Test]
-    public void PartialReadsReturnCorrectData()
+    public void ConcurrentReadsReturnRequestedPosition()
     {
-        string pendingFileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.~d2i");
-        string completeFileName = Path.ChangeExtension(pendingFileName, ".d2i");
-        Random r = new(1);
+        const int BlockSize = 4096;
+        const int PageSize = 65536;
+        const int BlocksPerPage = PageSize / BlockSize;
+        const int FullPages = 73;
+        const int BlockCount = FullPages * BlocksPerPage + 4; // The last page holds only 4 blocks, so reading it is a short read.
+        const int Threads = 8;
+        const int ReadsPerThread = 20000;
+        string fileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.d2i");
 
         try
         {
-            using (SimplifiedFileWriter writer = new(pendingFileName, completeFileName, 4096, FileFlags.ManualRollover))
-            {
-                using (ISupportsBinaryStream file = writer.CreateFile(SubFileName.CreateRandom()))
-                using (BinaryStream bs = new(file))
-                {
-                    for (int x = 0; x < 100000; x++)
-                        bs.Write(r.NextDouble());
-                }
-
-                writer.Commit();
-            }
-
-            r = new Random(1);
-
-            using TransactionalFileStructure reader = TransactionalFileStructure.OpenFile(completeFileName, true);
-            CustomFileStream queue = GetCustomFileStream(reader);
-
-            // Holding a stream user keeps Open/Close from replacing the injected stream.
-            queue.Open();
+            using CustomFileStream stream = CustomFileStream.CreateFile(fileName, PageSize, BlockSize);
+            stream.Open();
 
             try
             {
-                FieldInfo streamField = typeof(CustomFileStream).GetField("m_stream", BindingFlags.Instance | BindingFlags.NonPublic)!;
-                ((FileStream)streamField.GetValue(queue)!).Dispose();
-                streamField.SetValue(queue, new ShortReadFileStream(completeFileName, Globals.MemoryPool.PageSize, 4 * 4096));
+                // Stamp every block with its own index.
+                byte[] page = new byte[PageSize];
 
-                using SubFileStream file = reader.Snapshot.OpenFile(0);
-                using BinaryStream bs = new(file);
+                for (int block = 0; block < BlockCount; block += BlocksPerPage)
+                {
+                    int blocks = Math.Min(BlocksPerPage, BlockCount - block);
 
-                for (int x = 0; x < 100000; x++)
-                    Assert.That(bs.ReadDouble(), Is.EqualTo(r.NextDouble()));
+                    for (int x = 0; x < blocks; x++)
+                        BitConverter.TryWriteBytes(page.AsSpan(x * BlockSize), block + x);
+
+                    stream.WriteRaw((long)block * BlockSize, page, blocks * BlockSize);
+                }
+
+                // Overlapping reads, some of them of the short last page, must each return the blocks at their own position.
+                // Bad reads are counted rather than asserted, since an assertion on a worker thread stops only that thread.
+                int badReads = 0;
+                string firstBadRead = null;
+
+                Parallel.For(0, Threads, new ParallelOptions { MaxDegreeOfParallelism = Threads }, thread =>
+                {
+                    byte[] buffer = new byte[PageSize];
+                    Random random = new(thread);
+
+                    for (int read = 0; read < ReadsPerThread; read++)
+                    {
+                        int pageIndex = random.Next(5) == 0 ? FullPages : random.Next(FullPages);
+                        int firstBlock = pageIndex * BlocksPerPage;
+                        int blocks = Math.Min(BlocksPerPage, BlockCount - firstBlock);
+                        string badRead;
+
+                        try
+                        {
+                            int length = stream.ReadRaw((long)firstBlock * BlockSize, buffer, PageSize);
+                            bool isCorrect = length == blocks * BlockSize;
+
+                            for (int x = 0; x < blocks && isCorrect; x++)
+                                isCorrect = BitConverter.ToInt32(buffer, x * BlockSize) == firstBlock + x;
+
+                            badRead = isCorrect ? null : $"Read of block {firstBlock} returned {length} bytes starting with block {BitConverter.ToInt32(buffer, 0)}.";
+                        }
+                        catch (Exception ex)
+                        {
+                            // A shifted read can also fail rather than return the wrong data.
+                            badRead = $"Read of block {firstBlock} failed: {ex.GetBaseException().Message}";
+                        }
+
+                        if (badRead is null)
+                            continue;
+
+                        Interlocked.Increment(ref badReads);
+                        Interlocked.CompareExchange(ref firstBadRead, badRead, null);
+                    }
+                });
+
+                Assert.That(badReads, Is.Zero, $"{badReads} of {Threads * ReadsPerThread} reads returned the wrong data. First: {firstBadRead}");
             }
             finally
             {
-                queue.Close();
+                stream.Close();
             }
         }
         finally
         {
-            File.Delete(pendingFileName);
-            File.Delete(completeFileName);
+            File.Delete(fileName);
         }
-    }
-
-    private static CustomFileStream GetCustomFileStream(TransactionalFileStructure fileStructure)
-    {
-        object diskIo = GetPrivateField(fileStructure, "m_diskIo");
-        object diskMedium = GetPrivateField(diskIo, "m_stream");
-        object bufferedFile = GetPrivateField(diskMedium, "m_disk");
-
-        return (CustomFileStream)GetPrivateField(bufferedFile, "m_queue");
-    }
-
-    private static object GetPrivateField(object instance, string name)
-    {
-        return instance.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(instance)!;
     }
 
     #endregion
