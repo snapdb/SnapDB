@@ -54,11 +54,6 @@ internal sealed class CustomFileStream : IDisposable
     private FileStream? m_stream;
     private int m_streamUsers;
 
-    /// <summary>
-    /// Needed to properly synchronize read and write operations.
-    /// </summary>
-    private readonly Lock m_syncRoot;
-
     // Needed since this class computes footer check-sums.
     private bool m_disposed;
 
@@ -94,7 +89,6 @@ internal sealed class CustomFileStream : IDisposable
         IsSharingEnabled = isSharingEnabled;
         FileStructureBlockSize = fileStructureBlockSize;
         m_bufferQueue = s_resourceList.GetResourceQueue(ioSize);
-        m_syncRoot = new Lock();
 
         if (!File.Exists(fileName))
             return;
@@ -225,18 +219,10 @@ internal sealed class CustomFileStream : IDisposable
             {
                 int len;
 
+                // Reads overlap, so each one passes its own offset. Sharing the stream's position lets a short read at the
+                // end of the file move another read's position back by the shortfall.
                 using (m_isUsingStream.EnterReadLock())
-                {
-                    Task<int> results;
-
-                    lock (m_syncRoot)
-                    {
-                        m_stream!.Position = position;
-                        results = m_stream.ReadAsync(buffer, totalLengthRead, length);
-                    }
-
-                    len = results.Result;
-                }
+                    len = RandomAccess.Read(m_stream!.SafeFileHandle, buffer.AsSpan(totalLengthRead, length), position);
 
                 totalLengthRead += len;
 
@@ -286,17 +272,10 @@ internal sealed class CustomFileStream : IDisposable
             if (needsOpen)
                 Open();
 
+            // Writes overlap reads, so pass the offset rather than sharing the stream's position (see ReadRaw).
             using (m_isUsingStream.EnterReadLock())
             {
-                Task results;
-
-                lock (m_syncRoot)
-                {
-                    m_stream!.Position = position;
-                    results = m_stream.WriteAsync(buffer, 0, length);
-                }
-
-                results.Wait();
+                RandomAccess.Write(m_stream!.SafeFileHandle, buffer.AsSpan(0, length), position);
                 m_length.Value = m_stream.Length;
             }
         }
