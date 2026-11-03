@@ -22,6 +22,9 @@
 //  10/30/2026 - Preston Crawford
 //       Replaced the injected short-read test, which ReadRaw no longer exercises, with a concurrent read test.
 //
+//  11/03/2026 - Preston Crawford
+//       Added a short-read test that injects short reads through CustomFileStream.ReadAt.
+//
 //******************************************************************************************************
 
 using System;
@@ -112,6 +115,63 @@ public class CustomFileStreamTest
                 });
 
                 Assert.That(badReads, Is.Zero, $"{badReads} of {Threads * ReadsPerThread} reads returned the wrong data. First: {firstBadRead}");
+            }
+            finally
+            {
+                stream.Close();
+            }
+        }
+        finally
+        {
+            File.Delete(fileName);
+        }
+    }
+
+    [Test]
+    public void ShortReadsBeforeEndOfFileReturnWholePage()
+    {
+        const int BlockSize = 4096;
+        const int PageSize = 65536;
+        const int BlocksPerPage = PageSize / BlockSize;
+        const int MaxReadLength = 5 * BlockSize; // Does not divide the page, so the page takes 4 reads: 5, 5, 5 and 1 blocks.
+        string fileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.d2i");
+
+        try
+        {
+            using CustomFileStream stream = CustomFileStream.CreateFile(fileName, PageSize, BlockSize);
+            stream.Open();
+
+            try
+            {
+                // Write 3 pages, stamping every block with its own index.
+                byte[] page = new byte[PageSize];
+
+                for (int block = 0; block < 3 * BlocksPerPage; block += BlocksPerPage)
+                {
+                    for (int x = 0; x < BlocksPerPage; x++)
+                        BitConverter.TryWriteBytes(page.AsSpan(x * BlockSize), block + x);
+
+                    stream.WriteRaw((long)block * BlockSize, page, PageSize);
+                }
+
+                // Return at most MaxReadLength bytes per read, as the Stream contract allows anywhere in a file.
+                int reads = 0;
+
+                stream.ReadAt = (handle, buffer, fileOffset) =>
+                {
+                    reads++;
+                    return RandomAccess.Read(handle, buffer[..Math.Min(buffer.Length, MaxReadLength)], fileOffset);
+                };
+
+                // Read the middle page, so each short read ends before the end of the file and must be followed by another.
+                byte[] result = new byte[PageSize];
+                int length = stream.ReadRaw(PageSize, result, PageSize);
+
+                Assert.That(reads, Is.EqualTo(4));
+                Assert.That(length, Is.EqualTo(PageSize));
+
+                for (int x = 0; x < BlocksPerPage; x++)
+                    Assert.That(BitConverter.ToInt32(result, x * BlockSize), Is.EqualTo(BlocksPerPage + x), $"Block {x} of the page");
             }
             finally
             {

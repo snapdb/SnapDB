@@ -42,6 +42,11 @@ internal sealed class CustomFileStream : IDisposable
 {
     #region [ Members ]
 
+    /// <summary>
+    /// Reads from a file handle at an offset, as <see cref="RandomAccess.Read(SafeFileHandle, Span{byte}, long)"/> does.
+    /// </summary>
+    internal delegate int PositionalRead(SafeFileHandle handle, Span<byte> buffer, long fileOffset);
+
     private readonly ResourceQueue<byte[]> m_bufferQueue;
 
     /// <summary>
@@ -144,6 +149,12 @@ internal sealed class CustomFileStream : IDisposable
     /// </summary>
     public long Length => m_length;
 
+    /// <summary>
+    /// Gets or sets the read that <see cref="ReadRaw"/> uses. Tests replace it to return short reads, which local files
+    /// rarely do except at the end of the file.
+    /// </summary>
+    internal PositionalRead ReadAt { get; set; } = RandomAccess.Read;
+
     #endregion
 
     #region [ Methods ]
@@ -233,7 +244,7 @@ internal sealed class CustomFileStream : IDisposable
                 // Reads overlap, so each one passes its own offset. Sharing the stream's position lets a short read at the
                 // end of the file move another read's position back by the shortfall.
                 using (m_isUsingStream.EnterReadLock())
-                    len = RandomAccess.Read(m_handle!, buffer.AsSpan(totalLengthRead, length), position);
+                    len = ReadAt(m_handle!, buffer.AsSpan(totalLengthRead, length), position);
 
                 totalLengthRead += len;
 
