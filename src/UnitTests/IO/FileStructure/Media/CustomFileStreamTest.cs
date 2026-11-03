@@ -24,6 +24,7 @@
 //
 //  11/03/2026 - Preston Crawford
 //       Added a short-read test that injects short reads through CustomFileStream.ReadAt.
+//       Added a test that ChangeExtension reopens only a stream that was open.
 //
 //******************************************************************************************************
 
@@ -40,6 +41,48 @@ namespace SnapDB.UnitTests.IO.FileStructure.Media;
 public class CustomFileStreamTest
 {
     #region [ Methods ]
+
+    [Test]
+    public void ChangeExtensionReopensOnlyAnOpenStream()
+    {
+        const int BlockSize = 4096;
+        const int PageSize = 65536;
+        string fileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.~d2i");
+        string newFileName = Path.ChangeExtension(fileName, ".d2i");
+
+        try
+        {
+            using CustomFileStream stream = CustomFileStream.CreateFile(fileName, PageSize, BlockSize);
+            byte[] page = new byte[PageSize];
+            page[0] = 1;
+
+            // With a user, as an IoSession is, the stream must be reopened under the new name.
+            stream.Open();
+
+            try
+            {
+                stream.WriteRaw(0, page, PageSize);
+                stream.ChangeExtension(".d2i", true, true);
+
+                byte[] result = new byte[PageSize];
+                Assert.That(stream.ReadRaw(0, result, PageSize), Is.EqualTo(PageSize));
+                Assert.That(result[0], Is.EqualTo(1));
+            }
+            finally
+            {
+                stream.Close();
+            }
+
+            // Without a user, the rename must not leave the file open.
+            stream.ChangeExtension(".~d2i", true, true);
+            Assert.DoesNotThrow(() => new FileStream(fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None).Dispose());
+        }
+        finally
+        {
+            File.Delete(fileName);
+            File.Delete(newFileName);
+        }
+    }
 
     [Test]
     public void ConcurrentReadsReturnRequestedPosition()

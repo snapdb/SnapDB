@@ -402,7 +402,9 @@ internal sealed class CustomFileStream : IDisposable
             if (File.Exists(newFileName))
                 throw new Exception("New file already exists with this extension");
 
-            bool openStream = m_stream is null;
+            // Reopen only a stream that was open, as ChangeShareMode does. Users hold it open, and Open() does not create a
+            // stream while it has users.
+            bool openStream = m_stream is not null;
             m_stream?.Dispose();
             m_stream = null;
             m_handle = null;
