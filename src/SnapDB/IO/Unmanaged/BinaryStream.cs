@@ -160,36 +160,45 @@ public unsafe class BinaryStream : BinaryStreamPointerBase
         // If the object has not been disposed yet
         if (!m_disposed)
         {
-            // This will be done regardless of whether the object is finalized or disposed.
-            try
-            {
-                // Dispose of the main I/O session
-                m_mainIoSession?.Dispose();
+            // This will be done regardless of whether the object is finalized or disposed. Each resource is
+            // disposed on its own so one failure cannot leak the page locks, stream user or file handle of the others.
 
-                // Dispose of the secondary I/O session
-                m_secondaryIoSession?.Dispose();
+            // Dispose of the main I/O session
+            TryDispose(m_mainIoSession, "main I/O session");
 
-                // Dispose of the I/O stream
-                if (!m_leaveOpen && BaseStream is not null)
-                    BaseStream.Dispose();
-            }
-            finally
-            {
-                // Reset various fields and properties to release references.
-                FirstPosition = 0;
-                LastPosition = 0;
-                Current = null;
-                First = null;
-                LastRead = null;
-                LastWrite = null;
-                m_mainIoSession = null!;
-                m_secondaryIoSession = null!;
-                BaseStream = null;
-                m_disposed = true;
-            }
+            // Dispose of the secondary I/O session
+            TryDispose(m_secondaryIoSession, "secondary I/O session");
+
+            // Dispose of the I/O stream
+            if (!m_leaveOpen)
+                TryDispose(BaseStream, "base stream");
+
+            // Reset various fields and properties to release references.
+            FirstPosition = 0;
+            LastPosition = 0;
+            Current = null;
+            First = null;
+            LastRead = null;
+            LastWrite = null;
+            m_mainIoSession = null!;
+            m_secondaryIoSession = null!;
+            BaseStream = null;
+            m_disposed = true;
         }
 
         base.Dispose(disposing);
+
+        static void TryDispose(IDisposable? resource, string name)
+        {
+            try
+            {
+                resource?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                s_log.Publish(MessageLevel.Error, $"Unexpected Exception while disposing {name} of binary stream", null, null, ex);
+            }
+        }
     }
 
     /// <summary>

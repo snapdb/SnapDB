@@ -59,7 +59,7 @@ public class BufferedFileTest
             // Release the file before deleting it so a failure above is not hidden by a "file in use" error.
             session?.Dispose();
             file?.Dispose();
-            File.Delete(fileName);
+            HelperFunctions.TryDeleteFile(fileName);
         }
     }
 
