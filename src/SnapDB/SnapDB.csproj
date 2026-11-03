@@ -70,6 +70,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\gemstone\common\src\Gemstone\Gemstone.Common.csproj" Condition="'$(Configuration)'=='Development'" />
+    <PackageReference Include="BouncyCastle.Cryptography" Version="2.7.0" />
     <PackageReference Include="Gemstone.Common" Version="$(GemstoneVersion)" Condition="'$(Configuration)'!='Development'" />
     <ProjectReference Include="..\..\..\..\gemstone\communication\src\Gemstone.Communication\Gemstone.Communication.csproj" Condition="'$(Configuration)'=='Development'" />
     <PackageReference Include="Gemstone.Communication" Version="$(GemstoneVersion)" Condition="'$(Configuration)'!='Development'" />
@@ -81,7 +82,6 @@
     <PackageReference Include="Gemstone.Numeric" Version="$(GemstoneVersion)" Condition="'$(Configuration)'!='Development'" />
     <ProjectReference Include="..\..\..\..\gemstone\security\src\Gemstone.Security\Gemstone.Security.csproj" Condition="'$(Configuration)'=='Development'" />
     <PackageReference Include="Gemstone.Security" Version="$(GemstoneVersion)" Condition="'$(Configuration)'!='Development'" />
-    <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
     <PackageReference Include="JetBrains.Annotations" Version="2023.2.0" />
   </ItemGroup>
 

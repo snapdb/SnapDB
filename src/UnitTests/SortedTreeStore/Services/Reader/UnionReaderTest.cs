@@ -24,9 +24,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using SnapDB.Snap;
+using SnapDB.Snap.Services;
 using SnapDB.Snap.Services.Reader;
 using SnapDB.Snap.Storage;
 using SnapDB.UnitTests.Snap;
@@ -79,13 +81,45 @@ public class UnionReaderTest
         lst.ForEach(x => x.Dispose());
     }
 
+    [Test]
+    public void ConstructorFailureDisposesOpenedStreams()
+    {
+        string firstFileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.d2i");
+        string secondFileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.d2i");
+        SortedTreeFile first = null;
+        SortedTreeFile second = null;
 
-    private SortedTreeTable<HistorianKey, HistorianValue> CreateTable()
+        try
+        {
+            SortedTreeTable<HistorianKey, HistorianValue> firstTable = CreateTable(firstFileName);
+            first = firstTable.BaseFile;
+            SortedTreeTable<HistorianKey, HistorianValue> secondTable = CreateTable(secondFileName);
+            second = secondTable.BaseFile;
+            List<ArchiveTableSummary<HistorianKey, HistorianValue>> tables = [new(firstTable), new(secondTable)];
+
+            // Disposing the second file makes its stream fail to open part way through the constructor.
+            second.Dispose();
+
+            Assert.Catch(() => new UnionReader<HistorianKey, HistorianValue>(tables));
+
+            // A leaked I/O session keeps its file open.
+            Assert.That(HelperFunctions.IsFileOpen(firstFileName), Is.False);
+        }
+        finally
+        {
+            first?.Dispose();
+            second?.Dispose();
+            HelperFunctions.TryDeleteFile(firstFileName);
+            HelperFunctions.TryDeleteFile(secondFileName);
+        }
+    }
+
+    private SortedTreeTable<HistorianKey, HistorianValue> CreateTable(string fileName = null)
     {
         Random r = new(m_seed++);
         HistorianKey key = new();
         HistorianValue value = new();
-        SortedTreeFile file = SortedTreeFile.CreateInMemory();
+        SortedTreeFile file = fileName is null ? SortedTreeFile.CreateInMemory() : SortedTreeFile.CreateFile(fileName);
         SortedTreeTable<HistorianKey, HistorianValue> table = file.OpenOrCreateTable<HistorianKey, HistorianValue>(EncodingDefinition.FixedSizeCombinedEncoding);
 
         using SortedTreeTableEditor<HistorianKey, HistorianValue> edit = table.BeginEdit();

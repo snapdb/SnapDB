@@ -25,6 +25,7 @@
 //******************************************************************************************************
 
 using System;
+using System.IO;
 
 namespace SnapDB.UnitTests;
 
@@ -56,6 +57,38 @@ internal static class HelperFunctions
 
         if (success)
             throw new Exception("This procedure should have thrown an error.");
+    }
+
+    /// <summary>
+    /// Determines whether any handle to the given file is still open.
+    /// </summary>
+    /// <param name="fileName">the file to check</param>
+    public static bool IsFileOpen(string fileName)
+    {
+        try
+        {
+            using FileStream stream = new(fileName, FileMode.Open, FileAccess.Read, FileShare.None);
+            return false;
+        }
+        catch (IOException)
+        {
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Deletes the given file, ignoring failures so test cleanup cannot replace the test's own failure.
+    /// </summary>
+    /// <param name="fileName">the file to delete</param>
+    public static void TryDeleteFile(string fileName)
+    {
+        try
+        {
+            File.Delete(fileName);
+        }
+        catch (IOException)
+        {
+        }
     }
 
     #endregion
