@@ -27,6 +27,7 @@
 using System.Runtime.InteropServices;
 using Gemstone;
 using Gemstone.Diagnostics;
+using Microsoft.Win32.SafeHandles;
 using SnapDB.Collections;
 using SnapDB.IO.Unmanaged;
 using SnapDB.Threading;
@@ -41,6 +42,11 @@ internal sealed class CustomFileStream : IDisposable
 {
     #region [ Members ]
 
+    /// <summary>
+    /// Reads from a file handle at an offset, as <see cref="RandomAccess.Read(SafeFileHandle, Span{byte}, long)"/> does.
+    /// </summary>
+    internal delegate int PositionalRead(SafeFileHandle handle, Span<byte> buffer, long fileOffset);
+
     private readonly ResourceQueue<byte[]> m_bufferQueue;
 
     /// <summary>
@@ -52,12 +58,12 @@ internal sealed class CustomFileStream : IDisposable
     private readonly AtomicInt64 m_length = new();
 
     private FileStream? m_stream;
-    private int m_streamUsers;
 
-    /// <summary>
-    /// Needed to properly synchronize read and write operations.
-    /// </summary>
-    private readonly Lock m_syncRoot;
+    // The handle of m_stream. Reads and writes use it directly because FileStream.SafeFileHandle flushes and seeks
+    // on every call. The stream is opened for async I/O; on Windows a synchronous handle serializes all I/O on a file.
+    private SafeFileHandle? m_handle;
+
+    private int m_streamUsers;
 
     // Needed since this class computes footer check-sums.
     private bool m_disposed;
@@ -94,7 +100,6 @@ internal sealed class CustomFileStream : IDisposable
         IsSharingEnabled = isSharingEnabled;
         FileStructureBlockSize = fileStructureBlockSize;
         m_bufferQueue = s_resourceList.GetResourceQueue(ioSize);
-        m_syncRoot = new Lock();
 
         if (!File.Exists(fileName))
             return;
@@ -144,6 +149,12 @@ internal sealed class CustomFileStream : IDisposable
     /// </summary>
     public long Length => m_length;
 
+    /// <summary>
+    /// Gets or sets the read that <see cref="ReadRaw"/> uses. Tests replace it to return short reads, which local files
+    /// rarely do except at the end of the file.
+    /// </summary>
+    internal PositionalRead ReadAt { get; set; } = RandomAccess.Read;
+
     #endregion
 
     #region [ Methods ]
@@ -164,6 +175,7 @@ internal sealed class CustomFileStream : IDisposable
             {
                 m_stream?.Dispose();
                 m_stream = null;
+                m_handle = null;
             }
         }
         finally
@@ -180,7 +192,10 @@ internal sealed class CustomFileStream : IDisposable
         using (m_isUsingStream.EnterWriteLock())
         {
             if (m_streamUsers == 0)
+            {
                 m_stream = new FileStream(FileName, FileMode.Open, IsReadOnly ? FileAccess.Read : FileAccess.ReadWrite, IsSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
+                m_handle = m_stream.SafeFileHandle;
+            }
 
             m_streamUsers++;
         }
@@ -199,6 +214,7 @@ internal sealed class CustomFileStream : IDisposable
             {
                 m_stream?.Dispose();
                 m_stream = null;
+                m_handle = null;
             }
         }
     }
@@ -225,18 +241,10 @@ internal sealed class CustomFileStream : IDisposable
             {
                 int len;
 
+                // Reads overlap, so each one passes its own offset. Sharing the stream's position lets a short read at the
+                // end of the file move another read's position back by the shortfall.
                 using (m_isUsingStream.EnterReadLock())
-                {
-                    Task<int> results;
-
-                    lock (m_syncRoot)
-                    {
-                        m_stream!.Position = position;
-                        results = m_stream.ReadAsync(buffer, totalLengthRead, length);
-                    }
-
-                    len = results.Result;
-                }
+                    len = ReadAt(m_handle!, buffer.AsSpan(totalLengthRead, length), position);
 
                 totalLengthRead += len;
 
@@ -257,7 +265,7 @@ internal sealed class CustomFileStream : IDisposable
                 }
                 else
                 {
-                    s_log.Publish(MessageLevel.Warning, "File Read Error", $"The OS has closed the following file {m_stream.Name}. Attempting to reopen.");
+                    s_log.Publish(MessageLevel.Warning, "File Read Error", $"The OS has closed the following file {m_stream!.Name}. Attempting to reopen.");
                     ReopenFile();
                 }
             }
@@ -286,18 +294,11 @@ internal sealed class CustomFileStream : IDisposable
             if (needsOpen)
                 Open();
 
+            // Pass the offset, as ReadRaw does, rather than using the stream's position.
             using (m_isUsingStream.EnterReadLock())
             {
-                Task results;
-
-                lock (m_syncRoot)
-                {
-                    m_stream!.Position = position;
-                    results = m_stream.WriteAsync(buffer, 0, length);
-                }
-
-                results.Wait();
-                m_length.Value = m_stream.Length;
+                RandomAccess.Write(m_handle!, buffer.AsSpan(0, length), position);
+                m_length.Value = m_stream!.Length;
             }
         }
         finally
@@ -401,14 +402,20 @@ internal sealed class CustomFileStream : IDisposable
             if (File.Exists(newFileName))
                 throw new Exception("New file already exists with this extension");
 
-            bool openStream = m_stream is null;
+            // Reopen only a stream that was open, as ChangeShareMode does. Users hold it open, and Open() does not create a
+            // stream while it has users.
+            bool openStream = m_stream is not null;
             m_stream?.Dispose();
             m_stream = null;
+            m_handle = null;
 
             File.Move(oldFileName, newFileName);
 
             if (openStream)
+            {
                 m_stream = new FileStream(newFileName, FileMode.Open, isReadOnly ? FileAccess.Read : FileAccess.ReadWrite, isSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
+                m_handle = m_stream.SafeFileHandle;
+            }
 
             FileName = newFileName;
             IsSharingEnabled = isSharingEnabled;
@@ -429,6 +436,7 @@ internal sealed class CustomFileStream : IDisposable
             {
                 m_stream.Dispose();
                 m_stream = new FileStream(FileName, FileMode.Open, isReadOnly ? FileAccess.Read : FileAccess.ReadWrite, isSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
+                m_handle = m_stream.SafeFileHandle;
             }
 
             IsSharingEnabled = isSharingEnabled;
@@ -446,6 +454,7 @@ internal sealed class CustomFileStream : IDisposable
             {
                 m_stream.Dispose();
                 m_stream = null;
+                m_handle = null;
             }
             catch (Exception ex)
             {
@@ -453,6 +462,7 @@ internal sealed class CustomFileStream : IDisposable
             }
 
             m_stream = new FileStream(fileName, FileMode.Open, IsReadOnly ? FileAccess.Read : FileAccess.ReadWrite, IsSharingEnabled ? FileShare.Read : FileShare.None, 2048, true);
+            m_handle = m_stream.SafeFileHandle;
         }
     }
 
