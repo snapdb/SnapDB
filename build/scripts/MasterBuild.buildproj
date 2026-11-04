@@ -369,7 +369,7 @@
   <Target Name="AfterUpdateRepository"/>
   <Target Name="BeforeVersionSource"/>
 
-  <Target Name="CoreVersionSource" Condition="'@(FilesToVersion)' != '' And '$(SkipVersioning)' != 'true'">
+  <Target Name="CoreVersionSource" Condition="'$(SkipVersioning)' != 'true'">
     <Message Text="Versioning source code..."/>
 
     <Exec Command='PowerShell -NoProfile -ExecutionPolicy Bypass -File "$(MSBuildThisFileDirectory)update-version.ps1" -VersionFile "$(VersionFile)" -SourceRoot "$(LocalFolder)\src" -MajorType "$(VersionMajorChange)" -MinorType "$(VersionMinorChange)" -BuildType "$(VersionBuildChange)" -RevisionType "$(VersionRevisionChange)"' />
